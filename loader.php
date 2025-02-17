@@ -1,0 +1,145 @@
+<?php
+/**
+ * Loader.
+ *
+ * @package Autoblog_AI
+ * @since x.x.x
+ */
+
+namespace AutoBlogAI;
+
+use AutoBlogAI\Admin\Menu;
+use AutoBlogAI\Core\Maintenance;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Plugin_Loader
+ *
+ * @since x.x.x
+ */
+class Loader {
+	/**
+	 * Instance
+	 *
+	 * @access private
+	 * @var object Class Instance.
+	 * @since x.x.x
+	 */
+	private static $instance;
+
+	/**
+	 * Constructor
+	 *
+	 * @since x.x.x
+	 */
+	public function __construct() {
+		spl_autoload_register( [ $this, 'autoload' ] );
+
+		// Activation hook.
+		register_activation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'activation_actions' ] );
+
+		// Deactivation hook.
+		register_deactivation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'deactivation_actions' ] );
+
+		add_action( 'plugins_loaded', [ $this, 'setup' ], 1 );
+
+		add_action( 'after_setup_theme', [ $this, 'register_docs_menu' ] );
+	}
+
+	/**
+	 * Enqueue required setup after plugins loaded.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function setup(): void {
+
+		/* Maintenance init */
+		Maintenance::get_instance();
+
+		if ( is_admin() ) {
+			/* Admin Menu init */
+			Menu::get_instance();
+
+		} else {
+			/* Frontend init */
+		}
+	}
+
+	/**
+	 * Initiator
+	 *
+	 * @since x.x.x
+	 * @return object initialized object of class.
+	 */
+	public static function get_instance() {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Register theme menus.
+	 *
+	 * @since x.x.x
+	 */
+	public function register_docs_menu(): void {
+		register_nav_menus(
+			[
+				'wsd_menu' => esc_html__( 'Docs Menu', 'wp-docs-hub' ),
+			]
+		);
+	}
+
+	/**
+	 * Autoload classes.
+	 *
+	 * @param string $class class name.
+	 * @return void
+	 */
+	public function autoload( $class ): void {
+		if ( strpos( $class, __NAMESPACE__ ) !== 0 ) {
+			return;
+		}
+
+		$class_to_load = $class;
+
+		$filename = preg_replace(
+			[ '/^' . __NAMESPACE__ . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
+			[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
+			$class_to_load
+		);
+
+		if ( is_string( $filename ) ) {
+			$filename = strtolower( $filename );
+
+			$file = WP_AUTOBLOG_AI_DIR . $filename . '.php';
+
+			// if the file readable, include it.
+			if ( is_readable( $file ) ) {
+				require_once $file;
+			}
+		}
+	}
+
+	/**
+	 * Plugin Activation actions.
+	 *
+	 * @since x.x.x
+	 */
+	public function activation_actions(): void { }
+
+	/**
+	 * Plugin Deactivation actions.
+	 *
+	 * @since x.x.x
+	 */
+	public function deactivation_actions(): void { }
+}
+
+/**
+ * Kicking this off by calling 'get_instance()' method
+ */
+Loader::get_instance();

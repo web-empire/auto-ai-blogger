@@ -1,0 +1,4 @@
+*** AutoBlog AI Changelog ***
+
+Unreleased - 0.0.1
+* Initial Release.
