@@ -80,6 +80,7 @@ class Menu {
 				'version'      => WP_AUTOBLOG_AI_VERSION,
 				'upgrade_link' => WP_AUTOBLOG_AI_UPGRADE_LINK,
 				'nonce'        => wp_create_nonce( 'autoblog-ai' ),
+				'api_key'          => "AIzaSyATL5tPUW0Hds7FD5rYtSXch0WyyKXq2nI", // Make API key available to JavaScript
 			]
 		);
 

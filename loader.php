@@ -88,7 +88,7 @@ class Loader {
 	public function register_docs_menu(): void {
 		register_nav_menus(
 			[
-				'wsd_menu' => esc_html__( 'Docs Menu', 'wp-docs-hub' ),
+				'wsd_menu' => esc_html__( 'Docs Menu', 'autoblog-ai' ),
 			]
 		);
 	}

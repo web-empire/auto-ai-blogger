@@ -1,3 +1,70 @@
-.text {
-	color: #666;
+/* MainApp.scss */
+
+.autoblog-main-page--wrapper {
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    align-items: center; /* Center horizontally */
+    padding: 20px;
+    font-family: sans-serif; /* Use a clean font */
+    max-width: 800px; /* Limit width for readability */
+    margin: 0 auto; /* Center the container */
 }
+
+h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: vertical; /* Allow vertical resizing */
+	display: block;
+    margin: 20px 0;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+button:disabled {
+    background-color: #ccc; /* Grayed out when disabled */
+    cursor: default;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+.generated-content {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f8f9fa; /* Light gray background */
+}
+
+.generated-content h2 {
+    margin-top: 0; /* Remove top margin from h2 */
+}
+
+.generated-content p {
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+}
+
+
