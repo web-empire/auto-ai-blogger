@@ -27,7 +27,7 @@ class Menu {
 	/**
 	 * Settings page ID for Plugin settings.
 	 */
-	public const PAGE_ID = WP_AUTOBLOG_AI_SLUG;
+	public const PAGE_ID = WP_AI_BLOGGER_SLUG;
 
 	/**
 	 * Constructor
@@ -93,8 +93,8 @@ class Menu {
 			'autoblog_ai_localized_admin_data',
 			[
 				'ajax_url'           => admin_url( 'admin-ajax.php' ),
-				'version'            => WP_AUTOBLOG_AI_VERSION,
-				'upgrade_link'       => WP_AUTOBLOG_AI_UPGRADE_LINK,
+				'version'            => WP_AI_BLOGGER_VERSION,
+				'upgrade_link'       => WP_AI_BLOGGER_UPGRADE_LINK,
 				'admin_nonce'        => wp_create_nonce( 'wpaib_update_admin_setting' ),
 				'userOnboarded'      => get_option( 'autoblog_ai_userOnboarded', false ),
 				'admin_base_url'     => admin_url( 'edit.php' ),
@@ -102,8 +102,8 @@ class Menu {
 				'home_slug'          => self::PAGE_ID,
 				'current_user_name'  => wpaib_get_user_detail( 'name' ),
 				'current_user_email' => wpaib_get_user_detail( 'email' ),
-				'pro_available'      => defined( 'WP_AUTOBLOG_AI_PRO_VERSION' ) ? true : false,
-				'pro_version'        => defined( 'WP_AUTOBLOG_AI_PRO_VERSION' ) ? WP_AUTOBLOG_AI_PRO_VERSION : '',
+				'pro_available'      => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? true : false,
+				'pro_version'        => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
 				'pro_purchase_url'   => 'https://wpaiblogger.com/',
 				'licensing_nonce'    => wp_create_nonce( 'autoblog_ai_licensing_nonce' ),
 				'license_status'     => get_option( 'autoblog_ai_license_status', 'unlicensed' ),
@@ -113,14 +113,14 @@ class Menu {
 		);
 
 		$handle            = 'wp_ai_auto_blogger_admin_scripts';
-		$build_path        = WP_AUTOBLOG_AI_BASE_URL . 'assets/build/';
-		$script_asset_path = WP_AUTOBLOG_AI_DIR . 'assets/build/blog-app.asset.php';
+		$build_path        = WP_AI_BLOGGER_BASE_URL . 'assets/build/';
+		$script_asset_path = WP_AI_BLOGGER_DIR . 'assets/build/blog-app.asset.php';
 
 		$script_info = file_exists( $script_asset_path )
 			? include $script_asset_path
 			: [
 				'dependencies' => [],
-				'version'      => WP_AUTOBLOG_AI_VERSION,
+				'version'      => WP_AI_BLOGGER_VERSION,
 			];
 
 		$script_dep = array_merge( $script_info['dependencies'], [] );
@@ -129,15 +129,15 @@ class Menu {
 			$handle,
 			$build_path . 'blog-app.js',
 			$script_dep,
-			WP_AUTOBLOG_AI_VERSION,
+			WP_AI_BLOGGER_VERSION,
 			true
 		);
 
 		wp_localize_script( $handle, 'autoblog_data', $localized_data );
 
-		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AUTOBLOG_AI_DIR . 'languages' );
+		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AI_BLOGGER_DIR . 'languages' );
 
-		wp_enqueue_style( $handle, is_rtl() ? $build_path . 'blog-app-rtl.css' : $build_path . 'blog-app.css', [], WP_AUTOBLOG_AI_VERSION );
+		wp_enqueue_style( $handle, is_rtl() ? $build_path . 'blog-app-rtl.css' : $build_path . 'blog-app.css', [], WP_AI_BLOGGER_VERSION );
 	}
 
 	/**
@@ -155,12 +155,12 @@ class Menu {
 	 * @since x.x.x
 	 */
 	public function register_plugin_menus(): void {
-		if ( current_user_can( WP_AUTOBLOG_AI_CAPABILITY ) ) {
+		if ( current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			add_submenu_page(
 				'edit.php',
 				__( 'AI Blogger', 'wp-ai-blogger' ),
 				__( 'AI Blogger', 'wp-ai-blogger' ),
-				WP_AUTOBLOG_AI_CAPABILITY,
+				WP_AI_BLOGGER_CAPABILITY,
 				self::PAGE_ID,
 				[ $this, 'render_settings_page' ]
 			);

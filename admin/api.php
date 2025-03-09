@@ -35,7 +35,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @var string
 	 */
-	protected $namespace = WP_AUTOBLOG_AI_SLUG . '/v1';
+	protected $namespace = WP_AI_BLOGGER_SLUG . '/v1';
 
 	/**
 	 * Route base.
@@ -51,7 +51,7 @@ class API extends \WP_REST_Controller {
 	 * @var string $option_name DB option name.
 	 * @since x.x.x
 	 */
-	private static $option_name = WP_AUTOBLOG_AI_DB_OPTION;
+	private static $option_name = WP_AI_BLOGGER_DB_OPTION;
 
 	/**
 	 * Admin settings dataset
@@ -115,7 +115,7 @@ class API extends \WP_REST_Controller {
 	 */
 	public function get_permissions_check( $request ) {
 
-		if ( ! current_user_can( WP_AUTOBLOG_AI_CAPABILITY ) ) {
+		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			// return new \WP_Error( 'ai_blogger_rest_cannot_view', __( 'Sorry, you cannot list resources.', 'wp-ai-blogger' ), [ 'status' => rest_authorization_required_code() ] );
 		}
 

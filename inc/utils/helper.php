@@ -59,7 +59,7 @@ class Helper {
 	 * @since x.x.x
 	 */
 	public static function update_option( $key, $value = true ) {
-		$settings = get_option( WP_AUTOBLOG_AI_DB_OPTION, [] );
+		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
 		// If the value is same as default then remove it from the DB.
 		// This will help in the translatable strings.
@@ -69,7 +69,7 @@ class Helper {
 			$settings[ $key ] = $value;
 		}
 
-		update_option( WP_AUTOBLOG_AI_DB_OPTION, $settings );
+		update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
 
 		return $value;
 	}
@@ -83,7 +83,7 @@ class Helper {
 	 * @since x.x.x
 	 */
 	public static function delete_option( $key ) {
-		$settings = get_option( WP_AUTOBLOG_AI_DB_OPTION, [] );
+		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
 		if ( ! isset( $settings[ $key ] ) ) {
 			return;
@@ -91,6 +91,6 @@ class Helper {
 
 		unset( $settings[ $key ] );
 
-		update_option( WP_AUTOBLOG_AI_DB_OPTION, $settings );
+		update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
 	}
 }

@@ -103,7 +103,7 @@ class Settings {
 			return self::$dashboard_options;
 		}
 
-		$db_option = get_option( WP_AUTOBLOG_AI_DB_OPTION, [] );
+		$db_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
 		$defaults = apply_filters( 'autoblog_ai_dashboard_rest_options', self::get_default_settings() );
 

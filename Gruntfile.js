@@ -104,8 +104,8 @@ module.exports = function (grunt) {
 				overwrite: true,
 				replacements: [
 					{
-						from: /WP_AUTOBLOG_AI_VERSION', '.*?'/g,
-						to: 'WP_AUTOBLOG_AI_VERSION\', \'<%= pkg.version %>\''
+						from: /WP_AI_BLOGGER_VERSION', '.*?'/g,
+						to: 'WP_AI_BLOGGER_VERSION\', \'<%= pkg.version %>\''
 					}
 				]
 			},

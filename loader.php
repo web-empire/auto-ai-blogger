@@ -40,10 +40,10 @@ class Loader {
 		spl_autoload_register( [ $this, 'autoload' ] );
 
 		// Activation hook.
-		register_activation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'activation_actions' ] );
+		register_activation_hook( WP_AI_BLOGGER_FILE, [ $this, 'activation_actions' ] );
 
 		// Deactivation hook.
-		register_deactivation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'deactivation_actions' ] );
+		register_deactivation_hook( WP_AI_BLOGGER_FILE, [ $this, 'deactivation_actions' ] );
 
 		add_action( 'plugins_loaded', [ $this, 'setup' ], 1 );
 	}
@@ -111,7 +111,7 @@ class Loader {
 		if ( is_string( $filename ) ) {
 			$filename = strtolower( $filename );
 
-			$file = WP_AUTOBLOG_AI_DIR . $filename . '.php';
+			$file = WP_AI_BLOGGER_DIR . $filename . '.php';
 
 			// if the file readable, include it.
 			if ( is_readable( $file ) ) {

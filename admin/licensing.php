@@ -39,7 +39,7 @@ class Licensing {
 	 */
 	public function __construct() {
 		if ( ! class_exists( 'SureCart\Licensing\Client' ) ) {
-			require_once WP_AUTOBLOG_AI_DIR . '/inc/licensing/Client.php';
+			require_once WP_AI_BLOGGER_DIR . '/inc/licensing/Client.php';
 		}
 
 		$this->set_error_messages();
@@ -59,7 +59,7 @@ class Licensing {
 	 * @return \SureCart\Licensing\Client
 	 */
 	public static function licensing_setup() {
-		$client = new \SureCart\Licensing\Client( WP_AUTOBLOG_AI_PRODUCT_NAME, WP_AUTOBLOG_AI_PUBLIC_TOKEN, WP_AUTOBLOG_AI_FILE );
+		$client = new \SureCart\Licensing\Client( WP_AI_BLOGGER_PRODUCT_NAME, WP_AI_BLOGGER_PUBLIC_TOKEN, WP_AI_BLOGGER_FILE );
 		$client->set_textdomain( 'wp-ai-blogger' ); // @phpstan-ignore-line
 		return $client;
 	}
@@ -101,7 +101,7 @@ class Licensing {
 
 		$get_license = $client->license()->retrieve( $license_key );
 
-		if ( ! empty( $get_license->product ) && $get_license->product !== WP_AUTOBLOG_AI_PRODUCT_ID ) {
+		if ( ! empty( $get_license->product ) && $get_license->product !== WP_AI_BLOGGER_PRODUCT_ID ) {
 			wp_send_json_error( [ 'message' => __( 'Incorrect License key for this product.', 'wp-ai-blogger' ) ] );
 		}
 
@@ -166,7 +166,7 @@ class Licensing {
 		$get_license = $client->license()->retrieve( $license_key );
 
 		// if the license is not valid for this product, return false.
-		if ( ! empty( $get_license->product ) && $get_license->product !== WP_AUTOBLOG_AI_PRODUCT_ID ) {
+		if ( ! empty( $get_license->product ) && $get_license->product !== WP_AI_BLOGGER_PRODUCT_ID ) {
 			return false;
 		}
 
@@ -205,10 +205,10 @@ class Licensing {
 			return;
 		}
 
-		$cta_url = admin_url( 'edit.php?page=' . WP_AUTOBLOG_AI_SLUG );
+		$cta_url = admin_url( 'edit.php?page=' . WP_AI_BLOGGER_SLUG );
 
 		/* translators: %s: html tags */
-		$notice_message = sprintf( __( 'Please %1$s activate %2$s your copy to claim tokens %4$s %3$s %5$s to generate blog posts.', 'wp-ai-blogger' ), '<a href="' . esc_url( $cta_url ) . '">', '</a>', WP_AUTOBLOG_AI_PRODUCT_NAME, '<em>', '</em>' );
+		$notice_message = sprintf( __( 'Please %1$s activate %2$s your copy to claim tokens %4$s %3$s %5$s to generate blog posts.', 'wp-ai-blogger' ), '<a href="' . esc_url( $cta_url ) . '">', '</a>', WP_AI_BLOGGER_PRODUCT_NAME, '<em>', '</em>' );
 
 		\Web_Notices::add_notice(
 			[

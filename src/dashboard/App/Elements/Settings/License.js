@@ -49,7 +49,7 @@ export default function License() {
 				setLicenseKey( '' );
 				setLicenseStatus( 'licensed' );
 				setActivationText( __( 'Activated', 'wp-ai-blogger' ) );
-
+				setDeactivationText( __( 'Deactivate', 'wp-ai-blogger' ) );
 			} else {
 				setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
 			}
@@ -86,6 +86,7 @@ export default function License() {
 				setLicenseKey( '' );
 				setLicenseStatus( 'unlicensed' );
 				setDeactivationText( __( 'Deactivated', 'wp-ai-blogger' ) );
+				setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
 			} else {
 				setDeactivationText( __( 'Deactivate', 'wp-ai-blogger' ) );
 			}
@@ -125,7 +126,7 @@ export default function License() {
 									onClick={ () => {
 										deactivateLicense();
 									} }
-									className="cursor-pointer border-none rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+									className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
 								>
 									{ deactivationText }
 								</button>
@@ -136,7 +137,7 @@ export default function License() {
 									onClick={ () => {
 										activateLicense();
 									} }
-									className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									className="cursor-pointer rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									{ activationText }
 								</button>
