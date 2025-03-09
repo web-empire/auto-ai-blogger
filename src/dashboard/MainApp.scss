@@ -1,3 +1,235 @@
-.text {
-	color: #666;
+/* stylelint-disable */
+@use "./Styles/common.scss";
+@use "./Styles/typography-config.scss";
+@use "./Styles/tailwind-important.scss";
+
+@import url( "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" );
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+#autoblog-main-page--wrapper,
+.ai-blogger-container {
+	font-family: inter, sans-serif;
+	position: relative;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.posts_page_wp-ai-blogger,
+.posts_page_wp-ai-blogger.ai-blogger-wizard {
+	background: #fff;
+}
+
+.posts_page_wp-ai-blogger #wpbody-content {
+	padding: 0;
+	height: 100vh;
+}
+
+.posts_page_wp-ai-blogger .clear {
+    display: none;
+}
+#autoblog-main-page--wrapper {
+    height: 100%;
+}
+#headlessui-portal-root button,
+#autoblog-main-page--wrapper button {
+    cursor: pointer;
+	border: none;
+}
+.wpaib-content-header {
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.posts_page_wp-ai-blogger input {
+	padding-top: 0.375rem;
+	padding-bottom: 0.375rem;
+	padding-left: 0.75rem;
+	padding-right: 0.75rem;
+}
+
+#headlessui-portal-root p,
+#autoblog-main-page--wrapper p {
+	margin: 0;
+	padding: 0;
+}
+
+.ai-blogger-container input[type="checkbox"]:checked::before,
+.ai-blogger-container input[type="radio"]:checked::before {
+	background: #fff;
+	display: block;
+	width: 7px;
+	height: 7px;
+	margin: 0;
+	padding: 0;
+	line-height: unset;
+}
+
+.app-loader {
+	width: fit-content;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+}
+
+#wpaib-confetti-wrapper {
+	pointer-events: none;
+	position: fixed;
+	z-index: 2;
+	inset: 0;
+}
+
+.wizard-route {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.insight-inner-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.campaigns-insight-wrap {
+	display: grid;
+	gap: 16px;
+	margin-bottom: 1.5rem;
+}
+
+.trim-words {
+	text-overflow: ellipsis;
+	display: block;
+	max-width: 100%;
+	width: 40%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+@media ( max-width: 960px ) {
+	.wpaib-setup-header,
+	.wpaib-setup-footer {
+		left: 36px;
+	}
+}
+@media ( max-width: 782px ) {
+	.wpaib-setup-header,
+	.wpaib-setup-footer {
+		left: 0px;
+	}
+}
+
+.wpaib-container {
+	@apply max-w-7xl mx-auto  p-4;
+
+	.wpaib-row {
+		@apply mx-auto max-w-md;
+	}
+}
+
+.posts_page_wp-ai-blogger ::scrollbar {
+	width: 4px;
+	height: 4px;
+}
+.posts_page_wp-ai-blogger ::scrollbar-thumb {
+	background: #d5d6d7;
+}
+.posts_page_wp-ai-blogger ::scrollbar-track {
+	background: #f1f1f1;
+}
+
+.posts_page_wp-ai-blogger #wpcontent {
+	padding-left: 0;
+}
+
+.posts_page_wp-ai-blogger a:active,
+.posts_page_wp-ai-blogger a:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.wpaib-button {
+	@apply bg-[#2563eb] text-white hover:bg-[#1d4ed8] rounded-s p-2 text-sm font-semibold;
+}
+
+.wpaib-active-state-button {
+	border-bottom: 2px solid #2563eb;
+}
+
+.lucide-loader-pinwheel {
+	color: #2563eb;
+}
+
+#autoblog-main-page--wrapper a {
+	text-decoration: none;
+}
+
+.settings-nav {
+	border-right: 1px solid #e5e7eb;
+}
+.header-nav {
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.wpaib-wizard--button {
+	@apply rounded border border-transparent px-5 py-2.5 bg-[#2563eb] cursor-pointer text-[15px] justify-center text-center font-medium text-white shadow flex-shrink-0 flex items-center;
+
+	&:hover {
+		@apply hover:bg-[#1d4ed8];
+	}
+	&:focus {
+		@apply outline-none ring-2 ring-white ring-offset-2 ring-offset-blue-400;
+	}
+	&.is-loading {
+		background-size: 100px 100%;
+		background-image: linear-gradient( -45deg, #ea580c 33%, #c2410c 33%, #c2410c 70%, #ea580c 70% );
+		border-color: #ea580c;
+		animation: scrolling-bar-animation 2500ms infinite linear;
+
+		@keyframes scrolling-bar-animation {
+			0% {
+				background-position: 200px 0;
+			}
+		}
+	}
+}
+
+.wpaib-step-heading {
+	@apply text-center text-4xl font-semibold text-slate-800;
+}
+
+@screen sm {
+	.wpaib-container {
+		@apply p-4;
+
+		.wpaib-row {
+			@apply max-w-4xl;
+		}
+	}
+
+	.wpaib-wizard--button {
+		@apply px-8;
+	}
+}
+
+@screen lg {
+	.wpaib-row {
+		@apply max-w-4xl;
+	}
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+	scroll-behavior: smooth;
+}
+::-webkit-scrollbar-thumb {
+	background: #d5d6d7;
+	border-radius: 0;
+}
+::-webkit-scrollbar-track {
+	border-radius: 0;
 }

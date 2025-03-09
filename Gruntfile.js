@@ -49,24 +49,24 @@ module.exports = function (grunt) {
 					'!phpinsights.php',
 					'!src/**',
 				],
-				dest: 'autoblog-ai/',
+				dest: 'wp-ai-blogger/',
 			},
 		},
 		compress: {
 			main: {
 				options: {
-					archive: 'autoblog-ai-<%= pkg.version %>.zip',
+					archive: 'wp-ai-blogger-<%= pkg.version %>.zip',
 					mode: 'zip',
 				},
 				files: [
 					{
-						src: ['./autoblog-ai/**'],
+						src: ['./wp-ai-blogger/**'],
 					},
 				],
 			},
 		},
 		clean: {
-			main: ['autoblog-ai'],
+			main: ['wp-ai-blogger'],
 			zip: ['*.zip'],
 			concat: ['assets/js/unminified/main.js', 'assets/css/unminified/main.css'],
 		},
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
 		},
 		replace: {
 			plugin_main: {
-				src: ['autoblog-ai.php'],
+				src: ['wp-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{
@@ -100,7 +100,7 @@ module.exports = function (grunt) {
 				]
 			},
 			plugin_const: {
-				src: ['autoblog-ai.php'],
+				src: ['wp-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{

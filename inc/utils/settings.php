@@ -35,9 +35,21 @@ class Settings {
 		return apply_filters(
 			'autoblog_ai_settings_dataset',
 			[
-				'option_name' => [
-					'default' => '',
+				'userOnboarded' => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'onboardingTab'  => [
+					'default' => 'welcome',
 					'type'    => 'string',
+				],
+				'userName' => [
+					'default' => wpaib_get_user_detail( 'name' ),
+					'type'    => 'name',
+				],
+				'userEmail' => [
+					'default' => wpaib_get_user_detail( 'email' ),
+					'type'    => 'email',
 				],
 			]
 		);
@@ -86,7 +98,7 @@ class Settings {
 	 * @return array
 	 * @since x.x.x
 	 */
-	public static function get_blog_settings() {
+	public static function get_ai_blogger_settings() {
 		if ( ! empty( self::$dashboard_options ) ) {
 			return self::$dashboard_options;
 		}
@@ -97,6 +109,83 @@ class Settings {
 
 		self::$dashboard_options = wp_parse_args( $db_option, $defaults );
 		return self::$dashboard_options;
+	}
+
+	/**
+	 * Get all the settings type wise.
+	 *
+	 * @return array
+	 * @since x.x.x
+	 */
+	public static function get_all_type_wise_settings() {
+		$settings_dataset = self::get_settings_dataset();
+
+		$type_wise_settings = [];
+
+		foreach ( $settings_dataset as $key => $value ) {
+			$type_wise_settings[ $key ] = $value['type'];
+		}
+
+		return $type_wise_settings;
+	}
+
+	/**
+	 * Data cleaner
+	 *
+	 * @since x.x.x
+	 * @access public
+	 *
+	 * @param mixed  $value     data from AJAX.
+	 * @param string $data_type datatype to sanitize further.
+	 *
+	 * @return mixed Sanitized data.
+	 */
+	public static function sanitize_data( $value, $data_type = 'default' ) {
+		$output = '';
+		switch ( $data_type ) {
+			case 'bool':
+				$output = isset( $value ) && sanitize_text_field( $value ) === 'true' ? true : false;
+				break;
+
+			case 'email':
+				$output = isset( $value ) ? sanitize_email( wp_unslash( $value ) ) : wpaib_get_user_detail( 'email' );
+				break;
+
+			case 'name':
+				$output = isset( $value ) ? sanitize_text_field( wp_unslash( $value ) ) : wpaib_get_user_detail( 'name' );
+				break;
+
+			case 'int':
+				$output = ! empty( $value ) ? absint( $value ) : '';
+				break;
+
+			case 'url':
+				$output = ! empty( $value ) ? esc_url( $value ) : '';
+				break;
+
+			case 'color':
+				$output = ! empty( $value ) ? json_decode( stripslashes( $value ) ) : '';
+				$output = is_string( $output ) ? trim( $output, '"' ) : $output;
+				break;
+
+			case 'array':
+			case 'post_types':
+			case 'questions':
+				$output = ! empty( $value ) ? json_decode( stripslashes( $value ) ) : '';
+				break;
+
+			case 'html':
+				$output = ! empty( $value ) ? wp_unslash( $value ) : '';
+				break;
+
+			case 'text':
+			case 'default':
+			default:
+				$output = isset( $value ) ? sanitize_text_field( wp_unslash( $value ) ) : '';
+				break;
+		}
+
+		return $output;
 	}
 
 	/**

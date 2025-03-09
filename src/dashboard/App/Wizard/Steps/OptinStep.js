@@ -1,0 +1,147 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { __ } from '@wordpress/i18n';
+import { ArrowRight } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateApiData } from '@Utils/ApiData';
+import { useNavigate } from 'react-router-dom';
+
+const OptinStep = () => {
+	const abortControllerRef = useRef( {} );
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
+	const userName = useSelector( ( state ) => state.userName );
+	const userEmail = useSelector( ( state ) => state.userEmail );
+
+	const [ name, setName ] = useState( userName );
+	const [ email, setEmail ] = useState( userEmail );
+
+	const [ savingOptin, setSavingOptin ] = useState( false );
+
+	useEffect( () => {
+		setName( userName );
+	}, [ userName ] );
+
+	useEffect( () => {
+		setEmail( userEmail );
+	}, [ userEmail ] );
+
+	useEffect( () => {
+		dispatch( {
+			type: 'UPDATE_ONBOARDING_TAB',
+			payload: 'optin',
+		} );
+	}, [] );
+
+	const updateName = function ( e ) {
+		setName( e.target.value );
+		dispatch( { type: 'UPDATE_USER_NAME', payload: e.target.value } );
+	};
+
+	const updateEmail = function ( e ) {
+		setEmail( e.target.value );
+		dispatch( { type: 'UPDATE_USER_EMAIL', payload: e.target.value } );
+	};
+
+	const handleStepRedirection = function ( stepToRedirect ) {
+		navigate( `${ autoblog_data.admin_app_url }&step=${ stepToRedirect }` );
+	};
+
+	const submitOptinForm = function ( e ) {
+		e.preventDefault();
+
+		setSavingOptin( true );
+		updateApiData( 'userName', name, dispatch, abortControllerRef );
+
+		setTimeout( () => {
+			updateApiData( 'userEmail', email, dispatch, abortControllerRef );
+		}, 1000 );
+
+		setTimeout( () => {
+			handleStepRedirection( 'ready' );
+		}, 2000 );
+	};
+
+	return (
+		<div className="wpaib-container">
+			<div className="wpaib-row mt-12 max-w-5xl">
+				<div className="bg-white rounded text-center mx-auto px-11">
+					<span className="text-sm font-medium text-primary-600 mb-10 text-center block tracking-[.24em] uppercase">
+						{ __( 'Step 5 of 6', 'wp-ai-blogger' ) }
+					</span>
+
+					<h1 className="wpaib-step-heading mb-2 text-center">
+						{ __( 'One last step.', 'wp-ai-blogger' ) }
+					</h1>
+
+					<h2 className="wpaib-step-heading mb-4 text-center">
+						{ __( 'Let\'s setup email reports to grow your blog.', 'wp-ai-blogger' ) }
+					</h2>
+
+					<p className="mt-4 text-[#4B5563] text-base">
+						{ __( 'Let WP AI Blogger take you on the next level. You also will receive emails about trending topics, marketing strategies from us to help your blog grow more.', 'wp-ai-blogger' ) }
+					</p>
+
+					<form action="#" className="max-w-sm mx-auto mt-10">
+						<div className="sm:flex flex-col gap-5 text-left">
+							<div className="w-full">
+								<label
+									htmlFor="wpaib-user-name"
+									className="text-slate-800 text-base font-semibold block"
+								>
+									{ __( 'First Name', 'wp-ai-blogger' ) }
+								</label>
+								<div className="relative block">
+									<input
+										id="wpaib-user-name"
+										type="text"
+										className={ `!my-2 !p-3 !shadow-sm block w-full !text-sm !border-gray-300 !rounded !text-gray-500 !placeholder-slate-400 focus:ring focus:!shadow-none` }
+										placeholder={ __( 'Please enter your name', 'wp-ai-blogger' ) }
+										defaultValue={ name }
+										onChange={ updateName }
+									/>
+								</div>
+							</div>
+							<div className="w-full">
+								<label
+									htmlFor="wpaib-user-email"
+									className="text-slate-800 text-base font-semibold block"
+								>
+									{ __( 'Email address', 'wp-ai-blogger' ) }
+								</label>
+								<div className="relative block">
+									<input
+										id="wpaib-user-email"
+										type="email"
+										className={ `!my-2 !p-3 !shadow-sm block w-full !text-sm !border-gray-300 !rounded !text-gray-500 !placeholder-slate-400 focus:ring focus:!shadow-none` }
+										placeholder={ __(
+											'Enter Your Email',
+											'wp-ai-blogger'
+										) }
+										defaultValue={ email }
+										onChange={ updateEmail }
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div className="mt-[40px] grid justify-center">
+							<button
+								onClick={ submitOptinForm }
+								className={ `wpaib-wizard--button` }
+							>
+								{ ! savingOptin
+									? __( 'Save & Continue', 'wp-ai-blogger' )
+									: __( 'Saving…', 'wp-ai-blogger' ) }
+
+								{ ! savingOptin ? <ArrowRight className="w-5 h-5" /> : '' }
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default OptinStep;

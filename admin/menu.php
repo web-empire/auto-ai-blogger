@@ -9,7 +9,6 @@
 namespace AutoBlogAI\Admin;
 
 use AutoBlogAI\Inc\Traits\Get_Instance;
-use AutoBlogAI\Inc\Utils\Settings;
 
 /**
  * Frontend Compatibility
@@ -28,7 +27,7 @@ class Menu {
 	/**
 	 * Settings page ID for Plugin settings.
 	 */
-	public const PAGE_ID = 'autoblog-ai';
+	public const PAGE_ID = WP_AUTOBLOG_AI_SLUG;
 
 	/**
 	 * Constructor
@@ -51,6 +50,20 @@ class Menu {
 	public function settings_admin_scripts(): void {
 		if ( ! empty( $_GET['page'] ) && ( wp_unslash( $_GET['page'] ) === self::PAGE_ID || strpos( sanitize_text_field( wp_unslash( $_GET['page'] ) ), self::PAGE_ID . '_' ) !== false ) ) { // phpcs:ignore -- Input var okay.
 			add_action( 'admin_enqueue_scripts', [ $this, 'app_build_scripts' ] );
+
+			add_filter(
+				'admin_footer_text',
+				function () {
+					return ''; // Return an empty string to remove the text.
+				}
+			);
+
+			add_filter(
+				'update_footer',
+				function () {
+					return ''; // Return an empty string to remove the text.
+				}
+			);
 		}
 	}
 
@@ -73,17 +86,33 @@ class Menu {
 			return;
 		}
 
+		$blog_name = get_bloginfo( 'name' );
+		$admin_site_email_address = get_option( 'admin_email' );
+
 		$localized_data = apply_filters(
-			'wpdh_localized_admin_data',
+			'autoblog_ai_localized_admin_data',
 			[
-				'ajax_url'     => admin_url( 'admin-ajax.php' ),
-				'version'      => WP_AUTOBLOG_AI_VERSION,
-				'upgrade_link' => WP_AUTOBLOG_AI_UPGRADE_LINK,
-				'nonce'        => wp_create_nonce( 'autoblog-ai' ),
+				'ajax_url'           => admin_url( 'admin-ajax.php' ),
+				'version'            => WP_AUTOBLOG_AI_VERSION,
+				'upgrade_link'       => WP_AUTOBLOG_AI_UPGRADE_LINK,
+				'admin_nonce'        => wp_create_nonce( 'wpaib_update_admin_setting' ),
+				'userOnboarded'      => get_option( 'autoblog_ai_userOnboarded', false ),
+				'admin_base_url'     => admin_url( 'edit.php' ),
+				'admin_app_url'      => 'wp-admin/edit.php?page=' . self::PAGE_ID,
+				'home_slug'          => self::PAGE_ID,
+				'current_user_name'  => wpaib_get_user_detail( 'name' ),
+				'current_user_email' => wpaib_get_user_detail( 'email' ),
+				'pro_available'      => defined( 'WP_AUTOBLOG_AI_PRO_VERSION' ) ? true : false,
+				'pro_version'        => defined( 'WP_AUTOBLOG_AI_PRO_VERSION' ) ? WP_AUTOBLOG_AI_PRO_VERSION : '',
+				'pro_purchase_url'   => 'https://wpaiblogger.com/',
+				'licensing_nonce'    => wp_create_nonce( 'autoblog_ai_licensing_nonce' ),
+				'license_status'     => get_option( 'autoblog_ai_license_status', 'unlicensed' ),
+				'admin_email'        => $admin_site_email_address,
+				'blog_name'          => $blog_name,
 			]
 		);
 
-		$handle            = 'hub_admin_scripts';
+		$handle            = 'wp_ai_auto_blogger_admin_scripts';
 		$build_path        = WP_AUTOBLOG_AI_BASE_URL . 'assets/build/';
 		$script_asset_path = WP_AUTOBLOG_AI_DIR . 'assets/build/blog-app.asset.php';
 
@@ -106,7 +135,7 @@ class Menu {
 
 		wp_localize_script( $handle, 'autoblog_data', $localized_data );
 
-		wp_set_script_translations( $handle, 'autoblog-ai', WP_AUTOBLOG_AI_DIR . 'languages' );
+		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AUTOBLOG_AI_DIR . 'languages' );
 
 		wp_enqueue_style( $handle, is_rtl() ? $build_path . 'blog-app-rtl.css' : $build_path . 'blog-app.css', [], WP_AUTOBLOG_AI_VERSION );
 	}
@@ -128,9 +157,9 @@ class Menu {
 	public function register_plugin_menus(): void {
 		if ( current_user_can( WP_AUTOBLOG_AI_CAPABILITY ) ) {
 			add_submenu_page(
-				'options-general.php',
-				__( 'AutoBlog Ai', 'autoblog-ai' ),
-				__( 'AutoBlog Ai', 'autoblog-ai' ),
+				'edit.php',
+				__( 'AI Blogger', 'wp-ai-blogger' ),
+				__( 'AI Blogger', 'wp-ai-blogger' ),
 				WP_AUTOBLOG_AI_CAPABILITY,
 				self::PAGE_ID,
 				[ $this, 'render_settings_page' ]
