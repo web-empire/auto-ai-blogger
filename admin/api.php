@@ -116,7 +116,7 @@ class API extends \WP_REST_Controller {
 	public function get_permissions_check( $request ) {
 
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
-			// return new \WP_Error( 'ai_blogger_rest_cannot_view', __( 'Sorry, you cannot list resources.', 'wp-ai-blogger' ), [ 'status' => rest_authorization_required_code() ] );
+			return new \WP_Error( 'wp_ai_blogger_rest_cannot_view', __( 'Sorry, you cannot list resources.', 'wp-ai-blogger' ), [ 'status' => rest_authorization_required_code() ] );
 		}
 
 		return true;
