@@ -13,13 +13,13 @@
 		"portal",
 		"dashboard"
 	],
-	"homepage": "https://github.com/web-empire/wp-ai-blogger#readme",
+	"homepage": "https://github.com/wp-solvex/wp-ai-blogger#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/web-empire/wp-ai-blogger.git"
+		"url": "git+https://github.com/wp-solvex/wp-ai-blogger.git"
 	},
 	"bugs": {
-		"url": "https://github.com/web-empire/wp-ai-blogger/issues"
+		"url": "https://github.com/wp-solvex/wp-ai-blogger/issues"
 	},
 	"engines": {
 		"npm": ">=9.5.0 <10.4.0",
