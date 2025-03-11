@@ -18,7 +18,7 @@ module.exports = {
 		'jsdoc/check-tag-names': [ 'error', { definedTags: [ 'jsx' ] } ],
 		'@wordpress/i18n-text-domain': [
 			'error',
-			{ allowedTextDomain: 'wp-docs-hub' },
+			{ allowedTextDomain: 'wp-ai-blogger' },
 		],
 	},
 	parserOptions: {
@@ -40,5 +40,6 @@ module.exports = {
 		navigator: true,
 		docsMenuChange: true,
 		hub_admin_nav_menu_data: true,
+		autoblog_data: true,
 	},
 };

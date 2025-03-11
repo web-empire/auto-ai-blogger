@@ -8,8 +8,11 @@
 
 namespace AutoBlogAI;
 
+use AutoBlogAI\Admin\API;
+use AutoBlogAI\Admin\Ajax;
 use AutoBlogAI\Admin\Menu;
 use AutoBlogAI\Core\Maintenance;
+use AutoBlogAI\Admin\Licensing;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,14 +40,12 @@ class Loader {
 		spl_autoload_register( [ $this, 'autoload' ] );
 
 		// Activation hook.
-		register_activation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'activation_actions' ] );
+		register_activation_hook( WP_AI_BLOGGER_FILE, [ $this, 'activation_actions' ] );
 
 		// Deactivation hook.
-		register_deactivation_hook( WP_AUTOBLOG_AI_FILE, [ $this, 'deactivation_actions' ] );
+		register_deactivation_hook( WP_AI_BLOGGER_FILE, [ $this, 'deactivation_actions' ] );
 
 		add_action( 'plugins_loaded', [ $this, 'setup' ], 1 );
-
-		add_action( 'after_setup_theme', [ $this, 'register_docs_menu' ] );
 	}
 
 	/**
@@ -58,10 +59,18 @@ class Loader {
 		/* Maintenance init */
 		Maintenance::get_instance();
 
+		/* API init */
+		API::get_instance();
+
 		if ( is_admin() ) {
+			/* Ajax init */
+			Ajax::get_instance();
+
+			/* Licensing */
+			Licensing::get_instance();
+
 			/* Admin Menu init */
 			Menu::get_instance();
-
 		} else {
 			/* Frontend init */
 		}
@@ -78,19 +87,6 @@ class Loader {
 			self::$instance = new self();
 		}
 		return self::$instance;
-	}
-
-	/**
-	 * Register theme menus.
-	 *
-	 * @since x.x.x
-	 */
-	public function register_docs_menu(): void {
-		register_nav_menus(
-			[
-				'wsd_menu' => esc_html__( 'Docs Menu', 'wp-docs-hub' ),
-			]
-		);
 	}
 
 	/**
@@ -115,7 +111,7 @@ class Loader {
 		if ( is_string( $filename ) ) {
 			$filename = strtolower( $filename );
 
-			$file = WP_AUTOBLOG_AI_DIR . $filename . '.php';
+			$file = WP_AI_BLOGGER_DIR . $filename . '.php';
 
 			// if the file readable, include it.
 			if ( is_readable( $file ) ) {

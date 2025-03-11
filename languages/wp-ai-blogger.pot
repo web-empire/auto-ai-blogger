@@ -1,0 +1,566 @@
+# Copyright (C) 2025 WP Solvex
+# This file is distributed under the same license as the WP AI Blogger plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP AI Blogger 0.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-ai-blogger\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-03-09T03:50:35+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: wp-ai-blogger\n"
+
+#. Plugin Name of the plugin
+#: wp-ai-blogger.php
+msgid "WP AI Blogger"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: wp-ai-blogger.php
+msgid "https://wpaiblogger.com/"
+msgstr ""
+
+#. Description of the plugin
+#: wp-ai-blogger.php
+msgid "WP AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging."
+msgstr ""
+
+#. Author of the plugin
+#: wp-ai-blogger.php
+msgid "WP Solvex"
+msgstr ""
+
+#. Author URI of the plugin
+#: wp-ai-blogger.php
+msgid "https://wpsolvex.com/"
+msgstr ""
+
+#: admin/ajax.php:73
+msgid "Sorry, you are not allowed to do this operation."
+msgstr ""
+
+#: admin/ajax.php:74
+msgid "Nonce validation failed"
+msgstr ""
+
+#: admin/ajax.php:75
+msgid "Sorry, something went wrong."
+msgstr ""
+
+#: admin/ajax.php:76
+msgid "Successfully saved data!"
+msgstr ""
+
+#: admin/licensing.php:105
+msgid "Incorrect License key for this product."
+msgstr ""
+
+#: admin/licensing.php:116
+msgid "License activated successfully."
+msgstr ""
+
+#: admin/licensing.php:145
+msgid "License deactivated successfully."
+msgstr ""
+
+#. translators: %s: html tags
+#: admin/licensing.php:211
+msgid "Please %1$s activate %2$s your copy to claim tokens %4$s %3$s %5$s to generate blog posts."
+msgstr ""
+
+#: admin/licensing.php:240
+msgid "Invalid nonce."
+msgstr ""
+
+#: admin/licensing.php:241
+msgid "You do not have permission to activate license."
+msgstr ""
+
+#: admin/licensing.php:242
+msgid "Please enter a valid license key"
+msgstr ""
+
+#: admin/menu.php:161
+#: admin/menu.php:162
+msgid "AI Blogger"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Step 1 of 3"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Welcome to WP AI Blogger"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "You're only minutes away from having a more profitable WooCommerce store! This short setup wizard will help you get started with WP AI Blogger."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Let's Start"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Successfully saved!"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Step 5 of 6"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "One last step."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Let's setup email reports to grow your blog."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Let WP AI Blogger take you on the next level. You also will receive emails about trending topics, marketing strategies from us to help your blog grow more."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "First Name"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Please enter your name"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Email address"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Enter Your Email"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Saving…"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Save & Continue"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Step 6 of 6"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Congratulations, You Did It!"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "WP AI Blogger is set up on your website! Please watch the short video below for your next steps."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "WP AI Blogger Extended Walkthrough Tutorial"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Finishing the Setup"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Finish Store Setup"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Welcome"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Subscribe"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Done"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Exit setup wizard"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Next"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Back"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Redirecting.."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Skip"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "CORE"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "PRO"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Campaigns"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Settings"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Free vs Pro"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Unlock Pro Features"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Campaigns Insights"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Total Posts"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Total Visits"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Last Run on"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Blog Post Suggestions"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "A list of some new blog post ideas that you can use to grow your blog."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Refresh"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Title"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Volume"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Position"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Visits"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Write Post"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Create"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Upgrade to pro to get more post ideas."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Name of the Blog:"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "This blog is for:"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Tell us more about your blog:"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid " Settings"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Settings saved"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Save"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Persona"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Let AI know about your site persona, so it can generate better content for you."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Review Notification"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Toggle notifications for drafted and auto-scheduled posts that require your final review."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Mail Notification"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Enter multiple email addresses separated by commas."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "WhatsApp Notification"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Enter your WhatsApp number to receive notifications."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Activate"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Deactivate"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "License & Tokens"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Boost your AI Blogger capabilities by activating your license."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "License Key"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Your license is activated"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Paste your license key here"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Deactivating"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Deactivated"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Activating"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Activated"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Tokens Consumed"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "5,600 of 1,00,000 Tokens Used"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Humanized Content"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Auto Scheduling Posts"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Analytics"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Blog Post Topic"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Limited"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Unlimited"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Content Generation"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "AI Content Generation Tokens"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Basic"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Premium"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Highly Ranked Keywords Usage"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "SEO Friendly Content"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "24/7 Premium Support"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Access To Pro Updates"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Upgrade"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Edit Campaign"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "New Campaign"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Campaign Name"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Keywords"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Status"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Publish"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Campaign will be in action instantly."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Draft"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Campaign will be in draft mode. Later status toggle can be modify."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Learn more about how to configure your campaign."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Cancel"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Features"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Free"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Pro"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Start Growing with AI Blogger Pro"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Unlock all the features and take your blog to the next level with AI Blogger Pro."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Create and manage your blog campaigns."
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Add New"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Name"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Posts/Target"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Last Post"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Frequency"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Actions"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Last run"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Configure"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Run now"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Delete"
+msgstr ""
+
+#: assets/build/blog-app.js:2
+msgid "Close "
+msgstr ""

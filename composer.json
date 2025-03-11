@@ -1,5 +1,5 @@
 {
-	"name": "web-empire/autoblog-ai",
+	"name": "wp-solvex/wp-ai-blogger",
 	"description": "This is not just a content creator, its beyond the blogging.",
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.5",
@@ -20,8 +20,8 @@
 		"insights:fix": "./vendor/bin/phpinsights analyse --fix --no-interaction",
 		"phpstan": "vendor/bin/phpstan --memory-limit=2048M analyse",
     "gen-baseline": "vendor/bin/phpstan --memory-limit=2048M analyse --generate-baseline",
-		"gen-stubs": "vendor/bin/generate-stubs artifact/phpstan/autoblog-ai/ --out=tests/php/stubs/autoblog-ai-stubs.php && rm -rf artifact/phpstan",
-		"update-stubs": "rm -f tests/php/stubs/autoblog-ai-stubs.php && bash bin/build-folder-phpstan.sh && composer gen-stubs"
+		"gen-stubs": "vendor/bin/generate-stubs artifact/phpstan/wp-ai-blogger/ --out=tests/php/stubs/wp-ai-blogger-stubs.php && rm -rf artifact/phpstan",
+		"update-stubs": "rm -f tests/php/stubs/wp-ai-blogger-stubs.php && bash bin/build-folder-phpstan.sh && composer gen-stubs"
 	},
 	"config": {
 		"allow-plugins": {
