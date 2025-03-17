@@ -2,15 +2,17 @@ import { __ } from '@wordpress/i18n';
 import { useState } from 'react';
 
 const ContentHeader = ( { title, tab } ) => {
+	const [ processing, setProcessing ] = useState( false );
+
 	if ( 'license' === tab ) {
 		return;
 	}
 
-	const [ processing, setProcessing ] = useState( false );
-
 	const saveSettings = () => {
+		setProcessing( true );
 		console.log( __( 'Settings saved', 'wp-ai-blogger' ) );
-	}
+		setProcessing( false );
+	};
 
 	return (
 		<div className="flex items-center justify-between pb-4 mb-8 wpaib-content-header">
@@ -28,6 +30,6 @@ const ContentHeader = ( { title, tab } ) => {
 			</button>
 		</div>
 	);
-}
+};
 
 export default ContentHeader;

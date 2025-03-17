@@ -39,15 +39,15 @@ class Settings {
 					'default' => false,
 					'type'    => 'bool',
 				],
-				'onboardingTab'  => [
+				'onboardingTab' => [
 					'default' => 'welcome',
 					'type'    => 'string',
 				],
-				'userName' => [
+				'userName'      => [
 					'default' => wpaib_get_user_detail( 'name' ),
 					'type'    => 'name',
 				],
-				'userEmail' => [
+				'userEmail'     => [
 					'default' => wpaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],

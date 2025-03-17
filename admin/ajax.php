@@ -114,10 +114,12 @@ class Ajax {
 		$type_settings  = Settings::get_all_type_wise_settings();
 		$sub_option_key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
 
-		if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
-			$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] );
-		} else {
-			$sub_option_value = Settings::sanitize_data( $_POST['value'] );
+		if ( ! empty( $_POST['value'] ) ) {
+			if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
+				$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data.
+			} else {
+				$sub_option_value = Settings::sanitize_data( $_POST['value'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data.
+			}
 		}
 
 		Helper::update_option( $sub_option_key, $sub_option_value );

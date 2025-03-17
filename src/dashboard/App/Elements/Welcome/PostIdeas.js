@@ -78,7 +78,7 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-900">
-											<a href={autoblog_data.upgrade_link} className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
+											<a href={ autoblog_data.upgrade_link } className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
 												{ __( 'Upgrade to pro to get more post ideas.', 'wp-ai-blogger' ) }
 												<MoveRight className="w-5 h-5" />
 											</a>

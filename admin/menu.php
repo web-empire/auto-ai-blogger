@@ -53,14 +53,14 @@ class Menu {
 
 			add_filter(
 				'admin_footer_text',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
 
 			add_filter(
 				'update_footer',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
@@ -86,7 +86,7 @@ class Menu {
 			return;
 		}
 
-		$blog_name = get_bloginfo( 'name' );
+		$blog_name                = get_bloginfo( 'name' );
 		$admin_site_email_address = get_option( 'admin_email' );
 
 		$localized_data = apply_filters(

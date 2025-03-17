@@ -14,7 +14,7 @@ export default function ConfigureDrawer( props ) {
 
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( configureData );
-	const { type, title, status, keywords, lastRun } = drawerData;
+	const { type, title, keywords } = drawerData;
 
 	const closePopup = () => {
 		setOpen( false );

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import { RefreshCw, Settings, Trash2, Info } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';

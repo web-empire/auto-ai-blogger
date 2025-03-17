@@ -82,7 +82,7 @@ class Helper {
 	 *
 	 * @since x.x.x
 	 */
-	public static function delete_option( $key ) {
+	public static function delete_option( $key ): void {
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
 		if ( ! isset( $settings[ $key ] ) ) {

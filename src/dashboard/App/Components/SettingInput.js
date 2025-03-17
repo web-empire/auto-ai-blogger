@@ -2,7 +2,7 @@ const SettingInput = ( {
 	id,
 	defaultValue = '',
 	type = 'text',
-	placeholder = ''
+	placeholder = '',
 } ) => {
 	const onChange = ( event ) => {
 		console.error( event.target.value );

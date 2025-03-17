@@ -61,7 +61,8 @@
 	<exclude-pattern>*/build/*</exclude-pattern>
 	<exclude-pattern>*/dist/*</exclude-pattern>
 	<exclude-pattern>*/assets/*</exclude-pattern>
-	<exclude-pattern>*/lib/*</exclude-pattern>
+	<exclude-pattern>*/inc/web-notices/*</exclude-pattern>
+	<exclude-pattern>*/inc/licensing/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/artifact*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>

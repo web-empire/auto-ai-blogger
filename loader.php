@@ -8,11 +8,11 @@
 
 namespace AutoBlogAI;
 
-use AutoBlogAI\Admin\API;
 use AutoBlogAI\Admin\Ajax;
+use AutoBlogAI\Admin\API;
+use AutoBlogAI\Admin\Licensing;
 use AutoBlogAI\Admin\Menu;
 use AutoBlogAI\Core\Maintenance;
-use AutoBlogAI\Admin\Licensing;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -71,8 +71,6 @@ class Loader {
 
 			/* Admin Menu init */
 			Menu::get_instance();
-		} else {
-			/* Frontend init */
 		}
 	}
 
@@ -125,14 +123,16 @@ class Loader {
 	 *
 	 * @since x.x.x
 	 */
-	public function activation_actions(): void { }
+	public function activation_actions(): void {
+    }
 
 	/**
 	 * Plugin Deactivation actions.
 	 *
 	 * @since x.x.x
 	 */
-	public function deactivation_actions(): void { }
+	public function deactivation_actions(): void {
+    }
 }
 
 /**

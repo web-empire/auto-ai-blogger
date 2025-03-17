@@ -142,8 +142,8 @@ class License {
 	/**
 	 * Validate a license key.
 	 *
-	 * @param string  $key The license key.
-	 * @param bool $store Should we store the key and id.
+	 * @param string $key The license key.
+	 * @param bool   $store Should we store the key and id.
 	 * @return Object
 	 * @throws \Exception If the license is not valid.
 	 */
