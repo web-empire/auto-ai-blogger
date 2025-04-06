@@ -136,3 +136,13 @@ youremptytestdbnamehere
 yourpasswordhere
 yourusernamehere
 zxmf
+brizy
+elementor
+esb
+frm
+llms
+mec
+postdata
+postmeta
+sfwd
+WPAI
