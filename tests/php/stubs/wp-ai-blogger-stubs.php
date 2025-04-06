@@ -1,6 +1,6 @@
 <?php
 
-namespace AutoBlogAI {
+namespace WPAIBlogger {
     /**
      * Plugin_Loader
      *
@@ -95,7 +95,7 @@ namespace {
          * @param array $args Notice arguments.
          * @return void
          */
-        public static function add_notice($args = [])
+        public static function add_notice($args = []) : void
         {
         }
         /**
@@ -104,7 +104,7 @@ namespace {
          * @since 1.0.0
          * @return void
          */
-        public function dismiss_notice()
+        public function dismiss_notice() : void
         {
         }
         /**
@@ -113,7 +113,7 @@ namespace {
          * @since 1.0.0
          * @return void
          */
-        public function enqueue_scripts()
+        public function enqueue_scripts() : void
         {
         }
         /**
@@ -134,7 +134,7 @@ namespace {
          * @since 1.0.0
          * @return void
          */
-        public function show_notices()
+        public function show_notices() : void
         {
         }
         /**
@@ -144,7 +144,7 @@ namespace {
          * @param  array $notice Notice markup.
          * @return void
          */
-        public static function markup($notice = [])
+        public static function markup($notice = []) : void
         {
         }
         /**
@@ -157,7 +157,7 @@ namespace {
         }
     }
 }
-namespace AutoBlogAI\Inc\Traits {
+namespace WPAIBlogger\Inc\Traits {
     /**
      * Trait Get_Instance.
      *
@@ -182,7 +182,7 @@ namespace AutoBlogAI\Inc\Traits {
         }
     }
 }
-namespace AutoBlogAI\Inc\Utils {
+namespace WPAIBlogger\Inc\Utils {
     /**
      * This class will holds the code related to the managing of settings of the plugin.
      *
@@ -199,7 +199,7 @@ namespace AutoBlogAI\Inc\Utils {
          */
         public static $dashboard_options = [];
         /**
-         * Returns all default portal settings.
+         * Returns all default dashboard settings.
          *
          * @return array
          * @since x.x.x
@@ -272,6 +272,86 @@ namespace AutoBlogAI\Inc\Utils {
         }
     }
     /**
+     * This class will holds the code related to the managing of settings of the plugin.
+     *
+     * @class Metadata
+     */
+    class Metadata
+    {
+        /**
+         * Cache the DB options
+         *
+         * @since x.x.x
+         * @access public
+         * @var array
+         */
+        public static $dashboard_options = [];
+        /**
+         * Returns all default post settings.
+         *
+         * @return array
+         * @since x.x.x
+         */
+        public static function get_settings_dataset()
+        {
+        }
+        /**
+         * Returns an option from the default options.
+         *
+         * @param  string $key     The option key.
+         * @param  mixed  $default Option default value if option is not available.
+         * @return mixed   Returns the option value
+         *
+         * @since x.x.x
+         */
+        public static function get_default_option($key, $default = false)
+        {
+        }
+        /**
+         * As per the settings dataset, return the default settings.
+         *
+         * @return array
+         * @since x.x.x
+         */
+        public static function get_default_settings()
+        {
+        }
+        /**
+         * Data cleaner
+         *
+         * @since x.x.x
+         * @access public
+         *
+         * @param mixed  $value     data from AJAX.
+         * @param string $data_type datatype to sanitize further.
+         *
+         * @return mixed Sanitized data.
+         */
+        public static function sanitize_data($value, $data_type = 'default')
+        {
+        }
+        /**
+         * Format post metadata in a way that it can be saved in the database via wp_insert_post.
+         *
+         * @param array $postdata The metadata to format.
+         * @since x.x.x
+         * @return array The formatted metadata.
+         */
+        public static function format_data($postdata)
+        {
+        }
+        /**
+         * Get passed campaign post data.
+         *
+         * @param int $post_id The post ID.
+         * @since 0.0.1
+         * @return array|bool The campaign data or false if not found.
+         */
+        public static function get_campaign_data($post_id)
+        {
+        }
+    }
+    /**
      * This class setup all Helper functions.
      *
      * @class Helper
@@ -310,7 +390,7 @@ namespace AutoBlogAI\Inc\Utils {
          *
          * @since x.x.x
          */
-        public static function delete_option($key)
+        public static function delete_option($key) : void
         {
         }
     }
@@ -408,13 +488,34 @@ namespace SureCart\Licensing {
         {
         }
         /**
+         * Set an option.
+         *
+         * @param string $name Name of option.
+         *
+         * @return mixed
+         */
+        public function __get($name)
+        {
+        }
+        /**
+         * Set an option
+         *
+         * @param string $name Name of option.
+         * @param mixed  $value Value.
+         *
+         * @return bool
+         */
+        public function __set($name, $value)
+        {
+        }
+        /**
          * Add the settings page.
          *
          * @param array $args Settings page args.
          *
          * @return void
          */
-        public function add_page($args)
+        public function add_page($args) : void
         {
         }
         /**
@@ -432,7 +533,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function admin_menu()
+        public function admin_menu() : void
         {
         }
         /**
@@ -477,7 +578,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function settings_output()
+        public function settings_output() : void
         {
         }
         /**
@@ -485,7 +586,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function print_css()
+        public function print_css() : void
         {
         }
         /**
@@ -510,7 +611,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function redirect($url)
+        public function redirect($url) : void
         {
         }
         /**
@@ -522,7 +623,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function add_notice($code, $message, $type = 'info')
+        public function add_notice($code, $message, $type = 'info') : void
         {
         }
         /**
@@ -533,7 +634,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function add_error($code, $message)
+        public function add_error($code, $message) : void
         {
         }
         /**
@@ -544,28 +645,7 @@ namespace SureCart\Licensing {
          *
          * @return void
          */
-        public function add_success($code, $message)
-        {
-        }
-        /**
-         * Set an option.
-         *
-         * @param string $name Name of option.
-         *
-         * @return mixed
-         */
-        public function __get($name)
-        {
-        }
-        /**
-         * Set an option
-         *
-         * @param string $name Name of option.
-         * @param mixed  $value Value.
-         *
-         * @return bool
-         */
-        public function __set($name, $value)
+        public function add_success($code, $message) : void
         {
         }
     }
@@ -915,7 +995,7 @@ namespace SureCart\Licensing {
         }
     }
 }
-namespace AutoBlogAI\Core {
+namespace WPAIBlogger\Core {
     /**
      * Update Compatibility
      *
@@ -928,7 +1008,7 @@ namespace AutoBlogAI\Core {
      */
     class Maintenance
     {
-        use \AutoBlogAI\Inc\Traits\Get_Instance;
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
          *  Constructor
          */
@@ -945,8 +1025,64 @@ namespace AutoBlogAI\Core {
         {
         }
     }
+    /**
+     * Campaigns CPT
+     *
+     * @since 1.0.0
+     */
+    class CPT
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Post type name.
+         *
+         * @var string
+         */
+        public $post_type;
+        /**
+         * Post type labels.
+         *
+         * @since 1.0.0
+         * @var array<string, string>
+         */
+        public $post_type_labels = [];
+        /**
+         * Post type args.
+         *
+         * @since 1.0.0
+         * @var array<string, mixed>
+         */
+        public $post_type_args = [];
+        /**
+         * Constructor
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Function to initialize the CPT registration.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function create_cpt() : void
+        {
+        }
+        /**
+         * Register the post type for the plugin.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function register_post_type() : void
+        {
+        }
+    }
 }
-namespace AutoBlogAI\Admin {
+namespace WPAIBlogger\Admin {
     /**
      * This class setup all admin AJAX action
      *
@@ -954,7 +1090,7 @@ namespace AutoBlogAI\Admin {
      */
     class Ajax
     {
-        use \AutoBlogAI\Inc\Traits\Get_Instance;
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Holds all AJAX action events.
          *
@@ -963,7 +1099,7 @@ namespace AutoBlogAI\Admin {
          *
          * @var array
          */
-        public $ajax_events = ['wpaib_update_admin_setting'];
+        public $ajax_events = ['wpaib_update_admin_setting', 'wpaib_create_campaign', 'wpaib_update_campaign', 'wpaib_get_campaign_metadata'];
         /**
          * Holds all nonce for AJAX events.
          *
@@ -1001,6 +1137,33 @@ namespace AutoBlogAI\Admin {
         public function wpaib_update_admin_setting() : void
         {
         }
+        /**
+         * Handler to create campaign.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_create_campaign() : void
+        {
+        }
+        /**
+         * Handler to update campaign.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_update_campaign() : void
+        {
+        }
+        /**
+         * Handler to get campaign metadata in drawer edit settings.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_get_campaign_metadata() : void
+        {
+        }
     }
     /**
      * Frontend Compatibility
@@ -1014,7 +1177,7 @@ namespace AutoBlogAI\Admin {
      */
     class Menu
     {
-        use \AutoBlogAI\Inc\Traits\Get_Instance;
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Settings page ID for Plugin settings.
          */
@@ -1077,7 +1240,7 @@ namespace AutoBlogAI\Admin {
      */
     class API extends \WP_REST_Controller
     {
-        use \AutoBlogAI\Inc\Traits\Get_Instance;
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Namespace.
          *
@@ -1135,7 +1298,7 @@ namespace AutoBlogAI\Admin {
      */
     class Licensing
     {
-        use \AutoBlogAI\Inc\Traits\Get_Instance;
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Error messages.
          *
@@ -1220,6 +1383,65 @@ namespace {
     function wpaib_get_user_detail($detail)
     {
     }
+    /**
+     * Clean variables using sanitize_text_field.
+     *
+     * @param mixed $var Data to sanitize.
+     * @return mixed
+     *
+     * @since 0.0.1
+     */
+    function wpaib_clean_data($var)
+    {
+    }
+    /**
+     * Get all campaigns.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_all_campaigns()
+    {
+    }
+    /**
+     * Get all post statuses.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_post_statuses()
+    {
+    }
+    /**
+     * Get all post types.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_post_types()
+    {
+    }
+    /**
+     * Get all categories.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_categories()
+    {
+    }
+    /**
+     * Get all tags.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_tags()
+    {
+    }
+    /**
+     * Get all authors.
+     *
+     * @since 0.0.1
+     */
+    function wpaib_get_authors()
+    {
+    }
     // Define Constants.
     \define('WP_AI_BLOGGER_FILE', __FILE__);
     \define('WP_AI_BLOGGER_VERSION', '0.0.1');
@@ -1234,6 +1456,8 @@ namespace {
     \define('WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger');
     \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
     \define('WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1');
+    // CPT Constants.
+    \define('WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign');
     // Define Upgrade Link.
     \define('WP_AI_BLOGGER_UPGRADE_LINK', '#');
 }

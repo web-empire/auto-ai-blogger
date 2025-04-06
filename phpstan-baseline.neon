@@ -1,22 +1,22 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#2 \\$callback of function add_action expects callable\\(\\)\\: mixed, array\\{\\$this\\(AutoBlogAI\\\\Admin\\\\Ajax\\), mixed\\} given\\.$#"
+			message: "#^Parameter \\#2 \\$callback of function add_action expects callable\\(\\)\\: mixed, array\\{\\$this\\(WPAIBlogger\\\\Admin\\\\Ajax\\), mixed\\} given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Admin\\\\Ajax\\:\\:\\$ajax_events type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$ajax_events type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/ajax.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Admin\\\\Ajax\\:\\:\\$errors type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$errors type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/ajax.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Admin\\\\Ajax\\:\\:\\$nonce type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$nonce type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -26,42 +26,42 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid return type AutoBlogAI\\\\Admin\\\\WP_Error\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) should return AutoBlogAI\\\\Admin\\\\WP_Error\\|bool but returns WP_Error\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) should return WPAIBlogger\\\\Admin\\\\WP_Error\\|bool but returns WP_Error\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Parameter \\$request of method AutoBlogAI\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid type AutoBlogAI\\\\Admin\\\\WP_REST_Request\\.$#"
+			message: "#^Parameter \\$request of method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid type WPAIBlogger\\\\Admin\\\\WP_REST_Request\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Static property AutoBlogAI\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings \\(array\\) does not accept mixed\\.$#"
+			message: "#^Static property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings \\(array\\) does not accept mixed\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Static property AutoBlogAI\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings is never read, only written\\.$#"
+			message: "#^Static property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings is never read, only written\\.$#"
 			count: 1
 			path: admin/api.php
 
@@ -91,7 +91,7 @@ parameters:
 			path: admin/licensing.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Admin\\\\Licensing\\:\\:\\$error_messages type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Licensing\\:\\:\\$error_messages type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/licensing.php
 
@@ -536,27 +536,27 @@ parameters:
 			path: inc/utils/helper.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Inc\\\\Utils\\\\Helper\\:\\:update_option\\(\\) should return string but returns mixed\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:update_option\\(\\) should return string but returns mixed\\.$#"
 			count: 1
 			path: inc/utils/helper.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Inc\\\\Utils\\\\Settings\\:\\:get_ai_blogger_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_ai_blogger_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/settings.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Inc\\\\Utils\\\\Settings\\:\\:get_all_type_wise_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_all_type_wise_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/settings.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Inc\\\\Utils\\\\Settings\\:\\:get_default_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_default_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/settings.php
 
 		-
-			message: "#^Method AutoBlogAI\\\\Inc\\\\Utils\\\\Settings\\:\\:get_settings_dataset\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_settings_dataset\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/settings.php
 
@@ -591,7 +591,7 @@ parameters:
 			path: inc/utils/settings.php
 
 		-
-			message: "#^Property AutoBlogAI\\\\Inc\\\\Utils\\\\Settings\\:\\:\\$dashboard_options type has no value type specified in iterable type array\\.$#"
+			message: "#^Property WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:\\$dashboard_options type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/settings.php
 

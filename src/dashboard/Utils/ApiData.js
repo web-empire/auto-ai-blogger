@@ -46,4 +46,49 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 		.catch( () => {} );
 };
 
-export { updateApiData };
+/**
+ * A function to create a new campaign.
+ *
+ * @function
+ *
+ * @param {string} value              - The data to send.
+ * @param {string} isNew              - Is new campaign or not.
+ * @param {Object} abortControllerRef - The ref object with to hold abort controller.
+ *
+ * @return {Promise} Returns a promise representing the processed request.
+ */
+const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
+	// Abort any previous request.
+	if ( abortControllerRef.current.campaign_details ) {
+		abortControllerRef.current.campaign_details?.abort();
+	}
+
+	// Create a new AbortController.
+	const abortController = new AbortController();
+	abortControllerRef.current.campaign_details = abortController;
+
+	const formData = new window.FormData();
+
+	formData.append( 'action', isNew ? 'wpaib_create_campaign' : 'wpaib_update_campaign' );
+	formData.append( 'security', autoblog_data.admin_nonce );
+	formData.append( 'key', 'campaign_details' );
+	formData.append( 'value', JSON.stringify( value ) );
+
+	return apiFetch( {
+		url: autoblog_data.ajax_url,
+		method: 'POST',
+		body: formData,
+		signal: abortControllerRef.current.campaign_details?.signal, // Pass the signal to the fetch request.
+	} )
+		.then( ( data ) => {
+			if ( data.success ) {
+				window.location.reload();
+			} else {
+				// Show error message.
+				console.error( data.data.message );
+			}
+		} )
+		.catch( () => {} );
+};
+
+export { updateApiData, updateCampaign };

@@ -2,17 +2,17 @@
 /**
  * Helper.
  *
- * @package AutoBlogAI
+ * @package WPAIBlogger
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Inc\Utils;
+namespace WPAIBlogger\Inc\Utils;
 
 /**
  * Initialize setup
  *
  * @since x.x.x
- * @package AutoBlogAI
+ * @package WPAIBlogger
  */
 
 defined( 'ABSPATH' ) || exit;

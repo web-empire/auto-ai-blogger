@@ -35,6 +35,9 @@ define( 'WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger' );
 define( 'WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );
 define( 'WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1' );
 
+// CPT Constants.
+define( 'WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign' );
+
 // Define Upgrade Link.
 define( 'WP_AI_BLOGGER_UPGRADE_LINK', '#' );
 

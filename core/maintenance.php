@@ -6,9 +6,9 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Core;
+namespace WPAIBlogger\Core;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Traits\Get_Instance;
 
 /**
  * Update Compatibility

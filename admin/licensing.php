@@ -8,9 +8,9 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Admin;
+namespace WPAIBlogger\Admin;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Traits\Get_Instance;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

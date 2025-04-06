@@ -2,17 +2,18 @@
 /**
  * Loader.
  *
- * @package Autoblog_AI
+ * @package WPAIBlogger
  * @since x.x.x
  */
 
-namespace AutoBlogAI;
+namespace WPAIBlogger;
 
-use AutoBlogAI\Admin\Ajax;
-use AutoBlogAI\Admin\API;
-use AutoBlogAI\Admin\Licensing;
-use AutoBlogAI\Admin\Menu;
-use AutoBlogAI\Core\Maintenance;
+use WPAIBlogger\Admin\Ajax;
+use WPAIBlogger\Admin\API;
+use WPAIBlogger\Admin\Licensing;
+use WPAIBlogger\Admin\Menu;
+use WPAIBlogger\Core\CPT;
+use WPAIBlogger\Core\Maintenance;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -61,6 +62,9 @@ class Loader {
 
 		/* API init */
 		API::get_instance();
+
+		/* CPT init */
+		CPT::get_instance();
 
 		if ( is_admin() ) {
 			/* Ajax init */
@@ -124,7 +128,7 @@ class Loader {
 	 * @since x.x.x
 	 */
 	public function activation_actions(): void {
-    }
+	}
 
 	/**
 	 * Plugin Deactivation actions.
@@ -132,7 +136,7 @@ class Loader {
 	 * @since x.x.x
 	 */
 	public function deactivation_actions(): void {
-    }
+	}
 }
 
 /**
