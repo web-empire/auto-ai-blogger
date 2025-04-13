@@ -11,6 +11,10 @@
 		"php-stubs/wordpress-stubs": "^6.1",
 		"php-stubs/generator": "^0.8.2",
 		"automattic/vipwpcs": "^2.3",
+    "phpunit/phpunit": "^9",
+		"yoast/phpunit-polyfills": "^1",
+		"wp-phpunit/wp-phpunit": "^6.0",
+		"bamarni/composer-bin-plugin": "^1.8",
 		"nunomaduro/phpinsights": "^2.11"
 	},
 	"scripts": {
