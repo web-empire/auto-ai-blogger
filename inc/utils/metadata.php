@@ -95,12 +95,12 @@ class Metadata {
 					'default' => 0,
 					'type'    => 'number',
 				],
-				'minWords'     => [
+				'maxWords'     => [
 					'default' => 400,
 					'type'    => 'number',
 				],
-				'minTitleWords' => [
-					'default' => 7,
+				'maxTitleWords' => [
+					'default' => 8,
 					'type'    => 'number',
 				],
 			]

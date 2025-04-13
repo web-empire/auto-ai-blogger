@@ -338,16 +338,16 @@ export default function ConfigureDrawer( props ) {
 												<div className="divide-y divide-gray-200 px-4 sm:px-6">
 													<div className="space-y-6 pb-5 pt-6">
 														<div className="flex items-center justify-between">
-															<label htmlFor="minimum-title-words" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Minimum Title Words', 'wp-ai-blogger' ) }
+															<label htmlFor="maximum-title-words" className="flex items-center text-sm/6 font-medium text-gray-900">
+																{ __( 'Maximum Title Words', 'wp-ai-blogger' ) }
 															</label>
 
 															<div className="mt-2">
 																<input
-																	id="minimum-title-words"
-																	name="minimum-title-words"
-																	defaultValue={ drawerData.minTitleWords }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, minTitleWords: e.target.value } ) }
+																	id="maximum-title-words"
+																	name="maximum-title-words"
+																	defaultValue={ drawerData.maxTitleWords }
+																	onChange={ ( e ) => setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
 																	type="number"
 																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 																/>
@@ -355,16 +355,16 @@ export default function ConfigureDrawer( props ) {
 														</div>
 
 														<div className="flex items-center justify-between">
-															<label htmlFor="minimum-words" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Minimum Content Words', 'wp-ai-blogger' ) }
+															<label htmlFor="maximum-words" className="flex items-center text-sm/6 font-medium text-gray-900">
+																{ __( 'Maximum Content Words', 'wp-ai-blogger' ) }
 															</label>
 
 															<div className="mt-2">
 																<input
-																	id="minimum-words"
-																	name="minimum-words"
-																	defaultValue={ drawerData.minWords }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, minWords: e.target.value } ) }
+																	id="maximum-words"
+																	name="maximum-words"
+																	defaultValue={ drawerData.maxWords }
+																	onChange={ ( e ) => setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
 																	type="number"
 																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 																/>
