@@ -13,9 +13,10 @@ export default function ConfigureDrawer( props ) {
 	const [ activeTab, setActiveTab ] = useState( 'campaign' );
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
-	const [ drawerData, setDrawerData ] = useState( configureData );
+	const [ drawerData, setDrawerData ] = useState( {} );
 
 	useEffect( () => {
+		setDrawerData( configureData );
 		setHandlingCampaign( false );
 		setOpen( openDrawer );
 	}, [ openDrawer ] );
@@ -28,7 +29,7 @@ export default function ConfigureDrawer( props ) {
 	const handleCampaign = ( e ) => {
 		e.preventDefault();
 		setHandlingCampaign( true );
-		updateCampaign( drawerData, drawerData.type !== 'new', abortControllerRef );
+		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef );
 	};
 
 	return (
@@ -48,7 +49,7 @@ export default function ConfigureDrawer( props ) {
 										<div className="flex items-center justify-between">
 											<h2 className="text-base font-semibold text-white m-0 p-0">
 												{
-													drawerData.type !== 'new'
+													drawerData.type === 'new'
 														? __( 'New Campaign', 'wp-ai-blogger' )
 														: __( 'Edit Campaign', 'wp-ai-blogger' )
 												}
@@ -404,7 +405,7 @@ export default function ConfigureDrawer( props ) {
 										disabled={ handlingCampaign }
 										className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
 									>
-										{ drawerData.type !== 'new' ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+										{ drawerData.type === 'new' ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
 									</button>
 								</div>
 							</form>

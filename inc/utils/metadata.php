@@ -63,6 +63,10 @@ class Metadata {
 					'default' => 'post',
 					'type'    => 'string',
 				],
+				'postStatus'       => [
+					'default' => 'publish',
+					'type'    => 'string',
+				],
 				'summaryAsExcerpt' => [
 					'default' => false,
 					'type'    => 'bool',
@@ -80,7 +84,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'lastRun'          => [
-					'default' => '',
+					'default' => __( 'Never', 'wp-ai-blogger' ),
 					'type'    => 'string',
 				],
 				'lastPost'         => [
@@ -89,6 +93,14 @@ class Metadata {
 				],
 				'postsCreated'     => [
 					'default' => 0,
+					'type'    => 'number',
+				],
+				'minWords'     => [
+					'default' => 400,
+					'type'    => 'number',
+				],
+				'minTitleWords' => [
+					'default' => 7,
 					'type'    => 'number',
 				],
 			]
@@ -204,15 +216,39 @@ class Metadata {
 	}
 
 	/**
+	 * Get all campaign metadata as per the settings dataset.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return array<mixed> The metadata.
+	 * @since x.x.x
+	 */
+	public static function get_metadata( $post_id ) {
+		$settings_dataset = self::get_settings_dataset();
+		$metadata         = [];
+
+		foreach ( $settings_dataset as $key => $value ) {
+			$meta_value = get_post_meta( $post_id, $key, true );
+			if ( ! empty( $meta_value ) ) {
+				$metadata[ $key ] = $meta_value;
+			} else {
+				$metadata[ $key ] = $value['default'];
+			}
+		}
+
+		return $metadata;
+	}
+
+	/**
 	 * Get passed campaign post data.
 	 *
 	 * @param int $post_id The post ID.
+	 * @param bool $plain_metadata Whether to return plain metadata.
 	 * @since 0.0.1
 	 * @return array|bool The campaign data or false if not found.
 	 */
-	public static function get_campaign_data( $post_id ) {
-		$campaign      = get_post( $post_id );
-		$defaults_meta = self::get_default_settings();
+	public static function get_campaign_data( $post_id, $plain_metadata = false ) {
+		$campaign = get_post( $post_id );
+		$metadata = self::get_metadata( $post_id );
 
 		if ( ! $campaign ) {
 			return false;
@@ -222,32 +258,25 @@ class Metadata {
 			return false;
 		}
 
-		$meta_posts_created = get_post_meta( $post_id, 'postsCreated', true );
-		$meta_last_run      = get_post_meta( $post_id, 'lastRun', true );
-		$meta_last_post     = get_post_meta( $post_id, 'lastPost', true );
-		$meta_posts_target  = get_post_meta( $post_id, 'postsTarget', true );
-		$meta_frequency     = get_post_meta( $post_id, 'frequency', true );
+		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
+		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
+		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
 
-		$campaign_posts = absint( $meta_posts_created ?? $defaults_meta['postsCreated'] );
-		$last_run       = ! empty( $meta_last_run ) ? $meta_last_run : $defaults_meta['lastRun'];
-		$last_post      = ! empty( $meta_last_post ) ? $meta_last_post : $defaults_meta['lastPost'];
-		$posts_target   = absint( $meta_posts_target ?? $defaults_meta['postsTarget'] );
-		$frequency      = absint( $meta_frequency ?? $defaults_meta['frequency'] );
+		if ( ! $plain_metadata ) {
+			$meta_posts_target = $meta_posts_created . ' / ' . $meta_posts_target;
+			$metadata['postsTarget'] = $meta_posts_target;
 
-		$posts_target = $campaign_posts . ' / ' . $posts_target;
-		$frequency    = __( 'Every', 'wp-ai-blogger' ) . ' ' . $frequency . ' ' . _n( 'Day', 'Days', $frequency, 'wp-ai-blogger' );
+			$meta_frequency    = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
+			$metadata['frequency'] = $meta_frequency;
+		}
 
-		return [
+		return array_merge( $metadata, [
 			'id'          => $campaign->ID,
 			'name'        => $campaign->post_title,
 			'title'       => $campaign->post_title,
 			'status'      => $campaign->post_status,
 			'created_at'  => $campaign->post_date,
 			'updated_at'  => $campaign->post_modified,
-			'lastRun'     => $last_run,
-			'lastPost'    => $last_post,
-			'postsTarget' => $posts_target,
-			'frequency'   => $frequency,
-		];
+		] );
 	}
 }

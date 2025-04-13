@@ -160,7 +160,7 @@ export default function Campaigns() {
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 															<SwitchControl
-																checked={ 'active' === campaign.status }
+																checked={ 'publish' === campaign.status }
 																onChange={ () => {} }
 															/>
 														</td>

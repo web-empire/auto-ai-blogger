@@ -165,7 +165,7 @@ class Ajax {
 			[
 				'message'     => $this->get_error_msg( 'success' ),
 				'campaign_id' => $campaign_id,
-			] 
+			]
 		);
 	}
 
@@ -178,6 +178,38 @@ class Ajax {
 	public function wpaib_update_campaign(): void {
 		if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+		}
+
+		$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in wp_unslash.
+		$campaign_details = json_decode( $campaign_details, true );
+
+		$campaign_id = absint( $campaign_details['id'] );
+		if ( ! $campaign_id ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		$campaign_details        = Metadata::sanitize_data( $campaign_details, 'array' );
+		$formatted_campaign_data = Metadata::format_data( $campaign_details );
+
+		// Update the campaign.
+		$updated = \wp_update_post(
+			[
+				'ID'          => $campaign_id,
+				'post_title'  => $formatted_campaign_data['title'],
+				'post_content'=> $formatted_campaign_data['content'],
+				'post_status' => $formatted_campaign_data['status'],
+				'meta_input'  => $formatted_campaign_data['meta_input'],
+			]
+		);
+
+		if ( is_wp_error( $updated ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		if ( $updated ) {
+			wp_send_json_success( [ 'message' => $this->get_error_msg( 'success' ) ] );
+		} else {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
 	}
 
@@ -197,6 +229,6 @@ class Ajax {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
 
-		wp_send_json_success( Metadata::get_campaign_data( $campaign_id ) );
+		wp_send_json_success( Metadata::get_campaign_data( $campaign_id, true ) );
 	}
 }
