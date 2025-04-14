@@ -9,8 +9,8 @@
 namespace WPAIBlogger\Admin;
 
 use FluentCommunity\App\Models\Meta;
-use WPAIBlogger\Inc\Utils\Metadata;
 use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Metadata;
 
 /**
  * Frontend Compatibility

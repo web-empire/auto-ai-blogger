@@ -178,7 +178,7 @@ export default function ConfigureDrawer( props ) {
 															<div className="mt-2">
 																<SwitchControl
 																	checked={ drawerData.summaryAsExcerpt }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, summaryAsExcerpt: ! drawerData.summaryAsExcerpt } ) }
+																	onChange={ () => setDrawerData( { ...drawerData, summaryAsExcerpt: ! drawerData.summaryAsExcerpt } ) }
 																	id="use-summary-as-excerpt"
 																/>
 															</div>
@@ -198,7 +198,7 @@ export default function ConfigureDrawer( props ) {
 																			type="radio"
 																			aria-describedby="privacy-public-description"
 																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
-																			onChange={ ( e ) => setDrawerData( { ...drawerData, status: 'publish' } ) }
+																			onChange={ () => setDrawerData( { ...drawerData, status: 'publish' } ) }
 																		/>
 																	</div>
 																	<div className="pl-7 text-sm/6">
@@ -221,7 +221,7 @@ export default function ConfigureDrawer( props ) {
 																				type="radio"
 																				aria-describedby="privacy-private-to-project-description"
 																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
-																				onChange={ ( e ) => setDrawerData( { ...drawerData, status: 'draft' } ) }
+																				onChange={ () => setDrawerData( { ...drawerData, status: 'draft' } ) }
 																			/>
 																		</div>
 																		<div className="pl-7 text-sm/6">

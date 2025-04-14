@@ -10,8 +10,8 @@ namespace WPAIBlogger\Admin;
 
 use WPAIBlogger\Inc\Traits\Get_Instance;
 use WPAIBlogger\Inc\Utils\Helper;
-use WPAIBlogger\Inc\Utils\Settings;
 use WPAIBlogger\Inc\Utils\Metadata;
+use WPAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -161,6 +161,11 @@ class Ajax {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
 
+		// Add schedule data in DB separately to manage effectively.
+		if ( ! empty( $formatted_campaign_data['meta_input']['frequency'] ) ) {
+			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['frequency'] );
+		}
+
 		wp_send_json_success(
 			[
 				'message'     => $this->get_error_msg( 'success' ),
@@ -194,16 +199,21 @@ class Ajax {
 		// Update the campaign.
 		$updated = \wp_update_post(
 			[
-				'ID'          => $campaign_id,
-				'post_title'  => $formatted_campaign_data['title'],
-				'post_content'=> $formatted_campaign_data['content'],
-				'post_status' => $formatted_campaign_data['status'],
-				'meta_input'  => $formatted_campaign_data['meta_input'],
+				'ID'           => $campaign_id,
+				'post_title'   => $formatted_campaign_data['title'],
+				'post_content' => $formatted_campaign_data['content'],
+				'post_status'  => $formatted_campaign_data['status'],
+				'meta_input'   => $formatted_campaign_data['meta_input'],
 			]
 		);
 
 		if ( is_wp_error( $updated ) ) {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		// Add schedule data in DB separately to manage effectively.
+		if ( ! empty( $formatted_campaign_data['meta_input']['frequency'] ) ) {
+			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['frequency'] );
 		}
 
 		if ( $updated ) {
@@ -224,7 +234,7 @@ class Ajax {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 		}
 
-		$campaign_id = absint( isset( $_POST['campaign_id'] ) ? $_POST['campaign_id'] : 0 );
+		$campaign_id = absint( $_POST['campaign_id'] ?? 0 );
 		if ( ! $campaign_id ) {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}

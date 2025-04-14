@@ -296,6 +296,31 @@ namespace WPAIBlogger\Inc\Utils {
         {
         }
         /**
+         * Returns the campaign meta value.
+         *
+         * @param int    $campaign_id The campaign ID.
+         * @param string $key         The meta key.
+         * @return string
+         *
+         * @since x.x.x
+         */
+        public static function get_campaign_meta($campaign_id, $key)
+        {
+        }
+        /**
+         * Update the campaign meta value.
+         *
+         * @param int    $campaign_id The campaign ID.
+         * @param string $key         The meta key.
+         * @param mixed  $value       The meta value.
+         * @return bool
+         *
+         * @since x.x.x
+         */
+        public static function update_campaign_meta($campaign_id, $key, $value)
+        {
+        }
+        /**
          * Returns an option from the default options.
          *
          * @param  string $key     The option key.
@@ -341,13 +366,24 @@ namespace WPAIBlogger\Inc\Utils {
         {
         }
         /**
-         * Get passed campaign post data.
+         * Get all campaign metadata as per the settings dataset.
          *
          * @param int $post_id The post ID.
+         * @return array<mixed> The metadata.
+         * @since x.x.x
+         */
+        public static function get_metadata($post_id)
+        {
+        }
+        /**
+         * Get passed campaign post data.
+         *
+         * @param int  $post_id The post ID.
+         * @param bool $plain_metadata Whether to return plain metadata.
          * @since 0.0.1
          * @return array|bool The campaign data or false if not found.
          */
-        public static function get_campaign_data($post_id)
+        public static function get_campaign_data($post_id, $plain_metadata = false)
         {
         }
     }
@@ -1081,6 +1117,42 @@ namespace WPAIBlogger\Core {
         {
         }
     }
+    /**
+     * Create auto blog post scheduler
+     *
+     * @since x.x.x
+     */
+    class Scheduler
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         *  Constructor
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Custom cron schedules.
+         *
+         * @param array $schedules Schedules.
+         * @since x.x.x
+         * @return array
+         */
+        public function custom_cron_schedules($schedules)
+        {
+        }
+        /**
+         * Create blog post.
+         *
+         * @param int $campaign_id Campaign ID.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function create_blog_post($campaign_id) : void
+        {
+        }
+    }
 }
 namespace WPAIBlogger\Admin {
     /**
@@ -1442,6 +1514,57 @@ namespace {
     function wpaib_get_authors()
     {
     }
+    /**
+     * Get all custom schedules to schedule auto blog posts.
+     *
+     * @return array
+     * @since x.x.x
+     */
+    function wpaib_get_schedules()
+    {
+    }
+    /**
+     * Get all custom schedules to schedule auto blog posts.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @param int $days       Days.
+     * @return void
+     * @since x.x.x
+     */
+    function wpaib_update_schedules($campaign_id, $days) : void
+    {
+    }
+    /**
+     * Check if the campaign posts target is achieved.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @return bool
+     * @since x.x.x
+     */
+    function wpaib_is_campaign_posts_target_achieved($campaign_id)
+    {
+    }
+    /**
+     * Get API response in order to create blog post.
+     *
+     * @param string $keywords         Keywords.
+     * @param int    $max_title_words  Max title words.
+     * @param int    $max_content_words Max content words.
+     * @since x.x.x
+     */
+    function wpaib_get_post_creation_api_response($keywords, $max_title_words, $max_content_words)
+    {
+    }
+    /**
+     * Create blog post as per the campaign configurations.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @return int|WP_Error
+     * @since x.x.x
+     */
+    function wpaib_create_blog_post($campaign_id)
+    {
+    }
     // Define Constants.
     \define('WP_AI_BLOGGER_FILE', __FILE__);
     \define('WP_AI_BLOGGER_VERSION', '0.0.1');
@@ -1456,8 +1579,9 @@ namespace {
     \define('WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger');
     \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
     \define('WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1');
+    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/');
     // CPT Constants.
     \define('WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign');
     // Define Upgrade Link.
-    \define('WP_AI_BLOGGER_UPGRADE_LINK', '#');
+    \define('WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/');
 }

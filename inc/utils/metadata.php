@@ -87,24 +87,66 @@ class Metadata {
 					'default' => __( 'Never', 'wp-ai-blogger' ),
 					'type'    => 'string',
 				],
-				'lastPost'         => [
+				'lastPostID'       => [
 					'default' => '',
-					'type'    => 'string',
+					'type'    => 'number',
 				],
 				'postsCreated'     => [
 					'default' => 0,
 					'type'    => 'number',
 				],
-				'maxWords'     => [
+				'maxWords'         => [
 					'default' => 400,
 					'type'    => 'number',
 				],
-				'maxTitleWords' => [
+				'maxTitleWords'    => [
 					'default' => 8,
 					'type'    => 'number',
 				],
 			]
 		);
+	}
+
+	/**
+	 * Returns the campaign meta value.
+	 *
+	 * @param int    $campaign_id The campaign ID.
+	 * @param string $key         The meta key.
+	 * @return string
+	 *
+	 * @since x.x.x
+	 */
+	public static function get_campaign_meta( $campaign_id, $key ) {
+		$meta_value = get_post_meta( $campaign_id, $key, true );
+
+		if ( ! empty( $meta_value ) ) {
+			return $meta_value;
+		}
+
+		return self::get_default_option( $key );
+	}
+
+	/**
+	 * Update the campaign meta value.
+	 *
+	 * @param int    $campaign_id The campaign ID.
+	 * @param string $key         The meta key.
+	 * @param mixed  $value       The meta value.
+	 * @return bool
+	 *
+	 * @since x.x.x
+	 */
+	public static function update_campaign_meta( $campaign_id, $key, $value ) {
+		$settings_dataset = self::get_settings_dataset();
+
+		if ( ! array_key_exists( $key, $settings_dataset ) ) {
+			return false;
+		}
+
+		$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
+		$value     = self::sanitize_data( $value, $data_type );
+
+		return update_post_meta( $campaign_id, $key, $value );
 	}
 
 	/**
@@ -163,6 +205,7 @@ class Metadata {
 				break;
 
 			case 'int':
+			case 'number':
 				$output = ! empty( $value ) ? absint( $value ) : '';
 				break;
 
@@ -241,7 +284,7 @@ class Metadata {
 	/**
 	 * Get passed campaign post data.
 	 *
-	 * @param int $post_id The post ID.
+	 * @param int  $post_id The post ID.
 	 * @param bool $plain_metadata Whether to return plain metadata.
 	 * @since 0.0.1
 	 * @return array|bool The campaign data or false if not found.
@@ -263,20 +306,24 @@ class Metadata {
 		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
 
 		if ( ! $plain_metadata ) {
-			$meta_posts_target = $meta_posts_created . ' / ' . $meta_posts_target;
+			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
 			$metadata['postsTarget'] = $meta_posts_target;
 
-			$meta_frequency    = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
+			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
 			$metadata['frequency'] = $meta_frequency;
 		}
 
-		return array_merge( $metadata, [
-			'id'          => $campaign->ID,
-			'name'        => $campaign->post_title,
-			'title'       => $campaign->post_title,
-			'status'      => $campaign->post_status,
-			'created_at'  => $campaign->post_date,
-			'updated_at'  => $campaign->post_modified,
-		] );
+		return array_merge(
+			$metadata,
+			[
+				'id'              => $campaign->ID,
+				'name'            => $campaign->post_title,
+				'title'           => $campaign->post_title,
+				'status'          => $campaign->post_status,
+				'created_at'      => $campaign->post_date,
+				'updated_at'      => $campaign->post_modified,
+				'last_post_title' => get_the_title( $metadata['lastPostID'] ?? 0 ),
+			]
+		);
 	}
 }

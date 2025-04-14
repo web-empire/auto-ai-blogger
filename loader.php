@@ -14,6 +14,7 @@ use WPAIBlogger\Admin\Licensing;
 use WPAIBlogger\Admin\Menu;
 use WPAIBlogger\Core\CPT;
 use WPAIBlogger\Core\Maintenance;
+use WPAIBlogger\Core\Scheduler;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -59,6 +60,9 @@ class Loader {
 
 		/* Maintenance init */
 		Maintenance::get_instance();
+
+		/* Scheduler init */
+		Scheduler::get_instance();
 
 		/* API init */
 		API::get_instance();

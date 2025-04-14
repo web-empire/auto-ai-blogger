@@ -170,12 +170,12 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{ campaign.lastPost && campaign.lastPost.length > 0 ? (
-																<Tooltip text={ campaign.lastPost }
+															{ campaign.last_post_title && campaign.last_post_title.length > 0 ? (
+																<Tooltip text={ campaign.last_post_title }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<span> { TrimWordsContent( campaign.lastPost ) } </span>
+																	<span> { TrimWordsContent( campaign.last_post_title ) } </span>
 																</Tooltip>
 															) : (
 																<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>
