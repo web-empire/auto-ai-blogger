@@ -3,6 +3,8 @@ import { aiClassNames } from '@Utils/aiClassNames';
 import { BellIcon, UserCircleIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { General, Notifications, License } from '@Elements/Settings';
 import ContentHeader from '@Components/ContentHeader';
+import { useSelector } from 'react-redux';
+import { useSettingsSelector } from '@Utils/useSettingsSelector';
 
 const secondaryNavigation = [
 	{ name: 'General', slug: 'general', icon: UserCircleIcon, current: true, element: <General /> },
@@ -12,6 +14,8 @@ const secondaryNavigation = [
 
 export default function Settings() {
 	const [ currentTab, setCurrentTab ] = useState( 'general' );
+
+	const settings = useSettingsSelector();
 
 	return (
 		<>
@@ -48,7 +52,7 @@ export default function Settings() {
 
 				<main className="px-4 sm:px-6 lg:flex-auto py-8 bg-gray-50">
 					<div className="mx-auto max-w-3xl">
-						<ContentHeader title={ secondaryNavigation.find( ( item ) => item.slug === currentTab ).name } tab={ currentTab } />
+						<ContentHeader title={ secondaryNavigation.find( ( item ) => item.slug === currentTab ).name } tab={ currentTab } {...settings} />
 
 						{ secondaryNavigation.map( ( item ) => (
 							<div key={ item.slug } className={ aiClassNames( currentTab === item.slug ? 'block' : 'hidden' ) }>

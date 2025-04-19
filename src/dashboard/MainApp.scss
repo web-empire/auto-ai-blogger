@@ -57,6 +57,9 @@
 #autoblog-main-page--wrapper p {
 	margin: 0;
 	padding: 0;
+	&.wpaib-step-text {
+		margin-bottom: 2rem;
+	}
 }
 
 .ai-blogger-container input[type="checkbox"]:checked::before,

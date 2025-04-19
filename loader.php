@@ -71,8 +71,6 @@ class Loader {
 
 			/* Admin Menu init */
 			Menu::get_instance();
-		} else {
-			/* Frontend init */
 		}
 	}
 

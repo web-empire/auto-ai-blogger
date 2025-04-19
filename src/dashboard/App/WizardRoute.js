@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-
+import PersonaFormStep from '@WizardSteps/PersonaFormStep';
 import { WelcomeStep, OptinStep, ReadyStep } from '@WizardSteps';
 import { NavigationBar, FooterNavigationBar } from '@WizardFields';
 
@@ -19,18 +19,24 @@ const WizardRoute = () => {
 	const get_route_page = () => {
 		let route_page = '';
 
-		switch ( action ) {
+		switch (action) {
 			case 'welcome':
 				route_page = <WelcomeStep />;
 				previous_step = 'dashboard';
-				next_step = 'optin';
+				next_step = 'persona-form'; //change next step
 				step_sequence = 0;
+				break;
+			case 'persona-form': //Add new case
+				route_page = <PersonaFormStep />;
+				previous_step = 'welcome';
+				next_step = 'optin';
+				step_sequence = 1;
 				break;
 			case 'optin':
 				route_page = <OptinStep />;
-				previous_step = 'welcome';
+				previous_step = 'persona-form'; //change previous step
 				next_step = 'ready';
-				step_sequence = 1;
+				step_sequence = 2;
 				break;
 			case 'ready':
 				route_page = <ReadyStep />;
@@ -39,7 +45,7 @@ const WizardRoute = () => {
 				break;
 			default:
 				route_page = <WelcomeStep />;
-				next_step = 'optin';
+				next_step = 'persona-form'; //change next step
 				step_sequence = 0;
 				break;
 		}

@@ -37,7 +37,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @var array Notices.
 		 * @since 1.0.0
 		 */
-		private static $notices = array();
+		private static $notices = [];
 
 		/**
 		 * Constructor
@@ -45,10 +45,10 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __construct() {
-			add_action( 'admin_notices', array( $this, 'show_notices' ), 30 );
-			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-			add_action( 'wp_ajax_web-notice-dismiss', array( $this, 'dismiss_notice' ) );
-			add_filter( 'wp_kses_allowed_html', array( $this, 'add_data_attributes' ), 10, 2 );
+			add_action( 'admin_notices', [ $this, 'show_notices' ], 30 );
+			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+			add_action( 'wp_ajax_web-notice-dismiss', [ $this, 'dismiss_notice' ] );
+			add_filter( 'wp_kses_allowed_html', [ $this, 'add_data_attributes' ], 10, 2 );
 		}
 
 		/**
@@ -72,7 +72,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @param array $args Notice arguments.
 		 * @return void
 		 */
-		public static function add_notice( $args = array() ) {
+		public static function add_notice( $args = [] ) {
 			self::$notices[] = $args;
 		}
 
@@ -94,7 +94,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 			}
 
 			if ( false === wp_verify_nonce( $nonce, 'web-notices' ) ) {
-				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'divi_particle_js', 'bluechip-divi' ) );
+				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'wp-ai-blogger' ) );
 			}
 
 			// Valid inputs?
@@ -119,16 +119,16 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @return void
 		 */
 		public function enqueue_scripts() {
-			wp_register_script( 'web-notices', self::get_url() . 'script.js', array( 'jquery' ), self::$version, true );
+			wp_register_script( 'web-notices', self::get_url() . 'script.js', [ 'jquery' ], self::$version, true );
 			wp_localize_script(
 				'web-notices',
 				'webNotices',
-				array(
+				[
 					'_notice_nonce' => wp_create_nonce( 'web-notices' ),
-				)
+				]
 			);
 
-			wp_enqueue_style( 'web-notices', self::get_url() . 'style.css', array(), self::$version );
+			wp_enqueue_style( 'web-notices', self::get_url() . 'style.css', [], self::$version );
 		}
 
 		/**
@@ -158,7 +158,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @return array|null
 		 */
 		private function get_notices() {
-			usort( self::$notices, array( $this, 'sort_notices' ) );
+			usort( self::$notices, [ $this, 'sort_notices' ] );
 
 			return self::$notices;
 		}
@@ -172,18 +172,18 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 */
 		private function get_notice_by_id( $notice_id ) {
 			if ( empty( $notice_id ) ) {
-				return array();
+				return [];
 			}
 
 			$notices = $this->get_notices();
 			$notice  = wp_list_filter(
 				$notices,
-				array(
+				[
 					'id' => $notice_id,
-				)
+				]
 			);
 
-			return ! empty( $notice ) ? $notice[0] : array();
+			return ! empty( $notice ) ? $notice[0] : [];
 		}
 
 		/**
@@ -193,7 +193,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @return void
 		 */
 		public function show_notices() {
-			$defaults = array(
+			$defaults = [
 				'id'                         => '',      // Optional, Notice ID. If empty it set `web-notices-id-<$array-index>`.
 				'type'                       => 'info',  // Optional, Notice type. Default `info`. Expected [info, warning, notice, error].
 				'message'                    => '',      // Optional, Message.
@@ -205,7 +205,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 				'display-with-other-notices' => true,    // Should the notice be displayed if other notices  are being displayed from Web_Notices.
 				'is_dismissible'             => true,
 				'capability'                 => 'manage_options', // User capability - This capability is required for the current user to see this notice.
-			);
+			];
 
 			// Count for the notices that are rendered.
 			$notices_displayed = 0;
@@ -247,7 +247,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @param  array $notice Notice markup.
 		 * @return void
 		 */
-		public static function markup( $notice = array() ) {
+		public static function markup( $notice = [] ) {
 			wp_enqueue_script( 'web-notices' );
 
 			do_action( 'web_notice_before_markup' );
@@ -277,7 +277,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @return array       Notice wrapper classes.
 		 */
 		private static function get_wrap_classes( $notice ) {
-			$classes = array( 'web-notice', 'notice' );
+			$classes = [ 'web-notice', 'notice' ];
 
 			if ( $notice['is_dismissible'] ) {
 				$classes[] = 'is-dismissible';
