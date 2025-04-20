@@ -9,9 +9,22 @@ module.exports = {
 				wphoverbgcolor: '#2271b117',
 				wpcolorfaded: '#2271b120',
 				required_icon_color: '#EF4444',
-				portal: {
-					DEFAULT: '#0084c6',
+				blogapp: {
+					DEFAULT: '#046BD2',
 					hover: '#045CB4',
+				},
+				primary: {
+					25: '#F5FAFF', // Very light blue
+					50: '#EAF4FF', // Lightest blue
+					100: '#CDE5FF', // Light pastel blue
+					200: '#A8D2FF', // Soft sky blue
+					300: '#82BFFF', // Light blue
+					400: '#5DABFF', // Mid blue
+					500: '#3897FF', // Primary blue
+					600: '#2078E5', // Darker blue
+					700: '#1858AE', // Deep blue
+					800: '#15488C', // Navy shade
+					900: '#103669', // Dark navy
 				},
 			},
 			fontFamily: {

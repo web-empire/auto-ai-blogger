@@ -1,0 +1,921 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$postdata of static method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:format_data\\(\\) expects array, mixed given\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#2 \\$callback of function add_action expects callable\\(\\)\\: mixed, array\\{\\$this\\(WPAIBlogger\\\\Admin\\\\Ajax\\), mixed\\} given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$ajax_events type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$errors type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Ajax\\:\\:\\$nonce type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Variable \\$sub_option_value might not be defined\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) should return bool\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Parameter \\$request of method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid type WPAIBlogger\\\\Admin\\\\WP_REST_Request\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Static property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings \\(array\\) does not accept mixed\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Static property WPAIBlogger\\\\Admin\\\\API\\:\\:\\$ai_blogger_admin_settings is never read, only written\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Access to property \\$license_key on an unknown class SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Call to method activate\\(\\) on an unknown class SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Call to method deactivate\\(\\) on an unknown class SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Call to method get_activation\\(\\) on an unknown class SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Call to method retrieve\\(\\) on an unknown class SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 2
+			path: admin/licensing.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Admin\\\\Licensing\\:\\:\\$error_messages type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of function strval expects bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: core/maintenance.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) has parameter \\$schedules with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: core/scheduler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: core/scheduler.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Core\\\\Scheduler\\:\\:\\$schedules type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: core/scheduler.php
+
+		-
+			message: "#^Argument of an invalid type array\\<int, WP_Term\\>\\|WP_Error supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Cannot access offset 'content' on mixed\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Cannot access offset 'error' on mixed\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Cannot access offset 'title' on mixed\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Cannot access offset int on WP_Term\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Cannot access offset mixed on mixed\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_all_campaigns\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_authors\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_categories\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_statuses\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_types\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_schedules\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_schedules\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_tags\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_user_detail\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Offset 'body' on array\\{headers\\: WpOrg\\\\Requests\\\\Utility\\\\CaseInsensitiveDictionary, body\\: string, response\\: array\\{code\\: int, message\\: string\\}, cookies\\: array\\<int, WP_Http_Cookie\\>, filename\\: string\\|null, http_response\\: WP_HTTP_Requests_Response\\} in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$campaign_id of static method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_meta\\(\\) expects int, mixed given\\.$#"
+			count: 2
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: string, post_status\\: string, post_author\\: string, post_category\\?\\: array\\{non\\-falsy\\-string\\}, tags_input\\?\\: array\\{non\\-falsy\\-string\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#2 \\$max_title_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#2 \\$message of class WP_Error constructor expects string, mixed given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:__\\(\\)\\.$#"
+			count: 3
+			path: inc/licensing/Activation.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:license\\(\\)\\.$#"
+			count: 1
+			path: inc/licensing/Activation.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:send_request\\(\\)\\.$#"
+			count: 4
+			path: inc/licensing/Activation.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$client with type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client is not subtype of native type SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Activation.php
+
+		-
+			message: "#^Parameter \\$client of method SureCart\\\\Licensing\\\\Activation\\:\\:__construct\\(\\) has invalid type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Activation.php
+
+		-
+			message: "#^Cannot access property \\$code on mixed\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Default value of the parameter \\#1 \\$method \\(string\\) of method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) is incompatible with type array\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:__\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:activation\\(\\) has invalid return type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:activation\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Licensing but returns object\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:license\\(\\) has invalid return type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:license\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Licensing but returns object\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) has invalid return type SureCart\\\\Licensing\\\\WP_Error\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) has parameter \\$method with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) should return array\\|SureCart\\\\Licensing\\\\WP_Error but returns WP_Error\\.$#"
+			count: 4
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:send_request\\(\\) should return array\\|SureCart\\\\Licensing\\\\WP_Error but returns mixed\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:settings\\(\\) has invalid return type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:settings\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Licensing but returns object\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:updater\\(\\) has invalid return type SureCart\\\\Licensing\\\\SureCart\\\\Updater\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:updater\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Updater but returns object\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Parameter \\#2 \\$args of function wp_remote_request expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{headers\\: array\\{X\\-SURECART\\-WP\\-LICENSING\\-SDK\\-VERSION\\: string, Accept\\: 'application/json', Authorization\\?\\: non\\-falsy\\-string\\}, method\\: array, timeout\\: 30, blocking\\: bool, body\\: array\\|null\\} given\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 4
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$id\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$key\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$slug\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:__\\(\\)\\.$#"
+			count: 7
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:activation\\(\\)\\.$#"
+			count: 5
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:send_request\\(\\)\\.$#"
+			count: 2
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:settings\\(\\)\\.$#"
+			count: 12
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\License\\:\\:activate\\(\\) should return object but returns true\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Method WP_Error\\:\\:get_error_code\\(\\) invoked with 1 parameter, 0 required\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$client with type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client is not subtype of native type SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Parameter \\$client of method SureCart\\\\Licensing\\\\License\\:\\:__construct\\(\\) has invalid type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Property SureCart\\\\Licensing\\\\License\\:\\:\\$is_valid_license \\(bool\\) does not accept bool\\|WP_Error\\.$#"
+			count: 1
+			path: inc/licensing/License.php
+
+		-
+			message: "#^Access to an undefined property SureCart\\\\Licensing\\\\Settings\\:\\:\\$activation_id\\.$#"
+			count: 3
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Access to an undefined property SureCart\\\\Licensing\\\\Settings\\:\\:\\$license_id\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Access to an undefined property SureCart\\\\Licensing\\\\Settings\\:\\:\\$license_key\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$name\\.$#"
+			count: 6
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$slug\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:__\\(\\)\\.$#"
+			count: 11
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:activation\\(\\)\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:license\\(\\)\\.$#"
+			count: 2
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:__set\\(\\) with return type void returns bool but should not return anything\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:add_page\\(\\) has parameter \\$args with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:form_action_url\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:get_options\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:license_form_submit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Settings\\:\\:set_option_key\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$client with type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client is not subtype of native type SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$code of method SureCart\\\\Licensing\\\\Settings\\:\\:add_error\\(\\) expects string, int\\|string given\\.$#"
+			count: 2
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function strtolower expects string, string\\|null given\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Parameter \\$client of method SureCart\\\\Licensing\\\\Settings\\:\\:__construct\\(\\) has invalid type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Property SureCart\\\\Licensing\\\\Settings\\:\\:\\$menu_args type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Result of method SureCart\\\\Licensing\\\\Settings\\:\\:add_success\\(\\) \\(void\\) is used\\.$#"
+			count: 2
+			path: inc/licensing/Settings.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$basename\\.$#"
+			count: 5
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$checked\\.$#"
+			count: 2
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$last_checked\\.$#"
+			count: 2
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$last_updated\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$new_version\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$no_update\\.$#"
+			count: 2
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$package\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$plugin\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$project_version\\.$#"
+			count: 4
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$response\\.$#"
+			count: 2
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$slug\\.$#"
+			count: 6
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$theme\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$version\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:license\\(\\)\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:check_plugin_update\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:check_theme_update\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:get_cached_version_info\\(\\) should return object but returns false\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:get_cached_version_info\\(\\) should return object but returns mixed\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:get_project_latest_version\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:get_version_info\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:plugins_api_filter\\(\\) should return object but returns mixed\\.$#"
+			count: 2
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$client with type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client is not subtype of native type SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Parameter \\#1 \\$format of function date_i18n expects string, mixed given\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Parameter \\$client of method SureCart\\\\Licensing\\\\Updater\\:\\:__construct\\(\\) has invalid type SureCart\\\\Licensing\\\\SureCart\\\\Licensing\\\\Client\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between object and false will always evaluate to false\\.$#"
+			count: 1
+			path: inc/licensing/Updater.php
+
+		-
+			message: "#^Cannot access offset string on mixed\\.$#"
+			count: 3
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:update_option\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:format_data\\(\\) has parameter \\$postdata with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:format_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_meta\\(\\) should return string but returns mixed\\.$#"
+			count: 2
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_default_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_settings_dataset\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:update_campaign_meta\\(\\) should return bool but returns bool\\|int\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 2
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 2
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of function esc_url expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:\\$dashboard_options type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_ai_blogger_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_all_type_wise_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_default_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_settings_dataset\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$args of function wp_parse_args expects array\\|object\\|string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$email of function sanitize_email expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 3
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function stripslashes expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of function esc_url expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:\\$dashboard_options type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Function esc_html_e invoked with 3 parameters, 1\\-2 required\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:add_data_attributes\\(\\) has parameter \\$allowedposttags with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:add_data_attributes\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:add_notice\\(\\) has parameter \\$args with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_notice_by_id\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_notice_id\\(\\) has parameter \\$notice with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_notices\\(\\) never returns null so it can be removed from the return type\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_notices\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_wrap_classes\\(\\) has parameter \\$notice with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_wrap_classes\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:get_wrap_classes\\(\\) should return array but returns string\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:is_expired\\(\\) has parameter \\$notice with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:markup\\(\\) has parameter \\$notice with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:sort_notices\\(\\) has parameter \\$notice_1 with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:sort_notices\\(\\) has parameter \\$notice_2 with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:sort_notices\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Method Web_Notices\\:\\:sort_notices\\(\\) should return array but returns \\(float\\|int\\)\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Parameter \\#1 \\$input_list of function wp_list_filter expects array, array\\|null given\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, array\\{\\$this\\(Web_Notices\\), 'sort_notices'\\} given\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Parameter \\#4 \\$ver of function wp_enqueue_style expects bool\\|string\\|null, array given\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Parameter \\#4 \\$ver of function wp_register_script expects bool\\|string\\|null, array given\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Property Web_Notices\\:\\:\\$notices type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Property Web_Notices\\:\\:\\$version type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
+
+		-
+			message: "#^Static property Web_Notices\\:\\:\\$version \\(array\\) does not accept default value of type string\\.$#"
+			count: 1
+			path: inc/web-notices/class-web-notices.php
