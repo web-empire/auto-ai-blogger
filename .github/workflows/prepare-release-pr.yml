@@ -28,8 +28,23 @@ jobs:
 
       - name: Initialize mandatory git config
         run: |
-          git config user.name "Navanath Bhosale"
-          git config user.email "navanathb@bsf.io"
+          git config user.name "WebEmpire"
+          git config user.email "webempire143@gmail.com"
+
+      - name: Compute old and new version
+        id: get_version
+        run: |
+          OLD_VERSION=$(jq --raw-output '.version' package.json)
+          echo "::set-output name=old_version::$(echo $OLD_VERSION)"
+          NEW_VERSION=${{ github.event.inputs.version }}
+          echo "::set-output name=new_version::$(echo $NEW_VERSION)"
+
+      - name: Update plugin version
+        env:
+          VERSION: ${{ steps.get_version.outputs.new_version }}
+        run: |
+          cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
+          cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package-lock.json) > package-lock.json
 
       - name: Use desired version of NodeJS
         uses: actions/setup-node@v2
