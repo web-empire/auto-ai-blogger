@@ -6,7 +6,7 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Inc\Traits;
+namespace WPAIBlogger\Inc\Traits;
 
 /**
  * Trait Get_Instance.

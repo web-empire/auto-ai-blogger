@@ -8,9 +8,9 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Admin;
+namespace WPAIBlogger\Admin;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Traits\Get_Instance;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -60,7 +60,7 @@ class Licensing {
 	 */
 	public static function licensing_setup() {
 		$client = new \SureCart\Licensing\Client( WP_AI_BLOGGER_PRODUCT_NAME, WP_AI_BLOGGER_PUBLIC_TOKEN, WP_AI_BLOGGER_FILE );
-		$client->set_textdomain( 'wp-ai-blogger' ); // @phpstan-ignore-line
+		$client->set_textdomain( 'wp-ai-blogger' );
 		return $client;
 	}
 

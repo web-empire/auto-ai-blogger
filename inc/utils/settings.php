@@ -2,11 +2,11 @@
 /**
  * Settings.
  *
- * @package AutoBlogAI
+ * @package WPAIBlogger
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Inc\Utils;
+namespace WPAIBlogger\Inc\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,28 +26,28 @@ class Settings {
 	public static $dashboard_options = [];
 
 	/**
-	 * Returns all default portal settings.
+	 * Returns all default dashboard settings.
 	 *
 	 * @return array
 	 * @since x.x.x
 	 */
 	public static function get_settings_dataset() {
 		return apply_filters(
-			'autoblog_ai_settings_dataset',
+			'wp_ai_blogger_settings_dataset',
 			[
 				'userOnboarded' => [
 					'default' => false,
 					'type'    => 'bool',
 				],
-				'onboardingTab'  => [
+				'onboardingTab' => [
 					'default' => 'welcome',
 					'type'    => 'string',
 				],
-				'userName' => [
+				'userName'      => [
 					'default' => wpaib_get_user_detail( 'name' ),
 					'type'    => 'name',
 				],
-				'userEmail' => [
+				'userEmail'     => [
 					'default' => wpaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
@@ -169,9 +169,7 @@ class Settings {
 				break;
 
 			case 'array':
-			case 'post_types':
-			case 'questions':
-				$output = ! empty( $value ) ? json_decode( stripslashes( $value ) ) : '';
+				$output = ! empty( $value ) ? wpaib_clean_data( $value ) : '';
 				break;
 
 			case 'html':

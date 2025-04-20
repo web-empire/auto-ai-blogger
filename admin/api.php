@@ -6,10 +6,10 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Admin;
+namespace WPAIBlogger\Admin;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
-use AutoBlogAI\Inc\Utils\Settings;
+use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 

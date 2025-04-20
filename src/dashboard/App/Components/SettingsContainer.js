@@ -1,9 +1,7 @@
-import { __ } from '@wordpress/i18n';
-
 const SettingsContainer = ( { title, description, element } ) => {
 	return (
 		<>
-			<div className='flex gap-x-2 flex-col mb-4'>
+			<div className="flex gap-x-2 flex-col mb-4">
 				<h2 className="text-base/7 font-semibold text-gray-900 p-0 m-0"> { title } </h2>
 				<p className="mt-1 text-sm/6 text-gray-500">
 					{ description }
@@ -15,6 +13,6 @@ const SettingsContainer = ( { title, description, element } ) => {
 			</div>
 		</>
 	);
-}
+};
 
 export default SettingsContainer;

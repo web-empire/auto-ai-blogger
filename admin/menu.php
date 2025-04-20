@@ -6,9 +6,11 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Admin;
+namespace WPAIBlogger\Admin;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
+use FluentCommunity\App\Models\Meta;
+use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Metadata;
 
 /**
  * Frontend Compatibility
@@ -53,14 +55,14 @@ class Menu {
 
 			add_filter(
 				'admin_footer_text',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
 
 			add_filter(
 				'update_footer',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
@@ -86,16 +88,16 @@ class Menu {
 			return;
 		}
 
-		$blog_name = get_bloginfo( 'name' );
+		$blog_name                = get_bloginfo( 'name' );
 		$admin_site_email_address = get_option( 'admin_email' );
 
 		$localized_data = apply_filters(
-			'autoblog_ai_localized_admin_data',
+			'wp_ai_blogger_localized_admin_data',
 			[
 				'ajax_url'           => admin_url( 'admin-ajax.php' ),
 				'version'            => WP_AI_BLOGGER_VERSION,
 				'upgrade_link'       => WP_AI_BLOGGER_UPGRADE_LINK,
-				'admin_nonce'        => wp_create_nonce( 'wpaib_update_admin_setting' ),
+				'admin_nonce'        => wp_create_nonce( 'wpaib_admin_nonce' ),
 				'userOnboarded'      => get_option( 'autoblog_ai_userOnboarded', false ),
 				'admin_base_url'     => admin_url( 'edit.php' ),
 				'admin_app_url'      => 'wp-admin/edit.php?page=' . self::PAGE_ID,
@@ -109,6 +111,13 @@ class Menu {
 				'license_status'     => get_option( 'autoblog_ai_license_status', 'unlicensed' ),
 				'admin_email'        => $admin_site_email_address,
 				'blog_name'          => $blog_name,
+				'post_statuses'      => wpaib_get_post_statuses(),
+				'categories'         => wpaib_get_categories(),
+				'tags'               => wpaib_get_tags(),
+				'authors'            => wpaib_get_authors(),
+				'post_types'         => wpaib_get_post_types(),
+				'postmeta_defaults'  => Metadata::get_default_settings(),
+				'all_campaigns'      => wpaib_get_all_campaigns(),
 			]
 		);
 
