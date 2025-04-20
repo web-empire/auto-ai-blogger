@@ -53,7 +53,8 @@ return [
     'exclude' => [
         'assets/*',
 		'assets/build/blog-app.asset.php',
-        'phpinsights.php'
+        'phpinsights.php',
+		'inc/web-notices/class-web-notices.php',
     ],
 
     'add' => [

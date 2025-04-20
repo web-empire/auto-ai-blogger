@@ -13,12 +13,13 @@ module.exports = {
 		'no-nested-ternary': 'off',
 		'react/jsx-indent': 'off',
 		'jsx-a11y/click-events-have-key-events': 'off',
+		'jsx-a11y/anchor-is-valid': 'off',
 		'jsx-a11y/no-static-element-interactions': 'off',
 		'jsx-a11y/label-has-for': 'off',
 		'jsdoc/check-tag-names': [ 'error', { definedTags: [ 'jsx' ] } ],
 		'@wordpress/i18n-text-domain': [
 			'error',
-			{ allowedTextDomain: 'wp-docs-hub' },
+			{ allowedTextDomain: 'wp-ai-blogger' },
 		],
 	},
 	parserOptions: {
@@ -40,5 +41,7 @@ module.exports = {
 		navigator: true,
 		docsMenuChange: true,
 		hub_admin_nav_menu_data: true,
+		autoblog_data: true,
+		WebNotices: true,
 	},
 };

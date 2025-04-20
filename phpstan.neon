@@ -16,14 +16,13 @@ parameters:
 	scanFiles:
 	bootstrapFiles:
 		- %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
-		- tests/php/stubs/autoblog-ai-constants.php
-		- tests/php/stubs/autoblog-ai-stubs.php
+		- tests/php/stubs/wp-ai-blogger-constants.php
+		- tests/php/stubs/wp-ai-blogger-stubs.php
 	paths:
-		- autoblog-ai.php
+		- wp-ai-blogger.php
 		- inc
 		- core
 		- admin
-		- templates
 
 	excludePaths:
 		- node_modules

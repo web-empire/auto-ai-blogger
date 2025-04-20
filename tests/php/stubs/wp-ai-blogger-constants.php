@@ -1,0 +1,35 @@
+<?php
+/**
+ * Constant Stubs.
+ *
+ * @package suredash
+ */
+
+define( 'SUREDASHBOARD_UPGRADE_LINK', '' );
+define( 'SUREDASH_PRO_PRODUCT', '' );
+define( 'SUREDASH_PRO_VER', '' );
+define( 'SUREDASH_PRO_MINIMUM_VER', '');
+define( 'SUREDASHBOARD_BASE', '' );
+define( 'SUREDASHBOARD_MOBILE_BREAKPOINT', '' );
+define( 'SUREDASHBOARD_TABLET_BREAKPOINT', '' );
+define( 'SUREDASHBOARD_CSS_SUFFIX', '' );
+define( 'SUREDASHBOARD_CSS_ASSETS_FOLDER', '' );
+define( 'SUREDASHBOARD_JS_SUFFIX', '' );
+define( 'SUREMEMBERS_PLAN_EXCLUDE', '' );
+define( 'SUREDASHBOARD_JS_ASSETS_FOLDER', '' );
+define( 'SUREMEMBERS_PLAN_INCLUDE', '' );
+define( 'SUREMEMBERS_PLAN_PRIORITY', '' );
+define( 'SUREMEMBERS_POST_TYPE', '' );
+define( 'TVE_EDITOR_FLAG', '' );
+define( 'SUREDASHBOARD_SLUG', '' );
+define( 'SUREDASHBOARD_URL', '' );
+define( 'SUREDASHBOARD_TAXONOMY', '' );
+define( 'SUREDASHBOARD_CAPABILITY', '' );
+define( 'SUREDASHBOARD_SETTINGS', '' );
+define( 'SUREDASHBOARD_TOPIC_TAXONOMY', '' );
+define( 'SUREDASHBOARD_TOPIC_POST_TYPE', '' );
+define( 'SUREDASHBOARD_POST_TYPE', '' );
+define( 'SUREDASHBOARD_DIR', '' );
+define( 'SUREDASHBOARD_CONTENT_POST_TYPE', '' );
+define( 'SUREDASHBOARD_SUB_CONTENT_POST_TYPE', '' );
+define( 'SUREDASHBOARD_CONTENT_TAXONOMY', '' );
