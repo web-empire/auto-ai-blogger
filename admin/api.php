@@ -3,7 +3,7 @@
  * Admin Init.
  *
  * @package wp-ai-blogger
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Admin;
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Initialize setup
  *
- * @since x.x.x
+ * @since 0.0.1
  * @package wp-ai-blogger
  */
 
@@ -49,7 +49,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @access private
 	 * @var string $option_name DB option name.
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	private static $option_name = WP_AI_BLOGGER_DB_OPTION;
 
@@ -58,14 +58,14 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @access private
 	 * @var array $ai_blogger_admin_settings Settings array.
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	private static $ai_blogger_admin_settings = [];
 
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function __construct() {
 		self::$ai_blogger_admin_settings = get_option( self::$option_name, [] );
@@ -75,7 +75,7 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Register API routes.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function register_routes(): void {
 
@@ -100,7 +100,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return array $updated_option defaults + set DB option data.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function get_admin_settings( $request ) {
 		return Settings::get_ai_blogger_settings();
@@ -111,7 +111,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @param  WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function get_permissions_check( $request ) {
 

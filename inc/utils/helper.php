@@ -3,7 +3,7 @@
  * Helper.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Inc\Utils;
@@ -11,7 +11,7 @@ namespace WPAIBlogger\Inc\Utils;
 /**
  * Initialize setup
  *
- * @since x.x.x
+ * @since 0.0.1
  * @package WPAIBlogger
  */
 
@@ -30,7 +30,7 @@ class Helper {
 	 * @param  mixed  $default Option default value if option is not available.
 	 * @return mixed   Returns the option value
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_option( $key, $default = false ) {
 		$settings = Settings::get_ai_blogger_settings();
@@ -56,7 +56,7 @@ class Helper {
 	 * @param  mixed  $value    Option value to update.
 	 * @return string           Return the option value
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function update_option( $key, $value = true ) {
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
@@ -80,7 +80,7 @@ class Helper {
 	 * @param  string $key The option key.
 	 * @return void
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function delete_option( $key ): void {
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );

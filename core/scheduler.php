@@ -3,7 +3,7 @@
  * Scheduler.
  *
  * @package AutoBlog_AI
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Core;
@@ -14,7 +14,7 @@ use WPAIBlogger\Inc\Utils\Metadata;
 /**
  * Create auto blog post scheduler
  *
- * @since x.x.x
+ * @since 0.0.1
  */
 class Scheduler {
 	use Get_Instance;
@@ -52,7 +52,7 @@ class Scheduler {
 	 * Custom cron schedules.
 	 *
 	 * @param array $schedules Schedules.
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return array
 	 */
 	public function custom_cron_schedules( $schedules ) {
@@ -89,7 +89,7 @@ class Scheduler {
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public function create_blog_post( $campaign_id ): void {

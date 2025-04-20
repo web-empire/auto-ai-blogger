@@ -3,7 +3,7 @@
  * Metadata.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Inc\Utils;
@@ -19,7 +19,7 @@ class Metadata {
 	/**
 	 * Cache the DB options
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @access public
 	 * @var array
 	 */
@@ -29,7 +29,7 @@ class Metadata {
 	 * Returns all default post settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_settings_dataset() {
 		return apply_filters(
@@ -114,7 +114,7 @@ class Metadata {
 	 * @param string $key         The meta key.
 	 * @return string
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_campaign_meta( $campaign_id, $key ) {
 		$meta_value = get_post_meta( $campaign_id, $key, true );
@@ -134,7 +134,7 @@ class Metadata {
 	 * @param mixed  $value       The meta value.
 	 * @return bool
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function update_campaign_meta( $campaign_id, $key, $value ) {
 		$settings_dataset = self::get_settings_dataset();
@@ -156,7 +156,7 @@ class Metadata {
 	 * @param  mixed  $default Option default value if option is not available.
 	 * @return mixed   Returns the option value
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_default_option( $key, $default = false ) {
 		$default_settings = self::get_default_settings();
@@ -172,7 +172,7 @@ class Metadata {
 	 * As per the settings dataset, return the default settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_default_settings() {
 		$settings_dataset = self::get_settings_dataset();
@@ -189,7 +189,7 @@ class Metadata {
 	/**
 	 * Data cleaner
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @access public
 	 *
 	 * @param mixed  $value     data from AJAX.
@@ -235,7 +235,7 @@ class Metadata {
 	 * Format post metadata in a way that it can be saved in the database via wp_insert_post.
 	 *
 	 * @param array $postdata The metadata to format.
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return array The formatted metadata.
 	 */
 	public static function format_data( $postdata ) {
@@ -263,7 +263,7 @@ class Metadata {
 	 *
 	 * @param int $post_id The post ID.
 	 * @return array<mixed> The metadata.
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_metadata( $post_id ) {
 		$settings_dataset = self::get_settings_dataset();

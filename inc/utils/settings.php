@@ -3,7 +3,7 @@
  * Settings.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Inc\Utils;
@@ -19,7 +19,7 @@ class Settings {
 	/**
 	 * Cache the DB options
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @access public
 	 * @var array
 	 */
@@ -29,7 +29,7 @@ class Settings {
 	 * Returns all default dashboard settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_settings_dataset() {
 		return apply_filters(
@@ -62,7 +62,7 @@ class Settings {
 	 * @param  mixed  $default Option default value if option is not available.
 	 * @return mixed   Returns the option value
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_default_option( $key, $default = false ) {
 		$default_settings = self::get_default_settings();
@@ -78,7 +78,7 @@ class Settings {
 	 * As per the settings dataset, return the default settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_default_settings() {
 		$settings_dataset = self::get_settings_dataset();
@@ -96,7 +96,7 @@ class Settings {
 	 * Returns all portal settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_ai_blogger_settings() {
 		if ( ! empty( self::$dashboard_options ) ) {
@@ -115,7 +115,7 @@ class Settings {
 	 * Get all the settings type wise.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_all_type_wise_settings() {
 		$settings_dataset = self::get_settings_dataset();
@@ -132,7 +132,7 @@ class Settings {
 	/**
 	 * Data cleaner
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @access public
 	 *
 	 * @param mixed  $value     data from AJAX.
@@ -191,7 +191,7 @@ class Settings {
 	 *
 	 * @param string $key The setting key.
 	 * @return string
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public static function get_setting_type( $key ) {
 		$settings_dataset = self::get_settings_dataset();

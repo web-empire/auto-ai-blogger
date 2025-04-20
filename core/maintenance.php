@@ -3,7 +3,7 @@
  * Maintenance.
  *
  * @package AutoBlog_AI
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Core;
@@ -19,7 +19,7 @@ use WPAIBlogger\Inc\Traits\Get_Instance;
 /**
  * Update initial setup
  *
- * @since x.x.x
+ * @since 0.0.1
  */
 class Maintenance {
 	use Get_Instance;
@@ -38,7 +38,7 @@ class Maintenance {
 	/**
 	 * Init
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public static function init(): void {

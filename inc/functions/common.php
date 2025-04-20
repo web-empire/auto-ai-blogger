@@ -17,7 +17,7 @@ use WPAIBlogger\Inc\Utils\Metadata;
  * Get user details.
  *
  * @param string $detail Detail to get.
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_get_user_detail( $detail ) {
 	$current_user = wp_get_current_user();
@@ -188,7 +188,7 @@ function wpaib_get_authors() {
  * Get all custom schedules to schedule auto blog posts.
  *
  * @return array
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_get_schedules() {
 	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
@@ -215,7 +215,7 @@ function wpaib_get_schedules() {
  * @param int $campaign_id Campaign ID.
  * @param int $days       Days.
  * @return void
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_update_schedules( $campaign_id, $days ): void {
 	$schedules = wpaib_get_schedules();
@@ -234,7 +234,7 @@ function wpaib_update_schedules( $campaign_id, $days ): void {
  *
  * @param int $campaign_id Campaign ID.
  * @return bool
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
 	$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
@@ -253,7 +253,7 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @param string $keywords         Keywords.
  * @param int    $max_title_words  Max title words.
  * @param int    $max_content_words Max content words.
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words ) {
 	$api = WP_AI_BLOGGER_POST_CREATION_API;
@@ -309,7 +309,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
  *
  * @param int $campaign_id Campaign ID.
  * @return int|WP_Error
- * @since x.x.x
+ * @since 0.0.1
  */
 function wpaib_create_blog_post( $campaign_id ) {
 	// General settings.

@@ -5,7 +5,7 @@
  * This class handles all licensing related stuff.
  *
  * @package AutoBlog_AI
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Admin;
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Licensing handler class.
  *
- * @since x.x.x
+ * @since 0.0.1
  */
 class Licensing {
 	use Get_Instance;
@@ -34,7 +34,7 @@ class Licensing {
 	/**
 	 * Class constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public function __construct() {
@@ -55,7 +55,7 @@ class Licensing {
 	 * Licensing setup.
 	 * Creates a client object for SureCart licensing.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return \SureCart\Licensing\Client
 	 */
 	public static function licensing_setup() {
@@ -68,7 +68,7 @@ class Licensing {
 	 * Licensing setup.
 	 * Creates a client object for SureCart licensing.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public static function init_licensing(): void {
@@ -79,7 +79,7 @@ class Licensing {
 	 * Activate license
 	 *
 	 * @hooked wp_ajax_autoblog_ai_activate_license
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public function activate_license(): void {
@@ -120,7 +120,7 @@ class Licensing {
 	 * Deactivate license.
 	 *
 	 * @hooked wp_ajax_autoblog_ai_deactivate_license
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	public function deactivate_license(): void {
@@ -148,7 +148,7 @@ class Licensing {
 	/**
 	 * Checks if license is active.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return bool
 	 */
 	public static function is_license_active() {
@@ -232,7 +232,7 @@ class Licensing {
 	/**
 	 * Set error messages.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 * @return void
 	 */
 	private function set_error_messages(): void {

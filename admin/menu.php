@@ -3,7 +3,7 @@
  * Admin Menu.
  *
  * @package AutoBlog_AI
- * @since x.x.x
+ * @since 0.0.1
  */
 
 namespace WPAIBlogger\Admin;
@@ -21,7 +21,7 @@ use WPAIBlogger\Inc\Utils\Metadata;
 /**
  * Menu setup
  *
- * @since x.x.x
+ * @since 0.0.1
  */
 class Menu {
 	use Get_Instance;
@@ -34,7 +34,7 @@ class Menu {
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -47,7 +47,7 @@ class Menu {
 	/**
 	 * Initialize Admin Setup.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function settings_admin_scripts(): void {
 		if ( ! empty( $_GET['page'] ) && ( wp_unslash( $_GET['page'] ) === self::PAGE_ID || strpos( sanitize_text_field( wp_unslash( $_GET['page'] ) ), self::PAGE_ID . '_' ) !== false ) ) { // phpcs:ignore -- Input var okay.
@@ -72,7 +72,7 @@ class Menu {
 	/**
 	 * Renders the hub screen canvas.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function render_settings_page(): void {
 		echo "<div id='autoblog-main-page--wrapper'></div>";
@@ -81,7 +81,7 @@ class Menu {
 	/**
 	 * Enqueue the Admin's build files for plugin to work.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function app_build_scripts(): void {
 		if ( is_customize_preview() ) {
@@ -152,7 +152,7 @@ class Menu {
 	/**
 	 * Function to load the admin area actions.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function initialize_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'register_plugin_menus' ] );
@@ -161,7 +161,7 @@ class Menu {
 	/**
 	 * Add submenu to admin menu.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.1
 	 */
 	public function register_plugin_menus(): void {
 		if ( current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
