@@ -51,7 +51,7 @@ export default function PostIdeas() {
         }
 
         try {
-            const response = await fetch('https://localhost/wp-json/wp-ai-blogger/v1/generate-post-ideas', {
+            const response = await fetch('https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post-ideas', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
