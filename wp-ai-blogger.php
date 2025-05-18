@@ -34,9 +34,13 @@ define( 'WP_AI_BLOGGER_CAPABILITY', 'manage_options' );
 define( 'WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger' );
 define( 'WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );
 define( 'WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1' );
+define( 'WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/' );
+
+// CPT Constants.
+define( 'WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign' );
 
 // Define Upgrade Link.
-define( 'WP_AI_BLOGGER_UPGRADE_LINK', '#' );
+define( 'WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/' );
 
 // Include required files.
 require_once 'inc/functions/common.php';

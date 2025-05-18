@@ -6,10 +6,11 @@
  * @since x.x.x
  */
 
-namespace AutoBlogAI\Admin;
+namespace WPAIBlogger\Admin;
 
-use AutoBlogAI\Inc\Traits\Get_Instance;
-use AutoBlogAI\Inc\Utils\Helper;
+use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Metadata;
+use WPAIBlogger\Inc\Utils\Helper;
 
 /**
  * Frontend Compatibility
@@ -54,14 +55,14 @@ class Menu {
 
 			add_filter(
 				'admin_footer_text',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
 
 			add_filter(
 				'update_footer',
-				function () {
+				static function () {
 					return ''; // Return an empty string to remove the text.
 				}
 			);
@@ -90,6 +91,7 @@ class Menu {
 		$site_title               = Helper::get_option( 'siteTitle' );
 		$site_description         = Helper::get_option( 'siteDescription' );
 		$site_for                 = Helper::get_option( 'siteFor' );
+		$blog_name                = get_bloginfo( 'name' );
 		$admin_site_email_address = get_option( 'admin_email' );
 		$temperature              = Helper::get_option( 'temperature' );
 		$harassment               = Helper::get_option( 'harassment' );
@@ -104,16 +106,18 @@ class Menu {
 		$license = isset( $license['sc_license_key'] ) && ! empty( $license['sc_license_key'] ) ? $license['sc_license_key'] : '';
 
 		$localized_data = apply_filters(
-			'autoblog_ai_localized_admin_data',
+			'wp_ai_blogger_localized_admin_data',
 			[
 				'ajax_url'          => admin_url( 'admin-ajax.php' ),
 				'version'           => WP_AI_BLOGGER_VERSION,
 				'upgrade_link'      => WP_AI_BLOGGER_UPGRADE_LINK,
-				'admin_nonce'       => wp_create_nonce( 'wpaib_update_admin_setting' ),
+				'admin_nonce'       => wp_create_nonce( 'wpaib_admin_nonce' ),
 				'userOnboarded'     => get_option( 'autoblog_ai_userOnboarded', false ),
 				'admin_base_url'    => admin_url( 'edit.php' ),
 				'admin_app_url'     => 'wp-admin/edit.php?page=' . self::PAGE_ID,
 				'home_slug'         => self::PAGE_ID,
+				'current_user_name'  => wpaib_get_user_detail( 'name' ),
+				'current_user_email' => wpaib_get_user_detail( 'email' ),
 				'pro_available'     => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? true : false,
 				'pro_version'       => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
 				'pro_purchase_url'  => 'https://wpaiblogger.com/',
@@ -131,6 +135,14 @@ class Menu {
 				'sexually_explicit' => $sexually_explicit,
 				'dangerous_content' => $dangerous_content,
 				'civic_integrity'   => $civic_integrity,
+				'blog_name'          => $blog_name,
+				'post_statuses'      => wpaib_get_post_statuses(),
+				'categories'         => wpaib_get_categories(),
+				'tags'               => wpaib_get_tags(),
+				'authors'            => wpaib_get_authors(),
+				'post_types'         => wpaib_get_post_types(),
+				'postmeta_defaults'  => Metadata::get_default_settings(),
+				'all_campaigns'      => wpaib_get_all_campaigns(),
 			]
 		);
 

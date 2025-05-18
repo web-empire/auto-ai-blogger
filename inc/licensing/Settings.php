@@ -46,13 +46,36 @@ class Settings {
 	}
 
 	/**
+	 * Set an option.
+	 *
+	 * @param string $name Name of option.
+	 *
+	 * @return mixed
+	 */
+	public function __get( $name ) {
+		return $this->get_option( 'sc_' . $name );
+	}
+
+	/**
+	 * Set an option
+	 *
+	 * @param string $name Name of option.
+	 * @param mixed  $value Value.
+	 *
+	 * @return bool
+	 */
+	public function __set( $name, $value ) {
+		return $this->set_option( 'sc_' . $name, $value );
+	}
+
+	/**
 	 * Add the settings page.
 	 *
 	 * @param array $args Settings page args.
 	 *
 	 * @return void
 	 */
-	public function add_page( $args ) {
+	public function add_page( $args ): void {
 		// store menu args for proper menu creation.
 		$this->menu_args = wp_parse_args(
 			$args,
@@ -72,13 +95,6 @@ class Settings {
 	}
 
 	/**
-	 * Form action URL
-	 */
-	private function form_action_url() {
-		return apply_filters( 'surecart_client_license_form_action', '' );
-	}
-
-	/**
 	 * Set the option key.
 	 *
 	 * If someone wants to override the default generated key.
@@ -95,7 +111,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function admin_menu() {
+	public function admin_menu(): void {
 		switch ( $this->menu_args['type'] ) {
 			case 'menu':
 				$this->create_menu_page();
@@ -107,53 +123,6 @@ class Settings {
 				$this->create_options_page();
 				break;
 		}
-	}
-
-	/**
-	 * Add license menu page
-	 */
-	private function create_menu_page() {
-		call_user_func(
-			'add_menu_page',
-			$this->menu_args['page_title'],
-			$this->menu_args['menu_title'],
-			$this->menu_args['capability'],
-			$this->menu_args['menu_slug'],
-			[ $this, 'settings_output' ],
-			$this->menu_args['icon_url'],
-			$this->menu_args['position']
-		);
-	}
-
-	/**
-	 * Add submenu page
-	 */
-	private function create_submenu_page() {
-		call_user_func(
-			'add_submenu_page',
-			$this->menu_args['parent_slug'],
-			$this->menu_args['page_title'],
-			$this->menu_args['menu_title'],
-			$this->menu_args['capability'],
-			$this->menu_args['menu_slug'],
-			[ $this, 'settings_output' ],
-			$this->menu_args['position']
-		);
-	}
-
-	/**
-	 * Add submenu page
-	 */
-	private function create_options_page() {
-		call_user_func(
-			'add_options_page',
-			$this->menu_args['page_title'],
-			$this->menu_args['menu_title'],
-			$this->menu_args['capability'],
-			$this->menu_args['menu_slug'],
-			[ $this, 'settings_output' ],
-			$this->menu_args['position']
-		);
 	}
 
 	/**
@@ -183,7 +152,7 @@ class Settings {
 	 */
 	public function get_option( $name ) {
 		$options = $this->get_options();
-		return isset( $options[ $name ] ) ? $options[ $name ] : null;
+		return $options[ $name ] ?? null;
 	}
 
 	/**
@@ -205,7 +174,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function settings_output() {
+	public function settings_output(): void {
 		$this->license_form_submit();
 
 		$this->print_css();
@@ -226,24 +195,24 @@ class Settings {
 
 					<h2><?php echo esc_html( $this->menu_args['page_title'] ); ?></h2>
 					<label for="license_key">
-						<?php if ( $action === 'activate' ) : ?> 
+						<?php if ( $action === 'activate' ) { ?> 
 							<?php echo esc_html( sprintf( $this->client->__( 'Enter your license key to activate %s.', 'surecart' ), $this->client->name ) ); ?>
-						<?php else : ?>
+						<?php } else { ?>
 							<?php echo esc_html( sprintf( $this->client->__( 'Your license is succesfully activated for this site.', 'surecart' ), $this->client->name ) ); ?>
-						<?php endif; ?>
+						<?php } ?>
 					</label>
 
-					<?php if ( $action === 'activate' ) : ?> 
+					<?php if ( $action === 'activate' ) { ?> 
 						<input class="widefat" type="password" autocomplete="off" name="license_key" id="license_key" value="<?php echo esc_attr( $this->license_key ); ?>" autofocus>
-					<?php endif; ?>
+					<?php } ?>
 
-					<?php if ( isset( $_GET['debug'] ) ) : // phpcs:ignore  ?>
+					<?php if ( isset( $_GET['debug'] ) ) { // phpcs:ignore?>
 						<label for="license_id"><?php echo esc_html( sprintf( $this->client->__( 'License ID', 'surecart' ), $this->client->name ) ); ?></label>
 						<input class="widefat" type="text" autocomplete="off" name="license_id" id="license_id" value="<?php echo esc_attr( $this->license_id ); ?>" autofocus>
 
 						<label for="activation_id"><?php echo esc_html( sprintf( $this->client->__( 'Activation ID', 'surecart' ), $this->client->name ) ); ?></label>
 						<input class="widefat" type="text" autocomplete="off" name="activation_id" id="activation_id" value="<?php echo esc_attr( $this->activation_id ); ?>" autofocus>
-					<?php endif; ?>
+					<?php } ?>
 
 					<?php submit_button( $action === 'activate' ? $this->client->__( 'Activate License' ) : $this->client->__( 'Deactivate License' ) ); ?>
 				</form>
@@ -252,12 +221,12 @@ class Settings {
 		<?php
 	}
 
-		/**
-		 * Print the css for the form.
-		 *
-		 * @return void
-		 */
-	public function print_css() {
+	/**
+	 * Print the css for the form.
+	 *
+	 * @return void
+	 */
+	public function print_css(): void {
 		?>
 		<style>
 			.spinner {
@@ -368,7 +337,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function redirect( $url ) {
+	public function redirect( $url ): void {
 		?>
 		<div class="spinner is-active"></div>
 		<script>
@@ -386,7 +355,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function add_notice( $code, $message, $type = 'info' ) {
+	public function add_notice( $code, $message, $type = 'info' ): void {
 		add_settings_error(
 			$this->name . '_license_options', // matches what we registered in `register_setting.
 			$code, // the error code.
@@ -403,7 +372,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function add_error( $code, $message ) {
+	public function add_error( $code, $message ): void {
 		$this->add_notice( $code, $message, 'error' );
 	}
 
@@ -415,30 +384,61 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function add_success( $code, $message ) {
+	public function add_success( $code, $message ): void {
 		$this->add_notice( $code, $message, 'success' );
 	}
 
 	/**
-	 * Set an option.
-	 *
-	 * @param string $name Name of option.
-	 *
-	 * @return mixed
+	 * Form action URL
 	 */
-	public function __get( $name ) {
-		return $this->get_option( 'sc_' . $name );
+	private function form_action_url() {
+		return apply_filters( 'surecart_client_license_form_action', '' );
 	}
 
 	/**
-	 * Set an option
-	 *
-	 * @param string $name Name of option.
-	 * @param mixed  $value Value.
-	 *
-	 * @return bool
+	 * Add license menu page
 	 */
-	public function __set( $name, $value ) {
-		return $this->set_option( 'sc_' . $name, $value );
+	private function create_menu_page(): void {
+		call_user_func(
+			'add_menu_page',
+			$this->menu_args['page_title'],
+			$this->menu_args['menu_title'],
+			$this->menu_args['capability'],
+			$this->menu_args['menu_slug'],
+			[ $this, 'settings_output' ],
+			$this->menu_args['icon_url'],
+			$this->menu_args['position']
+		);
+	}
+
+	/**
+	 * Add submenu page
+	 */
+	private function create_submenu_page(): void {
+		call_user_func(
+			'add_submenu_page',
+			$this->menu_args['parent_slug'],
+			$this->menu_args['page_title'],
+			$this->menu_args['menu_title'],
+			$this->menu_args['capability'],
+			$this->menu_args['menu_slug'],
+			[ $this, 'settings_output' ],
+			$this->menu_args['position']
+		);
+	}
+
+	/**
+	 * Add submenu page
+	 */
+	private function create_options_page(): void {
+		call_user_func(
+			'add_options_page',
+			$this->menu_args['page_title'],
+			$this->menu_args['menu_title'],
+			$this->menu_args['capability'],
+			$this->menu_args['menu_slug'],
+			[ $this, 'settings_output' ],
+			$this->menu_args['position']
+		);
 	}
 }

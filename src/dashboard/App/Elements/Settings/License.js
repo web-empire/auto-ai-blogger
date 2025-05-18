@@ -103,9 +103,9 @@ export default function License() {
 			title={ __( 'License & Tokens', 'wp-ai-blogger' ) }
 			description={ __( 'Boost your AI Blogger capabilities by activating your license.', 'wp-ai-blogger' ) }
 			element={
-				<div className='grid grid-cols-2 gap-6 w-full'>
+				<div className="grid grid-cols-2 gap-6 w-full">
 					<div>
-						<SettingLabel forId='license-key' title={ __( 'License Key', 'wp-ai-blogger' ) } />
+						<SettingLabel forId="license-key" title={ __( 'License Key', 'wp-ai-blogger' ) } />
 						<div className="mt-2 flex gap-4">
 							<input
 								id="license-key"
@@ -146,9 +146,9 @@ export default function License() {
 					</div>
 
 					<SettingField>
-						<SettingLabel forId='available-tokens' title={ __( 'Tokens Consumed', 'wp-ai-blogger' ) } />
-						<div className='flex gap-2 flex-row items-center mt-3'>
-							<p className='text-sm text-gray-500 m-0 p-0'> { __( '5,600 of 1,00,000 Tokens Used', 'wp-ai-blogger' ) } </p>
+						<SettingLabel forId="available-tokens" title={ __( 'Tokens Consumed', 'wp-ai-blogger' ) } />
+						<div className="flex gap-2 flex-row items-center mt-3">
+							<p className="text-sm text-gray-500 m-0 p-0"> { __( '5,600 of 1,00,000 Tokens Used', 'wp-ai-blogger' ) } </p>
 							<a
 								href="#"
 								className="text-gray-500 hover:text-indigo-900 flex items-center"

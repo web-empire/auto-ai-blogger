@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-if ( ! class_exists( 'Web_Notices' ) ) :
+if ( ! class_exists( 'Web_Notices' ) ) {
 
 	/**
 	 * Web_Notices
@@ -20,7 +20,6 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 	 * @since 1.0.0
 	 */
 	class Web_Notices {
-
 		/**
 		 * Notices
 		 *
@@ -72,7 +71,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @param array $args Notice arguments.
 		 * @return void
 		 */
-		public static function add_notice( $args = [] ) {
+		public static function add_notice( $args = [] ): void {
 			self::$notices[] = $args;
 		}
 
@@ -82,12 +81,12 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @since 1.0.0
 		 * @return void
 		 */
-		public function dismiss_notice() {
-			$notice_id           = ( isset( $_POST['notice_id'] ) ) ? sanitize_key( $_POST['notice_id'] ) : '';
-			$repeat_notice_after = ( isset( $_POST['repeat_notice_after'] ) ) ? absint( $_POST['repeat_notice_after'] ) : '';
-			$nonce               = ( isset( $_POST['nonce'] ) ) ? sanitize_key( $_POST['nonce'] ) : '';
+		public function dismiss_notice(): void {
+			$notice_id           = isset( $_POST['notice_id'] ) ? sanitize_key( $_POST['notice_id'] ) : '';
+			$repeat_notice_after = isset( $_POST['repeat_notice_after'] ) ? absint( $_POST['repeat_notice_after'] ) : '';
+			$nonce               = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
 			$notice              = $this->get_notice_by_id( $notice_id );
-			$capability          = isset( $notice['capability'] ) ? $notice['capability'] : 'manage_options';
+			$capability          = $notice['capability'] ?? 'manage_options';
 
 			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) {
 				return;
@@ -118,7 +117,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @since 1.0.0
 		 * @return void
 		 */
-		public function enqueue_scripts() {
+		public function enqueue_scripts(): void {
 			wp_register_script( 'web-notices', self::get_url() . 'script.js', [ 'jquery' ], self::$version, true );
 			wp_localize_script(
 				'web-notices',
@@ -149,6 +148,102 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 			}
 
 			return $notice_1['priority'] - $notice_2['priority'];
+		}
+
+		/**
+		 * Display the notices in the WordPress admin.
+		 *
+		 * @since 1.0.0
+		 * @return void
+		 */
+		public function show_notices(): void {
+			$defaults = [
+				'id'                         => '',      // Optional, Notice ID. If empty it set `web-notices-id-<$array-index>`.
+				'type'                       => 'info',  // Optional, Notice type. Default `info`. Expected [info, warning, notice, error].
+				'message'                    => '',      // Optional, Message.
+				'show_if'                    => true,    // Optional, Show notice on custom condition. E.g. 'show_if' => if( is_admin() ) ? true, false, .
+				'repeat-notice-after'        => '',      // Optional, Dismiss-able notice time. It'll auto show after given time.
+				'display-notice-after'       => false,      // Optional, Dismiss-able notice time. It'll auto show after given time.
+				'class'                      => '',      // Optional, Additional notice wrapper class.
+				'priority'                   => 10,      // Priority of the notice.
+				'display-with-other-notices' => true,    // Should the notice be displayed if other notices  are being displayed from Web_Notices.
+				'is_dismissible'             => true,
+				'capability'                 => 'manage_options', // User capability - This capability is required for the current user to see this notice.
+			];
+
+			// Count for the notices that are rendered.
+			$notices_displayed = 0;
+			$notices           = $this->get_notices();
+
+			foreach ( $notices as $key => $notice ) {
+				$notice = wp_parse_args( $notice, $defaults );
+
+				// Show notices only for users with `manage_options` cap.
+				if ( ! current_user_can( $notice['capability'] ) ) {
+					continue;
+				}
+
+				$notice['id']      = self::get_notice_id( $notice, $key );
+				$notice['classes'] = self::get_wrap_classes( $notice );
+
+				// Notices visible after transient expire.
+				if ( isset( $notice['show_if'] ) && $notice['show_if'] === true ) {
+
+					// don't display the notice if it is not supposed to be displayed with other notices.
+					if ( $notices_displayed !== 0 && $notice['display-with-other-notices'] === false ) {
+						continue;
+					}
+
+					if ( self::is_expired( $notice ) ) {
+
+						self::markup( $notice );
+						++$notices_displayed;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Render a notice.
+		 *
+		 * @since 1.0.0
+		 * @param  array $notice Notice markup.
+		 * @return void
+		 */
+		public static function markup( $notice = [] ): void {
+			wp_enqueue_script( 'web-notices' );
+
+			do_action( 'web_notice_before_markup' );
+
+			do_action( "web_notice_before_markup_{$notice['id']}" );
+
+			?>
+			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
+				<div class="notice-container">
+					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?>
+					<?php echo wp_kses_post( $notice['message'] ); ?>
+				</div>
+			</div>
+			<?php
+
+			do_action( "web_notice_after_markup_{$notice['id']}" );
+
+			do_action( 'web_notice_after_markup' );
+		}
+
+		/**
+		 * Get base URL for the web-notices.
+		 *
+		 * @return mixed URL.
+		 */
+		public static function get_url() {
+			$path      = wp_normalize_path( dirname( __FILE__ ) );
+			$theme_dir = wp_normalize_path( get_template_directory() );
+
+			if ( strpos( $path, $theme_dir ) !== false ) {
+				return trailingslashit( get_template_directory_uri() . str_replace( $theme_dir, '', $path ) );
+			}
+				return plugin_dir_url( __FILE__ );
 		}
 
 		/**
@@ -187,88 +282,6 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		}
 
 		/**
-		 * Display the notices in the WordPress admin.
-		 *
-		 * @since 1.0.0
-		 * @return void
-		 */
-		public function show_notices() {
-			$defaults = [
-				'id'                         => '',      // Optional, Notice ID. If empty it set `web-notices-id-<$array-index>`.
-				'type'                       => 'info',  // Optional, Notice type. Default `info`. Expected [info, warning, notice, error].
-				'message'                    => '',      // Optional, Message.
-				'show_if'                    => true,    // Optional, Show notice on custom condition. E.g. 'show_if' => if( is_admin() ) ? true, false, .
-				'repeat-notice-after'        => '',      // Optional, Dismiss-able notice time. It'll auto show after given time.
-				'display-notice-after'       => false,      // Optional, Dismiss-able notice time. It'll auto show after given time.
-				'class'                      => '',      // Optional, Additional notice wrapper class.
-				'priority'                   => 10,      // Priority of the notice.
-				'display-with-other-notices' => true,    // Should the notice be displayed if other notices  are being displayed from Web_Notices.
-				'is_dismissible'             => true,
-				'capability'                 => 'manage_options', // User capability - This capability is required for the current user to see this notice.
-			];
-
-			// Count for the notices that are rendered.
-			$notices_displayed = 0;
-			$notices           = $this->get_notices();
-
-			foreach ( $notices as $key => $notice ) {
-				$notice = wp_parse_args( $notice, $defaults );
-
-				// Show notices only for users with `manage_options` cap.
-				if ( ! current_user_can( $notice['capability'] ) ) {
-					continue;
-				}
-
-				$notice['id']      = self::get_notice_id( $notice, $key );
-				$notice['classes'] = self::get_wrap_classes( $notice );
-
-				// Notices visible after transient expire.
-				if ( isset( $notice['show_if'] ) && true === $notice['show_if'] ) {
-
-					// don't display the notice if it is not supposed to be displayed with other notices.
-					if ( 0 !== $notices_displayed && false === $notice['display-with-other-notices'] ) {
-						continue;
-					}
-
-					if ( self::is_expired( $notice ) ) {
-
-						self::markup( $notice );
-						++$notices_displayed;
-					}
-				}
-			}
-
-		}
-
-		/**
-		 * Render a notice.
-		 *
-		 * @since 1.0.0
-		 * @param  array $notice Notice markup.
-		 * @return void
-		 */
-		public static function markup( $notice = [] ) {
-			wp_enqueue_script( 'web-notices' );
-
-			do_action( 'web_notice_before_markup' );
-
-			do_action( "web_notice_before_markup_{$notice['id']}" );
-
-			?>
-			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
-				<div class="notice-container">
-					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?>
-					<?php echo wp_kses_post( $notice['message'] ); ?>
-				</div>
-			</div>
-			<?php
-
-			do_action( "web_notice_after_markup_{$notice['id']}" );
-
-			do_action( 'web_notice_after_markup' );
-		}
-
-		/**
 		 * Get wrapper classes for a notice.
 		 *
 		 * @since 1.0.0
@@ -284,7 +297,7 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 			}
 
 			$classes[] = $notice['class'];
-			if ( isset( $notice['type'] ) && '' !== $notice['type'] ) {
+			if ( isset( $notice['type'] ) && $notice['type'] !== '' ) {
 				$classes[] = 'notice-' . $notice['type'];
 			}
 
@@ -314,17 +327,17 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 		 * @since 1.0.0
 		 *
 		 * @param  array $notice Notice arguments.
-		 * @return boolean
+		 * @return bool
 		 */
 		private static function is_expired( $notice ) {
 			$transient_status = get_transient( $notice['id'] );
 
-			if ( false === $transient_status ) {
+			if ( $transient_status === false ) {
 
-				if ( isset( $notice['display-notice-after'] ) && false !== $notice['display-notice-after'] ) {
+				if ( isset( $notice['display-notice-after'] ) && $notice['display-notice-after'] !== false ) {
 
-					if ( 'delayed-notice' !== get_user_meta( get_current_user_id(), $notice['id'], true ) &&
-						'notice-dismissed' !== get_user_meta( get_current_user_id(), $notice['id'], true ) ) {
+					if ( get_user_meta( get_current_user_id(), $notice['id'], true ) !== 'delayed-notice' &&
+						get_user_meta( get_current_user_id(), $notice['id'], true ) !== 'notice-dismissed' ) {
 						set_transient( $notice['id'], 'delayed-notice', $notice['display-notice-after'] );
 						update_user_meta( get_current_user_id(), $notice['id'], 'delayed-notice' );
 
@@ -335,28 +348,12 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 				// Check the user meta status if current notice is dismissed or delay completed.
 				$meta_status = get_user_meta( get_current_user_id(), $notice['id'], true );
 
-				if ( empty( $meta_status ) || 'delayed-notice' === $meta_status ) {
+				if ( empty( $meta_status ) || $meta_status === 'delayed-notice' ) {
 					return true;
 				}
 			}
 
 			return false;
-		}
-
-		/**
-		 * Get base URL for the web-notices.
-		 *
-		 * @return mixed URL.
-		 */
-		public static function get_url() {
-			$path      = wp_normalize_path( dirname( __FILE__ ) );
-			$theme_dir = wp_normalize_path( get_template_directory() );
-
-			if ( strpos( $path, $theme_dir ) !== false ) {
-				return trailingslashit( get_template_directory_uri() . str_replace( $theme_dir, '', $path ) );
-			} else {
-				return plugin_dir_url( __FILE__ );
-			}
 		}
 
 	}
@@ -366,4 +363,4 @@ if ( ! class_exists( 'Web_Notices' ) ) :
 	 */
 	new Web_Notices();
 
-endif;
+}

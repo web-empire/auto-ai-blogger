@@ -41,10 +41,12 @@
    </rule>
    <rule ref="Generic.Arrays.DisallowLongArraySyntax.Found"/>
 
-	<rule ref="WordPress" >
+	<rule ref="WordPress">
+		<exclude name="WordPressVIPMinimum.Performance.RemoteRequestTimeout.timeout_timeout" />
 	</rule>
 
 	<rule ref="WordPress-Core">
+		<exclude name="WordPress.WP.CronInterval.ChangeDetected" />
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 		<exclude name="WordPress.WP.CapitalPDangit.Misspelled" />
 		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query" />
@@ -61,7 +63,8 @@
 	<exclude-pattern>*/build/*</exclude-pattern>
 	<exclude-pattern>*/dist/*</exclude-pattern>
 	<exclude-pattern>*/assets/*</exclude-pattern>
-	<exclude-pattern>*/lib/*</exclude-pattern>
+	<exclude-pattern>*/inc/web-notices/*</exclude-pattern>
+	<exclude-pattern>*/inc/licensing/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/artifact*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>

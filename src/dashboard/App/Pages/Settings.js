@@ -22,7 +22,7 @@ export default function Settings() {
 			<div className="mx-auto lg:flex lg:gap-x-0 h-full">
 				<aside className="flex overflow-x-auto lg:block lg:w-72 py-8 px-4 lg:flex-none settings-nav">
 					<nav className="flex-none px-4 sm:px-6 lg:px-0">
-						<ul role="list" className="flex gap-x-3 gap-y-1 whitespace-nowrap lg:flex-col">
+						<ul className="flex gap-x-3 gap-y-1 whitespace-nowrap lg:flex-col">
 							{ secondaryNavigation.map( ( item ) => (
 								<li key={ item.slug }>
 									<a

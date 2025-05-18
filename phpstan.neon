@@ -23,7 +23,6 @@ parameters:
 		- inc
 		- core
 		- admin
-		- templates
 
 	excludePaths:
 		- node_modules
