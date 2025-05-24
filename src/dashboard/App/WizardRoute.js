@@ -19,7 +19,7 @@ const WizardRoute = () => {
 	const get_route_page = () => {
 		let route_page = '';
 
-		switch (action) {
+		switch ( action ) {
 			case 'welcome':
 				route_page = <WelcomeStep />;
 				previous_step = 'dashboard';
