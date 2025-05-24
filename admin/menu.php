@@ -8,8 +8,8 @@
 
 namespace WPAIBlogger\Admin;
 
-use FluentCommunity\App\Models\Meta;
 use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Helper;
 use WPAIBlogger\Inc\Utils\Metadata;
 
 /**
@@ -88,8 +88,21 @@ class Menu {
 			return;
 		}
 
+		$site_title               = Helper::get_option( 'siteTitle' );
+		$site_description         = Helper::get_option( 'siteDescription' );
+		$site_for                 = Helper::get_option( 'siteFor' );
 		$blog_name                = get_bloginfo( 'name' );
 		$admin_site_email_address = get_option( 'admin_email' );
+		$temperature              = Helper::get_option( 'temperature' );
+		$harassment               = Helper::get_option( 'harassment' );
+		$hate                     = Helper::get_option( 'hate' );
+		$sexually_explicit        = Helper::get_option( 'sexually_explicit' );
+		$dangerous_content        = Helper::get_option( 'dangerous_content' );
+		$civic_integrity          = Helper::get_option( 'civic_integrity' );
+		$post_ideas               = Helper::get_option( 'postIdeas' );
+
+		$license = get_option( 'wpaiblogger_license_options', [] );
+		$license = ! empty( $license['sc_license_key'] ) ? $license['sc_license_key'] : '';
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',
@@ -110,6 +123,17 @@ class Menu {
 				'licensing_nonce'    => wp_create_nonce( 'autoblog_ai_licensing_nonce' ),
 				'license_status'     => get_option( 'autoblog_ai_license_status', 'unlicensed' ),
 				'admin_email'        => $admin_site_email_address,
+				'site_title'         => $site_title,
+				'site_description'   => $site_description,
+				'site_for'           => $site_for,
+				'post_ideas'         => $post_ideas,
+				'license'            => $license,
+				'temperature'        => $temperature,
+				'harassment'         => $harassment,
+				'hate'               => $hate,
+				'sexually_explicit'  => $sexually_explicit,
+				'dangerous_content'  => $dangerous_content,
+				'civic_integrity'    => $civic_integrity,
 				'blog_name'          => $blog_name,
 				'post_statuses'      => wpaib_get_post_statuses(),
 				'categories'         => wpaib_get_categories(),

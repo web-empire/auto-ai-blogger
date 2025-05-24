@@ -26,17 +26,17 @@ const WelcomeStep = () => {
 						{ __( 'Welcome to WP AI Blogger', 'wp-ai-blogger' ) }
 					</h1>
 
-					<p className="text-center overflow-hidden max-w-2xl mb-10 mx-auto text-lg font-normal text-slate-500">
+					<p className="wpaib-step-text text-center overflow-hidden max-w-2xl mb-10 mx-auto text-lg font-normal text-slate-500">
 						{ __(
-							"You're only minutes away from having a more profitable WooCommerce store! This short setup wizard will help you get started with WP AI Blogger.",
+							"Launch your AI-powered blog in minutes! Let's set up WP AI Blogger and unleash your content potential.",
 							'wp-ai-blogger'
 						) }
 					</p>
 
-					<div className="flex justify-center">
+					<div className="flex justify-center mb-10">
 						<div
 							className={ `wpaib-wizard--button` }
-							id={ 'optin' }
+							id={ 'persona-form' } // Changed id to persona-form
 							onClick={ handleStepRedirection }
 						>
 							{ __( "Let's Start", 'wp-ai-blogger' ) }

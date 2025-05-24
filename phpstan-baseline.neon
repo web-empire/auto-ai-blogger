@@ -121,6 +121,11 @@ parameters:
 			path: admin/licensing.php
 
 		-
+			message: "#^Cannot access offset 'sc_license_key' on mixed\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
 			message: "#^Parameter \\#1 \\$value of function strval expects bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
 			count: 1
 			path: core/maintenance.php
@@ -797,11 +802,6 @@ parameters:
 
 		-
 			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: inc/web-notices/class-web-notices.php
-
-		-
-			message: "#^Function esc_html_e invoked with 3 parameters, 1\\-2 required\\.$#"
 			count: 1
 			path: inc/web-notices/class-web-notices.php
 
