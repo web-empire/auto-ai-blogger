@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import { useDispatch, useSelector } from 'react-redux';
+import { RangeControl } from '@wordpress/components';
 
 export default function Persona() {
 	const dispatch = useDispatch();
@@ -10,12 +11,11 @@ export default function Persona() {
 	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
 	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
 	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
-	const temperature = useSelector( ( state ) => state.temperature ) || ( ! autoblog_data.temperature ? 1 : autoblog_data.temperature );
-	const harassment = useSelector( ( state ) => state.harassment ) || 0;
-	const hate = useSelector( ( state ) => state.hate ) || 0;
-	const sexuallyExplicit = useSelector( ( state ) => state.sexuallyExplicit ) || 0;
-	const dangerousContent = useSelector( ( state ) => state.dangerousContent ) || 0;
-	const civicIntegrity = useSelector( ( state ) => state.civicIntegrity ) || 1;
+	const temperature = parseFloat(useSelector( ( state ) => state.temperature ));
+	const harassment = parseInt(useSelector( ( state ) => state.harassment ));
+	const hate = parseInt(useSelector( ( state ) => state.hate ));
+	const sexuallyExplicit = parseInt(useSelector( ( state ) => state.sexuallyExplicit ));
+	const dangerousContent = parseInt(useSelector( ( state ) => state.dangerousContent ));
 
 	const handleTemperatureChange = ( value ) => {
 		dispatch( { type: 'UPDATE_TEMPERATURE', payload: value } );
@@ -37,9 +37,14 @@ export default function Persona() {
 		dispatch( { type: 'UPDATE_DANGEROUS_CONTENT', payload: value } );
 	};
 
-	const handleCivicIntegrityChange = ( value ) => {
-		dispatch( { type: 'UPDATE_CIVIC_INTEGRITY', payload: value } );
-	};
+	// Helper array for the new 0-4 block levels
+    const blockLabels = [
+        __( 'Off', 'wp-ai-blogger' ),
+        __( 'Block none', 'wp-ai-blogger' ),
+        __( 'Block few', 'wp-ai-blogger' ),
+        __( 'Block some', 'wp-ai-blogger' ),
+        __( 'Block most', 'wp-ai-blogger' ),
+    ];
 
 	return (
 		<>
@@ -66,89 +71,89 @@ export default function Persona() {
 					/>
 				</SettingField>
 
-				<SettingField>
-					<SettingLabel forId="temperature" title={ __( 'Temperature:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="temperature"
-						min="0"
-						max="2"
-						step="0.05"
-						value={ temperature }
-						onChange={ ( e ) => handleTemperatureChange( parseFloat( e.target.value ) ) }
-					/>
-					<p>{ temperature }</p>
-				</SettingField>
+                <SettingField>
+                    <SettingLabel forId="temperature" title={ __( 'Temperature:', 'wp-ai-blogger' ) } />
+                    <RangeControl
+                        value={ temperature }
+                        onChange={ handleTemperatureChange }
+                        min={ 0 }
+                        max={ 2 }
+                        step={ 0.05 }
+                    />
+                    <p>{ temperature }</p>
+                </SettingField>
 
-				<SettingField>
-					<SettingLabel forId="harassment" title={ __( 'Harassment:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="harassment"
-						min="0"
-						max="2"
-						step="1"
-						value={ harassment }
-						onChange={ ( e ) => handleHarassmentChange( parseInt( e.target.value ) ) }
-					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ harassment ] }</p>
-				</SettingField>
+                <SettingField>
+                    <SettingLabel forId="harassment" title={ __( 'Harassment:', 'wp-ai-blogger' ) } />
+                    <RangeControl
+                        value={ harassment }
+                        onChange={ handleHarassmentChange }
+                        min={ 0 }
+                        max={ 4 }
+                        step={ 1 }
+                        marks={ [
+                            { value: 0, label: blockLabels[0] }, // Off
+                            { value: 1, label: blockLabels[1] }, // Block none
+                            { value: 2, label: blockLabels[2] }, // Block few
+                            { value: 3, label: blockLabels[3] }, // Block some
+                            { value: 4, label: blockLabels[4] }, // Block most
+                        ] }
+                    />
+                </SettingField>
 
-				<SettingField>
-					<SettingLabel forId="hate" title={ __( 'Hate:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="hate"
-						min="0"
-						max="2"
-						step="1"
-						value={ hate }
-						onChange={ ( e ) => handleHateChange( parseInt( e.target.value ) ) }
-					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ hate ] }</p>
-				</SettingField>
+                <SettingField>
+                    <SettingLabel forId="hate" title={ __( 'Hate:', 'wp-ai-blogger' ) } />
+                    <RangeControl
+                        value={ hate }
+                        onChange={ handleHateChange }
+                        min={ 0 }
+                        max={ 4 }
+                        step={ 1 }
+                        marks={ [
+                            { value: 0, label: blockLabels[0] },
+                            { value: 1, label: blockLabels[1] },
+                            { value: 2, label: blockLabels[2] },
+                            { value: 3, label: blockLabels[3] },
+                            { value: 4, label: blockLabels[4] },
+                        ] }
+                    />
+                </SettingField>
 
-				<SettingField>
-					<SettingLabel forId="sexually-explicit" title={ __( 'Sexually Explicit:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="sexually-explicit"
-						min="0"
-						max="2"
-						step="1"
-						value={ sexuallyExplicit }
-						onChange={ ( e ) => handleSexuallyExplicitChange( parseInt( e.target.value ) ) }
-					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ sexuallyExplicit ] }</p>
-				</SettingField>
+                <SettingField>
+                    <SettingLabel forId="sexually-explicit" title={ __( 'Sexually Explicit:', 'wp-ai-blogger' ) } />
+                    <RangeControl
+                        value={ sexuallyExplicit }
+                        onChange={ handleSexuallyExplicitChange }
+                        min={ 0 }
+                        max={ 4 }
+                        step={ 1 }
+                        marks={ [
+                            { value: 0, label: blockLabels[0] },
+                            { value: 1, label: blockLabels[1] },
+                            { value: 2, label: blockLabels[2] },
+                            { value: 3, label: blockLabels[3] },
+                            { value: 4, label: blockLabels[4] },
+                        ] }
+                    />
+                </SettingField>
 
-				<SettingField>
-					<SettingLabel forId="dangerous-content" title={ __( 'Dangerous Content:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="dangerous-content"
-						min="0"
-						max="2"
-						step="1"
-						value={ dangerousContent }
-						onChange={ ( e ) => handleDangerousContentChange( parseInt( e.target.value ) ) }
-					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ dangerousContent ] }</p>
-				</SettingField>
-
-				<SettingField>
-					<SettingLabel forId="civic-integrity" title={ __( 'Civic Integrity:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
-						id="civic-integrity"
-						min="0"
-						max="2"
-						step="1"
-						value={ civicIntegrity }
-						onChange={ ( e ) => handleCivicIntegrityChange( parseInt( e.target.value ) ) }
-					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ civicIntegrity ] }</p>
-				</SettingField>
+                <SettingField>
+                    <SettingLabel forId="dangerous-content" title={ __( 'Dangerous Content:', 'wp-ai-blogger' ) } />
+                    <RangeControl
+                        value={ dangerousContent }
+                        onChange={ handleDangerousContentChange }
+                        min={ 0 }
+                        max={ 4 }
+                        step={ 1 }
+                        marks={ [
+                            { value: 0, label: blockLabels[0] },
+                            { value: 1, label: blockLabels[1] },
+                            { value: 2, label: blockLabels[2] },
+                            { value: 3, label: blockLabels[3] },
+                            { value: 4, label: blockLabels[4] },
+                        ] }
+                    />
+                </SettingField>
 			</div>
 
 			<SettingField>

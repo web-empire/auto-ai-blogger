@@ -32,18 +32,11 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 	formData.append( 'value', value );
 
 	return apiFetch( {
-		url: autoblog_data.ajax_url,
-		method: 'POST',
-		body: formData,
-		signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
-	} )
-		.then( () => {
-			dispatch( {
-				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __( 'Successfully saved!', 'wp-ai-blogger' ),
-			} );
-		} )
-		.catch( () => {} );
+        url: autoblog_data.ajax_url,
+        method: 'POST',
+        body: formData,
+        signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
+    } );
 };
 
 /**

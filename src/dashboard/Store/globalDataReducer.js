@@ -18,10 +18,12 @@ const globalDataReducer = ( state = {}, action ) => {
 		UPDATE_TEMPERATURE: { temperature: action.payload },
 		UPDATE_HARASSMENT: { harassment: action.payload },
 		UPDATE_HATE: { hate: action.payload },
-		UPDATE_SEXUALLY_EXPLICIT: { sexually_explicit: action.payload },
-		UPDATE_DANGEROUS_CONTENT: { dangerous_content: action.payload },
-		UPDATE_CIVIC_INTEGRITY: { civic_integrity: action.payload },
+		UPDATE_SEXUALLY_EXPLICIT: { sexuallyExplicit: action.payload },
+		UPDATE_DANGEROUS_CONTENT: { dangerousContent: action.payload },
 		UPDATE_POST_IDEAS: { postIdeas: action.payload },
+		UPDATE_TOKEN_TOTAL: { tokenTotal: action.payload },
+		UPDATE_TOKEN_REMAINING: { tokenRemaining: action.payload },
+		UPDATE_LICENSE_STATUS: { licenseStatus: action.payload },
 	};
 
 	if ( actionHandlers[ actionType ] ) {
