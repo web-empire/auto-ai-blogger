@@ -11,6 +11,5 @@ export const useSettingsSelector = () => {
 		hate: state.hate,
 		sexuallyExplicit: state.sexuallyExplicit,
 		dangerousContent: state.dangerousContent,
-		civicIntegrity: state.civicIntegrity,
 	} ) );
 };

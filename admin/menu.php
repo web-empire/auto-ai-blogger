@@ -94,14 +94,15 @@ class Menu {
 		$site_title               = Helper::get_option( 'siteTitle' );
 		$site_description         = Helper::get_option( 'siteDescription' );
 		$site_for                 = Helper::get_option( 'siteFor' );
-		$temperature              = Helper::get_option( 'temperature' );
-		$harassment               = Helper::get_option( 'harassment' );
-		$hate                     = Helper::get_option( 'hate' );
-		$sexually_explicit        = Helper::get_option( 'sexuallyExplicit' );
-		$dangerous_content        = Helper::get_option( 'dangerousContent' );
-		$civic_integrity          = Helper::get_option( 'civicIntegrity' );
-		$post_ideas               = Helper::get_option( 'postIdeas' );
 		$license                  = Helper::get_option( 'license' );
+		$temperature              = Helper::get_option( 'temperature', 1 );
+		$harassment               = Helper::get_option( 'harassment', 0 );
+		$hate                     = Helper::get_option( 'hate', 0 );
+		$sexually_explicit        = Helper::get_option( 'sexuallyExplicit', 0 );
+		$dangerous_content        = Helper::get_option( 'dangerousContent', 0 );
+		$post_ideas               = Helper::get_option( 'postIdeas' );
+		$token_total              = Helper::get_option( 'tokenTotal' );
+		$token_remaining          = Helper::get_option( 'tokenRemaining' );
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',
@@ -122,17 +123,18 @@ class Menu {
 				'licensing_nonce'    => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
 				'license_status'     => get_option( 'wp_ai_blogger_license_status', 'unlicensed' ),
 				'admin_email'        => $admin_site_email_address,
-				'post_ideas'         => $post_ideas,
-				'license'            => $license,
 				'site_title'         => $site_title,
 				'site_description'   => $site_description,
 				'site_for'           => $site_for,
+				'post_ideas'         => $post_ideas,
+				'token_total'        => $token_total,
+				'token_remaining'    => $token_remaining,
+				'license'            => $license,
 				'temperature'        => $temperature,
 				'harassment'         => $harassment,
 				'hate'               => $hate,
 				'sexually_explicit'  => $sexually_explicit,
 				'dangerous_content'  => $dangerous_content,
-				'civic_integrity'    => $civic_integrity,
 				'blog_name'          => $blog_name,
 				'post_statuses'      => wpaib_get_post_statuses(),
 				'categories'         => wpaib_get_categories(),

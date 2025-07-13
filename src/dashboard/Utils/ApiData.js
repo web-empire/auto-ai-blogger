@@ -1,6 +1,5 @@
 // Import the apiFetch function from the '@wordpress/api-fetch' package.
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
 
 /**
  * A function to send form data via API fetch.
@@ -36,14 +35,7 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 		method: 'POST',
 		body: formData,
 		signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
-	} )
-		.then( () => {
-			dispatch( {
-				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __( 'Successfully saved!', 'wp-ai-blogger' ),
-			} );
-		} )
-		.catch( () => {} );
+	} );
 };
 
 /**

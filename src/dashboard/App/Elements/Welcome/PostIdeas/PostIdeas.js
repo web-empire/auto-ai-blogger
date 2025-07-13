@@ -24,7 +24,6 @@ export default function PostIdeas() {
 	const hate = useSelector( ( state ) => state.hate ) || '';
 	const sexuallyExplicit = useSelector( ( state ) => state.sexuallyExplicit ) || '';
 	const dangerousContent = useSelector( ( state ) => state.dangerousContent ) || '';
-	const civicIntegrity = useSelector( ( state ) => state.civicIntegrity ) || '';
 	const license = useSelector( ( state ) => state.license ) || '';
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas ) || '';
 
@@ -65,9 +64,8 @@ export default function PostIdeas() {
 					temperature,
 					harassment,
 					hate,
-					sexuallyExplicit: sexuallyExplicit,
-					dangerousContent: dangerousContent,
-					civicIntegrity: civicIntegrity,
+					sexually_explicit: sexuallyExplicit,
+					dangerous_content: dangerousContent,
 					license,
 				} ),
 			} );
