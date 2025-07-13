@@ -2,7 +2,7 @@
 /**
  * Maintenance.
  *
- * @package AutoBlog_AI
+ * @package WP_AI_Blogger
  * @since x.x.x
  */
 
@@ -13,7 +13,7 @@ use WPAIBlogger\Inc\Traits\Get_Instance;
 /**
  * Update Compatibility
  *
- * @package AutoBlog_AI
+ * @package WP_AI_Blogger
  */
 
 /**
@@ -42,14 +42,14 @@ class Maintenance {
 	 * @return void
 	 */
 	public static function init(): void {
-		do_action( 'autoblog_ai_update_before' );
+		do_action( 'wp_ai_blogger_update_before' );
 
 		// Get auto saved version number.
-		$saved_version = get_option( 'autoblog_ai_saved_version', false );
+		$saved_version = get_option( 'wp_ai_blogger_saved_version', false );
 
 		// Update auto saved version number.
 		if ( ! $saved_version ) {
-			update_option( 'autoblog_ai_saved_version', WP_AI_BLOGGER_VERSION );
+			update_option( 'wp_ai_blogger_saved_version', WP_AI_BLOGGER_VERSION );
 		}
 
 		// If equals then return.
@@ -58,8 +58,8 @@ class Maintenance {
 		}
 
 		// Update auto saved version number.
-		update_option( 'autoblog_ai_saved_version', WP_AI_BLOGGER_VERSION );
+		update_option( 'wp_ai_blogger_saved_version', WP_AI_BLOGGER_VERSION );
 
-		do_action( 'autoblog_ai_update_after' );
+		do_action( 'wp_ai_blogger_update_after' );
 	}
 }

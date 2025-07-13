@@ -5,11 +5,12 @@ export const useSettingsSelector = () => {
 		siteTitle: state.siteTitle,
 		siteFor: state.siteFor,
 		siteDescription: state.siteDescription,
+		license: state.license,
 		temperature: state.temperature,
 		harassment: state.harassment,
 		hate: state.hate,
-		sexually_explicit: state.sexually_explicit,
-		dangerous_content: state.dangerous_content,
-		civic_integrity: state.civic_integrity,
+		sexuallyExplicit: state.sexuallyExplicit,
+		dangerousContent: state.dangerousContent,
+		civicIntegrity: state.civicIntegrity,
 	} ) );
 };

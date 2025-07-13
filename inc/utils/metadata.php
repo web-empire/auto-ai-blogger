@@ -103,6 +103,26 @@ class Metadata {
 					'default' => 8,
 					'type'    => 'number',
 				],
+				'postsVisit'       => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'overrideSitePersona' => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'overrideSiteTitle' => [
+					'default' => get_bloginfo( 'name' ),
+					'type'    => 'string',
+				],
+				'overrideSiteDescription' => [
+					'default' => get_bloginfo( 'description' ),
+					'type'    => 'string',
+				],
+				'overrideSiteFor'       => [
+					'default' => '',
+					'type'    => 'string',
+				],
 			]
 		);
 	}

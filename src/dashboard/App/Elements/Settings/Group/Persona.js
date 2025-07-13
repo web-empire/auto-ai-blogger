@@ -1,12 +1,15 @@
 import { __ } from '@wordpress/i18n';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
+import SettingInput from '@Components/SettingInput';
+import SettingInputRange from '@Components/SettingInputRange';
 import { useDispatch, useSelector } from 'react-redux';
+import Container from '@Components/Container';
 
 export default function Persona() {
 	const dispatch = useDispatch();
 
-	// Retrieve data from Redux store using selectors
+	// Retrieve data from Redux store using selectors.
 	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
 	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
 	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
@@ -46,9 +49,9 @@ export default function Persona() {
 			<div className="grid grid-cols-2 gap-6 w-full">
 				<SettingField>
 					<SettingLabel forId="name-of-the-blog" title={ __( 'Title for your site:', 'wp-ai-blogger' ) } />
-					<input
+					<SettingInput
 						id="name-of-the-blog"
-						value={ siteTitle }
+						defaultValue={ siteTitle }
 						onChange={ ( e ) => {
 							dispatch( { type: 'UPDATE_SITE_TITLE', payload: e.target.value } );
 						} }
@@ -56,10 +59,10 @@ export default function Persona() {
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="blog-for" title={ __( 'This site is for:', 'wp-ai-blogger' ) } />
-					<input
+					<SettingLabel forId="blog-for" title={ __( 'Description for your site:', 'wp-ai-blogger' ) } />
+					<SettingInput
 						id="blog-for"
-						value={ siteFor }
+						defaultValue={ siteFor }
 						onChange={ ( e ) => {
 							dispatch( { type: 'UPDATE_SITE_FOR', payload: e.target.value } );
 						} }
@@ -67,87 +70,106 @@ export default function Persona() {
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="temperature" title={ __( 'Temperature:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="temperature" title={ __( 'Temperature:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500"> { temperature } </span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="temperature"
-						min="0"
-						max="2"
 						step="0.05"
-						value={ temperature }
+						defaultValue={ temperature }
 						onChange={ ( e ) => handleTemperatureChange( parseFloat( e.target.value ) ) }
 					/>
-					<p>{ temperature }</p>
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="harassment" title={ __( 'Harassment:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="harassment" title={ __( 'Harassment:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500">{ [ 'Block none', 'Block some', 'Block high' ][ harassment ] }</span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="harassment"
-						min="0"
-						max="2"
-						step="1"
-						value={ harassment }
+						defaultValue={ harassment }
 						onChange={ ( e ) => handleHarassmentChange( parseInt( e.target.value ) ) }
 					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ harassment ] }</p>
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="hate" title={ __( 'Hate:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="hate" title={ __( 'Hate:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500">{ [ 'Block none', 'Block some', 'Block high' ][ hate ] }</span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="hate"
-						min="0"
-						max="2"
-						step="1"
-						value={ hate }
+						defaultValue={ hate }
 						onChange={ ( e ) => handleHateChange( parseInt( e.target.value ) ) }
 					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ hate ] }</p>
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="sexually-explicit" title={ __( 'Sexually Explicit:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="sexually-explicit" title={ __( 'Sexually Explicit:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500">{ [ 'Block none', 'Block some', 'Block high' ][ sexuallyExplicit ] }</span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="sexually-explicit"
-						min="0"
-						max="2"
-						step="1"
-						value={ sexuallyExplicit }
+						defaultValue={ sexuallyExplicit }
 						onChange={ ( e ) => handleSexuallyExplicitChange( parseInt( e.target.value ) ) }
 					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ sexuallyExplicit ] }</p>
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="dangerous-content" title={ __( 'Dangerous Content:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="dangerous-content" title={ __( 'Dangerous Content:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500">{ [ 'Block none', 'Block some', 'Block high' ][ dangerousContent ] }</span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="dangerous-content"
-						min="0"
-						max="2"
-						step="1"
-						value={ dangerousContent }
+						defaultValue={ dangerousContent }
 						onChange={ ( e ) => handleDangerousContentChange( parseInt( e.target.value ) ) }
 					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ dangerousContent ] }</p>
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="civic-integrity" title={ __( 'Civic Integrity:', 'wp-ai-blogger' ) } />
-					<input
-						type="range"
+					<Container
+						direction="row"
+						element={
+							<>
+								<SettingLabel forId="civic-integrity" title={ __( 'Civic Integrity:', 'wp-ai-blogger' ) } />
+								<span className="text-sm/6 text-gray-500">{ [ 'Block none', 'Block some', 'Block high' ][ civicIntegrity ] }</span>
+							</>
+						}
+					/>
+					<SettingInputRange
 						id="civic-integrity"
-						min="0"
-						max="2"
-						step="1"
-						value={ civicIntegrity }
+						defaultValue={ civicIntegrity }
 						onChange={ ( e ) => handleCivicIntegrityChange( parseInt( e.target.value ) ) }
 					/>
-					<p>{ [ 'Block none', 'Block some', 'Block high' ][ civicIntegrity ] }</p>
 				</SettingField>
 			</div>
 
@@ -156,6 +178,7 @@ export default function Persona() {
 				<textarea
 					id="more-about-blog"
 					value={ siteDescription }
+					className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 					onChange={ ( e ) => {
 						dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: e.target.value } );
 					} }

@@ -25,6 +25,10 @@ const NavigationBar = () => {
 			id: 'persona-form',
 		},
 		{
+			name: __( 'License', 'wp-ai-blogger' ),
+			id: 'license',
+		},
+		{
 			name: __( 'Subscribe', 'wp-ai-blogger' ),
 			id: 'optin',
 		},

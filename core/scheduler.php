@@ -36,16 +36,16 @@ class Scheduler {
 			return;
 		}
 
-		add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
+		// add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
 
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
 
-		foreach ( $this->schedules as $campaign_id => $days ) {
-			if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
-				$args = [ $campaign_id ];
-				wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
-			}
-		}
+		// foreach ( $this->schedules as $campaign_id => $days ) {
+		// 	if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
+		// 		$args = [ $campaign_id ];
+		// 		// wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
+		// 	}
+		// }
 	}
 
 	/**
@@ -90,29 +90,29 @@ class Scheduler {
 	 * @param int $campaign_id Campaign ID.
 	 *
 	 * @since x.x.x
-	 * @return void
+	 * @return string|void|int|WP_Error
 	 */
-	public function create_blog_post( $campaign_id ): void {
+	public function create_blog_post( $campaign_id ) {
 		// Get the campaign instance.
 		$campaign = get_post( $campaign_id );
 
 		// Check if the campaign is valid.
 		if ( ! $campaign ) {
-			return;
+			return __( 'Invalid campaign ID.', 'wp-ai-blogger' );
 		}
 
 		// Check if the campaign is valid.
 		$campaign_status = Metadata::get_campaign_meta( $campaign_id, 'status' );
 		if ( empty( $campaign_status ) || $campaign_status !== 'publish' ) {
-			return;
+			return __( 'Campaign is not active.', 'wp-ai-blogger' );
 		}
 
 		// Check if the target is reached.
 		if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
-			return;
+			return __( 'Campaign posts target already achieved.', 'wp-ai-blogger' );
 		}
 
 		// Create the blog post.
-		wpaib_create_blog_post( $campaign_id );
+		return wpaib_create_blog_post( $campaign_id );
 	}
 }

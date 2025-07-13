@@ -1,16 +1,15 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import PersonaFormStep from '@WizardSteps/PersonaFormStep';
-import { WelcomeStep, OptinStep, ReadyStep } from '@WizardSteps';
+import { WelcomeStep, PersonaFormStep, LicenseStep, OptinStep, ReadyStep } from '@WizardSteps';
 import { NavigationBar, FooterNavigationBar } from '@WizardFields';
 
 const WizardRoute = () => {
-	// Add a "ai-blogger-wizard" class to the body tag.
-	document.body.classList.add( 'ai-blogger-wizard' );
+	// Add a "wp-ai-blogger-wizard" class to the body tag.
+	document.body.classList.add( 'wp-ai-blogger-wizard' );
 
 	const query = new URLSearchParams( useLocation().search );
 	const action = query.get( 'step' );
-	const maxSteps = 3;
+	const maxSteps = 4;
 
 	let previous_step = 'dashboard',
 		next_step = '',
@@ -29,19 +28,25 @@ const WizardRoute = () => {
 			case 'persona-form': //Add new case
 				route_page = <PersonaFormStep />;
 				previous_step = 'welcome';
-				next_step = 'optin';
+				next_step = 'license';
 				step_sequence = 1;
+				break;
+			case 'license': //Add new case
+				route_page = <LicenseStep />;
+				previous_step = 'persona-form';
+				next_step = 'optin';
+				step_sequence = 2;
 				break;
 			case 'optin':
 				route_page = <OptinStep />;
-				previous_step = 'persona-form'; //change previous step
+				previous_step = 'license';
 				next_step = 'ready';
-				step_sequence = 2;
+				step_sequence = 3;
 				break;
 			case 'ready':
 				route_page = <ReadyStep />;
 				previous_step = 'optin';
-				step_sequence = 2;
+				step_sequence = 4;
 				break;
 			default:
 				route_page = <WelcomeStep />;

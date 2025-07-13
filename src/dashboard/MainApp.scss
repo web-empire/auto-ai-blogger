@@ -22,7 +22,7 @@
 @tailwind utilities;
 
 .posts_page_wp-ai-blogger,
-.posts_page_wp-ai-blogger.ai-blogger-wizard {
+.posts_page_wp-ai-blogger.wp-ai-blogger-wizard {
 	background: #fff;
 }
 
@@ -63,6 +63,12 @@
 	padding-bottom: 0.375rem;
 	padding-left: 0.75rem;
 	padding-right: 0.75rem;
+}
+.posts_page_wp-ai-blogger input[type="range"] {
+    padding: 0;
+}
+.wp-ai-blogger-wizard #wpfooter {
+    display: none;
 }
 
 #headlessui-portal-root p,
@@ -188,6 +194,13 @@
 }
 .header-nav {
 	border-bottom: 1px solid #e5e7eb;
+}
+
+.wpaib-menu {
+    border-bottom: 2px solid transparent;
+}
+.wpaib-menu.wpaib-active-menu {
+    border-color: rgb(4 107 210);
 }
 
 .wpaib-wizard--button {

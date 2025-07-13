@@ -46,6 +46,11 @@ const ReadyStep = () => {
 	useEffect( () => {
 		dispatch( { type: 'UPDATE_USER_ONBOARDED', payload: true } );
 		updateApiData( 'userOnboarded', true, dispatch, abortControllerRef );
+
+		setTimeout( () => {
+			const redirectUrl = '?page=wp-ai-blogger';
+			window.location.href = autoblog_data.admin_base_url + redirectUrl;
+		}, 1000 );
 	}, [] );
 
 	const handleClick = ( e ) => {
@@ -84,17 +89,6 @@ const ReadyStep = () => {
 							) }
 						</p>
 					</div>
-					<iframe
-						className="mx-auto"
-						width="80%"
-						height="400"
-						src="https://www.youtube.com/embed/nQ8O1jObdlc"
-						title={ __(
-							'WP AI Blogger Extended Walkthrough Tutorial',
-							'wp-ai-blogger'
-						) }
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					></iframe>
 
 					<div className="mt-[50px] flex justify-center">
 						<div
@@ -104,7 +98,7 @@ const ReadyStep = () => {
 							onClick={ handleClick }
 						>
 							{ ! isFinishingSetup
-								? __( 'Finish Store Setup', 'wp-ai-blogger' )
+								? __( 'Finish AI Blogging Setup', 'wp-ai-blogger' )
 								: __( 'Finishing the Setup', 'wp-ai-blogger' ) }
 						</div>
 					</div>

@@ -5,7 +5,7 @@ export const Features = [
 	{ name: __( 'Auto Scheduling Posts', 'wp-ai-blogger' ) },
 	{ name: __( 'Analytics', 'wp-ai-blogger' ) },
 	{
-		name: __( 'Blog Post Topic', 'wp-ai-blogger' ),
+		name: __( 'Blog Post Topics', 'wp-ai-blogger' ),
 		free: __( 'Limited', 'wp-ai-blogger' ),
 		pro: __( 'Unlimited', 'wp-ai-blogger' ),
 	},

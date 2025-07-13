@@ -11,6 +11,7 @@ const globalDataReducer = ( state = {}, action ) => {
 		UPDATE_SITE_TITLE: { siteTitle: action.payload },
 		UPDATE_SITE_FOR: { siteFor: action.payload },
 		UPDATE_SITE_DESCRIPTION: { siteDescription: action.payload },
+		UPDATE_LICENSE: { license: action.payload },
 		UPDATE_USER_ONBOARDED: { userOnboarded: action.payload },
 		UPDATE_USER_NAME: { userName: action.payload },
 		UPDATE_USER_EMAIL: { userEmail: action.payload },
@@ -18,9 +19,9 @@ const globalDataReducer = ( state = {}, action ) => {
 		UPDATE_TEMPERATURE: { temperature: action.payload },
 		UPDATE_HARASSMENT: { harassment: action.payload },
 		UPDATE_HATE: { hate: action.payload },
-		UPDATE_SEXUALLY_EXPLICIT: { sexually_explicit: action.payload },
-		UPDATE_DANGEROUS_CONTENT: { dangerous_content: action.payload },
-		UPDATE_CIVIC_INTEGRITY: { civic_integrity: action.payload },
+		UPDATE_SEXUALLY_EXPLICIT: { sexuallyExplicit: action.payload },
+		UPDATE_DANGEROUS_CONTENT: { dangerousContent: action.payload },
+		UPDATE_CIVIC_INTEGRITY: { civicIntegrity: action.payload },
 		UPDATE_POST_IDEAS: { postIdeas: action.payload },
 	};
 

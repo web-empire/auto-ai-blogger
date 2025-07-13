@@ -6,13 +6,16 @@ import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import apiFetch from '@wordpress/api-fetch';
+import { useDispatch } from 'react-redux';
 
 export default function Campaigns() {
+	const dispatch = useDispatch();
 	const campaigns = autoblog_data.all_campaigns;
 	const defaultMetaDefaults = autoblog_data.postmeta_defaults;
 
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
+	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -40,6 +43,7 @@ export default function Campaigns() {
 
 	const configureCampaign = ( e ) => {
 		e.preventDefault();
+		setOpeningConfigureDrawer( true );
 
 		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
 		if ( ! campaignId ) {
@@ -61,6 +65,36 @@ export default function Campaigns() {
 			.catch( ( error ) => {
 				console.error( error );
 			} );
+
+		setOpeningConfigureDrawer( false );
+	};
+
+	const runCampaign = ( e, campaignId ) => {
+		e.preventDefault();
+		const formData = new window.FormData();
+
+		formData.append( 'action', 'wpaib_run_campaign' );
+		formData.append( 'security', autoblog_data.admin_nonce );
+		formData.append( 'campaign_id', campaignId );
+
+		apiFetch( {
+			url: autoblog_data.ajax_url,
+			method: 'POST',
+			body: formData,
+		} )
+			.then( ( data ) => {
+				if ( data.success ) {
+					// Campaign run successfully
+				}
+
+				dispatch( {
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: data?.data?.message || __( 'Campaign run successfully.', 'wp-ai-blogger' ),
+				} );
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
 	};
 
 	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
@@ -69,10 +103,10 @@ export default function Campaigns() {
 				<div className="flex flex-col items-center justify-center gap-y-3 border border-dashed border-gray-300 rounded-md p-6 max-w-lg mx-auto mt-20">
 					<FolderPlus className="w-8 h-8 text-gray-400" />
 					<h3 className="text-base font-semibold text-gray-900 m-0 p-0">
-						{ __( 'No campaigns.', 'wp-ai-blogger' ) }
+						{ __( 'No Campaigns.', 'wp-ai-blogger' ) }
 					</h3>
 					<p className="text-sm text-gray-500">
-						{ __( 'Get started by creating a new campaign.', 'wp-ai-blogger' ) }
+						{ __( 'Get Started by Creating a New Campaign.', 'wp-ai-blogger' ) }
 					</p>
 					<button
 						type="button"
@@ -140,7 +174,7 @@ export default function Campaigns() {
 														{ __( 'Posts/Target', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-														{ __( 'Last Post', 'wp-ai-blogger' ) }
+														{ __( 'Latest Post', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
 														{ __( 'Frequency', 'wp-ai-blogger' ) }
@@ -201,11 +235,19 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Settings className="w-4 h-4" />
+																	{
+																		openingConfigureDrawer ? (
+																			<RotateCw className="w-4 h-4 animate-spin" />
+																		) : (
+																			<Settings className="w-4 h-4" />
+																		)
+																	}
 																</Tooltip>
 															</a>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900">
+															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																runCampaign( e, campaign.id );
+															} }>
 																<Tooltip text={ __( 'Run now', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"

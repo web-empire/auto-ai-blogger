@@ -35,7 +35,7 @@ export default function License() {
 		setProcessing( true );
 
 		const formData = new window.FormData();
-		formData.append( 'action', 'autoblog_ai_activate_license' );
+		formData.append( 'action', 'wp_ai_blogger_activate_license' );
 		formData.append( 'license_key', licenseKey );
 		formData.append( 'nonce', autoblog_data.licensing_nonce );
 
@@ -58,6 +58,9 @@ export default function License() {
 				payload: data?.data?.message,
 			} );
 			setProcessing( false );
+			setTimeout( () => {
+				location.reload();
+			}, 500 );
 		} );
 	};
 
@@ -73,7 +76,7 @@ export default function License() {
 		setProcessing( true );
 
 		const formData = new window.FormData();
-		formData.append( 'action', 'autoblog_ai_deactivate_license' );
+		formData.append( 'action', 'wp_ai_blogger_deactivate_license' );
 		formData.append( 'nonce', autoblog_data.licensing_nonce );
 
 		apiFetch( {
@@ -95,6 +98,9 @@ export default function License() {
 				payload: data?.data?.message,
 			} );
 			setProcessing( false );
+			setTimeout( () => {
+				location.reload();
+			}, 500 );
 		} );
 	};
 

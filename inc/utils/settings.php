@@ -51,6 +51,50 @@ class Settings {
 					'default' => wpaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
+				'siteTitle'     => [
+					'default' => get_bloginfo( 'name' ),
+					'type'    => 'string',
+				],
+				'siteDescription' => [
+					'default' => get_bloginfo( 'description' ),
+					'type'    => 'string',
+				],
+				'siteFor'       => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'temperature' => [
+					'default' => 1,
+					'type'    => 'float',
+				],
+				'harassment' => [
+					'default' => 0,
+					'type'    => 'float',
+				],
+				'hate' => [
+					'default' => 0,
+					'type'    => 'float',
+				],
+				'sexuallyExplicit' => [
+					'default' => 0,
+					'type'    => 'float',
+				],
+				'dangerousContent' => [
+					'default' => 0,
+					'type'    => 'float',
+				],
+				'civicIntegrity' => [
+					'default' => 1,
+					'type'    => 'float',
+				],
+				'license'    => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'postIdeas'  => [
+					'default' => null,
+					'type'    => 'array',
+				]
 			]
 		);
 	}
@@ -105,7 +149,7 @@ class Settings {
 
 		$db_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
-		$defaults = apply_filters( 'autoblog_ai_dashboard_rest_options', self::get_default_settings() );
+		$defaults = apply_filters( 'wp_ai_blogger_dashboard_rest_options', self::get_default_settings() );
 
 		self::$dashboard_options = wp_parse_args( $db_option, $defaults );
 		return self::$dashboard_options;
@@ -157,6 +201,10 @@ class Settings {
 
 			case 'int':
 				$output = ! empty( $value ) ? absint( $value ) : '';
+				break;
+
+			case 'float':
+				$output = ! empty( $value ) ? floatval( $value ) : '';
 				break;
 
 			case 'url':

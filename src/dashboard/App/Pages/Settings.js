@@ -4,17 +4,32 @@ import { BellIcon, UserCircleIcon, CubeIcon } from '@heroicons/react/24/outline'
 import { General, Notifications, License } from '@Elements/Settings';
 import ContentHeader from '@Components/ContentHeader';
 import { useSettingsSelector } from '@Utils/useSettingsSelector';
-
-const secondaryNavigation = [
-	{ name: 'General', slug: 'general', icon: UserCircleIcon, current: true, element: <General /> },
-	{ name: 'Notifications', slug: 'notifications', icon: BellIcon, current: false, element: <Notifications /> },
-	{ name: 'License', slug: 'license', icon: CubeIcon, current: false, element: <License /> },
-];
+import { TriangleAlert } from 'lucide-react';
+import { __ } from '@wordpress/i18n';
+import { useSelector } from 'react-redux';
 
 export default function Settings() {
+	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
+	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
+	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
+
 	const [ currentTab, setCurrentTab ] = useState( 'general' );
 
 	const settings = useSettingsSelector();
+
+	const secondaryNavigation = [
+		{ name: 'General', slug: 'general', icon: UserCircleIcon, current: true, element: <General /> },
+		{ name: 'Notifications', slug: 'notifications', icon: BellIcon, current: false, element: <Notifications /> },
+		{ name: 'License', slug: 'license', icon: CubeIcon, current: false, element: <License /> },
+	];
+
+	const licenseEnabled = 'licensed' === autoblog_data.license_status;
+	const siteDetailedUnfilled = ! siteTitle || ! siteFor || ! siteDescription ? true : false;
+
+	// If license is not enabled, we need to remove 'notifications' navigation from secondaryNavigation.
+	if ( ! licenseEnabled ) {
+		secondaryNavigation.splice( 1, 1 );
+	}
 
 	return (
 		<>
@@ -32,16 +47,32 @@ export default function Settings() {
 											currentTab === item.slug
 												? 'bg-gray-50 text-indigo-600'
 												: 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600',
-											'group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm/6 font-semibold cursor-pointer',
+											'group flex items-center justify-between gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm/6 font-semibold cursor-pointer',
 										) }
 									>
-										<item.icon
-											aria-hidden="true"
-											className={ aiClassNames(
-												currentTab === item.slug ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600', 'size-6 shrink-0',
-											) }
-										/>
-										{ item.name }
+										<span className='flex items-center gap-2'>
+											<item.icon
+												aria-hidden="true"
+												className={ aiClassNames(
+													currentTab === item.slug ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600', 'size-6 shrink-0',
+												) }
+											/>
+											{ item.name }
+										</span>
+										{
+											'license' === item.slug && ! licenseEnabled && (
+												<span title={ __( 'License is Required', 'wp-ai-blogger' ) } className="flex ml-1">
+													<TriangleAlert className="w-4 h-4 text-orange-400" />
+												</span>
+											)
+										}
+										{
+											'general' === item.slug && siteDetailedUnfilled && (
+												<span title={ __( 'All site Details are Required', 'wp-ai-blogger' ) } className="flex ml-1">
+													<TriangleAlert className="w-4 h-4 text-orange-400" />
+												</span>
+											)
+										}
 									</a>
 								</li>
 							) ) }

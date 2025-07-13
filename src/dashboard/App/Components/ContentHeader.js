@@ -12,9 +12,9 @@ const ContentHeader = ( {
 	temperature,
 	harassment,
 	hate,
-	sexually_explicit,
-	dangerous_content,
-	civic_integrity,
+	sexuallyExplicit,
+	dangerousContent,
+	civicIntegrity,
 } ) => {
 	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
@@ -35,9 +35,9 @@ const ContentHeader = ( {
 			temperature,
 			harassment,
 			hate,
-			sexually_explicit,
-			dangerous_content,
-			civic_integrity,
+			sexuallyExplicit,
+			dangerousContent,
+			civicIntegrity,
 		};
 
 		const validSettings = Object.entries( settingsToSave )
