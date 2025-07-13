@@ -11,13 +11,13 @@ const CoreVersion = () => (
 				delay={ 100 }
 				className="z-999999 bg-black text-white shadow-md p-2 rounded-md"
 			>
-				<span>V-{ autoblog_data.version }</span>
+				<span>V-{ wpaib_localized_data.version }</span>
 			</Tooltip>
 		</div>
 
-		{ autoblog_data.pro_available && (
+		{ wpaib_localized_data.pro_available && (
 			<div className="flex items-center">
-				<span>{ autoblog_data.pro_version }</span>
+				<span>{ wpaib_localized_data.pro_version }</span>
 				<span className="ml-1 sm:ml-2 text-[0.625rem] leading-[1rem] font-medium text-white border border-slate-800 bg-slate-800 rounded-[0.1875rem] relative inline-flex flex-shrink-0 py-[0rem] px-1.5">
 					{ ' ' }
 					{ __( 'PRO', 'wp-ai-blogger' ) }{ ' ' }
@@ -33,27 +33,27 @@ const CoreVersion = () => (
 );
 
 export default function MainNav() {
-	const licenseEnabled = 'licensed' === autoblog_data.license_status;
+	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
 
 	const navMenus = [
 		{
 			name: __( 'Welcome', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: '',
 		},
 		{
 			name: __( 'Campaigns', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'campaigns',
 		},
 		{
 			name: __( 'Settings', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'settings',
 		},
 		{
 			name: __( 'Free vs Pro', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'free-vs-pro',
 		},
 	];
@@ -65,7 +65,7 @@ export default function MainNav() {
 
 	const redirectToProPurchase = () => {
 		window.open(
-			autoblog_data.pro_purchase_url,
+			wpaib_localized_data.pro_purchase_url,
 			'_blank'
 		);
 	};
@@ -73,7 +73,7 @@ export default function MainNav() {
 	const menus = wp.hooks.applyFilters( 'wp_ai_blogger_dashboard.main_navigation', navMenus );
 
 	const query = new URLSearchParams( useLocation()?.search );
-	const activePage = query.get( 'page' ) || autoblog_data.home_slug;
+	const activePage = query.get( 'page' ) || wpaib_localized_data.home_slug;
 	const activePath = query.get( 'path' ) || '';
 
 	return (
@@ -112,7 +112,7 @@ export default function MainNav() {
 					</div>
 
 					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex gap-6 items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
-						{ ! autoblog_data.pro_available && (
+						{ ! wpaib_localized_data.pro_available && (
 							<div className="text-sm font-medium text-slate-600 border-r hover:text-[#1E293B] hover:svg-hover-color">
 								<a
 									onClick={ redirectToProPurchase }

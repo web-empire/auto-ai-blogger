@@ -35,43 +35,43 @@ class Settings {
 		return apply_filters(
 			'wp_ai_blogger_settings_dataset',
 			[
-				'userOnboarded' => [
+				'userOnboarded'    => [
 					'default' => false,
 					'type'    => 'bool',
 				],
-				'onboardingTab' => [
+				'onboardingTab'    => [
 					'default' => 'welcome',
 					'type'    => 'string',
 				],
-				'userName'      => [
+				'userName'         => [
 					'default' => wpaib_get_user_detail( 'name' ),
 					'type'    => 'name',
 				],
-				'userEmail'     => [
+				'userEmail'        => [
 					'default' => wpaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
-				'siteTitle'     => [
+				'siteTitle'        => [
 					'default' => get_bloginfo( 'name' ),
 					'type'    => 'string',
 				],
-				'siteDescription' => [
+				'siteDescription'  => [
 					'default' => get_bloginfo( 'description' ),
 					'type'    => 'string',
 				],
-				'siteFor'       => [
+				'siteFor'          => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'temperature' => [
+				'temperature'      => [
 					'default' => 1,
 					'type'    => 'float',
 				],
-				'harassment' => [
+				'harassment'       => [
 					'default' => 0,
 					'type'    => 'float',
 				],
-				'hate' => [
+				'hate'             => [
 					'default' => 0,
 					'type'    => 'float',
 				],
@@ -83,18 +83,18 @@ class Settings {
 					'default' => 0,
 					'type'    => 'float',
 				],
-				'civicIntegrity' => [
+				'civicIntegrity'   => [
 					'default' => 1,
 					'type'    => 'float',
 				],
-				'license'    => [
+				'license'          => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'postIdeas'  => [
+				'postIdeas'        => [
 					'default' => null,
 					'type'    => 'array',
-				]
+				],
 			]
 		);
 	}
@@ -204,7 +204,8 @@ class Settings {
 				break;
 
 			case 'float':
-				$output = ! empty( $value ) ? floatval( $value ) : '';
+				$val    = ( is_scalar( $value ) || is_null( $value ) ) ? strval( $value ) : '';
+				$output = ! empty( $value ) ? floatval( $val ) : '';
 				break;
 
 			case 'url':

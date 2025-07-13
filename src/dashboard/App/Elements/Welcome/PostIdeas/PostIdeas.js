@@ -32,7 +32,7 @@ export default function PostIdeas() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 
-	const licenseEnabled = 'licensed' === autoblog_data.license_status;
+	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
 
 	const fetchPostIdeas = async () => {
 		console.log( 'Fetching post ideas...', postIdeasFromRedux );
@@ -130,8 +130,8 @@ export default function PostIdeas() {
 	}, [ postIdeas ] );
 
 	const handleRefresh = () => {
-		if ( ! autoblog_data.pro_available ) {
-			window.open( autoblog_data.upgrade_link, '_blank' );
+		if ( ! wpaib_localized_data.pro_available ) {
+			window.open( wpaib_localized_data.upgrade_link, '_blank' );
 			return;
 		}
 
@@ -157,13 +157,13 @@ export default function PostIdeas() {
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
-		navigate( `?page=${ autoblog_data.home_slug }&path=settings` ); // Navigate to the settings tab.
+		navigate( `?page=${ wpaib_localized_data.home_slug }&path=settings` ); // Navigate to the settings tab.
 	};
 
 	if ( error ) {
 		if ( error === 'Missing required fields' ) {
-			let title = __( 'Please fill out the general settings to see post ideas.', 'wp-ai-blogger' );
-			let buttonText = __( 'Go to General Settings', 'wp-ai-blogger' );
+			const title = __( 'Please fill out the general settings to see post ideas.', 'wp-ai-blogger' );
+			const buttonText = __( 'Go to General Settings', 'wp-ai-blogger' );
 
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
@@ -205,21 +205,21 @@ export default function PostIdeas() {
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
-		formData.append( 'security', autoblog_data.admin_nonce );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
 
 		const postData = {
-			title: title,
+			title,
 			status: 'draft',
 			post_type: 'post',
 			post_content: '',
 			excerpt: '',
-			metadata: JSON.stringify( { 'wp_aib_reference': 1 } )
+			metadata: JSON.stringify( { wp_aib_reference: 1 } ),
 		};
 
 		formData.append( 'post_data', JSON.stringify( postData ) );
 
 		return apiFetch( {
-			url: autoblog_data.ajax_url,
+			url: wpaib_localized_data.ajax_url,
 			method: 'POST',
 			body: formData,
 		} )
@@ -231,7 +231,7 @@ export default function PostIdeas() {
 
 				e.target.dataset.type = 'edit';
 				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
-				e.target.href = autoblog_data.edit_post_link.replace( '{{POST_ID}}', response.data.post_id );
+				e.target.href = wpaib_localized_data.edit_post_link.replace( '{{POST_ID}}', response.data.post_id );
 				window.open( e.target.href, '_blank' );
 
 				dispatch( {
@@ -276,7 +276,7 @@ export default function PostIdeas() {
 												{ TrimWordsContent( post.title, 120 ) }
 											</td>
 											<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-												<a target='_blank' href="#" onClick={ ( e ) => wpaib_create_post( e, post.title ) } className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer" data-type="create">
+												<a target="_blank" href="#" onClick={ ( e ) => wpaib_create_post( e, post.title ) } className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer" data-type="create">
 													<Plus className="w-5 h-5" />
 													{ __( 'Create', 'wp-ai-blogger' ) }
 												</a>
@@ -288,7 +288,7 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-900">
-											<a href={ autoblog_data.upgrade_link } className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
+											<a href={ wpaib_localized_data.upgrade_link } className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
 												{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
 												<MoveRight className="w-5 h-5" />
 											</a>

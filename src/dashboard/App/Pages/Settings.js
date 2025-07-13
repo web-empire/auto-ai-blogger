@@ -23,7 +23,7 @@ export default function Settings() {
 		{ name: 'License', slug: 'license', icon: CubeIcon, current: false, element: <License /> },
 	];
 
-	const licenseEnabled = 'licensed' === autoblog_data.license_status;
+	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
 	const siteDetailedUnfilled = ! siteTitle || ! siteFor || ! siteDescription ? true : false;
 
 	// If license is not enabled, we need to remove 'notifications' navigation from secondaryNavigation.
@@ -50,7 +50,7 @@ export default function Settings() {
 											'group flex items-center justify-between gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm/6 font-semibold cursor-pointer',
 										) }
 									>
-										<span className='flex items-center gap-2'>
+										<span className="flex items-center gap-2">
 											<item.icon
 												aria-hidden="true"
 												className={ aiClassNames(

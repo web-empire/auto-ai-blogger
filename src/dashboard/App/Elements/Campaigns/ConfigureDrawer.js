@@ -17,7 +17,7 @@ export default function ConfigureDrawer( props ) {
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
-	const postTypes = autoblog_data.post_types || {};
+	const postTypes = wpaib_localized_data.post_types || {};
 
 	useEffect( () => {
 		setDrawerData( configureData );
@@ -260,7 +260,7 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-type" value={ drawerData.postType } onChange={ ( e ) => setDrawerData( { ...drawerData, postType: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => (
+																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => ( // eslint-disable-line no-unused-vars
 																		<option key={ label } value={ label }>
 																			{ label.charAt( 0 ).toUpperCase() + label.slice( 1 ) } { /* Capitalize first letter */ }
 																		</option>
@@ -276,7 +276,7 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-author" value={ drawerData.author } onChange={ ( e ) => setDrawerData( { ...drawerData, author: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.authors ).map( ( [ key, label ] ) => (
+																	{ Object.entries( wpaib_localized_data.authors ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -292,7 +292,7 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-status" value={ drawerData.postStatus } onChange={ ( e ) => setDrawerData( { ...drawerData, postStatus: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.post_statuses ).map( ( [ key, label ] ) => (
+																	{ Object.entries( wpaib_localized_data.post_statuses ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -311,7 +311,7 @@ export default function ConfigureDrawer( props ) {
 																		<div>
 																			<select className="wpaib-select-control" id="post-category" value={ drawerData.category } onChange={ ( e ) => setDrawerData( { ...drawerData, category: e.target.value } ) }>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( autoblog_data.categories ).map( ( [ key, label ] ) => (
+																				{ Object.entries( wpaib_localized_data.categories ).map( ( [ key, label ] ) => (
 																					<option key={ key } value={ key }>
 																						{ label }
 																					</option>
@@ -327,7 +327,7 @@ export default function ConfigureDrawer( props ) {
 																		<div>
 																			<select className="wpaib-select-control" id="post-tag" value={ drawerData.tag } onChange={ ( e ) => setDrawerData( { ...drawerData, tag: e.target.value } ) }>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( autoblog_data.tags ).map( ( [ key, label ] ) => (
+																				{ Object.entries( wpaib_localized_data.tags ).map( ( [ key, label ] ) => (
 																					<option key={ key } value={ key }>
 																						{ label }
 																					</option>

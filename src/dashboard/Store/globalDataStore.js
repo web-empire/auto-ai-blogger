@@ -3,20 +3,20 @@ import globalDataReducer from './globalDataReducer';
 
 // Get the initial state, applying the filter.
 const initialState = wp.hooks.applyFilters( 'ai_blogger_dashboard/datastore', {
-	...autoblog_data.defaults,
-	siteTitle: autoblog_data.site_title || '',
-	siteFor: autoblog_data.site_for || '',
-	siteDescription: autoblog_data.site_description || '',
-	temperature: parseFloat( autoblog_data.temperature ),
-	harassment: parseInt( autoblog_data.harassment ),
-	hate: parseInt( autoblog_data.hate ),
-	sexuallyExplicit: parseInt( autoblog_data.sexually_explicit ),
-	dangerousContent: parseInt( autoblog_data.dangerous_content ),
-	license: autoblog_data.license || '',
-	postIdeas: autoblog_data.post_ideas || '',
-	tokenTotal: autoblog_data.token_total || 0,
-	tokenRemaining: autoblog_data.token_remaining || 0,
-	licenseStatus: autoblog_data.license_status || 0,
+	...wpaib_localized_data.defaults,
+	siteTitle: wpaib_localized_data.site_title || '',
+	siteFor: wpaib_localized_data.site_for || '',
+	siteDescription: wpaib_localized_data.site_description || '',
+	temperature: parseFloat( wpaib_localized_data.temperature ),
+	harassment: parseInt( wpaib_localized_data.harassment ),
+	hate: parseInt( wpaib_localized_data.hate ),
+	sexuallyExplicit: parseInt( wpaib_localized_data.sexually_explicit ),
+	dangerousContent: parseInt( wpaib_localized_data.dangerous_content ),
+	license: wpaib_localized_data.license || '',
+	postIdeas: wpaib_localized_data.post_ideas || '',
+	tokenTotal: wpaib_localized_data.token_total || 0,
+	tokenRemaining: wpaib_localized_data.token_remaining || 0,
+	licenseStatus: wpaib_localized_data.license_status || 0,
 } );
 
 const globalDataStore = createStore(

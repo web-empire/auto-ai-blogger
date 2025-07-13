@@ -26,12 +26,12 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 	const formData = new window.FormData();
 
 	formData.append( 'action', 'wpaib_update_admin_setting' );
-	formData.append( 'security', autoblog_data.admin_nonce );
+	formData.append( 'security', wpaib_localized_data.admin_nonce );
 	formData.append( 'key', key );
 	formData.append( 'value', value );
 
 	return apiFetch( {
-		url: autoblog_data.ajax_url,
+		url: wpaib_localized_data.ajax_url,
 		method: 'POST',
 		body: formData,
 		signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
@@ -62,12 +62,12 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
 	const formData = new window.FormData();
 
 	formData.append( 'action', isNew ? 'wpaib_create_campaign' : 'wpaib_update_campaign' );
-	formData.append( 'security', autoblog_data.admin_nonce );
+	formData.append( 'security', wpaib_localized_data.admin_nonce );
 	formData.append( 'key', 'campaign_details' );
 	formData.append( 'value', JSON.stringify( value ) );
 
 	return apiFetch( {
-		url: autoblog_data.ajax_url,
+		url: wpaib_localized_data.ajax_url,
 		method: 'POST',
 		body: formData,
 		signal: abortControllerRef.current.campaign_details?.signal, // Pass the signal to the fetch request.

@@ -15,7 +15,7 @@ const PagesRoute = () => {
 	const page = query.get( 'page' );
 	const path = query.get( 'path' );
 
-	if ( autoblog_data.home_slug !== page ) {
+	if ( wpaib_localized_data.home_slug !== page ) {
 		return <p>Something went wrong..!</p>;
 	}
 

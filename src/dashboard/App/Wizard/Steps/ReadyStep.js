@@ -49,7 +49,7 @@ const ReadyStep = () => {
 
 		setTimeout( () => {
 			const redirectUrl = '?page=wp-ai-blogger';
-			window.location.href = autoblog_data.admin_base_url + redirectUrl;
+			window.location.href = wpaib_localized_data.admin_base_url + redirectUrl;
 		}, 1000 );
 	}, [] );
 
@@ -60,7 +60,7 @@ const ReadyStep = () => {
 		const redirectUrl = '?page=wp-ai-blogger';
 
 		// Redirect to the created url.
-		window.location.href = autoblog_data.admin_base_url + redirectUrl;
+		window.location.href = wpaib_localized_data.admin_base_url + redirectUrl;
 	};
 
 	return (

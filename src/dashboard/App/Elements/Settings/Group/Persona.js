@@ -2,7 +2,6 @@ import { __ } from '@wordpress/i18n';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
-import SettingInputRange from '@Components/SettingInputRange';
 import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
 
@@ -92,12 +91,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
-							{ value: 0, label: blockLabels[ 0 ] }, // Off
-							{ value: 1, label: blockLabels[ 1 ] }, // Block none
-							{ value: 2, label: blockLabels[ 2 ] }, // Block few
-							{ value: 3, label: blockLabels[ 3 ] }, // Block some
-							{ value: 4, label: blockLabels[ 4 ] }, // Block most
+							{ value: 0, label: blockLabels[ 0 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -110,12 +118,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -128,12 +145,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -143,15 +169,24 @@ export default function Persona() {
 					<RangeControl
 						value={ dangerousContent }
 						onChange={ handleDangerousContentChange }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						min={ 0 }
 						max={ 4 }
+						withInputField={ false }
 						step={ 1 }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>

@@ -112,10 +112,10 @@ class Licensing {
 			wp_send_json_error( [ 'message' => $response->get_error_message() ] );
 		}
 
-		Helper::update_option( 'license', $license_key );
-
 		// Update the license status in the database after activating the license.
-		update_option( 'wp_ai_blogger_license_status', 'licensed' );
+		Helper::update_option( 'license', $license_key );
+		Helper::update_option( 'license_status', 'licensed' );
+
 		wp_send_json_success( [ 'message' => __( 'License activated successfully.', 'wp-ai-blogger' ) ] );
 	}
 
@@ -143,10 +143,10 @@ class Licensing {
 			wp_send_json_error( [ 'message' => $response->get_error_message() ] );
 		}
 
-		Helper::update_option('license', '');
-
 		// Update the license status in the database after deactivating the license.
-		update_option( 'wp_ai_blogger_license_status', 'unlicensed' );
+		Helper::update_option( 'license', '' );
+		Helper::update_option( 'license_status', 'unlicensed' );
+
 		wp_send_json_success( [ 'message' => __( 'License deactivated successfully.', 'wp-ai-blogger' ) ] );
 	}
 
@@ -196,14 +196,14 @@ class Licensing {
 			return;
 		}
 
-		$license_status = get_option( 'wp_ai_blogger_license_status', '' );
+		$license_status = Helper::get_option( 'license_status', '' );
 		/**
 		 * If the license status is not set then get the license status and update the option accordingly.
 		 * This will be executed only once. Subsequently, the option status is updated by the licensing class on license activation or deactivation.
 		 */
 		if ( empty( $license_status ) ) {
 			$license_status = Licensing::is_license_active() ? 'licensed' : 'unlicensed';
-			update_option( 'wp_ai_blogger_license_status', $license_status );
+			Helper::update_option( 'license_status', $license_status );
 		}
 
 		if ( $license_status === 'licensed' ) {

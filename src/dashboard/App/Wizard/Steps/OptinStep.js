@@ -42,7 +42,7 @@ const OptinStep = () => {
 	};
 
 	const handleStepRedirection = function ( stepToRedirect ) {
-		navigate( `${ autoblog_data.admin_app_url }&step=${ stepToRedirect }` );
+		navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
 	};
 
 	const submitOptinForm = async function ( e ) {

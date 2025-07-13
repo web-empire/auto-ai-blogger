@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RefreshCw, Settings, Trash2, Info, FolderPlus } from 'lucide-react';
+import { RefreshCw, Settings, Trash2, Info, FolderPlus, RotateCw } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
@@ -10,8 +10,8 @@ import { useDispatch } from 'react-redux';
 
 export default function Campaigns() {
 	const dispatch = useDispatch();
-	const campaigns = autoblog_data.all_campaigns;
-	const defaultMetaDefaults = autoblog_data.postmeta_defaults;
+	const campaigns = wpaib_localized_data.all_campaigns;
+	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
@@ -21,11 +21,11 @@ export default function Campaigns() {
 		const formData = new window.FormData();
 
 		formData.append( 'action', 'wpaib_get_campaign_metadata' );
-		formData.append( 'security', autoblog_data.admin_nonce );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
 		formData.append( 'campaign_id', campaignId );
 
 		const response = await apiFetch( {
-			url: autoblog_data.ajax_url,
+			url: wpaib_localized_data.ajax_url,
 			method: 'POST',
 			body: formData,
 		} )
@@ -74,11 +74,11 @@ export default function Campaigns() {
 		const formData = new window.FormData();
 
 		formData.append( 'action', 'wpaib_run_campaign' );
-		formData.append( 'security', autoblog_data.admin_nonce );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
 		formData.append( 'campaign_id', campaignId );
 
 		apiFetch( {
-			url: autoblog_data.ajax_url,
+			url: wpaib_localized_data.ajax_url,
 			method: 'POST',
 			body: formData,
 		} )

@@ -1,21 +1,21 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { MoveRight, Lock } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-const campaigns = autoblog_data.all_campaigns || {};
-
-const licenseEnabled = 'licensed' === autoblog_data.license_status;
+const campaigns = wpaib_localized_data.all_campaigns || {};
 
 export default function CampaignsInsights() {
 	const navigate = useNavigate();
+	const licenseStatus = useSelector( ( state ) => state.licenseStatus ) || 'unlicensed';
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
-		navigate( `?page=${ autoblog_data.home_slug }&path=settings` ); // Navigate to the settings tab
+		navigate( `?page=${ wpaib_localized_data.home_slug }&path=settings` ); // Navigate to the settings tab
 	};
 
-	if ( ! licenseEnabled ) {
+	if ( 'unlicensed' === licenseStatus ) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-y-3 border border-dashed border-gray-300 rounded-md p-6 max-w-lg mx-auto mt-20">
 				<Lock className="w-8 h-8 text-gray-400" />

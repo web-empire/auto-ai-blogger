@@ -13,12 +13,12 @@ const LicenseStep = () => {
 
 	// Fetch data from Redux.
 	const reduxLicense = useSelector( ( state ) => state.license );
-	const [ licenseStatus, setLicenseStatus ] = useState( autoblog_data?.license_status );
+	const [ licenseStatus, setLicenseStatus ] = useState( wpaib_localized_data?.license_status );
 	const [ processing, setProcessing ] = useState( false );
 	const [ buttonText, setButtonText ] = useState( __( 'Connect & Proceed', 'wp-ai-blogger' ) );
 
 	// Use Redux data for initial state.
-	const [ license, setLicense ] = useState( reduxLicense || autoblog_data.license );
+	const [ license, setLicense ] = useState( reduxLicense || wpaib_localized_data.license );
 
 	const [ licenseStatusMessage, setLicenseStatusMessage ] = useState( '' );
 
@@ -40,7 +40,7 @@ const LicenseStep = () => {
 		const formData = new window.FormData();
 		formData.append( 'action', 'wp_ai_blogger_activate_license' );
 		formData.append( 'license_key', license );
-		formData.append( 'nonce', autoblog_data.licensing_nonce );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		apiFetch( {
 			url: ajaxurl,
@@ -49,10 +49,14 @@ const LicenseStep = () => {
 		} ).then( ( data ) => {
 			if ( data.success ) {
 				setLicense( '' );
+				dispatch( {
+					type: 'UPDATE_LICENSE_STATUS',
+					payload: 'licensed',
+				} );
 				setLicenseStatus( 'licensed' );
-				setButtonText( __( 'Proceeding...', 'wp-ai-blogger' ) );
+				setButtonText( __( 'Proceeding…', 'wp-ai-blogger' ) );
 				setLicenseStatusMessage( __( 'License activated successfully.', 'wp-ai-blogger' ) );
-				navigate( `${ autoblog_data.admin_app_url }&step=optin` );
+				navigate( `${ wpaib_localized_data.admin_app_url }&step=optin` );
 			} else {
 				setButtonText( __( 'Connect & Proceed', 'wp-ai-blogger' ) );
 			}
@@ -85,7 +89,7 @@ const LicenseStep = () => {
 		await updateApiData( 'license', license, dispatch, abortControllerRef );
 		dispatch( { type: 'UPDATE_LICENSE', payload: license } );
 
-		navigate( `${ autoblog_data.admin_app_url }&step=optin` );
+		navigate( `${ wpaib_localized_data.admin_app_url }&step=optin` );
 	};
 
 	return (
@@ -103,7 +107,7 @@ const LicenseStep = () => {
 					<p className="text-center overflow-hidden font-normal text-[#4B5563] text-base">
 						{ __( 'Enter your license key below to allocate tokens for WP AI Blogger from', 'wp-ai-blogger' ) }
 						{ ' ' }
-						<a href={autoblog_data.upgrade_link} target='_blank' className="text-blue-500">{ __('here', 'wp-ai-blogger') }</a>.
+						<a href={ wpaib_localized_data.upgrade_link } target="_blank" className="text-blue-500" rel="noreferrer">{ __( 'here', 'wp-ai-blogger' ) }</a>.
 					</p>
 
 					<form className="max-w-sm mx-auto mt-10">
@@ -125,7 +129,7 @@ const LicenseStep = () => {
 							<p className="wpaib-step-text text-center overflow-hidden text-sm font-normal text-slate-500">
 								{ __( 'Don\'t have a license key?', 'wp-ai-blogger' ) }
 								{ ' ' }
-								<a href={autoblog_data.upgrade_link} target='_blank' className="text-blue-500">{ __('Get Free Credits', 'wp-ai-blogger') }</a>
+								<a href={ wpaib_localized_data.upgrade_link } target="_blank" className="text-blue-500" rel="noreferrer">{ __( 'Get Free Credits', 'wp-ai-blogger' ) }</a>
 							</p>
 						</div>
 

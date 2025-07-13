@@ -48,7 +48,7 @@ export default function License() {
 		const formData = new window.FormData();
 		formData.append( 'action', 'wp_ai_blogger_activate_license' );
 		formData.append( 'license_key', licenseKey );
-		formData.append( 'nonce', autoblog_data.licensing_nonce );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		apiFetch( {
 			url: ajaxurl,
@@ -133,9 +133,6 @@ export default function License() {
 			} );
 		} ).finally( () => {
 			setProcessing( false );
-			setTimeout( () => {
-				location.reload();
-			}, 500 );
 		} );
 	};
 
@@ -152,7 +149,7 @@ export default function License() {
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wp_ai_blogger_deactivate_license' );
-		formData.append( 'nonce', autoblog_data.licensing_nonce );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		apiFetch( {
 			url: ajaxurl,
@@ -187,9 +184,6 @@ export default function License() {
 				payload: data?.data?.message,
 			} );
 			setProcessing( false );
-			setTimeout( () => {
-				location.reload();
-			}, 500 );
 		} );
 	};
 

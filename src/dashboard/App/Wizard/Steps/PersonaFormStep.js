@@ -16,9 +16,9 @@ const PersonaFormStep = () => {
 	const reduxSiteDescription = useSelector( ( state ) => state.siteDescription );
 
 	// Use Redux data for initial state
-	const [ siteTitle, setSiteTitle ] = useState( reduxSiteTitle || autoblog_data.site_title );
-	const [ siteFor, setSiteFor ] = useState( reduxSiteFor || autoblog_data.site_for );
-	const [ siteDescription, setSiteDescription ] = useState( reduxSiteDescription || autoblog_data.site_description );
+	const [ siteTitle, setSiteTitle ] = useState( reduxSiteTitle || wpaib_localized_data.site_title );
+	const [ siteFor, setSiteFor ] = useState( reduxSiteFor || wpaib_localized_data.site_for );
+	const [ siteDescription, setSiteDescription ] = useState( reduxSiteDescription || wpaib_localized_data.site_description );
 
 	const [ siteTitleError, setSiteTitleError ] = useState( '' );
 	const [ siteForError, setSiteForError ] = useState( '' );
@@ -62,7 +62,7 @@ const PersonaFormStep = () => {
 		dispatch( { type: 'UPDATE_SITE_FOR', payload: siteFor } );
 		dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: siteDescription } );
 
-		navigate( `${ autoblog_data.admin_app_url }&step=license` );
+		navigate( `${ wpaib_localized_data.admin_app_url }&step=license` );
 	};
 
 	return (

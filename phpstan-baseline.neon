@@ -2,7 +2,7 @@ parameters:
 	ignoreErrors:
 		-
 			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
-			count: 2
+			count: 3
 			path: admin/ajax.php
 
 		-
@@ -11,7 +11,42 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Cannot access offset 'metadata' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'post_content' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'post_type' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'status' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'title' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_status\\: mixed, post_type\\: mixed, meta_input\\: mixed\\} given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -47,7 +82,7 @@ parameters:
 
 		-
 			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
-			count: 2
+			count: 3
 			path: admin/ajax.php
 
 		-
@@ -121,14 +156,24 @@ parameters:
 			path: admin/licensing.php
 
 		-
-			message: "#^Cannot access offset 'sc_license_key' on mixed\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
 			message: "#^Parameter \\#1 \\$value of function strval expects bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
 			count: 1
 			path: core/maintenance.php
+
+		-
+			message: "#^Action callback returns int\\|string\\|void\\|WPAIBlogger\\\\Core\\\\WP_Error but should not return anything\\.$#"
+			count: 1
+			path: core/scheduler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:create_blog_post\\(\\) has invalid return type WPAIBlogger\\\\Core\\\\WP_Error\\.$#"
+			count: 1
+			path: core/scheduler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:create_blog_post\\(\\) should return int\\|string\\|void\\|WPAIBlogger\\\\Core\\\\WP_Error but returns int\\|WP_Error\\.$#"
+			count: 1
+			path: core/scheduler.php
 
 		-
 			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) has parameter \\$schedules with no value type specified in iterable type array\\.$#"
@@ -146,12 +191,17 @@ parameters:
 			path: core/scheduler.php
 
 		-
-			message: "#^Argument of an invalid type array\\<int, WP_Term\\>\\|WP_Error supplied for foreach, only iterables are supported\\.$#"
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			message: "#^Call to function is_wp_error\\(\\) with array\\<int, WP_Post\\> will always evaluate to false\\.$#"
+			count: 2
+			path: inc/functions/common.php
+
+		-
+			message: "#^Call to function is_wp_error\\(\\) with array\\<int, WP_Term\\> will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -161,28 +211,13 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Cannot access offset 'content' on mixed\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Cannot access offset 'error' on mixed\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Cannot access offset 'title' on mixed\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Cannot access offset int on WP_Term\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^Cannot access offset mixed on mixed\\.$#"
 			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 3
 			path: inc/functions/common.php
 
 		-
@@ -201,7 +236,32 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_post_creation_api_response\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_generated_posts\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) has parameter \\$site_persona_details with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) never returns WP_Error so it can be removed from the return type\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) should return array\\|WP_Error but empty return statement found\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_post_creation_api_response\\(\\) should return array\\|WP_Error but returns mixed\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -226,17 +286,17 @@ parameters:
 			path: inc/functions/common.php
 
 		-
+			message: "#^Function wpaib_get_site_persona_details\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
 			message: "#^Function wpaib_get_tags\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
 			message: "#^Function wpaib_get_user_detail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Offset 'body' on array\\{headers\\: WpOrg\\\\Requests\\\\Utility\\\\CaseInsensitiveDictionary, body\\: string, response\\: array\\{code\\: int, message\\: string\\}, cookies\\: array\\<int, WP_Http_Cookie\\>, filename\\: string\\|null, http_response\\: WP_HTTP_Requests_Response\\} in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -251,17 +311,27 @@ parameters:
 			path: inc/functions/common.php
 
 		-
+			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 45, redirection\\: 10, httpversion\\: '1\\.1', blocking\\: true, headers\\: array\\{Content\\-Type\\: 'application/json'\\}, body\\: non\\-empty\\-string\\|false, cookies\\: array\\{\\}\\} given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
 			message: "#^Parameter \\#2 \\$max_title_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#2 \\$message of class WP_Error constructor expects string, mixed given\\.$#"
+			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
+			message: "#^is_wp_error\\(array\\<int, WP_Post\\>\\) will always evaluate to false\\.$#"
+			count: 2
+			path: inc/functions/common.php
+
+		-
+			message: "#^is_wp_error\\(array\\<int, WP_Term\\>\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
 

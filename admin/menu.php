@@ -91,18 +91,18 @@ class Menu {
 		$blog_name                = get_bloginfo( 'name' );
 		$admin_site_email_address = get_option( 'admin_email' );
 
-		$site_title               = Helper::get_option( 'siteTitle' );
-		$site_description         = Helper::get_option( 'siteDescription' );
-		$site_for                 = Helper::get_option( 'siteFor' );
-		$license                  = Helper::get_option( 'license' );
-		$temperature              = Helper::get_option( 'temperature', 1 );
-		$harassment               = Helper::get_option( 'harassment', 0 );
-		$hate                     = Helper::get_option( 'hate', 0 );
-		$sexually_explicit        = Helper::get_option( 'sexuallyExplicit', 0 );
-		$dangerous_content        = Helper::get_option( 'dangerousContent', 0 );
-		$post_ideas               = Helper::get_option( 'postIdeas' );
-		$token_total              = Helper::get_option( 'tokenTotal' );
-		$token_remaining          = Helper::get_option( 'tokenRemaining' );
+		$site_title        = Helper::get_option( 'siteTitle' );
+		$site_description  = Helper::get_option( 'siteDescription' );
+		$site_for          = Helper::get_option( 'siteFor' );
+		$license           = Helper::get_option( 'license' );
+		$temperature       = Helper::get_option( 'temperature', 1 );
+		$harassment        = Helper::get_option( 'harassment', 0 );
+		$hate              = Helper::get_option( 'hate', 0 );
+		$sexually_explicit = Helper::get_option( 'sexuallyExplicit', 0 );
+		$dangerous_content = Helper::get_option( 'dangerousContent', 0 );
+		$post_ideas        = Helper::get_option( 'postIdeas' );
+		$token_total       = Helper::get_option( 'tokenTotal' );
+		$token_remaining   = Helper::get_option( 'tokenRemaining' );
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',
@@ -121,7 +121,7 @@ class Menu {
 				'pro_version'        => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
 				'pro_purchase_url'   => 'https://wpaiblogger.com/',
 				'licensing_nonce'    => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
-				'license_status'     => get_option( 'wp_ai_blogger_license_status', 'unlicensed' ),
+				'license_status'     => Helper::get_option( 'license_status', 'unlicensed' ),
 				'admin_email'        => $admin_site_email_address,
 				'site_title'         => $site_title,
 				'site_description'   => $site_description,
@@ -144,10 +144,10 @@ class Menu {
 				'postmeta_defaults'  => Metadata::get_default_settings(),
 				'all_campaigns'      => wpaib_get_all_campaigns(),
 				'generated_posts'    => wpaib_get_generated_posts(),
-				'edit_post_link'      => add_query_arg(
+				'edit_post_link'     => add_query_arg(
 					[
-						'post'             => '{{POST_ID}}',
-						'action'           => 'edit',
+						'post'   => '{{POST_ID}}',
+						'action' => 'edit',
 					],
 					admin_url( 'post.php' )
 				),
@@ -175,7 +175,7 @@ class Menu {
 			true
 		);
 
-		wp_localize_script( $handle, 'autoblog_data', $localized_data );
+		wp_localize_script( $handle, 'wpaib_localized_data', $localized_data );
 
 		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AI_BLOGGER_DIR . 'languages' );
 

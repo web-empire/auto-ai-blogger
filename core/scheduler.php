@@ -41,10 +41,10 @@ class Scheduler {
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
 
 		// foreach ( $this->schedules as $campaign_id => $days ) {
-		// 	if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
-		// 		$args = [ $campaign_id ];
-		// 		// wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
-		// 	}
+		// if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
+		// $args = [ $campaign_id ];
+		// wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
+		// }
 		// }
 	}
 

@@ -9,5 +9,5 @@ export {
 	OptinStep,
 	ReadyStep,
 	LicenseStep,
-	PersonaFormStep
+	PersonaFormStep,
 };

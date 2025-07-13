@@ -50,7 +50,7 @@ const NavigationBar = () => {
 
 		if ( e.target.id ) {
 			const stepToRedirect = e.target.id;
-			navigate( `${ autoblog_data.admin_app_url }&step=${ stepToRedirect }` );
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
 		}
 	};
 

@@ -21,7 +21,7 @@ export default function Notifications() {
 								onChange={ () => {} }
 							/>
 						</SettingField>
-						<SettingInput id="email-notification" defaultValue={ autoblog_data.admin_email } />
+						<SettingInput id="email-notification" defaultValue={ wpaib_localized_data.admin_email } />
 						<SettingDescription description={ __( 'Enter multiple email addresses separated by commas.', 'wp-ai-blogger' ) } />
 					</SettingField>
 
