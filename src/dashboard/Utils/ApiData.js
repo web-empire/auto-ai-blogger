@@ -1,6 +1,5 @@
 // Import the apiFetch function from the '@wordpress/api-fetch' package.
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
 
 /**
  * A function to send form data via API fetch.
@@ -32,11 +31,11 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 	formData.append( 'value', value );
 
 	return apiFetch( {
-        url: autoblog_data.ajax_url,
-        method: 'POST',
-        body: formData,
-        signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
-    } );
+		url: autoblog_data.ajax_url,
+		method: 'POST',
+		body: formData,
+		signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
+	} );
 };
 
 /**

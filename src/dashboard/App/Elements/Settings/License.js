@@ -63,30 +63,28 @@ export default function License() {
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'licensed',
 				} );
-				setActivationText( __( 'Fetching tokens...', 'wp-ai-blogger' ) );
+				setActivationText( __( 'Fetching tokens…', 'wp-ai-blogger' ) );
 				setDeactivationText( __( 'Activating', 'wp-ai-blogger' ) );
 
 				// Then fetch the token data using native fetch (not apiFetch for external APIs)
-				return fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`, {
+				return fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ licenseKey }`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
 					},
-				} ).then( response => {
+				} ).then( ( response ) => {
 					if ( ! response.ok ) {
-						throw new Error( `HTTP error! status: ${response.status}` );
+						throw new Error( `HTTP error! status: ${ response.status }` );
 					}
 					return response.json();
 				} );
-			} else {
-				setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
-				throw new Error( data?.data?.message || 'License activation failed' );
 			}
+			setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
+			throw new Error( data?.data?.message || 'License activation failed' );
 		} ).then( async ( tokenData ) => {
 			if ( tokenData && tokenData.success && tokenData.data ) {
-
-				console.log("TOKEN TOTAL:", tokenData.data.total);
-				console.log("TOKEN REMAINING:", tokenData.data.remaining);
+				console.log( 'TOKEN TOTAL:', tokenData.data.total );
+				console.log( 'TOKEN REMAINING:', tokenData.data.remaining );
 
 				// Update the store with token data
 				dispatch( {
@@ -200,14 +198,14 @@ export default function License() {
 		setProcessing( true );
 
 		// Fetch fresh token data using the license key from Redux store
-		fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`, {
+		fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ license }`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		} ).then( response => {
+		} ).then( ( response ) => {
 			if ( ! response.ok ) {
-				throw new Error( `HTTP error! status: ${response.status}` );
+				throw new Error( `HTTP error! status: ${ response.status }` );
 			}
 			return response.json();
 		} ).then( async ( tokenData ) => {
@@ -295,7 +293,13 @@ export default function License() {
 						<SettingLabel forId="available-tokens" title={ __( 'Tokens Consumed', 'wp-ai-blogger' ) } />
 						<div className="flex gap-2 flex-row items-center mt-3">
 							<p className="text-sm text-gray-500 m-0 p-0">
-								{ __( `${formattedTokensUsed} of ${formattedTotalTokens} Tokens Used`, 'wp-ai-blogger' ) }
+								{ formattedTokensUsed }
+								{ ' ' }
+								{ __( 'of', 'wp-ai-blogger' ) }
+								{ ' ' }
+								{ formattedTotalTokens }
+								{ ' ' }
+								{ __( 'Tokens Used', 'wp-ai-blogger' ) }
 							</p>
 							<button
 								disabled={ licenseStatus !== 'licensed' || processing || ! license }
