@@ -55,23 +55,6 @@ class Loader {
 	}
 
 	/**
-	 * Suppress translation error.
-	 *
-	 * @param bool   $status       Status.
-	 * @param string $function_name Function name.
-	 * @param string $message      Message.
-	 * @param string $version      Version.
-	 *
-	 * @return bool
-	 */
-	public function suppress_translation_error( $status, $function_name, $message, $version ) {
-		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'wp-ai-blogger' ) !== false ) {
-			return false;
-		}
-		return $status;
-	}
-
-	/**
 	 * Enqueue required setup after plugins loaded.
 	 *
 	 * @since x.x.x
@@ -104,6 +87,23 @@ class Loader {
 			/* Admin Menu init */
 			Menu::get_instance();
 		}
+	}
+
+	/**
+	 * Suppress translation error.
+	 *
+	 * @param bool   $status       Status.
+	 * @param string $function_name Function name.
+	 * @param string $message      Message.
+	 * @param string $version      Version.
+	 *
+	 * @return bool
+	 */
+	public function suppress_translation_error( $status, $function_name, $message, $version ) {
+		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'wp-ai-blogger' ) !== false ) {
+			return false;
+		}
+		return $status;
 	}
 
 	/**

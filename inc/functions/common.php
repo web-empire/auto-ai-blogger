@@ -380,7 +380,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 	// Check for WP_Error.
 	if ( is_wp_error( $response ) ) {
 		$error_message = $response->get_error_message();
-		echo "Something went wrong: $error_message";
+		echo "Something went wrong: {$error_message}";
 		return;
 	}
 
@@ -390,7 +390,6 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 	// echo "Response Body: " . $body; // Debugging purpose.
 	error_log( print_r( $body, true ) ); // Debugging purpose.
 	return $body;
-
 
 	// $api_response = wp_safe_remote_post(
 	// WP_AI_BLOGGER_POST_CREATION_API,

@@ -204,7 +204,7 @@ class Settings {
 				break;
 
 			case 'float':
-				$val    = ( is_scalar( $value ) || is_null( $value ) ) ? strval( $value ) : '';
+				$val    = is_scalar( $value ) || is_null( $value ) ? strval( $value ) : '';
 				$output = ! empty( $value ) ? floatval( $val ) : '';
 				break;
 
