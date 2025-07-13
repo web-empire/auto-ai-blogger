@@ -5,7 +5,7 @@
  * This class will holds the Campaigns related to the admin area modification
  * along with the plugin functionalities.
  *
- * @package SureDash
+ * @package WP AI Blogger
  * @since 1.0.0
  */
 

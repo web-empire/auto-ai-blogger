@@ -11,13 +11,13 @@ const CoreVersion = () => (
 				delay={ 100 }
 				className="z-999999 bg-black text-white shadow-md p-2 rounded-md"
 			>
-				<span>V-{ autoblog_data.version }</span>
+				<span>V-{ wpaib_localized_data.version }</span>
 			</Tooltip>
 		</div>
 
-		{ autoblog_data.pro_available && (
-			<div className="flex items-center pl-3">
-				<span>{ autoblog_data.pro_version }</span>
+		{ wpaib_localized_data.pro_available && (
+			<div className="flex items-center">
+				<span>{ wpaib_localized_data.pro_version }</span>
 				<span className="ml-1 sm:ml-2 text-[0.625rem] leading-[1rem] font-medium text-white border border-slate-800 bg-slate-800 rounded-[0.1875rem] relative inline-flex flex-shrink-0 py-[0rem] px-1.5">
 					{ ' ' }
 					{ __( 'PRO', 'wp-ai-blogger' ) }{ ' ' }
@@ -26,47 +26,54 @@ const CoreVersion = () => (
 		) }
 
 		{ wp.hooks.applyFilters(
-			'autoblog_ai_dashboard.after_navigation_version',
+			'wp_ai_blogger_dashboard.after_navigation_version',
 			<span />
 		) }
 	</>
 );
 
 export default function MainNav() {
+	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
+
 	const navMenus = [
 		{
 			name: __( 'Welcome', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: '',
 		},
 		{
 			name: __( 'Campaigns', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'campaigns',
 		},
 		{
 			name: __( 'Settings', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'settings',
 		},
 		{
 			name: __( 'Free vs Pro', 'wp-ai-blogger' ),
-			slug: autoblog_data.home_slug,
+			slug: wpaib_localized_data.home_slug,
 			path: 'free-vs-pro',
 		},
 	];
 
+	// If license is not enabled, we need to remove 'campaigns' from the navMenus.
+	if ( ! licenseEnabled ) {
+		navMenus.splice( 1, 1 );
+	}
+
 	const redirectToProPurchase = () => {
 		window.open(
-			autoblog_data.pro_purchase_url,
+			wpaib_localized_data.pro_purchase_url,
 			'_blank'
 		);
 	};
 
-	const menus = wp.hooks.applyFilters( 'autoblog_ai_dashboard.main_navigation', navMenus );
+	const menus = wp.hooks.applyFilters( 'wp_ai_blogger_dashboard.main_navigation', navMenus );
 
 	const query = new URLSearchParams( useLocation()?.search );
-	const activePage = query.get( 'page' ) || autoblog_data.home_slug;
+	const activePage = query.get( 'page' ) || wpaib_localized_data.home_slug;
 	const activePath = query.get( 'path' ) || '';
 
 	return (
@@ -93,8 +100,8 @@ export default function MainNav() {
 										} }
 										className={ `${
 											activePage === menu.slug && activePath === menu.path
-												? 'mb-4 sm:mb-0 border-blogapp text-blogapp active:text-blogapp focus:text-blogapp focus-visible:text-blogapp-hover hover:text-blogapp-hover inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer'
-												: 'mb-4 sm:mb-0 border-transparent text-slate-600 active:text-blogapp focus-visible:border-slate-300 focus-visible:text-slate-800 hover:border-slate-300 hover:text-slate-800 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer'
+												? 'mb-4 sm:mb-0 border-blogapp text-blogapp active:text-blogapp focus:text-blogapp focus-visible:text-blogapp-hover hover:text-blogapp-hover inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
+												: 'mb-4 sm:mb-0 border-transparent text-slate-600 active:text-blogapp focus-visible:border-slate-300 focus-visible:text-slate-800 hover:border-slate-300 hover:text-slate-800 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu'
 										}` }
 									>
 										{ menu.name }
@@ -104,9 +111,9 @@ export default function MainNav() {
 						</div>
 					</div>
 
-					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
-						{ ! autoblog_data.pro_available && (
-							<div className="text-sm font-medium text-slate-600 pr-3 tablet:pr-2 border-r hover:text-[#1E293B] hover:svg-hover-color">
+					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex gap-6 items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
+						{ ! wpaib_localized_data.pro_available && (
+							<div className="text-sm font-medium text-slate-600 border-r hover:text-[#1E293B] hover:svg-hover-color">
 								<a
 									onClick={ redirectToProPurchase }
 									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B]"
@@ -132,7 +139,7 @@ export default function MainNav() {
 							</div>
 						) }
 
-						<div className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 mr-1 sm:mr-3 divide-x divide-slate-200 gap-3 pl-1 sm:pl-3 border-r">
+						<div className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 divide-x divide-slate-200 gap-2 border-r">
 							<CoreVersion />
 						</div>
 					</div>

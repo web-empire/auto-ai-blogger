@@ -11,6 +11,7 @@ const globalDataReducer = ( state = {}, action ) => {
 		UPDATE_SITE_TITLE: { siteTitle: action.payload },
 		UPDATE_SITE_FOR: { siteFor: action.payload },
 		UPDATE_SITE_DESCRIPTION: { siteDescription: action.payload },
+		UPDATE_LICENSE: { license: action.payload },
 		UPDATE_USER_ONBOARDED: { userOnboarded: action.payload },
 		UPDATE_USER_NAME: { userName: action.payload },
 		UPDATE_USER_EMAIL: { userEmail: action.payload },

@@ -11,6 +11,7 @@
 namespace WPAIBlogger\Admin;
 
 use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -47,8 +48,8 @@ class Licensing {
 		add_action( 'init', self::class . '::init_licensing' );
 		add_action( 'admin_notices', [ $this, 'license_activation_notice' ] );
 
-		add_action( 'wp_ajax_autoblog_ai_activate_license', [ $this, 'activate_license' ] );
-		add_action( 'wp_ajax_autoblog_ai_deactivate_license', [ $this, 'deactivate_license' ] );
+		add_action( 'wp_ajax_wp_ai_blogger_activate_license', [ $this, 'activate_license' ] );
+		add_action( 'wp_ajax_wp_ai_blogger_deactivate_license', [ $this, 'deactivate_license' ] );
 	}
 
 	/**
@@ -78,12 +79,12 @@ class Licensing {
 	/**
 	 * Activate license
 	 *
-	 * @hooked wp_ajax_autoblog_ai_activate_license
+	 * @hooked wp_ajax_wp_ai_blogger_activate_license
 	 * @since x.x.x
 	 * @return void
 	 */
 	public function activate_license(): void {
-		if ( ! check_ajax_referer( 'autoblog_ai_licensing_nonce', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'wp_ai_blogger_licensing_nonce', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => $this->error_messages['nonce'] ] );
 		}
 
@@ -112,19 +113,21 @@ class Licensing {
 		}
 
 		// Update the license status in the database after activating the license.
-		update_option( 'autoblog_ai_license_status', 'licensed' );
+		Helper::update_option( 'license', $license_key );
+		Helper::update_option( 'license_status', 'licensed' );
+
 		wp_send_json_success( [ 'message' => __( 'License activated successfully.', 'wp-ai-blogger' ) ] );
 	}
 
 	/**
 	 * Deactivate license.
 	 *
-	 * @hooked wp_ajax_autoblog_ai_deactivate_license
+	 * @hooked wp_ajax_wp_ai_blogger_deactivate_license
 	 * @since x.x.x
 	 * @return void
 	 */
 	public function deactivate_license(): void {
-		if ( ! check_ajax_referer( 'autoblog_ai_licensing_nonce', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'wp_ai_blogger_licensing_nonce', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => $this->error_messages['nonce'] ] );
 		}
 
@@ -141,7 +144,9 @@ class Licensing {
 		}
 
 		// Update the license status in the database after deactivating the license.
-		update_option( 'autoblog_ai_license_status', 'unlicensed' );
+		Helper::update_option( 'license', '' );
+		Helper::update_option( 'license_status', 'unlicensed' );
+
 		wp_send_json_success( [ 'message' => __( 'License deactivated successfully.', 'wp-ai-blogger' ) ] );
 	}
 
@@ -191,14 +196,14 @@ class Licensing {
 			return;
 		}
 
-		$license_status = get_option( 'autoblog_ai_license_status', '' );
+		$license_status = Helper::get_option( 'license_status', '' );
 		/**
 		 * If the license status is not set then get the license status and update the option accordingly.
 		 * This will be executed only once. Subsequently, the option status is updated by the licensing class on license activation or deactivation.
 		 */
 		if ( empty( $license_status ) ) {
 			$license_status = Licensing::is_license_active() ? 'licensed' : 'unlicensed';
-			update_option( 'autoblog_ai_license_status', $license_status );
+			Helper::update_option( 'license_status', $license_status );
 		}
 
 		if ( $license_status === 'licensed' ) {

@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file.
  *
- * @package SureDashboard
+ * @package WP AI Blogger
  */
 
 if ( PHP_MAJOR_VERSION >= 8 ) {

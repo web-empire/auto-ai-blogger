@@ -1,13 +1,14 @@
 import { __ } from '@wordpress/i18n';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
+import SettingInput from '@Components/SettingInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
 
 export default function Persona() {
 	const dispatch = useDispatch();
 
-	// Retrieve data from Redux store using selectors
+	// Retrieve data from Redux store using selectors.
 	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
 	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
 	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
@@ -51,9 +52,9 @@ export default function Persona() {
 			<div className="grid grid-cols-2 gap-6 w-full">
 				<SettingField>
 					<SettingLabel forId="name-of-the-blog" title={ __( 'Title for your site:', 'wp-ai-blogger' ) } />
-					<input
+					<SettingInput
 						id="name-of-the-blog"
-						value={ siteTitle }
+						defaultValue={ siteTitle }
 						onChange={ ( e ) => {
 							dispatch( { type: 'UPDATE_SITE_TITLE', payload: e.target.value } );
 						} }
@@ -61,10 +62,10 @@ export default function Persona() {
 				</SettingField>
 
 				<SettingField>
-					<SettingLabel forId="blog-for" title={ __( 'This site is for:', 'wp-ai-blogger' ) } />
-					<input
+					<SettingLabel forId="blog-for" title={ __( 'Description for your site:', 'wp-ai-blogger' ) } />
+					<SettingInput
 						id="blog-for"
-						value={ siteFor }
+						defaultValue={ siteFor }
 						onChange={ ( e ) => {
 							dispatch( { type: 'UPDATE_SITE_FOR', payload: e.target.value } );
 						} }
@@ -80,7 +81,6 @@ export default function Persona() {
 						max={ 2 }
 						step={ 0.05 }
 					/>
-					<p>{ temperature }</p>
 				</SettingField>
 
 				<SettingField>
@@ -91,12 +91,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
-							{ value: 0, label: blockLabels[ 0 ] }, // Off
-							{ value: 1, label: blockLabels[ 1 ] }, // Block none
-							{ value: 2, label: blockLabels[ 2 ] }, // Block few
-							{ value: 3, label: blockLabels[ 3 ] }, // Block some
-							{ value: 4, label: blockLabels[ 4 ] }, // Block most
+							{ value: 0, label: blockLabels[ 0 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -109,12 +118,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -127,12 +145,21 @@ export default function Persona() {
 						min={ 0 }
 						max={ 4 }
 						step={ 1 }
+						withInputField={ false }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -142,15 +169,24 @@ export default function Persona() {
 					<RangeControl
 						value={ dangerousContent }
 						onChange={ handleDangerousContentChange }
+						renderTooltipContent={ ( value ) => {
+							const label = blockLabels[ value ] || '';
+							return (
+								<>
+									{ label }
+								</>
+							);
+						} }
 						min={ 0 }
 						max={ 4 }
+						withInputField={ false }
 						step={ 1 }
 						marks={ [
 							{ value: 0, label: blockLabels[ 0 ] },
-							{ value: 1, label: blockLabels[ 1 ] },
-							{ value: 2, label: blockLabels[ 2 ] },
-							{ value: 3, label: blockLabels[ 3 ] },
-							{ value: 4, label: blockLabels[ 4 ] },
+							{ value: 1, label: 1 },
+							{ value: 2, label: 2 },
+							{ value: 3, label: 3 },
+							{ value: 4, label: 4 },
 						] }
 					/>
 				</SettingField>
@@ -161,6 +197,7 @@ export default function Persona() {
 				<textarea
 					id="more-about-blog"
 					value={ siteDescription }
+					className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 					onChange={ ( e ) => {
 						dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: e.target.value } );
 					} }

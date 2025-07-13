@@ -1409,7 +1409,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Activate license
          *
-         * @hooked wp_ajax_autoblog_ai_activate_license
+         * @hooked wp_ajax_wp_ai_blogger_activate_license
          * @since x.x.x
          * @return void
          */
@@ -1419,7 +1419,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Deactivate license.
          *
-         * @hooked wp_ajax_autoblog_ai_deactivate_license
+         * @hooked wp_ajax_wp_ai_blogger_deactivate_license
          * @since x.x.x
          * @return void
          */
@@ -1573,13 +1573,13 @@ namespace {
     \define('WP_AI_BLOGGER_BASE_URL', \plugins_url('/', \WP_AI_BLOGGER_FILE));
     // Define Plugin Option.
     \define('WP_AI_BLOGGER_SLUG', 'wp-ai-blogger');
-    \define('WP_AI_BLOGGER_DB_OPTION', 'autoblog_ai_settings');
+    \define('WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings');
     \define('WP_AI_BLOGGER_CAPABILITY', 'manage_options');
     // Store Linking.
     \define('WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger');
     \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
     \define('WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1');
-    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/');
+    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post/');
     // CPT Constants.
     \define('WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign');
     // Define Upgrade Link.

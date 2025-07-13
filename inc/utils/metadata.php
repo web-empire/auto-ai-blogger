@@ -35,73 +35,93 @@ class Metadata {
 		return apply_filters(
 			'wp_ai_blogger_postmeta_dataset',
 			[
-				'type'             => [
+				'type'                    => [
 					'default' => 'new',
 					'type'    => 'string',
 				],
-				'title'            => [
+				'title'                   => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'status'           => [
+				'status'                  => [
 					'default' => 'publish',
 					'type'    => 'string',
 				],
-				'keywords'         => [
+				'keywords'                => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'postsTarget'      => [
+				'postsTarget'             => [
 					'default' => '',
 					'type'    => 'number',
 				],
-				'frequency'        => [
+				'frequency'               => [
 					'default' => '',
 					'type'    => 'number',
 				],
-				'postType'         => [
+				'postType'                => [
 					'default' => 'post',
 					'type'    => 'string',
 				],
-				'postStatus'       => [
+				'postStatus'              => [
 					'default' => 'publish',
 					'type'    => 'string',
 				],
-				'summaryAsExcerpt' => [
+				'summaryAsExcerpt'        => [
 					'default' => false,
 					'type'    => 'bool',
 				],
-				'author'           => [
+				'author'                  => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'category'         => [
+				'category'                => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'tag'              => [
+				'tag'                     => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'lastRun'          => [
+				'lastRun'                 => [
 					'default' => __( 'Never', 'wp-ai-blogger' ),
 					'type'    => 'string',
 				],
-				'lastPostID'       => [
+				'lastPostID'              => [
 					'default' => '',
 					'type'    => 'number',
 				],
-				'postsCreated'     => [
+				'postsCreated'            => [
 					'default' => 0,
 					'type'    => 'number',
 				],
-				'maxWords'         => [
+				'maxWords'                => [
 					'default' => 400,
 					'type'    => 'number',
 				],
-				'maxTitleWords'    => [
+				'maxTitleWords'           => [
 					'default' => 8,
 					'type'    => 'number',
+				],
+				'postsVisit'              => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'overrideSitePersona'     => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'overrideSiteTitle'       => [
+					'default' => get_bloginfo( 'name' ),
+					'type'    => 'string',
+				],
+				'overrideSiteDescription' => [
+					'default' => get_bloginfo( 'description' ),
+					'type'    => 'string',
+				],
+				'overrideSiteFor'         => [
+					'default' => '',
+					'type'    => 'string',
 				],
 			]
 		);

@@ -44,4 +44,4 @@ if [ "no-clean" != "$1" ]; then
 	rm -rf wp-ai-blogger
 fi
 
-success "Done. Your SureDash zip is ready..! 🎉"
+success "Done. Your WP AI Blogger zip is ready..! 🎉"

@@ -46,9 +46,9 @@ export default function License() {
 		setProcessing( true );
 
 		const formData = new window.FormData();
-		formData.append( 'action', 'autoblog_ai_activate_license' );
+		formData.append( 'action', 'wp_ai_blogger_activate_license' );
 		formData.append( 'license_key', licenseKey );
-		formData.append( 'nonce', autoblog_data.licensing_nonce );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		apiFetch( {
 			url: ajaxurl,
@@ -148,8 +148,8 @@ export default function License() {
 		setProcessing( true );
 
 		const formData = new window.FormData();
-		formData.append( 'action', 'autoblog_ai_deactivate_license' );
-		formData.append( 'nonce', autoblog_data.licensing_nonce );
+		formData.append( 'action', 'wp_ai_blogger_deactivate_license' );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		apiFetch( {
 			url: ajaxurl,

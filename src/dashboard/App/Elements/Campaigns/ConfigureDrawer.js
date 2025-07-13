@@ -5,6 +5,9 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid';
 import { updateCampaign } from '@Utils/ApiData';
 import SwitchControl from '@Components/SwitchControl';
+import SettingField from '@Components/SettingField';
+import SettingLabel from '@Components/SettingLabel';
+import SettingInput from '@Components/SettingInput';
 
 export default function ConfigureDrawer( props ) {
 	const abortControllerRef = useRef( {} );
@@ -14,6 +17,7 @@ export default function ConfigureDrawer( props ) {
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
+	const postTypes = wpaib_localized_data.post_types || {};
 
 	useEffect( () => {
 		setDrawerData( configureData );
@@ -185,7 +189,7 @@ export default function ConfigureDrawer( props ) {
 														</div>
 
 														<fieldset>
-															<legend className="text-sm/6 font-medium text-gray-900"> { __( 'Status', 'wp-ai-blogger' ) } </legend>
+															<legend className="text-sm/6 font-medium text-gray-900"> { __( 'Campaign Status', 'wp-ai-blogger' ) } </legend>
 
 															<div className="mt-2 space-y-4">
 																<div className="relative flex items-start">
@@ -203,17 +207,18 @@ export default function ConfigureDrawer( props ) {
 																	</div>
 																	<div className="pl-7 text-sm/6">
 																		<label htmlFor="privacy-public" className="font-medium text-gray-900">
-																			{ __( 'Publish', 'wp-ai-blogger' ) }
+																			{ __( 'On', 'wp-ai-blogger' ) }
+																			{ ' ' }
+																			<span id="privacy-public-description" className="text-gray-500 text-normal">
+																				{ __( 'The campaign will be activated immediately and start running.', 'wp-ai-blogger' ) }
+																			</span>
 																		</label>
-																		<p id="privacy-public-description" className="text-gray-500">
-																			{ __( 'Campaign will be in action instantly.', 'wp-ai-blogger' ) }
-																		</p>
 																	</div>
 																</div>
 
 																<div>
 																	<div className="relative flex items-start">
-																		<div className="absolute flex h-6 items-center">
+																		<div className="absolute flex h-6 mt-1 items-center">
 																			<input
 																				defaultValue="private-to-project"
 																				id="privacy-private-to-project"
@@ -226,11 +231,12 @@ export default function ConfigureDrawer( props ) {
 																		</div>
 																		<div className="pl-7 text-sm/6">
 																			<label htmlFor="privacy-private-to-project" className="font-medium text-gray-900">
-																				{ __( 'Draft', 'wp-ai-blogger' ) }
+																				{ __( 'Off', 'wp-ai-blogger' ) }
+																				{ ' ' }
+																				<span id="privacy-private-to-project-description" className="text-gray-500 text-normal">
+																					{ __( 'The campaign setup will be saved, but it won\'t run until you switch it ON.', 'wp-ai-blogger' ) }
+																				</span>
 																			</label>
-																			<p id="privacy-private-to-project-description" className="text-gray-500">
-																				{ __( 'Campaign will be in draft mode. Later status toggle can be modify.', 'wp-ai-blogger' ) }
-																			</p>
 																		</div>
 																	</div>
 																</div>
@@ -254,9 +260,9 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-type" value={ drawerData.postType } onChange={ ( e ) => setDrawerData( { ...drawerData, postType: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ autoblog_data.post_types.map( ( type ) => (
-																		<option key={ type } value={ type }>
-																			{ type.charAt( 0 ).toUpperCase() + type.slice( 1 ) } { /* Capitalize first letter */ }
+																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => ( // eslint-disable-line no-unused-vars
+																		<option key={ label } value={ label }>
+																			{ label.charAt( 0 ).toUpperCase() + label.slice( 1 ) } { /* Capitalize first letter */ }
 																		</option>
 																	) ) }
 																</select>
@@ -270,7 +276,7 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-author" value={ drawerData.author } onChange={ ( e ) => setDrawerData( { ...drawerData, author: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.authors ).map( ( [ key, label ] ) => (
+																	{ Object.entries( wpaib_localized_data.authors ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -286,7 +292,7 @@ export default function ConfigureDrawer( props ) {
 															<div>
 																<select className="wpaib-select-control" id="post-status" value={ drawerData.postStatus } onChange={ ( e ) => setDrawerData( { ...drawerData, postStatus: e.target.value } ) }>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.post_statuses ).map( ( [ key, label ] ) => (
+																	{ Object.entries( wpaib_localized_data.post_statuses ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -295,37 +301,43 @@ export default function ConfigureDrawer( props ) {
 															</div>
 														</div>
 
-														<div className="flex items-center justify-between post-filters-option">
-															<label htmlFor="post-category" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Post Category', 'wp-ai-blogger' ) }
-															</label>
-															<div>
-																<select className="wpaib-select-control" id="post-category" value={ drawerData.category } onChange={ ( e ) => setDrawerData( { ...drawerData, category: e.target.value } ) }>
-																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.categories ).map( ( [ key, label ] ) => (
-																		<option key={ key } value={ key }>
-																			{ label }
-																		</option>
-																	) ) }
-																</select>
-															</div>
-														</div>
+														{
+															'post' === drawerData.postType && (
+																<>
+																	<div className="flex items-center justify-between post-filters-option">
+																		<label htmlFor="post-category" className="block text-sm/6 font-medium text-gray-900">
+																			{ __( 'Post Category', 'wp-ai-blogger' ) }
+																		</label>
+																		<div>
+																			<select className="wpaib-select-control" id="post-category" value={ drawerData.category } onChange={ ( e ) => setDrawerData( { ...drawerData, category: e.target.value } ) }>
+																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
+																				{ Object.entries( wpaib_localized_data.categories ).map( ( [ key, label ] ) => (
+																					<option key={ key } value={ key }>
+																						{ label }
+																					</option>
+																				) ) }
+																			</select>
+																		</div>
+																	</div>
 
-														<div className="flex items-center justify-between post-filters-option">
-															<label htmlFor="post-tag" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Post Tag', 'wp-ai-blogger' ) }
-															</label>
-															<div>
-																<select className="wpaib-select-control" id="post-tag" value={ drawerData.tag } onChange={ ( e ) => setDrawerData( { ...drawerData, tag: e.target.value } ) }>
-																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( autoblog_data.tags ).map( ( [ key, label ] ) => (
-																		<option key={ key } value={ key }>
-																			{ label }
-																		</option>
-																	) ) }
-																</select>
-															</div>
-														</div>
+																	<div className="flex items-center justify-between post-filters-option">
+																		<label htmlFor="post-tag" className="block text-sm/6 font-medium text-gray-900">
+																			{ __( 'Post Tag', 'wp-ai-blogger' ) }
+																		</label>
+																		<div>
+																			<select className="wpaib-select-control" id="post-tag" value={ drawerData.tag } onChange={ ( e ) => setDrawerData( { ...drawerData, tag: e.target.value } ) }>
+																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
+																				{ Object.entries( wpaib_localized_data.tags ).map( ( [ key, label ] ) => (
+																					<option key={ key } value={ key }>
+																						{ label }
+																					</option>
+																				) ) }
+																			</select>
+																		</div>
+																	</div>
+																</>
+															)
+														}
 													</div>
 												</div>
 											</div>
@@ -370,6 +382,53 @@ export default function ConfigureDrawer( props ) {
 																/>
 															</div>
 														</div>
+
+														<div className="flex items-center justify-between">
+															<label htmlFor="override-site-persona" className="block text-sm/6 font-medium text-gray-900">
+																{ __( 'Override Site Persona for this Campaign?', 'wp-ai-blogger' ) }
+															</label>
+															<div className="mt-2">
+																<SwitchControl
+																	checked={ drawerData.overrideSitePersona }
+																	onChange={ () => setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
+																	id="override-site-persona"
+																/>
+															</div>
+														</div>
+
+														{
+															drawerData.overrideSitePersona && (
+																<>
+																	<SettingField>
+																		<SettingLabel forId="name-of-the-blog" title={ __( 'Campaign Title:', 'wp-ai-blogger' ) } />
+																		<SettingInput
+																			id="name-of-the-blog"
+																			defaultValue={ drawerData.overrideSiteTitle }
+																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteTitle: e.target.value } ) }
+																		/>
+																	</SettingField>
+
+																	<SettingField>
+																		<SettingLabel forId="blog-for" title={ __( 'Campaign For:', 'wp-ai-blogger' ) } />
+																		<SettingInput
+																			id="blog-for"
+																			defaultValue={ drawerData.overrideSiteFor }
+																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteFor: e.target.value } ) }
+																		/>
+																	</SettingField>
+
+																	<SettingField>
+																		<SettingLabel forId="more-about-blog" title={ __( 'Campaign Description:', 'wp-ai-blogger' ) } />
+																		<textarea
+																			id="more-about-blog"
+																			className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																			value={ drawerData.overrideSiteDescription }
+																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
+																		/>
+																	</SettingField>
+																</>
+															)
+														}
 
 														<div>
 															<div className="mt-4 flex text-sm">

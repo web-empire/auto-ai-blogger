@@ -5,6 +5,7 @@ export const useSettingsSelector = () => {
 		siteTitle: state.siteTitle,
 		siteFor: state.siteFor,
 		siteDescription: state.siteDescription,
+		license: state.license,
 		temperature: state.temperature,
 		harassment: state.harassment,
 		hate: state.hate,

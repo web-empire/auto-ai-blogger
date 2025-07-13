@@ -20,7 +20,7 @@ const FooterNavigationBar = ( props ) => {
 
 	const handlePreviousStep = function () {
 		if ( 'dashboard' !== previousStep ) {
-			navigate( `${ autoblog_data.admin_app_url }&step=${ previousStep }` );
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ previousStep }` );
 		}
 
 		return '';
@@ -30,7 +30,7 @@ const FooterNavigationBar = ( props ) => {
 		e.preventDefault();
 
 		if ( '' !== nextStep ) {
-			navigate( `${ autoblog_data.admin_app_url }&step=${ nextStep }` );
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ nextStep }` );
 		}
 
 		if ( '' === nextStep && 'ready' === currentActiveStep ) {

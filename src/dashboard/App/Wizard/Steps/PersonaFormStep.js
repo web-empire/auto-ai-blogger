@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import { ArrowRight } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { updateApiData } from '@Utils/ApiData';
 
 const PersonaFormStep = () => {
+	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -14,15 +16,15 @@ const PersonaFormStep = () => {
 	const reduxSiteDescription = useSelector( ( state ) => state.siteDescription );
 
 	// Use Redux data for initial state
-	const [ siteTitle, setSiteTitle ] = useState( reduxSiteTitle || autoblog_data.site_title );
-	const [ siteFor, setSiteFor ] = useState( reduxSiteFor || autoblog_data.site_for );
-	const [ siteDescription, setSiteDescription ] = useState( reduxSiteDescription || autoblog_data.site_description );
+	const [ siteTitle, setSiteTitle ] = useState( reduxSiteTitle || wpaib_localized_data.site_title );
+	const [ siteFor, setSiteFor ] = useState( reduxSiteFor || wpaib_localized_data.site_for );
+	const [ siteDescription, setSiteDescription ] = useState( reduxSiteDescription || wpaib_localized_data.site_description );
 
 	const [ siteTitleError, setSiteTitleError ] = useState( '' );
 	const [ siteForError, setSiteForError ] = useState( '' );
 	const [ siteDescriptionError, setSiteDescriptionError ] = useState( '' );
 
-	const handleStepRedirection = function ( e ) {
+	const handleStepRedirection = async function ( e ) {
 		e.preventDefault();
 
 		// Reset errors
@@ -51,22 +53,28 @@ const PersonaFormStep = () => {
 			return; // Stop redirection if there are errors
 		}
 
+		// Update data
+		await updateApiData( 'siteTitle', siteTitle, dispatch, abortControllerRef );
+		await updateApiData( 'siteFor', siteFor, dispatch, abortControllerRef );
+		await updateApiData( 'siteDescription', siteDescription, dispatch, abortControllerRef );
+
 		dispatch( { type: 'UPDATE_SITE_TITLE', payload: siteTitle } );
 		dispatch( { type: 'UPDATE_SITE_FOR', payload: siteFor } );
 		dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: siteDescription } );
-		navigate( `${ autoblog_data.admin_app_url }&step=optin` );
+
+		navigate( `${ wpaib_localized_data.admin_app_url }&step=license` );
 	};
 
 	return (
 		<div className="wpaib-container">
-			<div className="wpaib-row mt-12 max-w-5xl">
+			<div className="wpaib-row mt-8 max-w-5xl">
 				<div className="bg-white rounded text-center mx-auto px-11">
 					<span className="text-sm font-medium text-primary-600 mb-10 text-center block tracking-[.24em] uppercase">
-						{ __( 'Step 2 of 3', 'wp-ai-blogger' ) }
+						{ __( 'Step 2 of 4', 'wp-ai-blogger' ) }
 					</span>
 
 					<h1 className="wpaib-step-heading mb-2 text-center">
-						{ __( 'Tell us about your site', 'wp-ai-blogger' ) }
+						{ __( 'Tell Us About Your Site', 'wp-ai-blogger' ) }
 					</h1>
 
 					<form className="max-w-sm mx-auto mt-10">

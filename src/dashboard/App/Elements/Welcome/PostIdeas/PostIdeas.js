@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from './Skeleton';
+import apiFetch from '@wordpress/api-fetch';
 
 const UPDATE_POST_IDEAS = 'UPDATE_POST_IDEAS';
 
@@ -14,7 +15,7 @@ export default function PostIdeas() {
 	const abortControllerRef = useRef( {} );
 	const navigate = useNavigate();
 
-	// Fetch data from Redux store using selectors
+	// Fetch data from Redux store using selectors.
 	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
 	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
 	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
@@ -30,7 +31,8 @@ export default function PostIdeas() {
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
-	const [ showTooltip, setShowTooltip ] = useState( false );
+
+	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
 
 	const fetchPostIdeas = async () => {
 		console.log( 'Fetching post ideas...', postIdeasFromRedux );
@@ -98,7 +100,7 @@ export default function PostIdeas() {
 	useEffect( () => {
 		fetchPostIdeas();
 
-		if ( postIdeas ) {
+		if ( licenseEnabled && postIdeas ) {
 			let formattedPostIdeas = postIdeas;
 
 			if ( ! postIdeas.includes( '\n' ) ) {
@@ -128,11 +130,20 @@ export default function PostIdeas() {
 	}, [ postIdeas ] );
 
 	const handleRefresh = () => {
+		if ( ! wpaib_localized_data.pro_available ) {
+			window.open( wpaib_localized_data.upgrade_link, '_blank' );
+			return;
+		}
+
 		setPostIdeas( '' );
 		setLoading( true );
 		setError( null );
 		fetchPostIdeas();
 	};
+
+	if ( ! licenseEnabled ) {
+		return ( '' );
+	}
 
 	if ( loading ) {
 		return (
@@ -146,41 +157,90 @@ export default function PostIdeas() {
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
-		navigate( `?page=${ autoblog_data.home_slug }&path=settings` ); // Navigate to the settings tab
+		navigate( `?page=${ wpaib_localized_data.home_slug }&path=settings` ); // Navigate to the settings tab.
 	};
 
 	if ( error ) {
 		if ( error === 'Missing required fields' ) {
+			const title = __( 'Please fill out the general settings to see post ideas.', 'wp-ai-blogger' );
+			const buttonText = __( 'Go to General Settings', 'wp-ai-blogger' );
+
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
-					<p>
-						{ __( 'Please fill out the general settings to see post ideas.', 'wp-ai-blogger' ) }
-					</p>
+					<p> { title } </p>
 					<a
 						href="#"
 						onClick={ handlePersonaClick }
-						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5"
-						style={ { color: 'white' } } // Inline style to ensure white color
+						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 gap-1"
+						style={ { color: 'white' } } // Inline style to ensure white color.
 					>
-						{ __( 'Go to General Settings', 'wp-ai-blogger' ) }
+						{ buttonText }
 						<MoveRight className="h-5 w-5" />
 					</a>
 				</div>
 			);
 		}
+
 		return (
 			<div className="p-4 text-red-500 flex flex-col items-center">
-				<p>Error while loading post ideas: { error }</p>
+				<p> { __( 'Error while loading post ideas:', 'wp-ai-blogger' ) } { error } </p>
 				<button
 					onClick={ handleRefresh }
 					className="mt-4 flex items-center gap-2 bg-indigo-600 text-white rounded px-4 py-2"
 				>
-					<RotateCw className="h-5 w-5" />
-                    Retry
+					<RotateCw className="h-4 w-4" />
+					{ __( 'Retry', 'wp-ai-blogger' ) }
 				</button>
 			</div>
 		);
 	}
+
+	const wpaib_create_post = ( e, title ) => {
+		e.preventDefault();
+
+		if ( e.target.dataset.type === 'edit' ) {
+			window.open( e.target.href, '_blank' );
+			return;
+		}
+
+		const formData = new window.FormData();
+		formData.append( 'action', 'wpaib_create_post' );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
+
+		const postData = {
+			title,
+			status: 'draft',
+			post_type: 'post',
+			post_content: '',
+			excerpt: '',
+			metadata: JSON.stringify( { wp_aib_reference: 1 } ),
+		};
+
+		formData.append( 'post_data', JSON.stringify( postData ) );
+
+		return apiFetch( {
+			url: wpaib_localized_data.ajax_url,
+			method: 'POST',
+			body: formData,
+		} )
+			.then( ( response ) => {
+				if ( ! response.success ) {
+					console.error( __( 'Failed to create post.', 'wp-ai-blogger' ) );
+					return;
+				}
+
+				e.target.dataset.type = 'edit';
+				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
+				e.target.href = wpaib_localized_data.edit_post_link.replace( '{{POST_ID}}', response.data.post_id );
+				window.open( e.target.href, '_blank' );
+
+				dispatch( {
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
+				} );
+			} )
+			.catch( () => {} );
+	};
 
 	return (
 		<div className="px-4 sm:px-6 lg:px-8 py-8">
@@ -190,29 +250,6 @@ export default function PostIdeas() {
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
 					</p>
-				</div>
-				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
-					<span
-						className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 relative"
-						onMouseEnter={ () => setShowTooltip( true ) }
-						onMouseLeave={ () => setShowTooltip( false ) }
-					>
-                        PRO
-						{ showTooltip && (
-							<div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mt-2 whitespace-nowrap">
-                                Upgrade to Pro
-							</div>
-						) }
-					</span>
-					<button
-						type="button"
-						className="flex rounded-md bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-500 cursor-not-allowed"
-						disabled
-						onClick={ handleRefresh }
-					>
-						<RotateCw className="w-5 h-5 inline-block mr-1" />
-						{ __( 'Refresh', 'wp-ai-blogger' ) }
-					</button>
 				</div>
 			</div>
 
@@ -239,7 +276,7 @@ export default function PostIdeas() {
 												{ TrimWordsContent( post.title, 120 ) }
 											</td>
 											<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-												<a href="#" className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1">
+												<a target="_blank" href="#" onClick={ ( e ) => wpaib_create_post( e, post.title ) } className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer" data-type="create">
 													<Plus className="w-5 h-5" />
 													{ __( 'Create', 'wp-ai-blogger' ) }
 												</a>
@@ -251,8 +288,8 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-900">
-											<a href={ autoblog_data.upgrade_link } className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
-												{ __( 'Upgrade to pro to get more post ideas.', 'wp-ai-blogger' ) }
+											<a href={ wpaib_localized_data.upgrade_link } className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
+												{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
 												<MoveRight className="w-5 h-5" />
 											</a>
 										</td>

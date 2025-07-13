@@ -13,6 +13,7 @@ use WPAIBlogger\Admin\API;
 use WPAIBlogger\Admin\Licensing;
 use WPAIBlogger\Admin\Menu;
 use WPAIBlogger\Core\CPT;
+use WPAIBlogger\Core\Editor;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Core\Scheduler;
 
@@ -48,6 +49,9 @@ class Loader {
 		register_deactivation_hook( WP_AI_BLOGGER_FILE, [ $this, 'deactivation_actions' ] );
 
 		add_action( 'plugins_loaded', [ $this, 'setup' ], 1 );
+
+		// Remove this after the translation error is fixed.
+		add_filter( 'doing_it_wrong_trigger_error', [ $this, 'suppress_translation_error' ], 10, 4 );
 	}
 
 	/**
@@ -70,6 +74,9 @@ class Loader {
 		/* CPT init */
 		CPT::get_instance();
 
+		/* Load Editor Support */
+		Editor::get_instance();
+
 		if ( is_admin() ) {
 			/* Ajax init */
 			Ajax::get_instance();
@@ -80,6 +87,23 @@ class Loader {
 			/* Admin Menu init */
 			Menu::get_instance();
 		}
+	}
+
+	/**
+	 * Suppress translation error.
+	 *
+	 * @param bool   $status       Status.
+	 * @param string $function_name Function name.
+	 * @param string $message      Message.
+	 * @param string $version      Version.
+	 *
+	 * @return bool
+	 */
+	public function suppress_translation_error( $status, $function_name, $message, $version ) {
+		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'wp-ai-blogger' ) !== false ) {
+			return false;
+		}
+		return $status;
 	}
 
 	/**

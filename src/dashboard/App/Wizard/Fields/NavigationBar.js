@@ -25,6 +25,10 @@ const NavigationBar = () => {
 			id: 'persona-form',
 		},
 		{
+			name: __( 'License', 'wp-ai-blogger' ),
+			id: 'license',
+		},
+		{
 			name: __( 'Subscribe', 'wp-ai-blogger' ),
 			id: 'optin',
 		},
@@ -46,7 +50,7 @@ const NavigationBar = () => {
 
 		if ( e.target.id ) {
 			const stepToRedirect = e.target.id;
-			navigate( `${ autoblog_data.admin_app_url }&step=${ stepToRedirect }` );
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
 		}
 	};
 

@@ -45,6 +45,8 @@ class Ajax {
 		'wpaib_create_campaign',
 		'wpaib_update_campaign',
 		'wpaib_get_campaign_metadata',
+		'wpaib_create_post',
+		'wpaib_run_campaign',
 	];
 
 	/**
@@ -240,5 +242,84 @@ class Ajax {
 		}
 
 		wp_send_json_success( Metadata::get_campaign_data( $campaign_id, true ) );
+	}
+
+	/**
+	 * Handler to create post.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function wpaib_create_post(): void {
+		if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+		}
+
+		$post_data = isset( $_POST['post_data'] ) ? wp_unslash( $_POST['post_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in wp_unslash.
+		$post_data = json_decode( $post_data, true );
+		if ( ! is_array( $post_data ) || empty( $post_data['title'] ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		$post_data = Metadata::sanitize_data( $post_data, 'array' );
+		$meta_data = ! empty( $post_data['metadata'] ) ? json_decode( $post_data['metadata'], true ) : [];
+		$meta_data = Metadata::sanitize_data( $meta_data, 'array' );
+
+		// Create a new post.
+		$post_id = \wp_insert_post(
+			[
+				'post_title'   => $post_data['title'],
+				'post_content' => $post_data['post_content'],
+				'post_status'  => $post_data['status'],
+				'post_type'    => $post_data['post_type'] ?? 'post',
+				'meta_input'   => $meta_data,
+			]
+		);
+		if ( is_wp_error( $post_id ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		if ( $post_id ) {
+			wp_send_json_success(
+				[
+					'message' => $this->get_error_msg( 'success' ),
+					'post_id' => $post_id,
+				]
+			);
+		}
+	}
+
+	/**
+	 * Handler to run campaign.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function wpaib_run_campaign(): void {
+		if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+		}
+
+		$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+		if ( ! $campaign_id ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		$post_id = wpaib_create_blog_post( $campaign_id );
+
+		if ( is_wp_error( $post_id ) ) {
+			wp_send_json_error( [ 'message' => $post_id->get_error_message() ] );
+		}
+
+		if ( $post_id ) {
+			wp_send_json_success(
+				[
+					'message' => $this->get_error_msg( 'success' ),
+					'post_id' => $post_id,
+				]
+			);
+		} else {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
 	}
 }

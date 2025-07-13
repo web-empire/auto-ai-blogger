@@ -11,7 +11,7 @@ const WelcomeStep = () => {
 
 		if ( e.target.id ) {
 			const stepToRedirect = e.target.id;
-			navigate( `${ autoblog_data.admin_app_url }&step=${ stepToRedirect }` );
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
 		}
 	};
 
@@ -20,7 +20,7 @@ const WelcomeStep = () => {
 			<div className="wpaib-row">
 				<div className="bg-white rounded mx-auto px-11">
 					<span className="text-sm font-medium text-primary-600 mb-10 text-center block tracking-[.24em] uppercase">
-						{ __( 'Step 1 of 3', 'wp-ai-blogger' ) }
+						{ __( 'Step 1 of 4', 'wp-ai-blogger' ) }
 					</span>
 					<h1 className="wpaib-step-heading mb-4 text-center">
 						{ __( 'Welcome to WP AI Blogger', 'wp-ai-blogger' ) }
