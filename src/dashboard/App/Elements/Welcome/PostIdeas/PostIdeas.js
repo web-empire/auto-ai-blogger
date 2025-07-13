@@ -21,9 +21,8 @@ export default function PostIdeas() {
 	const temperature = useSelector( ( state ) => state.temperature ) || '';
 	const harassment = useSelector( ( state ) => state.harassment ) || '';
 	const hate = useSelector( ( state ) => state.hate ) || '';
-	const sexuallyExplicit = useSelector( ( state ) => state.sexually_explicit ) || '';
-	const dangerousContent = useSelector( ( state ) => state.dangerous_content ) || '';
-	const civicIntegrity = useSelector( ( state ) => state.civic_integrity ) || '';
+	const sexuallyExplicit = useSelector( ( state ) => state.sexuallyExplicit ) || '';
+	const dangerousContent = useSelector( ( state ) => state.dangerousContent ) || '';
 	const license = useSelector( ( state ) => state.license ) || '';
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas ) || '';
 
@@ -65,7 +64,6 @@ export default function PostIdeas() {
 					hate,
 					sexually_explicit: sexuallyExplicit,
 					dangerous_content: dangerousContent,
-					civic_integrity: civicIntegrity,
 					license,
 				} ),
 			} );
