@@ -1,7 +1,8 @@
-const TrimWordsContent = ( content ) => {
+const TrimWordsContent = ( content, count ) => {
+	const wordCount = count ? count : 40;
 	return (
 		<>
-			{ content?.length > 40 ? content?.slice( 0, 40 ) + '...' : content }
+			{ content.length > wordCount ? content.slice( 0, wordCount ) + '...' : content }
 		</>
 	);
 };

@@ -21,6 +21,10 @@ const NavigationBar = () => {
 			id: 'welcome',
 		},
 		{
+			name: __( 'Site Info', 'wp-ai-blogger' ),
+			id: 'persona-form',
+		},
+		{
 			name: __( 'Subscribe', 'wp-ai-blogger' ),
 			id: 'optin',
 		},
@@ -74,9 +78,7 @@ const NavigationBar = () => {
 											: 'border-transparent text-gray-300 hover:border-gray-300 hover:text-gray-700'
 									}` }
 									id={ menu.id }
-									onClick={
-										handleStepRedirection
-									}
+									onClick={ handleStepRedirection }
 									key={ menu.id }
 								>
 									{ menu.name }
@@ -88,14 +90,9 @@ const NavigationBar = () => {
 						<span
 							className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
 							onClick={ handleClick }
-							title={ __(
-								'Exit setup wizard',
-								'wp-ai-blogger'
-							) }
+							title={ __( 'Exit setup wizard', 'wp-ai-blogger' ) }
 						>
-							<span className="sr-only">
-								Exit Wizard
-							</span>
+							<span className="sr-only">Exit Wizard</span>
 							<X className="h-5 w-5" />
 						</span>
 					</div>

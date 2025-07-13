@@ -92,8 +92,8 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 				return;
 			}
 
-			if ( wp_verify_nonce( $nonce, 'web-notices' ) === false ) {
-				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'divi_particle_js', 'bluechip-divi' ) );
+			if ( false === wp_verify_nonce( $nonce, 'web-notices' ) ) {
+				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'wp-ai-blogger' ) );
 			}
 
 			// Valid inputs?
