@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -33,6 +33,7 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 
 	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
+	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	const fetchPostIdeas = async () => {
 		console.log( 'Fetching post ideas...', postIdeasFromRedux );
@@ -250,6 +251,33 @@ export default function PostIdeas() {
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
 					</p>
+				</div>
+				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
+					<span
+						className="inline-flex items-center text-xs font-medium text-indigo-700 relative"
+						onMouseEnter={ () => setShowTooltip( true ) }
+						onMouseLeave={ () => setShowTooltip( false ) }
+					>
+						{ showTooltip && (
+							<div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mt-2 whitespace-nowrap">
+                                { __( 'Upgrade to Pro', 'wp-ai-blogger' ) }
+							</div>
+						) }
+						<button
+							type="button"
+							className="rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-none cursor-pointer flex items-center gap-x-1"
+							onClick={ handleRefresh }
+						>
+							{
+								wpaib_localized_data.pro_available ? (
+									<RotateCw className="w-4 h-4" />
+								) : (
+									<Crown className="w-4 h-4" />
+								)
+							}
+							{ __( 'Refresh', 'wp-ai-blogger' ) }
+						</button>
+					</span>
 				</div>
 			</div>
 

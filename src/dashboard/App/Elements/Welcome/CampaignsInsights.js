@@ -68,7 +68,7 @@ export default function CampaignsInsights() {
 							</div>
 
 							<div className="insight-inner-wrap">
-								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Last Run on', 'wp-ai-blogger' ) }</div>
+								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Last Run', 'wp-ai-blogger' ) }</div>
 								<div className="text-base font-semibold text-gray-900 m-0 p-0">{ campaign.lastRun }</div>
 							</div>
 						</div>

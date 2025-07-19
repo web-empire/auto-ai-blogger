@@ -73,6 +73,17 @@ export default function Persona() {
 				</SettingField>
 
 				<SettingField>
+					<SettingLabel forId="more-about-blog" title={ __( 'Tell us more about your site:', 'wp-ai-blogger' ) } />
+					<SettingInput
+						id="more-about-blog"
+						defaultValue={ siteDescription }
+						onChange={ ( e ) => {
+							dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: e.target.value } );
+						} }
+					/>
+				</SettingField>
+
+				<SettingField>
 					<SettingLabel forId="temperature" title={ __( 'Temperature:', 'wp-ai-blogger' ) } />
 					<RangeControl
 						value={ temperature }
@@ -191,18 +202,6 @@ export default function Persona() {
 					/>
 				</SettingField>
 			</div>
-
-			<SettingField>
-				<SettingLabel forId="more-about-blog" title={ __( 'Tell us more about your site:', 'wp-ai-blogger' ) } />
-				<textarea
-					id="more-about-blog"
-					value={ siteDescription }
-					className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-					onChange={ ( e ) => {
-						dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: e.target.value } );
-					} }
-				/>
-			</SettingField>
 		</>
 	);
 }

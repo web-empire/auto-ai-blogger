@@ -324,6 +324,7 @@ class Metadata {
 		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
 		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
 		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
+		$last_run_on        = absint( $metadata['lastRun'] ?? 0 );
 
 		if ( ! $plain_metadata ) {
 			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
@@ -331,6 +332,11 @@ class Metadata {
 
 			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
 			$metadata['frequency'] = $meta_frequency;
+		}
+
+		if ( $last_run_on ) {
+			$last_run_on = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_run_on );
+			$metadata['lastRun'] = $last_run_on;
 		}
 
 		return array_merge(

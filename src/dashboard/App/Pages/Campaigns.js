@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RefreshCw, Settings, Trash2, Info, FolderPlus, RotateCw } from 'lucide-react';
+import { RefreshCw, Settings, Trash2, Info, FolderPlus, RotateCw, List } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
@@ -227,6 +227,17 @@ export default function Campaigns() {
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
 																	<Info className="w-4 h-4" />
+																</Tooltip>
+															</a>
+
+															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																console.error( e, campaign.id );
+															} }>
+																<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																>
+																	<List className="w-4 h-4" />
 																</Tooltip>
 															</a>
 
