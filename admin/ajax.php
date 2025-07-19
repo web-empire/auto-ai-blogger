@@ -47,6 +47,7 @@ class Ajax {
 		'wpaib_get_campaign_metadata',
 		'wpaib_create_post',
 		'wpaib_run_campaign',
+		'wpaib_get_campaign_analytics',
 	];
 
 	/**
@@ -190,7 +191,7 @@ class Ajax {
 		$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in wp_unslash.
 		$campaign_details = json_decode( $campaign_details, true );
 
-		$campaign_id = absint( $campaign_details['id'] );
+		$campaign_id = absint( $campaign_details['id'] ?? 0 );
 		if ( ! $campaign_id ) {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
@@ -321,5 +322,137 @@ class Ajax {
 		} else {
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
+	}
+
+	/**
+	 * Handler to get campaign analytics data.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function wpaib_get_campaign_analytics(): void {
+		if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+		}
+
+		$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+		if ( ! $campaign_id ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		$published_posts = get_posts(
+			[
+				'post_type'              => 'any',
+				'post_status'            => 'publish',
+				'meta_query'             => [
+					[
+						'key'     => 'wp_aib_campaign_id',
+						'value'   => $campaign_id,
+						'compare' => '=',
+					],
+				],
+				'numberposts'            => -1,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			]
+		);
+
+		// Calculate total views (basic implementation - can be enhanced with analytics plugins).
+		$total_views = 0;
+		foreach ( $published_posts as $post_id ) {
+			$views = absint( get_post_meta( $post_id, 'post_views_count', true ) ?? 0 );
+			if ( $views ) {
+				$total_views += $views;
+			}
+		}
+
+		// Calculate total comments.
+		$total_comments = 0;
+		if ( ! empty( $published_posts ) ) {
+			$comment_count  = get_comments(
+				[
+					'post__in' => $published_posts,
+					'count'    => true,
+					'status'   => 'approve',
+				]
+			);
+			$total_comments = absint( $comment_count );
+		}
+
+		// Get campaign metadata.
+		$campaign_meta = Metadata::get_campaign_data( $campaign_id );
+		$posts_target  = absint( $campaign_meta['postsTarget'] ?? 0 );
+		$posts_created = count( $published_posts );
+
+		// Calculate success rate.
+		$success_rate = $posts_target > 0 ? round( $posts_created / $posts_target * 100 ) : 100;
+
+		// Get campaign health.
+		$health = __( 'Good', 'wp-ai-blogger' );
+		if ( $success_rate >= 90 ) {
+			$health = __( 'Excellent', 'wp-ai-blogger' );
+		} elseif ( $success_rate >= 70 ) {
+			$health = __( 'Good', 'wp-ai-blogger' );
+		} elseif ( $success_rate >= 50 ) {
+			$health = __( 'Warning', 'wp-ai-blogger' );
+		} else {
+			$health = __( 'Poor', 'wp-ai-blogger' );
+		}
+
+		// Calculate days active.
+		$campaign_post = get_post( $campaign_id );
+		$days_active   = 0;
+		if ( $campaign_post ) {
+			$created_date = new \DateTime( $campaign_post->post_date );
+			$current_date = new \DateTime();
+			$days_active  = $created_date->diff( $current_date )->days;
+		}
+
+		// Get author name.
+		$author_id   = $campaign_meta['author'] ?? get_current_user_id();
+		$author_data = get_userdata( $author_id );
+		$author_name = $author_data ? $author_data->display_name : __( 'Unknown', 'wp-ai-blogger' );
+
+		// Get top performing posts.
+		$top_posts = [];
+		if ( ! empty( $published_posts ) ) {
+			$posts_with_views = [];
+			foreach ( $published_posts as $post_id ) {
+				$views = absint( get_post_meta( $post_id, 'post_views_count', true ) ?? 0 );
+				$post  = get_post( $post_id );
+				if ( $post ) {
+					$posts_with_views[] = [
+						'id'    => $post_id,
+						'title' => $post->post_title,
+						'views' => $views,
+						'date'  => strtotime( $post->post_date ),
+					];
+				}
+			}
+
+			// Sort by views and get top 5.
+			usort(
+				$posts_with_views,
+				static function( $a, $b ) {
+					return $b['views'] - $a['views'];
+				}
+			);
+
+			$top_posts = array_slice( $posts_with_views, 0, 5 );
+		}
+
+		$analytics_data = [
+			'publishedPosts' => $posts_created,
+			'totalViews'     => $total_views,
+			'totalComments'  => $total_comments,
+			'successRate'    => $success_rate,
+			'health'         => $health,
+			'daysActive'     => $days_active,
+			'authorName'     => $author_name,
+			'topPosts'       => $top_posts,
+		];
+
+		wp_send_json_success( $analytics_data );
 	}
 }

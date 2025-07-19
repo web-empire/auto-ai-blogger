@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RefreshCw, Settings, Trash2, Info, FolderPlus, RotateCw, List } from 'lucide-react';
+import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
+import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
 import apiFetch from '@wordpress/api-fetch';
-import { useDispatch } from 'react-redux';
 
 export default function Campaigns() {
-	const dispatch = useDispatch();
 	const campaigns = wpaib_localized_data.all_campaigns;
 	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
+	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -69,32 +69,39 @@ export default function Campaigns() {
 		setOpeningConfigureDrawer( false );
 	};
 
-	const runCampaign = ( e, campaignId ) => {
+	const openCampaignAnalytics = ( e, campaignId ) => {
 		e.preventDefault();
-		const formData = new window.FormData();
 
-		formData.append( 'action', 'wpaib_run_campaign' );
-		formData.append( 'security', wpaib_localized_data.admin_nonce );
-		formData.append( 'campaign_id', campaignId );
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
 
-		apiFetch( {
-			url: wpaib_localized_data.ajax_url,
-			method: 'POST',
-			body: formData,
-		} )
-			.then( ( data ) => {
-				if ( data.success ) {
-					// Campaign run successfully
-				}
+		// Open analytics modal
+		setAnalyticsModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
 
-				dispatch( {
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: data?.data?.message || __( 'Campaign run successfully.', 'wp-ai-blogger' ),
-				} );
-			} )
-			.catch( ( error ) => {
-				console.error( error );
-			} );
+	const viewCampaignPosts = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data to determine the post type
+		const campaignData = campaigns[ campaignId ];
+		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found
+
+		// Redirect to All Posts page with campaign filter
+		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		let filterUrl;
+
+		// For 'post' type, we don't need to specify post_type parameter
+		if ( postType === 'post' ) {
+			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+		} else {
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+		}
+
+		window.open( filterUrl, '_blank' );
 	};
 
 	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
@@ -125,6 +132,13 @@ export default function Campaigns() {
 					openDrawer={ openDrawer }
 					setOpenDrawer={ setOpenDrawer }
 					configureData={ configureData }
+				/>
+
+				<CampaignAnalyticsModal
+					isOpen={ analyticsModal.isOpen }
+					onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+					campaignId={ analyticsModal.campaignId }
+					campaignData={ analyticsModal.campaignData }
 				/>
 			</>
 		);
@@ -231,7 +245,7 @@ export default function Campaigns() {
 															</a>
 
 															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																console.error( e, campaign.id );
+																viewCampaignPosts( e, campaign.id );
 															} }>
 																<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
 																	delay={ 100 }
@@ -257,13 +271,13 @@ export default function Campaigns() {
 															</a>
 
 															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																runCampaign( e, campaign.id );
+																openCampaignAnalytics( e, campaign.id );
 															} }>
-																<Tooltip text={ __( 'Run now', 'wp-ai-blogger' ) }
+																<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<RefreshCw className="w-4 h-4" />
+																	<ChartNoAxesColumn className="w-4 h-4" />
 																</Tooltip>
 															</a>
 
@@ -292,6 +306,13 @@ export default function Campaigns() {
 				openDrawer={ openDrawer }
 				setOpenDrawer={ setOpenDrawer }
 				configureData={ configureData }
+			/>
+
+			<CampaignAnalyticsModal
+				isOpen={ analyticsModal.isOpen }
+				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ analyticsModal.campaignId }
+				campaignData={ analyticsModal.campaignData }
 			/>
 		</>
 	);

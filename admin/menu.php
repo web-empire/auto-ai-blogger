@@ -108,6 +108,7 @@ class Menu {
 			'wp_ai_blogger_localized_admin_data',
 			[
 				'ajax_url'           => admin_url( 'admin-ajax.php' ),
+				'admin_url'          => admin_url(),
 				'version'            => WP_AI_BLOGGER_VERSION,
 				'upgrade_link'       => WP_AI_BLOGGER_UPGRADE_LINK,
 				'admin_nonce'        => wp_create_nonce( 'wpaib_admin_nonce' ),

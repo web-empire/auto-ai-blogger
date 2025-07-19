@@ -339,100 +339,50 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		'site_url'      => get_site_url(),
 	];
 
-	$body_args = [
-		'keywords'         => [
-			'Pet supplies',
-			'Pet products',
-			'Pet care',
-			'Pet owner tips',
-			'Best pet accessories',
-			'Premium pet food',
-			'Natural dog food',
-			'Organic cat food',
-			'Durable dog toys',
-			'Interactive cat toys',
-			'Cat trees',
-		],
-		'maxTitleWords'    => 10,
-		'maxWords'         => 500,
-		'name'             => 'Vaccination Drive for Pets',
-		'license'          => '25415bcb-1643-446c-9bbf-0a5f260c7bce',
-		'site_title'       => 'Pawsitively Purrfect Pet Supplies',
-		'site_purpose'     => 'To provide the best for furry, scaled, or feathered friends.',
-		'site_description' => 'This site offers premium pet food, fun toys, and essential accessories for all types of pets, focusing on pet wellness, nutritional dog food, durable cat trees, exotic fish supplies, and grooming tools for all breeds.',
-	];
+	$api_response = wp_safe_remote_post(
+		WP_AI_BLOGGER_POST_CREATION_API,
+		[
+			'body'        => wp_json_encode(
+				array_merge(
+					$core_details,
+					$site_persona_details
+				)
+			),
+			'timeout'     => 45,
+			'headers'     => [
+				'Content-Type' => 'application/json',
+			],
+			'cookies'     => [],
+			'blocking'    => true, // Whether to block the request until complete.
+			'redirection' => 10, // Number of redirects allowed.
+			'httpversion' => '1.1',
+		]
+	);
 
-	$args = [
-		'method'      => 'POST',
-		'timeout'     => 45, // In seconds. 0 means no timeout (use with caution).
-		'redirection' => 10, // Number of redirects allowed.
-		'httpversion' => '1.1',
-		'blocking'    => true, // Whether to block the request until complete.
-		'headers'     => [
-			'Content-Type' => 'application/json',
-		],
-		'body'        => json_encode( $body_args ), // Encode the body arguments as JSON.
-		'cookies'     => [],
-	];
-
-	$response = wp_remote_post( WP_AI_BLOGGER_POST_CREATION_API, $args );
-
-	// Check for WP_Error.
-	if ( is_wp_error( $response ) ) {
-		$error_message = $response->get_error_message();
-		echo "Something went wrong: {$error_message}";
-		return;
+	// Check for errors.
+	if ( is_wp_error( $api_response ) ) {
+		return $api_response;
 	}
 
-	// Get the body of the response.
-	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+	// Check for a valid response.
+	if ( ! isset( $api_response['body'] ) ) {
+		return new \WP_Error( 'invalid_response', __( 'Invalid response from API.', 'wp-ai-blogger' ) );
+	}
 
-	// echo "Response Body: " . $body; // Debugging purpose.
-	error_log( print_r( $body, true ) ); // Debugging purpose.
-	return $body;
+	// Decode the response.
+	$api_response = json_decode( wp_remote_retrieve_body( $api_response ), true );
 
-	// $api_response = wp_safe_remote_post(
-	// WP_AI_BLOGGER_POST_CREATION_API,
-	// [
-	// 'body' => wp_json_encode(
-	// array_merge(
-	// $core_details,
-	// $site_persona_details
-	// )
-	// ),
-	// 'timeout' => 15,
-	// 'headers' => [
-	// 'Content-Type' => 'application/json',
-	// ],
-	// ]
-	// );
+	// Check for errors in the response.
+	if ( isset( $api_response['error'] ) ) {
+		return new \WP_Error( 'api_error', $api_response['error'] );
+	}
 
-	// // Check for errors.
-	// if ( is_wp_error( $api_response ) ) {
-	// return $api_response;
-	// }
+	// Check for a valid response.
+	if ( empty( $api_response['title'] ) || empty( $api_response['content'] ) ) {
+		return new \WP_Error( 'invalid_response', __( 'Empty response from API for title or content.', 'wp-ai-blogger' ) );
+	}
 
-	// // Check for a valid response.
-	// if ( ! isset( $api_response['body'] ) ) {
-	// return new \WP_Error( 'invalid_response', __( 'Invalid response from API.', 'wp-ai-blogger' ) );
-	// }
-
-	// // Decode the response.
-	// $api_response = json_decode( wp_remote_retrieve_body( $api_response ), true );
-
-	// error_log( print_r( $api_response, true ) ); // Debugging purpose.
-
-	// // Check for errors in the response.
-	// if ( isset( $api_response['error'] ) ) {
-	// return new \WP_Error( 'api_error', $api_response['error'] );
-	// }
-
-	// // Check for a valid response.
-	// if ( empty( $api_response['title'] ) || empty( $api_response['content'] ) ) {
-	// return new \WP_Error( 'invalid_response', __( 'Empty response from API for title or content.', 'wp-ai-blogger' ) );
-	// }
-
-	// return $api_response; // It's needed title, content and summary.
+	return $api_response; // It's needed title, content and summary.
 }
 
 /**
@@ -445,15 +395,15 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 function wpaib_get_site_persona_details( $campaign_id = 0 ) {
 	$site_details    = Settings::get_ai_blogger_settings();
 	$persona_details = [
-		'site_title'       => $site_details['siteTitle'] ?? '',
-		'site_purpose'     => $site_details['siteFor'] ?? '',
-		'site_description' => $site_details['siteDescription'] ?? '',
-		// 'temperature'     => $site_details['temperature'] ?? 0,
-		// 'harassment' 	  => $site_details['harassment'] ?? 0,
-		// 'hate'            => $site_details['hate'] ?? 0,
-		// 'sexually_explicit' => $site_details['sexuallyExplicit'] ?? 0,
-		// 'dangerous_content' => $site_details['dangerousContent'] ?? 0,
-		// 'civic_integrity' => $site_details['civicIntegrity'] ?? 0,
+		'site_title'        => $site_details['siteTitle'] ?? '',
+		'site_purpose'      => $site_details['siteFor'] ?? '',
+		'site_description'  => $site_details['siteDescription'] ?? '',
+		'temperature'       => $site_details['temperature'] ?? 0,
+		'harassment'        => $site_details['harassment'] ?? 0,
+		'hate'              => $site_details['hate'] ?? 0,
+		'sexually_explicit' => $site_details['sexuallyExplicit'] ?? 0,
+		'dangerous_content' => $site_details['dangerousContent'] ?? 0,
+		'civic_integrity'   => $site_details['civicIntegrity'] ?? 0,
 	];
 
 	if ( $campaign_id ) {
@@ -529,6 +479,10 @@ function wpaib_create_blog_post( $campaign_id ) {
 		return new \WP_Error( 'post_creation_failed', __( 'Failed to create the post.', 'wp-ai-blogger' ) );
 	}
 
+	// Add campaign metadata to the created post.
+	add_post_meta( $post_id, 'wp_aib_reference', 1 );
+	add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
+
 	// Update the campaign meta.
 	$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
 	$posts_created = $posts_created ? $posts_created + 1 : 1;
@@ -538,4 +492,33 @@ function wpaib_create_blog_post( $campaign_id ) {
 	Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
 
 	return $post_id;
+}
+
+/**
+ * Track post views for analytics.
+ *
+ * @param int $post_id Post ID.
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_track_post_view( $post_id ): void {
+	// Only track for campaign posts.
+	$is_campaign_post = get_post_meta( $post_id, 'wp_aib_reference', true );
+	if ( ! $is_campaign_post ) {
+		return;
+	}
+
+	// Avoid counting views from admin, logged-in users, or bots.
+	if ( is_admin() || current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+
+	// Get current view count.
+	$current_views = absint( get_post_meta( $post_id, 'post_views_count', true ) ?? 0 );
+
+	// Increment view count.
+	$new_views = $current_views + 1;
+
+	// Update post meta.
+	update_post_meta( $post_id, 'post_views_count', $new_views );
 }

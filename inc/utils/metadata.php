@@ -335,7 +335,7 @@ class Metadata {
 		}
 
 		if ( $last_run_on ) {
-			$last_run_on = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_run_on );
+			$last_run_on         = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_run_on );
 			$metadata['lastRun'] = $last_run_on;
 		}
 

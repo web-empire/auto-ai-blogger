@@ -260,7 +260,7 @@ export default function PostIdeas() {
 					>
 						{ showTooltip && (
 							<div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mt-2 whitespace-nowrap">
-                                { __( 'Upgrade to Pro', 'wp-ai-blogger' ) }
+								{ __( 'Upgrade to Pro', 'wp-ai-blogger' ) }
 							</div>
 						) }
 						<button
