@@ -174,8 +174,6 @@ export default function License() {
 		} );
 	};
 
-
-
 	return (
 		<SettingsContainer
 			title={ __( 'License & Tokens', 'wp-ai-blogger' ) }

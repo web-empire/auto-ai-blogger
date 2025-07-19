@@ -39,92 +39,93 @@ const CoreVersion = () => (
 // Token Display and Refresh Component
 const TokenDisplayAndRefresh = () => {
 	const dispatch = useDispatch();
-	const [processing, setProcessing] = useState(false);
-	const licenseStatus = useSelector((state) => state.licenseStatus) || 'unlicensed';
-	const tokenTotal = useSelector((state) => state.tokenTotal) || 0;
-	const tokenRemaining = useSelector((state) => state.tokenRemaining) || 0;
-	const license = useSelector((state) => state.license) || '';
-	const abortControllerRef = useRef({});
+	const [ processing, setProcessing ] = useState( false );
+	const licenseStatus = useSelector( ( state ) => state.licenseStatus ) || 'unlicensed';
+	const tokenTotal = useSelector( ( state ) => state.tokenTotal ) || 0;
+	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining ) || 0;
+	const license = useSelector( ( state ) => state.license ) || '';
+	const abortControllerRef = useRef( {} );
 
 	// Calculate tokens used and format numbers
 	const tokensUsed = licenseStatus === 'licensed' ? tokenTotal - tokenRemaining : 0;
 	const totalTokens = licenseStatus === 'licensed' ? tokenTotal : 0;
-	const formattedTokensUsed = tokensUsed.toLocaleString();
-	const formattedTotalTokens = totalTokens.toLocaleString();
 
 	const refreshTokens = () => {
-		if (licenseStatus !== 'licensed' || processing || !license) {
+		if ( licenseStatus !== 'licensed' || processing || ! license ) {
 			return;
 		}
 
-		setProcessing(true);
+		setProcessing( true );
 
 		// Fetch fresh token data using the license key from Redux store
-		fetch(`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`, {
+		fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ license }`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		}).then((response) => {
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+		} ).then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error( `HTTP error! status: ${ response.status }` );
 			}
 			return response.json();
-		}).then(async (tokenData) => {
-			if (tokenData && tokenData.success && tokenData.data) {
+		} ).then( async ( tokenData ) => {
+			if ( tokenData && tokenData.success && tokenData.data ) {
 				// Update the store with fresh token data
-				dispatch({
+				dispatch( {
 					type: 'UPDATE_TOKEN_TOTAL',
 					payload: tokenData.data.total,
-				});
-				dispatch({
+				} );
+				dispatch( {
 					type: 'UPDATE_TOKEN_REMAINING',
 					payload: tokenData.data.remaining,
-				});
+				} );
 
 				// Update API data
-				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+				await updateApiData( 'tokenTotal', tokenData.data.total, dispatch, abortControllerRef );
+				await updateApiData( 'tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef );
 
-				dispatch({
+				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __('Tokens refreshed successfully!', 'wp-ai-blogger'),
-				});
+					payload: __( 'Tokens refreshed successfully!', 'wp-ai-blogger' ),
+				} );
 			} else {
-				throw new Error('Invalid response from token API.');
+				throw new Error( 'Invalid response from token API.' );
 			}
-		}).catch((error) => {
-			console.error('Token refresh error:', error);
-			dispatch({
+		} ).catch( ( error ) => {
+			console.error( 'Token refresh error:', error );
+			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('Failed to refresh token data', 'wp-ai-blogger'),
-			});
-		}).finally(() => {
-			setProcessing(false);
-		});
+				payload: __( 'Failed to refresh token data', 'wp-ai-blogger' ),
+			} );
+		} ).finally( () => {
+			setProcessing( false );
+		} );
 	};
 
-	if (licenseStatus !== 'licensed') {
+	if ( licenseStatus !== 'licensed' ) {
 		return null;
 	}
 
 	const isError = tokenRemaining < 100;
 	const isWarning = tokenRemaining <= 1000;
 
+	const formattedTokensUsed = tokensUsed.toLocaleString();
+	const formattedTotalTokens = totalTokens.toLocaleString();
+
 	return (
-		<div className="flex items-center gap-2 border-r pr-4">
-			<p className={`text-sm m-0 p-0 ${
+		<div className="flex items-center gap-2 border-r">
+			<p className={ `text-sm m-0 p-0 ${
 				isError ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
-			}`}>
-				{formattedTokensUsed}
-				{'/'}
-				{formattedTotalTokens}
-				{' '}
-				{__('Tokens', 'wp-ai-blogger')}
+			}` }>
+				{ formattedTokensUsed }
+				{ '/' }
+				{ formattedTotalTokens }
+				{ ' ' }
+				{ __( 'Tokens', 'wp-ai-blogger' ) }
 			</p>
 			<button
-				disabled={licenseStatus !== 'licensed' || processing || !license}
-				className={`
+				disabled={ licenseStatus !== 'licensed' || processing || ! license }
+				className={ `
 					text-indigo-700
 					bg-indigo-50
 					border border-indigo-200
@@ -132,16 +133,16 @@ const TokenDisplayAndRefresh = () => {
 					flex items-center justify-center
 					font-medium
 					focus:outline-none focus:ring-0
-					${licenseStatus !== 'licensed' || processing || !license 
-						? 'opacity-50 cursor-not-allowed' 
-						: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300'}
-					${processing ? 'pointer-events-none' : ''}
-				`}
-				onClick={refreshTokens}
+					${ licenseStatus !== 'licensed' || processing || ! license
+			? 'opacity-50 cursor-not-allowed'
+			: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
+					${ processing ? 'pointer-events-none' : '' }
+				` }
+				onClick={ refreshTokens }
 			>
-				<Tooltip text={__('Refresh', 'wp-ai-blogger')} delay={100} className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md">
+				<Tooltip text={ __( 'Refresh', 'wp-ai-blogger' ) } delay={ 100 } className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md">
 					<div className="relative">
-						<RefreshCw className={`w-4 h-4 ${processing ? 'animate-spin' : ''}`} />
+						<RefreshCw className={ `w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
 					</div>
 				</Tooltip>
 			</button>

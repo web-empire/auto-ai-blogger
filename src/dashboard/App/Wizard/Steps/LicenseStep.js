@@ -16,7 +16,6 @@ const LicenseStep = () => {
 	const [ licenseStatus, setLicenseStatus ] = useState( wpaib_localized_data?.license_status );
 	const [ processing, setProcessing ] = useState( false );
 	const [ buttonText, setButtonText ] = useState( __( 'Connect & Proceed', 'wp-ai-blogger' ) );
-	const [isFetching, setIsFetching] = useState(false);
 
 	// Use Redux data for initial state.
 	const [ license, setLicense ] = useState( reduxLicense || wpaib_localized_data.license );
@@ -27,41 +26,39 @@ const LicenseStep = () => {
 	 * Activate the license.
 	 */
 	const activateLicense = async () => {
-		if (!license.trim() || processing) {
+		if ( ! license.trim() || processing ) {
 			return;
 		}
 
-		setButtonText(__('Activating', 'wp-ai-blogger'));
-		setProcessing(true);
-		setIsFetching(true); // Set fetching state to true
+		setButtonText( __( 'Activating', 'wp-ai-blogger' ) );
+		setProcessing( true );
 
 		const formData = new window.FormData();
-		formData.append('action', 'wp_ai_blogger_activate_license');
-		formData.append('license_key', license);
-		formData.append('nonce', wpaib_localized_data.licensing_nonce);
+		formData.append( 'action', 'wp_ai_blogger_activate_license' );
+		formData.append( 'license_key', license );
+		formData.append( 'nonce', wpaib_localized_data.licensing_nonce );
 
 		try {
-			const licenseResponse = await apiFetch({
+			const licenseResponse = await apiFetch( {
 				url: ajaxurl,
 				method: 'POST',
 				body: formData,
-			});
+			} );
 
-			if (licenseResponse.success) {
-				// Store the license temporarily before masking
-				const originalLicense = license;
-				setLicense('*'.repeat(license.length)); // Mask the license
+			if ( licenseResponse.success ) {
+				// Store the license temporarily before masking.
+				setLicense( '*'.repeat( license.length ) ); // Mask the license.
 
-				dispatch({
+				dispatch( {
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'licensed',
-				});
-				setLicenseStatus('licensed');
-				setButtonText(__('Fetching tokens…', 'wp-ai-blogger'));
+				} );
+				setLicenseStatus( 'licensed' );
+				setButtonText( __( 'Fetching tokens…', 'wp-ai-blogger' ) );
 
 				// Fetch token data
 				const tokenResponse = await fetch(
-					`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
+					`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ license }`,
 					{
 						method: 'GET',
 						headers: {
@@ -70,44 +67,43 @@ const LicenseStep = () => {
 					}
 				);
 
-				if (!tokenResponse.ok) {
-					throw new Error(`HTTP error! status: ${tokenResponse.status}`);
+				if ( ! tokenResponse.ok ) {
+					throw new Error( `HTTP error! status: ${ tokenResponse.status }` );
 				}
 
 				const tokenData = await tokenResponse.json();
 
-				if (tokenData && tokenData.success && tokenData.data) {
+				if ( tokenData && tokenData.success && tokenData.data ) {
 					// Update token data in Redux store
-					dispatch({
+					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: tokenData.data.total,
-					});
-					dispatch({
+					} );
+					dispatch( {
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: tokenData.data.remaining,
-					});
+					} );
 
 					// Update API data
-					await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+					await updateApiData( 'tokenTotal', tokenData.data.total, dispatch, abortControllerRef );
+					await updateApiData( 'tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef );
 
-					setButtonText(__('Proceeding…', 'wp-ai-blogger'));
-					setLicenseStatusMessage(__('License activated successfully.', 'wp-ai-blogger'));
-					navigate(`${wpaib_localized_data.admin_app_url}&step=optin`);
+					setButtonText( __( 'Proceeding…', 'wp-ai-blogger' ) );
+					setLicenseStatusMessage( __( 'License activated successfully.', 'wp-ai-blogger' ) );
+					navigate( `${ wpaib_localized_data.admin_app_url }&step=optin` );
 				} else {
-					throw new Error('Invalid response from token API.');
+					throw new Error( 'Invalid response from token API.' );
 				}
 			} else {
-				setButtonText(__('Connect & Proceed', 'wp-ai-blogger'));
-				setLicenseStatusMessage(__('License activation failed. Please check your license key.', 'wp-ai-blogger'));
+				setButtonText( __( 'Connect & Proceed', 'wp-ai-blogger' ) );
+				setLicenseStatusMessage( __( 'License activation failed. Please check your license key.', 'wp-ai-blogger' ) );
 			}
-		} catch (error) {
-			console.error('License activation error:', error);
-			setButtonText(__('Connect & Proceed', 'wp-ai-blogger'));
-			setLicenseStatusMessage(__('Failed to activate license or fetch tokens.', 'wp-ai-blogger'));
+		} catch ( error ) {
+			console.error( 'License activation error:', error );
+			setButtonText( __( 'Connect & Proceed', 'wp-ai-blogger' ) );
+			setLicenseStatusMessage( __( 'Failed to activate license or fetch tokens.', 'wp-ai-blogger' ) );
 		} finally {
-			setProcessing(false);
-        	setIsFetching(false);
+			setProcessing( false );
 		}
 	};
 

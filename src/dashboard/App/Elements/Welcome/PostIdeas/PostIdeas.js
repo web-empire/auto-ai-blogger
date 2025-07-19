@@ -156,9 +156,8 @@ export default function PostIdeas() {
 	};
 
 	if ( error ) {
-
 		// Check for insufficient tokens error
-		if (error === 'Token exhausted: Insufficient tokens for this request.') {
+		if ( error === 'Token exhausted: Insufficient tokens for this request.' ) {
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
 					<p> { __( 'Error while loading post ideas:', 'wp-ai-blogger' ) } { error } </p>
@@ -167,9 +166,9 @@ export default function PostIdeas() {
 						target="_blank"
 						rel="noopener noreferrer"
 						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 gap-1 mt-5"
-						style={{ color: 'white' }}
+						style={ { color: 'white' } }
 					>
-						{__('Upgrade Now', 'wp-ai-blogger')}
+						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
 						<MoveRight className="h-5 w-5" />
 					</a>
 				</div>
@@ -303,7 +302,7 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-900">
-											<a href={ wpaib_localized_data.upgrade_link } target="_blank" className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1">
+											<a href={ wpaib_localized_data.upgrade_link } target="_blank" className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1" rel="noreferrer">
 												{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
 												<MoveRight className="w-5 h-5" />
 											</a>
