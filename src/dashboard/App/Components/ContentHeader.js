@@ -21,16 +21,17 @@ const ContentHeader = ( {
 	onSaveStart,
 	onSaveComplete,
 	onSaveError,
+	...otherProps
 } ) => {
+	// Don't render for license tab - check this FIRST before any other processing
+	if ( tab === 'license' ) {
+		return null;
+	}
+
 	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
 	const [ processing, setProcessing ] = useState( false );
 	const [ lastSaveTime, setLastSaveTime ] = useState( null );
-
-	// Don't render for license tab
-	if ( tab === 'license' ) {
-		return null;
-	}
 
 	// Memoize settings object to prevent unnecessary re-renders
 	const settingsToSave = useMemo( () => {

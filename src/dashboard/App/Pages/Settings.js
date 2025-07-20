@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect, memo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { aiClassNames } from '@Utils/aiClassNames';
 import { BellIcon, UserCircleIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { General, Notifications, License } from '@Elements/Settings';
@@ -110,11 +111,28 @@ const NavigationItem = memo(({
 NavigationItem.displayName = 'SettingsNavigationItem';
 
 function Settings() {
+	const location = useLocation();
 	const siteTitle = useSelector((state) => state.siteTitle) || '';
 	const siteFor = useSelector((state) => state.siteFor) || '';
 	const siteDescription = useSelector((state) => state.siteDescription) || '';
 
-	const [currentTab, setCurrentTab] = useState(TAB_IDS.GENERAL);
+	// Get initial tab from URL parameters
+	const getInitialTab = useCallback(() => {
+		try {
+			const searchParams = new URLSearchParams(location.search);
+			const urlTab = searchParams.get('tab');
+
+			// Validate that the tab exists in our TAB_IDS
+			if (urlTab && Object.values(TAB_IDS).includes(urlTab)) {
+				return urlTab;
+			}
+		} catch (error) {
+			console.warn('Error parsing URL tab parameter:', error);
+		}
+		return TAB_IDS.GENERAL;
+	}, [location.search]);
+
+	const [currentTab, setCurrentTab] = useState(getInitialTab);
 	const [isLoading, setIsLoading] = useState(false);
 	const [loadError, setLoadError] = useState(null);
 
@@ -140,7 +158,7 @@ function Settings() {
 			name: __('License', 'wp-ai-blogger'),
 			slug: TAB_IDS.LICENSE,
 			icon: CubeIcon,
-			renderContent: () => <div>Test tab</div>,
+			component: License,
 			description: __('License activation and management', 'wp-ai-blogger')
 		},
 	], []);
@@ -168,13 +186,10 @@ function Settings() {
 	const handleTabChange = useCallback(async (newTab) => {
 		if (newTab === currentTab) return;
 
-		console.log('Switching to tab:', newTab);
-
 		setIsLoading(true);
 		setLoadError(null);
 
 		try {
-			// Immediate tab switch for testing
 			setCurrentTab(newTab);
 		} catch (error) {
 			console.error('Error changing tab:', error);
@@ -213,6 +228,14 @@ function Settings() {
 			setCurrentTab(availableNavigation[0]?.slug || TAB_IDS.GENERAL);
 		}
 	}, [availableNavigation, currentTab]);
+
+	// Handle URL tab parameter changes
+	useEffect(() => {
+		const newTab = getInitialTab();
+		if (newTab !== currentTab && availableNavigation.some(item => item.slug === newTab)) {
+			setCurrentTab(newTab);
+		}
+	}, [location.search, getInitialTab, currentTab, availableNavigation]);
 
 	if (loadError) {
 		return (
@@ -283,22 +306,12 @@ function Settings() {
 			>
 				<div className="mx-auto max-w-3xl">
 					{/* Enhanced content header with current tab info */}
-					{(() => {
-						console.log('ContentHeader props:', {
-							title: currentTabData?.name,
-							description: currentTabData?.description,
-							tab: currentTab,
-							settings
-						});
-						return (
-							<ContentHeader
-								title={currentTabData?.name}
-								description={currentTabData?.description}
-								tab={currentTab}
-								{...settings}
-							/>
-						);
-					})()}
+					<ContentHeader
+						title={currentTabData?.name}
+						description={currentTabData?.description}
+						tab={currentTab}
+						{...settings}
+					/>
 
 					{/* Tab panels with proper ARIA roles */}
 					<div className="mt-6">
@@ -332,23 +345,9 @@ function Settings() {
 										</span>
 									</div>
 								) : (
-									currentTab === item.slug && (() => {
-										console.log('Rendering tab content for:', item.slug, 'item:', item);
-										try {
-											if (item.component) {
-												console.log('Rendering component:', item.component.name || 'Unknown');
-												return React.createElement(item.component);
-											} else if (item.renderContent) {
-												console.log('Rendering content function');
-												return item.renderContent();
-											}
-											console.log('No content to render');
-											return null;
-										} catch (error) {
-											console.error('Error rendering content:', error);
-											return <div>Error: {error.message}</div>;
-										}
-									})()
+									currentTab === item.slug && (
+										item.component ? React.createElement(item.component) : item.renderContent ? item.renderContent() : null
+									)
 								)}
 							</div>
 						))}
