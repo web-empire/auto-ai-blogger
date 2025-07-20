@@ -178,7 +178,7 @@ export const TokenDisplayAndRefresh = () => {
 					delay={ 100 }
 					className="z-[99999] bg-black text-xs text-white shadow-md p-2 rounded-md"
 				>
-					<div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-help">
+					<div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-help">
 						<div
 							className={ `h-full transition-all duration-500 ease-in-out ${tokenStatus.color}` }
 							style={{ width: `${Math.min(progressPercentage, 100)}%` }}
