@@ -334,7 +334,7 @@ class Menu {
 				'admin_page_nonce'   => wp_create_nonce( 'wp_ai_blogger_admin_page' ),
 				'userOnboarded'      => (bool) get_option( 'wp_ai_blogger_userOnboarded', false ),
 				'admin_base_url'     => esc_url( admin_url( 'edit.php' ) ),
-				'admin_app_url'      => esc_url( 'wp-admin/edit.php?page=' . self::PAGE_ID ),
+				'admin_app_url'      => esc_url( admin_url( 'edit.php?page=' . self::PAGE_ID ) ),
 				'home_slug'          => sanitize_key( self::PAGE_ID ),
 				'current_user_name'  => sanitize_text_field( wpaib_get_user_detail( 'name' ) ),
 				'current_user_email' => sanitize_email( wpaib_get_user_detail( 'email' ) ),

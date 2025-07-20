@@ -102,89 +102,61 @@ class Helper {
 	 * @since 1.0.0
 	 */
 	public static function update_option( $key, $value = true ) {
-		// Debug logging
-		error_log('WPAIB HELPER DEBUG: update_option called with key: ' . $key . ', value: ' . print_r($value, true));
-
 		// Validate key parameter
 		if ( ! is_string( $key ) || empty( $key ) ) {
-			error_log('WPAIB HELPER DEBUG: Key validation failed - not string or empty');
 			return false;
 		}
 
 		// Capability check
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_cron() && ! wp_doing_ajax() ) {
-			error_log('WPAIB HELPER DEBUG: Capability check failed - user cannot manage options');
 			return false;
 		}
-		error_log('WPAIB HELPER DEBUG: Capability check passed');
 
 		// Sanitize key
 		$key = sanitize_key( $key );
-		error_log('WPAIB HELPER DEBUG: Sanitized key: ' . $key);
 
 		if ( empty( $key ) ) {
-			error_log('WPAIB HELPER DEBUG: Sanitized key is empty');
 			return false;
 		}
 
 		// Check if key is in allowed list (compare sanitized versions)
 		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
-			error_log('WPAIB HELPER DEBUG: Key not in allowed list: ' . $key);
-			error_log('WPAIB HELPER DEBUG: Sanitized allowed keys: ' . print_r($sanitized_allowed_keys, true));
 			return false;
 		}
-		error_log('WPAIB HELPER DEBUG: Key in allowed list check passed');
 
 		// Get the original camelCase key for switch statements
 		$original_key_index = array_search($key, $sanitized_allowed_keys);
 		$original_key = self::$allowed_keys[$original_key_index];
-		error_log('WPAIB HELPER DEBUG: Original camelCase key: ' . $original_key);
 
 		// Sanitize value based on key type (use original camelCase key for switch)
 		$sanitized_value = self::sanitize_input( $original_key, $value );
-		error_log('WPAIB HELPER DEBUG: Sanitized value result: ' . print_r($sanitized_value, true));
-		error_log('WPAIB HELPER DEBUG: Sanitized value === false: ' . ($sanitized_value === false ? 'true' : 'false'));
 
 		if ( $sanitized_value === false ) {
-			error_log('WPAIB HELPER DEBUG: sanitize_input returned false - stopping here');
 			return false;
 		}
 
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
-		error_log('WPAIB HELPER DEBUG: Current settings from DB: ' . print_r($settings, true));
 
 		// Validate settings is array
 		if ( ! is_array( $settings ) ) {
 			$settings = [];
 		}
 
-		// Get default value for comparison (use original camelCase key)
-		$default_value = Settings::get_default_option( $original_key );
-		error_log('WPAIB HELPER DEBUG: Default value for key ' . $original_key . ': ' . print_r($default_value, true));
-		error_log('WPAIB HELPER DEBUG: Comparing sanitized_value === default_value: ' . ($sanitized_value === $default_value ? 'true' : 'false'));
-
 		// If the value is same as default then remove it from the DB.
 		if ( Settings::get_default_option( $original_key ) === $sanitized_value ) {
-			error_log('WPAIB HELPER DEBUG: Value matches default, unsetting from array');
 			unset( $settings[ $key ] );
 		} else {
-			error_log('WPAIB HELPER DEBUG: Value different from default, setting in array');
 			$settings[ $key ] = $sanitized_value;
 		}
 
 		// Validate final settings array
 		$validated_settings = self::validate_settings_array( $settings );
-		error_log('WPAIB HELPER DEBUG: Validated settings: ' . print_r($validated_settings, true));
 
-		$update_result = update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
-		error_log('WPAIB HELPER DEBUG: WordPress update_option result: ' . ($update_result ? 'true' : 'false'));
-		error_log('WPAIB HELPER DEBUG: WP_AI_BLOGGER_DB_OPTION constant: ' . (defined('WP_AI_BLOGGER_DB_OPTION') ? WP_AI_BLOGGER_DB_OPTION : 'UNDEFINED'));
+		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
 
 		return $sanitized_value;
-	}
-
-	/**
+	}	/**
 	 * Delete option from the database for the admin settings.
 	 *
 	 * @param  string $key The option key.

@@ -471,48 +471,35 @@ class Ajax {
 	 */
 	public function wpaib_update_admin_setting(): void {
 		try {
-			// Debug: Log the start of the function
-			error_log('WPAIB DEBUG: wpaib_update_admin_setting called');
-			error_log('WPAIB DEBUG: POST data: ' . print_r($_POST, true));
-
 			// security validation
 			$security_check = $this->validate_ajax_security( 'update_admin_setting' );
 			if ( is_wp_error( $security_check ) ) {
-				error_log('WPAIB DEBUG: Security check failed: ' . $security_check->get_error_message());
 				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
 				return;
 			}
-			error_log('WPAIB DEBUG: Security check passed');
 
 			// Nonce validation
 			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
-				error_log('WPAIB DEBUG: Nonce validation failed');
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
-			error_log('WPAIB DEBUG: Nonce validation passed');
 
 			// Validate and sanitize input
 			$sub_option_key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
 			if ( empty( $sub_option_key ) ) {
-				error_log('WPAIB DEBUG: Empty sub_option_key');
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
-			error_log('WPAIB DEBUG: sub_option_key: ' . $sub_option_key);
 
 			// Get allowed setting keys for validation
 			$type_settings = Settings::get_all_type_wise_settings();
 			$allowed_keys = array_keys( $type_settings );
-			error_log('WPAIB DEBUG: allowed_keys: ' . print_r($allowed_keys, true));
 
 			// Additional whitelist allowed setting keys
 			if ( ! in_array( $sub_option_key, $allowed_keys, true ) ) {
-				error_log('WPAIB DEBUG: Key not in allowed keys: ' . $sub_option_key);
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
-			error_log('WPAIB DEBUG: Key validation passed');
 
 			$sub_option_value = '';
 			if ( ! empty( $_POST['value'] ) ) {
@@ -522,20 +509,15 @@ class Ajax {
 					$sub_option_value = Settings::sanitize_data( $_POST['value'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data.
 				}
 			}
-			error_log('WPAIB DEBUG: sanitized value: ' . print_r($sub_option_value, true));
 
 			// Update option with error handling
-			error_log('WPAIB DEBUG: Attempting to update option with Helper::update_option');
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
-			error_log('WPAIB DEBUG: Update result: ' . ($update_result ? 'true' : 'false'));
 
 			if ( false === $update_result ) {
-				error_log('WPAIB DEBUG: Helper::update_option returned false');
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
 			}
 
-			error_log('WPAIB DEBUG: Success - sending json success');
 			wp_send_json_success( [
 				'message' => $this->get_error_msg( 'success' ),
 				'key' => $sub_option_key,
@@ -543,13 +525,9 @@ class Ajax {
 			] );
 
 		} catch ( \Exception $e ) {
-			error_log('WPAIB DEBUG: Exception caught: ' . $e->getMessage());
-			error_log('WPAIB DEBUG: Exception trace: ' . $e->getTraceAsString());
 			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 		}
-	}
-
-	/**
+	}	/**
 	 * Handler to create campaign with security.
 	 *
 	 * @since 1.0.0
