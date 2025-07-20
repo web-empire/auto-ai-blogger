@@ -32,7 +32,7 @@ export default function PostIdeas() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 
-	const licenseEnabled = 'licensed' === wpaib_localized_data.license_status;
+	const licenseEnabled = 'licensed' === ((typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status) || '');
 
 	const fetchPostIdeas = async () => {
 		console.log( 'Fetching post ideas...', postIdeasFromRedux );
@@ -152,7 +152,7 @@ export default function PostIdeas() {
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
-		navigate( `?page=${ wpaib_localized_data.home_slug }&path=settings` ); // Navigate to the settings tab.
+		navigate( `?page=${ (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug) || 'wp-ai-blogger' }&path=settings` ); // Navigate to the settings tab.
 	};
 
 	if ( error ) {
@@ -219,7 +219,7 @@ export default function PostIdeas() {
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
-		formData.append( 'security', wpaib_localized_data.admin_nonce );
+		formData.append( 'security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '' );
 
 		const postData = {
 			title,
@@ -233,7 +233,7 @@ export default function PostIdeas() {
 		formData.append( 'post_data', JSON.stringify( postData ) );
 
 		return apiFetch( {
-			url: wpaib_localized_data.ajax_url,
+			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 		} )
@@ -245,7 +245,7 @@ export default function PostIdeas() {
 
 				e.target.dataset.type = 'edit';
 				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
-				e.target.href = wpaib_localized_data.edit_post_link.replace( '{{POST_ID}}', response.data.post_id );
+				e.target.href = ((typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.edit_post_link) || '/wp-admin/post.php?post={{POST_ID}}&action=edit').replace( '{{POST_ID}}', response.data.post_id );
 				window.open( e.target.href, '_blank' );
 
 				dispatch( {
@@ -319,7 +319,7 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold text-indigo-600 hover:text-indigo-900">
-											<a href={ wpaib_localized_data.upgrade_link } target="_blank" className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1" rel="noreferrer">
+											<a href={ (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.upgrade_link) || '#' } target="_blank" className="text-indigo-600 hover:text-indigo-900 flex items-center justify-center gap-x-1" rel="noreferrer">
 												{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
 												<MoveRight className="w-5 h-5" />
 											</a>

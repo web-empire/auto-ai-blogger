@@ -34,7 +34,7 @@ const createSecureFormData = ( action, key, value ) => {
 	const formData = new window.FormData();
 
 	formData.append( 'action', action );
-	formData.append( 'security', wpaib_localized_data.admin_nonce );
+	formData.append( 'security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '' );
 	formData.append( 'key', key );
 
 	// Properly serialize complex values
@@ -82,7 +82,7 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value );
 
 		const response = await apiFetch( {
-			url: wpaib_localized_data.ajax_url,
+			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			signal: abortController.signal,
@@ -154,7 +154,7 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
 		const formData = createSecureFormData( action, 'campaign_details', value );
 
 		const response = await apiFetch( {
-			url: wpaib_localized_data.ajax_url,
+			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			signal: abortController.signal,

@@ -249,8 +249,8 @@ EmptyState.displayName = 'CampaignsEmptyState';
 
 export default function Campaigns() {
 	const dispatch = useDispatch();
-	const campaigns = wpaib_localized_data.all_campaigns;
-	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
+	const campaigns = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.all_campaigns) || {};
+	const defaultMetaDefaults = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.postmeta_defaults) || {};
 
 	const [configureData, setConfigureData] = useState(defaultMetaDefaults);
 	const [openDrawer, setOpenDrawer] = useState(false);
@@ -275,11 +275,11 @@ export default function Campaigns() {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wpaib_get_campaign_metadata');
-			formData.append('security', wpaib_localized_data.admin_nonce);
+			formData.append('security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '');
 			formData.append('campaign_id', campaignId);
 
 			const response = await apiFetch({
-				url: wpaib_localized_data.ajax_url,
+				url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
 				timeout: 30000
@@ -333,11 +333,11 @@ export default function Campaigns() {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wpaib_run_campaign');
-			formData.append('security', wpaib_localized_data.admin_nonce);
+			formData.append('security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '');
 			formData.append('campaign_id', campaignId);
 
 			const data = await apiFetch({
-				url: wpaib_localized_data.ajax_url,
+				url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
 				timeout: 60000

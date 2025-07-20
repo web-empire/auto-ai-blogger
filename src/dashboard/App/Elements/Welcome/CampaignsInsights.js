@@ -163,7 +163,7 @@ function CampaignsInsights({ onError }) {
 
 	// Memoized campaigns data with enhancements
 	const campaignsData = useMemo(() => {
-		const campaigns = wpaib_localized_data.all_campaigns || {};
+		const campaigns = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.all_campaigns) || {};
 
 		if (!campaigns || typeof campaigns !== 'object') {
 			return { campaigns: [], totalCampaigns: 0, activeCampaigns: 0, totalPosts: 0, totalVisits: 0 };
@@ -187,7 +187,7 @@ function CampaignsInsights({ onError }) {
 	const handleNavigateToLicense = useCallback((event) => {
 		event.preventDefault();
 		try {
-			navigate(`?page=${wpaib_localized_data.home_slug}&path=settings&tab=license`);
+			navigate(`?page=${(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug) || 'wp-ai-blogger'}&path=settings&tab=license`);
 		} catch (error) {
 			console.error('Navigation error:', error);
 			onError?.(error, { component: 'CampaignsInsights', action: 'navigate_to_license' });
@@ -196,7 +196,7 @@ function CampaignsInsights({ onError }) {
 
 	const handleViewCampaignDetails = useCallback((campaign) => {
 		try {
-			navigate(`?page=${wpaib_localized_data.home_slug}&path=campaigns&id=${campaign.id}`);
+			navigate(`?page=${(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug) || 'wp-ai-blogger'}&path=campaigns&id=${campaign.id}`);
 		} catch (error) {
 			console.error('Navigation error:', error);
 			onError?.(error, { component: 'CampaignsInsights', action: 'view_campaign_details' });
