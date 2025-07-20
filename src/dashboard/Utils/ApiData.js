@@ -76,6 +76,8 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
 			action: 'wpaib_update_admin_setting',
 			key: key,
 			value: value,
+			valueType: typeof value,
+			valueLength: typeof value === 'string' ? value.length : 'N/A',
 			nonce: config.nonce || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || 'NO_NONCE',
 			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php'
 		});

@@ -233,6 +233,10 @@ class Settings {
 				$output = ! empty( $value ) ? wp_unslash( $value ) : '';
 				break;
 
+			case 'string':
+				$output = isset( $value ) ? sanitize_textarea_field( wp_unslash( $value ) ) : '';
+				break;
+
 			case 'text':
 			case 'default':
 			default:

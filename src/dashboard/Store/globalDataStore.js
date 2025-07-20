@@ -85,7 +85,7 @@ const getInitialState = () => {
 		sexuallyExplicit: safeParseLocalizedData( wpaib_localized_data.sexually_explicit, 'boolean', false ),
 		dangerousContent: safeParseLocalizedData( wpaib_localized_data.dangerous_content, 'boolean', false ),
 		license: safeParseLocalizedData( wpaib_localized_data.license, 'string', '' ),
-		postIdeas: safeParseLocalizedData( wpaib_localized_data.post_ideas, 'string', '' ),
+		postIdeas: safeParseLocalizedData( wpaib_localized_data.postIdeas, 'string', '' ),
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),

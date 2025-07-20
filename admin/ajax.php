@@ -513,6 +513,11 @@ class Ajax {
 			// Update option with error handling
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
 
+			// Debug logging for postIdeas
+			if ( $sub_option_key === 'postIdeas' ) {
+				error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $sub_option_key . ', Value: ' . print_r( $sub_option_value, true ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
+			}
+
 			if ( false === $update_result ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
