@@ -47,52 +47,50 @@ const LicenseStatus = memo(({ status, tokensUsed, totalTokens, onRefresh, isRefr
 					</span>
 				</div>
 
-				{status === 'licensed' && (
-					<button
-						type="button"
-						onClick={onRefresh}
-						disabled={isRefreshing}
-						className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-						aria-label={__('Refresh token data', 'wp-ai-blogger')}
-					>
-						<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-					</button>
-				)}
+				<button
+					type="button"
+					onClick={onRefresh}
+					disabled={isRefreshing}
+					className={`p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${
+						status === 'licensed' ? 'opacity-100 visible' : 'opacity-0 invisible'
+					}`}
+					aria-label={__('Refresh token data', 'wp-ai-blogger')}
+				>
+					<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+				</button>
 			</div>
 
-			{status === 'licensed' && (
-				<div className="space-y-2">
-					<div className="flex justify-between text-sm">
-						<span className="text-gray-600">
-							{__('Tokens Used', 'wp-ai-blogger')}
-						</span>
-						<span className="font-medium text-gray-900">
-							{tokensUsed.toLocaleString()} / {totalTokens.toLocaleString()}
-						</span>
-					</div>
-
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className={`h-2 rounded-full transition-all duration-300 ${
-								usagePercentage > 90 ? 'bg-red-500' :
-								usagePercentage > 75 ? 'bg-amber-500' : 'bg-green-500'
-							}`}
-							style={{ width: `${usagePercentage}%` }}
-							role="progressbar"
-							aria-valuenow={usagePercentage}
-							aria-valuemin={0}
-							aria-valuemax={100}
-							aria-label={__(`Token usage: ${usagePercentage.toFixed(1)}%`, 'wp-ai-blogger')}
-						/>
-					</div>
-
-					<p className="text-xs text-gray-500">
-						{usagePercentage > 90 && __('⚠️ Running low on tokens', 'wp-ai-blogger')}
-						{usagePercentage <= 90 && usagePercentage > 75 && __('📊 Moderate usage', 'wp-ai-blogger')}
-						{usagePercentage <= 75 && __('✅ Plenty of tokens available', 'wp-ai-blogger')}
-					</p>
+			<div className={`space-y-2 transition-opacity duration-200 ${status === 'licensed' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
+				<div className="flex justify-between text-sm">
+					<span className="text-gray-600">
+						{__('Tokens Used', 'wp-ai-blogger')}
+					</span>
+					<span className="font-medium text-gray-900">
+						{tokensUsed.toLocaleString()} / {totalTokens.toLocaleString()}
+					</span>
 				</div>
-			)}
+
+				<div className="w-full bg-gray-200 rounded-full h-2">
+					<div
+						className={`h-2 rounded-full transition-all duration-300 ${
+							usagePercentage > 90 ? 'bg-red-500' :
+							usagePercentage > 75 ? 'bg-amber-500' : 'bg-green-500'
+						}`}
+						style={{ width: `${usagePercentage}%` }}
+						role="progressbar"
+						aria-valuenow={usagePercentage}
+						aria-valuemin={0}
+						aria-valuemax={100}
+						aria-label={__(`Token usage: ${usagePercentage.toFixed(1)}%`, 'wp-ai-blogger')}
+					/>
+				</div>
+
+				<p className="text-xs text-gray-500">
+					{usagePercentage > 90 && __('⚠️ Running low on tokens', 'wp-ai-blogger')}
+					{usagePercentage <= 90 && usagePercentage > 75 && __('📊 Moderate usage', 'wp-ai-blogger')}
+					{usagePercentage <= 75 && __('✅ Plenty of tokens available', 'wp-ai-blogger')}
+				</p>
+			</div>
 		</div>
 	);
 });
@@ -239,7 +237,12 @@ const License = memo(() => {
 
 	// Function to fetch token data from external API
 	const fetchTokenData = useCallback(async () => {
-		if (!license) return;
+		if (!license) {
+			console.log('No license available for token fetch:', license);
+			return;
+		}
+
+		console.log('Fetching token data for license:', license);
 
 		try {
 			const response = await fetch(
@@ -331,6 +334,14 @@ const License = memo(() => {
 				payload: 'licensed',
 			});
 
+			// Also update the license key in Redux for token fetching
+			dispatch({
+				type: 'UPDATE_LICENSE',
+				payload: licenseKey,
+			});
+
+			console.log('License key set in Redux:', licenseKey);
+
 			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
 
 			// Fetch token data after successful license activation
@@ -396,6 +407,10 @@ const License = memo(() => {
 				dispatch({
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'unlicensed',
+				});
+				dispatch({
+					type: 'UPDATE_LICENSE',
+					payload: '',
 				});
 				dispatch({
 					type: 'UPDATE_TOKEN_TOTAL',
