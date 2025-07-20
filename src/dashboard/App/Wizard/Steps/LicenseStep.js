@@ -154,6 +154,7 @@ const LicenseStep = memo(() => {
 
 	// Redux state
 	const reduxLicense = useSelector((state) => state.license);
+	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
 
 	// Component state
 	const [license, setLicense] = useState(() => {
@@ -181,7 +182,7 @@ const LicenseStep = memo(() => {
 			formData.append('nonce', wpaib_localized_data.licensing_nonce);
 
 			const response = await apiFetch({
-				url: ajaxurl,
+				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
 				timeout: 30000

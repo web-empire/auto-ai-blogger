@@ -18,7 +18,8 @@ const LicenseForm = memo(({
 	activationText,
 	deactivationText,
 	onActivate,
-	onDeactivate
+	onDeactivate,
+	upgradeLink
 }) => {
 	const handleKeyPress = useCallback((e) => {
 		if (e.key === 'Enter' && !activated && licenseKey.trim() && !processing) {
@@ -361,6 +362,7 @@ const License = memo(() => {
 						deactivationText={deactivationText}
 						onActivate={activateLicense}
 						onDeactivate={deactivateLicense}
+						upgradeLink={upgradeLink}
 					/>
 				}
 				className="bg-white shadow-sm rounded-lg border border-gray-200"
