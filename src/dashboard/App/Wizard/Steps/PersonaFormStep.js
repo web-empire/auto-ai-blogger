@@ -1,135 +1,391 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateApiData } from '@Utils/ApiData';
 
-const PersonaFormStep = () => {
-	const abortControllerRef = useRef( {} );
+// Enhanced form field component
+const FormField = memo(({
+	id,
+	label,
+	type = 'text',
+	value,
+	onChange,
+	error,
+	placeholder,
+	maxLength,
+	rows,
+	icon: Icon,
+	required = false,
+	description
+}) => {
+	const [isFocused, setIsFocused] = useState(false);
+	const [charCount, setCharCount] = useState(value?.length || 0);
+
+	const handleChange = useCallback((e) => {
+		const newValue = e.target.value;
+		onChange(newValue);
+		setCharCount(newValue.length);
+	}, [onChange]);
+
+	const handleFocus = useCallback(() => setIsFocused(true), []);
+	const handleBlur = useCallback(() => setIsFocused(false), []);
+
+	const fieldClasses = `
+		w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200
+		${error
+			? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
+			: 'border-gray-300 bg-white focus:border-indigo-500 focus:ring-indigo-500'
+		}
+		${isFocused ? 'shadow-md' : 'shadow-sm'}
+		focus:outline-none focus:ring-2 focus:ring-opacity-50
+		placeholder:text-gray-400
+	`;
+
+	return (
+		<div className="space-y-2">
+			<label
+				htmlFor={id}
+				className="flex items-center gap-2 text-sm font-semibold text-gray-900"
+			>
+				{Icon && <Icon className="w-4 h-4 text-gray-600" aria-hidden="true" />}
+				{label}
+				{required && <span className="text-red-500" aria-label={__('Required', 'wp-ai-blogger')}>*</span>}
+			</label>
+
+			{description && (
+				<p className="text-xs text-gray-600 mb-2">{description}</p>
+			)}
+
+			<div className="relative">
+				{type === 'textarea' ? (
+					<textarea
+						id={id}
+						value={value}
+						onChange={handleChange}
+						onFocus={handleFocus}
+						onBlur={handleBlur}
+						placeholder={placeholder}
+						maxLength={maxLength}
+						rows={rows || 4}
+						className={fieldClasses}
+						aria-describedby={error ? `${id}-error` : undefined}
+						aria-invalid={!!error}
+					/>
+				) : (
+					<input
+						id={id}
+						type={type}
+						value={value}
+						onChange={handleChange}
+						onFocus={handleFocus}
+						onBlur={handleBlur}
+						placeholder={placeholder}
+						maxLength={maxLength}
+						className={fieldClasses}
+						aria-describedby={error ? `${id}-error` : undefined}
+						aria-invalid={!!error}
+					/>
+				)}
+
+				{/* Status indicator */}
+				<div className="absolute right-3 top-3">
+					{error ? (
+						<AlertCircle className="w-4 h-4 text-red-500" aria-hidden="true" />
+					) : value && !error ? (
+						<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+					) : null}
+				</div>
+			</div>
+
+			{/* Character count */}
+			{maxLength && (
+				<div className="flex justify-between items-center text-xs">
+					<span className={`${error ? 'text-red-600' : 'text-gray-500'}`}>
+						{error && (
+							<span id={`${id}-error`} className="flex items-center gap-1">
+								<AlertCircle className="w-3 h-3" />
+								{error}
+							</span>
+						)}
+					</span>
+					<span className={`${charCount > maxLength * 0.9 ? 'text-orange-500' : 'text-gray-400'}`}>
+						{charCount}/{maxLength}
+					</span>
+				</div>
+			)}
+
+			{/* Error message without character count */}
+			{error && !maxLength && (
+				<p id={`${id}-error`} className="text-xs text-red-600 flex items-center gap-1">
+					<AlertCircle className="w-3 h-3" />
+					{error}
+				</p>
+			)}
+		</div>
+	);
+});
+
+FormField.displayName = 'PersonaFormField';
+
+// Enhanced submit button component
+const SubmitButton = memo(({ onClick, loading, disabled, children }) => {
+	const handleClick = useCallback((e) => {
+		e.preventDefault();
+		if (!disabled && !loading) {
+			onClick(e);
+		}
+	}, [onClick, disabled, loading]);
+
+	return (
+		<button
+			type="submit"
+			onClick={handleClick}
+			disabled={disabled || loading}
+			className="
+				group inline-flex items-center gap-3 px-8 py-4
+				bg-gradient-to-r from-indigo-600 to-purple-600
+				text-white font-semibold rounded-xl shadow-lg
+				hover:from-indigo-700 hover:to-purple-700
+				focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+				transform transition-all duration-200 hover:scale-105 hover:shadow-xl
+				disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+			"
+			aria-label={__('Continue to next step', 'wp-ai-blogger')}
+		>
+			{loading ? (
+				<Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+			) : (
+				<span>{children}</span>
+			)}
+			{!loading && (
+				<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+			)}
+		</button>
+	);
+});
+
+SubmitButton.displayName = 'PersonaSubmitButton';
+
+const PersonaFormStep = memo(() => {
+	const abortControllerRef = useRef({});
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	// Fetch data from Redux
-	const reduxSiteTitle = useSelector( ( state ) => state.siteTitle );
-	const reduxSiteFor = useSelector( ( state ) => state.siteFor );
-	const reduxSiteDescription = useSelector( ( state ) => state.siteDescription );
+	// Redux selectors
+	const reduxSiteTitle = useSelector((state) => state.siteTitle);
+	const reduxSiteFor = useSelector((state) => state.siteFor);
+	const reduxSiteDescription = useSelector((state) => state.siteDescription);
 
-	// Use Redux data for initial state
-	const [ siteTitle, setSiteTitle ] = useState( reduxSiteTitle || wpaib_localized_data.site_title );
-	const [ siteFor, setSiteFor ] = useState( reduxSiteFor || wpaib_localized_data.site_for );
-	const [ siteDescription, setSiteDescription ] = useState( reduxSiteDescription || wpaib_localized_data.site_description );
+	// Enhanced form state
+	const [formData, setFormData] = useState({
+		siteTitle: reduxSiteTitle || wpaib_localized_data.site_title || '',
+		siteFor: reduxSiteFor || wpaib_localized_data.site_for || '',
+		siteDescription: reduxSiteDescription || wpaib_localized_data.site_description || '',
+	});
 
-	const [ siteTitleError, setSiteTitleError ] = useState( '' );
-	const [ siteForError, setSiteForError ] = useState( '' );
-	const [ siteDescriptionError, setSiteDescriptionError ] = useState( '' );
+	const [errors, setErrors] = useState({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const handleStepRedirection = async function ( e ) {
+	// Enhanced validation
+	const validateForm = useCallback(() => {
+		const newErrors = {};
+
+		if (!formData.siteTitle.trim()) {
+			newErrors.siteTitle = __('Site title is required', 'wp-ai-blogger');
+		} else if (formData.siteTitle.length < 3) {
+			newErrors.siteTitle = __('Site title must be at least 3 characters', 'wp-ai-blogger');
+		}
+
+		if (!formData.siteFor.trim()) {
+			newErrors.siteFor = __('Site purpose is required', 'wp-ai-blogger');
+		} else if (formData.siteFor.length < 10) {
+			newErrors.siteFor = __('Please provide a more detailed description (at least 10 characters)', 'wp-ai-blogger');
+		}
+
+		if (!formData.siteDescription.trim()) {
+			newErrors.siteDescription = __('Site description is required', 'wp-ai-blogger');
+		} else if (formData.siteDescription.length < 20) {
+			newErrors.siteDescription = __('Please provide a more detailed description (at least 20 characters)', 'wp-ai-blogger');
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	}, [formData]);
+
+	// Form field handlers
+	const handleFieldChange = useCallback((field) => (value) => {
+		setFormData(prev => ({ ...prev, [field]: value }));
+		// Clear error when user starts typing
+		if (errors[field]) {
+			setErrors(prev => ({ ...prev, [field]: '' }));
+		}
+	}, [errors]);
+
+	// Enhanced form submission
+	const handleSubmit = useCallback(async (e) => {
 		e.preventDefault();
 
-		// Reset errors
-		setSiteTitleError( '' );
-		setSiteForError( '' );
-		setSiteDescriptionError( '' );
+		if (!validateForm()) return;
 
-		let hasError = false;
+		setIsSubmitting(true);
 
-		if ( ! siteTitle ) {
-			setSiteTitleError( __( 'Site Title is required.', 'wp-ai-blogger' ) );
-			hasError = true;
+		try {
+			// Update Redux state
+			dispatch({ type: 'UPDATE_SITE_TITLE', payload: formData.siteTitle });
+			dispatch({ type: 'UPDATE_SITE_FOR', payload: formData.siteFor });
+			dispatch({ type: 'UPDATE_SITE_DESCRIPTION', payload: formData.siteDescription });
+
+			// Update API data
+			await Promise.all([
+				updateApiData('siteTitle', formData.siteTitle, dispatch, abortControllerRef),
+				updateApiData('siteFor', formData.siteFor, dispatch, abortControllerRef),
+				updateApiData('siteDescription', formData.siteDescription, dispatch, abortControllerRef),
+			]);
+
+			// Navigate to next step
+			navigate(`${wpaib_localized_data.admin_app_url}&step=license`);
+		} catch (error) {
+			console.error('Form submission error:', error);
+			setErrors({ submit: __('Failed to save your information. Please try again.', 'wp-ai-blogger') });
+		} finally {
+			setIsSubmitting(false);
 		}
+	}, [formData, validateForm, dispatch, navigate]);
 
-		if ( ! siteFor ) {
-			setSiteForError( __( 'Site For is required.', 'wp-ai-blogger' ) );
-			hasError = true;
-		}
-
-		if ( ! siteDescription ) {
-			setSiteDescriptionError( __( 'Site Description is required.', 'wp-ai-blogger' ) );
-			hasError = true;
-		}
-
-		if ( hasError ) {
-			return; // Stop redirection if there are errors
-		}
-
-		// Update data
-		await updateApiData( 'siteTitle', siteTitle, dispatch, abortControllerRef );
-		await updateApiData( 'siteFor', siteFor, dispatch, abortControllerRef );
-		await updateApiData( 'siteDescription', siteDescription, dispatch, abortControllerRef );
-
-		dispatch( { type: 'UPDATE_SITE_TITLE', payload: siteTitle } );
-		dispatch( { type: 'UPDATE_SITE_FOR', payload: siteFor } );
-		dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: siteDescription } );
-
-		navigate( `${ wpaib_localized_data.admin_app_url }&step=license` );
-	};
+	// Form completion percentage
+	const completionPercentage = useMemo(() => {
+		const fields = ['siteTitle', 'siteFor', 'siteDescription'];
+		const filledFields = fields.filter(field => formData[field].trim().length > 0);
+		return Math.round((filledFields.length / fields.length) * 100);
+	}, [formData]);
 
 	return (
-		<div className="wpaib-container">
-			<div className="wpaib-row mt-8 max-w-5xl">
-				<div className="bg-white rounded text-center mx-auto px-11">
-					<span className="text-sm font-medium text-primary-600 mb-10 text-center block tracking-[.24em] uppercase">
-						{ __( 'Step 2 of 4', 'wp-ai-blogger' ) }
-					</span>
-
-					<h1 className="wpaib-step-heading mb-2 text-center">
-						{ __( 'Tell Us About Your Site', 'wp-ai-blogger' ) }
-					</h1>
-
-					<form className="max-w-sm mx-auto mt-10">
-						<div className="sm:flex flex-col gap-5 text-left">
-							<div className="w-full">
-								<label htmlFor="wpaib-site-title" className="text-slate-800 text-base font-semibold block">
-									{ __( 'Site Title', 'wp-ai-blogger' ) }
-								</label>
-								<input
-									id="wpaib-site-title"
-									type="text"
-									className="!my-2 !p-3 !shadow-sm block w-full !text-sm !border-gray-300 !rounded !text-gray-500 !placeholder-slate-400 focus:ring focus:!shadow-none"
-									value={ siteTitle }
-									onChange={ ( e ) => setSiteTitle( e.target.value ) }
-								/>
-								{ siteTitleError && <p className="text-red-500 mt-1">{ siteTitleError }</p> }
-							</div>
-							<div className="w-full">
-								<label htmlFor="wpaib-site-for" className="text-slate-800 text-base font-semibold block">
-									{ __( 'Site For', 'wp-ai-blogger' ) }
-								</label>
-								<input
-									id="wpaib-site-for"
-									type="text"
-									className="!my-2 !p-3 !shadow-sm block w-full !text-sm !border-gray-300 !rounded !text-gray-500 !placeholder-slate-400 focus:ring focus:!shadow-none"
-									value={ siteFor }
-									onChange={ ( e ) => setSiteFor( e.target.value ) }
-								/>
-								{ siteForError && <p className="text-red-500 mt-1">{ siteForError }</p> }
-							</div>
-							<div className="w-full">
-								<label htmlFor="wpaib-site-description" className="text-slate-800 text-base font-semibold block">
-									{ __( 'Site Description', 'wp-ai-blogger' ) }
-								</label>
-								<textarea
-									id="wpaib-site-description"
-									className="!my-2 !p-3 !shadow-sm block w-full !text-sm !border-gray-300 !rounded !text-gray-500 !placeholder-slate-400 focus:ring focus:!shadow-none"
-									value={ siteDescription }
-									onChange={ ( e ) => setSiteDescription( e.target.value ) }
-								/>
-								{ siteDescriptionError && <p className="text-red-500 mt-1">{ siteDescriptionError }</p> }
-							</div>
+		<main
+			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4"
+			role="main"
+			aria-labelledby="persona-heading"
+		>
+			<div className="w-full max-w-2xl">
+				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+					{/* Header */}
+					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
+						<div className="mb-4">
+							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
+								<User className="w-4 h-4 mr-2" aria-hidden="true" />
+								{__('Step 2 of 5', 'wp-ai-blogger')}
+							</span>
 						</div>
+						<h1 id="persona-heading" className="text-3xl font-bold text-white mb-2">
+							{__('Tell Us About Your Site', 'wp-ai-blogger')}
+						</h1>
+						<p className="text-indigo-100 text-lg">
+							{__('Help us understand your site so we can generate the perfect content for your audience.', 'wp-ai-blogger')}
+						</p>
 
-						<div className="mt-[40px] grid justify-center">
-							<button className="wpaib-wizard--button" onClick={ handleStepRedirection }>
-								{ __( 'Next', 'wp-ai-blogger' ) }
-								<ArrowRight className="w-5 h-5" />
-							</button>
+						{/* Progress bar */}
+						<div className="mt-6">
+							<div className="bg-white bg-opacity-20 rounded-full h-2 overflow-hidden">
+								<div
+									className="bg-white h-full transition-all duration-500 ease-out"
+									style={{ width: `${completionPercentage}%` }}
+									role="progressbar"
+									aria-valuenow={completionPercentage}
+									aria-valuemin={0}
+									aria-valuemax={100}
+									aria-label={__(`Form completion: ${completionPercentage}%`, 'wp-ai-blogger')}
+								/>
+							</div>
+							<p className="text-indigo-100 text-sm mt-2">
+								{__(`${completionPercentage}% complete`, 'wp-ai-blogger')}
+							</p>
+						</div>
+					</div>
+
+					{/* Form */}
+					<form className="p-8 space-y-6" onSubmit={handleSubmit} noValidate>
+						<FormField
+							id="wpaib-site-title"
+							label={__('Site Title', 'wp-ai-blogger')}
+							value={formData.siteTitle}
+							onChange={handleFieldChange('siteTitle')}
+							error={errors.siteTitle}
+							placeholder={__('e.g., Tech Insights Blog, Travel Adventures, Cooking Tips', 'wp-ai-blogger')}
+							maxLength={100}
+							icon={Globe}
+							required
+							description={__('The main title of your website or blog', 'wp-ai-blogger')}
+						/>
+
+						<FormField
+							id="wpaib-site-for"
+							label={__('Site Purpose', 'wp-ai-blogger')}
+							value={formData.siteFor}
+							onChange={handleFieldChange('siteFor')}
+							error={errors.siteFor}
+							placeholder={__('e.g., technology enthusiasts, travel lovers, food bloggers', 'wp-ai-blogger')}
+							maxLength={200}
+							icon={User}
+							required
+							description={__('Who is your target audience or what is your site about?', 'wp-ai-blogger')}
+						/>
+
+						<FormField
+							id="wpaib-site-description"
+							label={__('Detailed Description', 'wp-ai-blogger')}
+							type="textarea"
+							value={formData.siteDescription}
+							onChange={handleFieldChange('siteDescription')}
+							error={errors.siteDescription}
+							placeholder={__('Describe your site in detail: topics you cover, writing style, target audience, goals, etc. This helps AI generate more relevant content.', 'wp-ai-blogger')}
+							maxLength={1000}
+							rows={6}
+							icon={FileText}
+							required
+							description={__('Provide detailed information to help AI understand your content needs', 'wp-ai-blogger')}
+						/>
+
+						{/* Submit error */}
+						{errors.submit && (
+							<div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+								<p className="text-red-700 text-sm flex items-center gap-2">
+									<AlertCircle className="w-4 h-4" />
+									{errors.submit}
+								</p>
+							</div>
+						)}
+
+						{/* Submit button */}
+						<div className="flex justify-center pt-6">
+							<SubmitButton
+								onClick={handleSubmit}
+								loading={isSubmitting}
+								disabled={Object.keys(errors).length > 0 && !errors.submit}
+							>
+								{isSubmitting ? __('Saving...', 'wp-ai-blogger') : __('Continue', 'wp-ai-blogger')}
+							</SubmitButton>
 						</div>
 					</form>
 				</div>
+
+				{/* Help text */}
+				<div className="text-center mt-6">
+					<p className="text-sm text-gray-600">
+						{__('This information will be used to configure your AI content generator for optimal results.', 'wp-ai-blogger')}
+					</p>
+				</div>
 			</div>
-		</div>
+
+			{/* Screen reader announcements */}
+			<div className="sr-only" aria-live="polite" aria-atomic="true">
+				{isSubmitting && __('Saving your site information...', 'wp-ai-blogger')}
+				{Object.keys(errors).length > 0 && __('Please fix the form errors before continuing.', 'wp-ai-blogger')}
+			</div>
+		</main>
 	);
-};
+});
+
+PersonaFormStep.displayName = 'WizardPersonaFormStep';
 
 export default PersonaFormStep;

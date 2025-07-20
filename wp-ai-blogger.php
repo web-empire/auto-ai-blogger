@@ -50,3 +50,4 @@ require_once 'inc/web-notices/class-web-notices.php';
 
 // Plugin loader.
 require_once 'loader.php';
+

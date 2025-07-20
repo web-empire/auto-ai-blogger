@@ -3,7 +3,7 @@
  * Loader.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 1.0.0
  */
 
 namespace WPAIBlogger;
@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin_Loader
  *
- * @since x.x.x
+ * @since 1.0.0
  */
 class Loader {
 	/**
@@ -30,14 +30,14 @@ class Loader {
 	 *
 	 * @access private
 	 * @var object Class Instance.
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	private static $instance;
 
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function __construct() {
 		spl_autoload_register( [ $this, 'autoload' ] );
@@ -57,7 +57,7 @@ class Loader {
 	/**
 	 * Enqueue required setup after plugins loaded.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function setup(): void {
@@ -109,7 +109,7 @@ class Loader {
 	/**
 	 * Initiator
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return object initialized object of class.
 	 */
 	public static function get_instance() {
@@ -153,7 +153,7 @@ class Loader {
 	/**
 	 * Plugin Activation actions.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function activation_actions(): void {
 	}
@@ -161,7 +161,7 @@ class Loader {
 	/**
 	 * Plugin Deactivation actions.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function deactivation_actions(): void {
 	}
@@ -171,3 +171,4 @@ class Loader {
  * Kicking this off by calling 'get_instance()' method
  */
 Loader::get_instance();
+
