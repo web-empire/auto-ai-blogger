@@ -3,11 +3,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
-import { RefreshCw } from 'lucide-react';
-import { Tooltip } from '@wordpress/components';
 import { updateApiData } from '@Utils/ApiData';
-
-import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 
 export default function License() {
@@ -19,16 +15,7 @@ export default function License() {
 	const [ activationText, setActivationText ] = useState( __( 'Activate', 'wp-ai-blogger' ) );
 	const [ deactivationText, setDeactivationText ] = useState( __( 'Deactivate', 'wp-ai-blogger' ) );
 	const [ activated, setActivated ] = useState( 'licensed' === licenseStatus );
-	const tokenTotal = useSelector( ( state ) => state.tokenTotal ) || 0;
-	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining ) || 0;
-	const license = useSelector( ( state ) => state.license ) || '';
 	const abortControllerRef = useRef( {} );
-
-	// Calculate tokens used and format numbers
-	const tokensUsed = activated ? tokenTotal - tokenRemaining : 0;
-	const totalTokens = activated ? tokenTotal : 0;
-	const formattedTokensUsed = tokensUsed.toLocaleString();
-	const formattedTotalTokens = totalTokens.toLocaleString();
 
 	/**
 	 * Activate the license.
@@ -187,67 +174,12 @@ export default function License() {
 		} );
 	};
 
-	/**
-	 * Refresh token data.
-	 */
-	const refreshTokens = () => {
-		if ( licenseStatus !== 'licensed' || processing || ! license ) {
-			return;
-		}
-
-		setProcessing( true );
-
-		// Fetch fresh token data using the license key from Redux store
-		fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ license }`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} ).then( ( response ) => {
-			if ( ! response.ok ) {
-				throw new Error( `HTTP error! status: ${ response.status }` );
-			}
-			return response.json();
-		} ).then( async ( tokenData ) => {
-			if ( tokenData && tokenData.success && tokenData.data ) {
-				// Update the store with fresh token data
-				dispatch( {
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.data.total,
-				} );
-				dispatch( {
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.data.remaining,
-				} );
-
-				// Update API data
-				await updateApiData( 'tokenTotal', tokenData.data.total, dispatch, abortControllerRef );
-				await updateApiData( 'tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef );
-
-				dispatch( {
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Token data refreshed successfully!', 'wp-ai-blogger' ),
-				} );
-			} else {
-				throw new Error( 'Invalid response from token API.' );
-			}
-		} ).catch( ( error ) => {
-			console.error( 'Token refresh error:', error );
-			dispatch( {
-				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __( 'Failed to refresh token data', 'wp-ai-blogger' ),
-			} );
-		} ).finally( () => {
-			setProcessing( false );
-		} );
-	};
-
 	return (
 		<SettingsContainer
 			title={ __( 'License & Tokens', 'wp-ai-blogger' ) }
 			description={ __( 'Boost your AI Blogger capabilities by activating your license.', 'wp-ai-blogger' ) }
 			element={
-				<div className="grid grid-cols-2 gap-6 w-full">
+				<div className="w-full">
 					<div>
 						<SettingLabel forId="license-key" title={ __( 'License Key', 'wp-ai-blogger' ) } />
 						<div className="mt-2 flex gap-4">
@@ -288,40 +220,6 @@ export default function License() {
 							) }
 						</div>
 					</div>
-
-					<SettingField>
-						<SettingLabel forId="available-tokens" title={ __( 'Tokens Consumed', 'wp-ai-blogger' ) } />
-						<div className="flex gap-2 flex-row items-center mt-3">
-							<p className="text-sm text-gray-500 m-0 p-0">
-								{ formattedTokensUsed }
-								{ ' ' }
-								{ __( 'of', 'wp-ai-blogger' ) }
-								{ ' ' }
-								{ formattedTotalTokens }
-								{ ' ' }
-								{ __( 'Tokens Used', 'wp-ai-blogger' ) }
-							</p>
-							<button
-								disabled={ licenseStatus !== 'licensed' || processing || ! license }
-								className={ `
-									text-indigo-700 hover:text-indigo-900
-									bg-indigo-50 hover:bg-indigo-100
-									border border-indigo-200 hover:border-indigo-300
-									rounded-md px-2 py-1
-									flex items-center justify-center
-									font-medium
-									transition-all duration-200
-									focus:outline-none focus:ring-0
-									${ licenseStatus !== 'licensed' || processing || ! license ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-sm' }
-								` }
-								onClick={ refreshTokens }
-							>
-								<Tooltip text={ __( 'Refresh', 'wp-ai-blogger' ) } delay={ 100 } className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md">
-									<RefreshCw className={ `w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
-								</Tooltip>
-							</button>
-						</div>
-					</SettingField>
 				</div>
 			}
 		/>
