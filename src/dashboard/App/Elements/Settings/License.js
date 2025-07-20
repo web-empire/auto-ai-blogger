@@ -257,9 +257,8 @@ const License = memo(() => {
 
 			const tokenData = await response.json();
 
+			// Check if component is still mounted before proceeding
 			if (!isMountedRef.current) return;
-
-			console.log('Token data response:', tokenData);
 
 			if (tokenData?.success && tokenData?.data) {
 				// Update Redux store with token data
@@ -274,16 +273,22 @@ const License = memo(() => {
 
 				// Also save to backend for persistence
 				try {
-					await apiFetch({
-						path: '/wp-ai-blogger/v1/admin/settings/',
-						method: 'POST',
-						data: {
-							tokenTotal: tokenData.data.total,
-							tokenRemaining: tokenData.data.remaining,
-						},
-					});
+					// Only save if component is still mounted
+					if (isMountedRef.current) {
+						await apiFetch({
+							path: '/wp-ai-blogger/v1/admin/settings/',
+							method: 'POST',
+							data: {
+								tokenTotal: tokenData.data.total,
+								tokenRemaining: tokenData.data.remaining,
+							},
+						});
+					}
 				} catch (saveError) {
-					console.error('Failed to save token data to backend:', saveError);
+					// Only log if component is still mounted
+					if (isMountedRef.current) {
+						console.error('Failed to save token data to backend:', saveError);
+					}
 				}
 
 				return tokenData;
@@ -291,7 +296,10 @@ const License = memo(() => {
 				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
 			}
 		} catch (error) {
-			console.error('Token fetch error:', error);
+			// Only log errors if component is still mounted
+			if (isMountedRef.current) {
+				console.error('Token fetch error:', error);
+			}
 			throw error;
 		}
 	}, [license, dispatch]);
@@ -351,11 +359,11 @@ const License = memo(() => {
 
 			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
 
-			// Fetch token data directly from external API
+			// Fetch token data after successful license activation
 			try {
 				await fetchTokenData();
 			} catch (tokenError) {
-				console.error('Token fetch error:', tokenError);
+				console.error('Token fetch error after activation:', tokenError);
 				// Don't fail license activation if token fetch fails
 			}
 
@@ -366,7 +374,7 @@ const License = memo(() => {
 
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('License activated successfully!', 'wp-ai-blogger'),
+				payload: __('License activated and token data loaded successfully!', 'wp-ai-blogger'),
 			});
 		} catch (error) {
 			// Don't update state if component is unmounted or request was aborted
