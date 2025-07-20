@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -58,9 +59,6 @@ const RouteError = ( { type = 'not-found', message } ) => {
 				<button
 					onClick={ () => {
 						try {
-							const homeSlug = ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug )
-								? wpaib_localized_data.home_slug
-								: 'wp-ai-blogger';
 							window.location.href = `?page=${ homeSlug }`;
 						} catch ( error ) {
 							console.warn( 'Error navigating to home page:', error );
@@ -138,6 +136,10 @@ const PageLoader = () => (
 const PagesRoute = () => {
 	const { search } = useLocation();
 
+	// Redux selectors
+	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
+	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
+
 	// Memoize URL parsing with safe data access
 	const { page, path, isValidPage } = useMemo( () => {
 		try {
@@ -146,14 +148,12 @@ const PagesRoute = () => {
 			const currentPath = query.get( 'path' ) || '';
 
 			// Safely access localized data
-			const homeSlug = ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug )
-				? wpaib_localized_data.home_slug
-				: 'wp-ai-blogger';
+			const currentHomeSlug = homeSlug;
 
 			return {
 				page: currentPage,
 				path: currentPath,
-				isValidPage: currentPage === homeSlug,
+				isValidPage: currentPage === currentHomeSlug,
 			};
 		} catch ( error ) {
 			console.warn( 'Error parsing URL parameters:', error );
@@ -163,17 +163,12 @@ const PagesRoute = () => {
 				isValidPage: false,
 			};
 		}
-	}, [ search ] );
+	}, [ search, homeSlug ] );
 
 	// Memoize license status with safe data access
 	const isLicensed = useMemo( () => {
-		try {
-			return ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status === 'licensed' );
-		} catch ( error ) {
-			console.warn( 'Error accessing license status:', error );
-			return false;
-		}
-	}, [ wpaib_localized_data?.license_status ] );
+		return licenseStatus === 'licensed';
+	}, [ licenseStatus ] );
 
 	// Handle invalid page parameter
 	if ( ! isValidPage ) {

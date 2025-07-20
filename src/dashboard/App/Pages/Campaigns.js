@@ -6,7 +6,7 @@ import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import apiFetch from '@wordpress/api-fetch';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // Enhanced action button component with loading states
 const ActionButton = memo(({
@@ -249,8 +249,15 @@ EmptyState.displayName = 'CampaignsEmptyState';
 
 export default function Campaigns() {
 	const dispatch = useDispatch();
-	const campaigns = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.all_campaigns) || {};
-	const defaultMetaDefaults = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.postmeta_defaults) || {};
+
+	// Redux selectors
+	const allCampaigns = useSelector((state) => state.allCampaigns) || {};
+	const postmetaDefaults = useSelector((state) => state.postmetaDefaults) || {};
+	const adminNonce = useSelector((state) => state.adminNonce) || '';
+	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
+
+	const campaigns = allCampaigns;
+	const defaultMetaDefaults = postmetaDefaults;
 
 	const [configureData, setConfigureData] = useState(defaultMetaDefaults);
 	const [openDrawer, setOpenDrawer] = useState(false);
@@ -275,11 +282,11 @@ export default function Campaigns() {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wpaib_get_campaign_metadata');
-			formData.append('security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '');
+			formData.append('security', adminNonce);
 			formData.append('campaign_id', campaignId);
 
 			const response = await apiFetch({
-				url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
 				timeout: 30000
@@ -295,7 +302,7 @@ export default function Campaigns() {
 			setError(__('Failed to load campaign configuration', 'wp-ai-blogger'));
 			throw error;
 		}
-	}, []);
+	}, [adminNonce, ajaxUrl]);
 
 	// Enhanced configure handler
 	const configureCampaign = useCallback(async (e) => {
@@ -333,11 +340,11 @@ export default function Campaigns() {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wpaib_run_campaign');
-			formData.append('security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '');
+			formData.append('security', adminNonce);
 			formData.append('campaign_id', campaignId);
 
 			const data = await apiFetch({
-				url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
 				timeout: 60000
@@ -361,7 +368,7 @@ export default function Campaigns() {
 				payload: __('Failed to run campaign. Please try again.', 'wp-ai-blogger'),
 			});
 		}
-	}, [dispatch]);
+	}, [dispatch, adminNonce, ajaxUrl]);
 
 	// Enhanced status toggle handler
 	const toggleCampaignStatus = useCallback(async (campaignId, currentStatus) => {
