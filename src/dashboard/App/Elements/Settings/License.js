@@ -277,15 +277,6 @@ const License = memo(() => {
 
 		console.log('Fetching token data for license:', license);
 
-		// Cancel any existing token update request
-		if (abortControllerRef.current?.tokenUpdate) {
-			abortControllerRef.current.tokenUpdate.abort();
-		}
-
-		// Create new abort controller for this request
-		const abortController = new AbortController();
-		abortControllerRef.current.tokenUpdate = abortController;
-
 		try {
 			const response = await fetch(
 				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
@@ -302,14 +293,10 @@ const License = memo(() => {
 			const tokenData = await response.json();
 
 			if (tokenData?.success && tokenData?.data) {
-				// Update local state immediately for UI responsiveness
-				setLocalTokenData({
-					total: tokenData.data.total,
-					remaining: tokenData.data.remaining,
-					lastUpdated: new Date().toISOString()
-				});
+				console.log('TOKEN TOTAL:', tokenData.data.total);
+				console.log('TOKEN REMAINING:', tokenData.data.remaining);
 
-				// Update Redux state properly to maintain consistency
+				// Update Redux state immediately
 				dispatch({
 					type: 'UPDATE_TOKEN_TOTAL',
 					payload: tokenData.data.total,
@@ -320,24 +307,20 @@ const License = memo(() => {
 					payload: tokenData.data.remaining,
 				});
 
-				// Delayed backend save to prevent DOM conflicts
-				setTimeout(async () => {
-					try {
-						// Save token data to backend using individual calls with delay
-						await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
+				// Update local state for immediate UI response
+				setLocalTokenData({
+					total: tokenData.data.total,
+					remaining: tokenData.data.remaining,
+					lastUpdated: new Date().toISOString()
+				});
 
-						// Small delay between calls to prevent conflicts
-						setTimeout(async () => {
-							try {
-								await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
-							} catch (error) {
-								console.warn('Failed to save tokenRemaining to backend:', error);
-							}
-						}, 100);
-					} catch (error) {
-						console.warn('Failed to save tokenTotal to backend:', error);
-					}
-				}, 500); // Wait 500ms for UI to stabilize
+				// Save to backend sequentially without complex timing
+				try {
+					await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
+					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+				} catch (saveError) {
+					console.warn('Failed to save token data to backend:', saveError);
+				}
 
 				return tokenData;
 			} else {
@@ -346,11 +329,6 @@ const License = memo(() => {
 		} catch (error) {
 			console.error('Token fetch error:', error);
 			throw error;
-		} finally {
-			// Clean up abort controller
-			if (abortControllerRef.current?.tokenUpdate) {
-				delete abortControllerRef.current.tokenUpdate;
-			}
 		}
 	}, [license, dispatch]);
 
