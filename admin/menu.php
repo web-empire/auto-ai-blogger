@@ -9,7 +9,7 @@
  * @package wp-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
- * 
+ *
  */
 
 namespace WPAIBlogger\Admin;
@@ -184,19 +184,98 @@ class Menu {
 		$blog_name = sanitize_text_field( get_bloginfo( 'name' ) );
 		$admin_site_email_address = sanitize_email( get_option( 'admin_email' ) );
 
-		// Get settings with proper sanitization
-		$site_title = sanitize_text_field( Helper::get_option( 'siteTitle' ) );
-		$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription' ) );
-		$site_for = sanitize_text_field( Helper::get_option( 'siteFor' ) );
-		$license = $this->sanitize_license_data( Helper::get_option( 'license' ) );
-		$temperature = (float) Helper::get_option( 'temperature', 1 );
-		$harassment = absint( Helper::get_option( 'harassment', 0 ) );
-		$hate = absint( Helper::get_option( 'hate', 0 ) );
-		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 0 ) );
-		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 0 ) );
-		$post_ideas = $this->sanitize_post_ideas( Helper::get_option( 'postIdeas' ) );
-		$token_total = absint( Helper::get_option( 'tokenTotal' ) );
-		$token_remaining = absint( Helper::get_option( 'tokenRemaining' ) );
+		// Safely get settings with error handling
+		$site_title = '';
+		$site_description = '';
+		$site_for = '';
+		$license = '';
+		$temperature = 1.0;
+		$harassment = 0;
+		$hate = 0;
+		$sexually_explicit = 0;
+		$dangerous_content = 0;
+		$post_ideas = [];
+		$token_total = 0;
+		$token_remaining = 0;
+		$license_status = 'unlicensed';
+
+		try {
+			$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', '' ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get siteTitle - ' . $e->getMessage() );
+		}
+
+		try {
+			$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get siteDescription - ' . $e->getMessage() );
+		}
+
+		try {
+			$site_for = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get siteFor - ' . $e->getMessage() );
+		}
+
+		try {
+			$license = $this->sanitize_license_data( Helper::get_option( 'license', '' ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get license - ' . $e->getMessage() );
+		}
+
+		try {
+			$temperature = (float) Helper::get_option( 'temperature', 1 );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get temperature - ' . $e->getMessage() );
+		}
+
+		try {
+			$harassment = absint( Helper::get_option( 'harassment', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get harassment - ' . $e->getMessage() );
+		}
+
+		try {
+			$hate = absint( Helper::get_option( 'hate', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get hate - ' . $e->getMessage() );
+		}
+
+		try {
+			$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get sexuallyExplicit - ' . $e->getMessage() );
+		}
+
+		try {
+			$dangerous_content = absint( Helper::get_option( 'dangerousContent', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get dangerousContent - ' . $e->getMessage() );
+		}
+
+		try {
+			$post_ideas = $this->sanitize_post_ideas( Helper::get_option( 'postIdeas', [] ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get postIdeas - ' . $e->getMessage() );
+		}
+
+		try {
+			$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get tokenTotal - ' . $e->getMessage() );
+		}
+
+		try {
+			$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get tokenRemaining - ' . $e->getMessage() );
+		}
+
+		try {
+			$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get license_status - ' . $e->getMessage() );
+		}
 
 		// Validate numeric ranges
 		$temperature = max( 0, min( 2, $temperature ) );
@@ -226,7 +305,7 @@ class Menu {
 				'pro_version'        => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
 				'pro_purchase_url'   => esc_url( 'https://wpaiblogger.com/' ),
 				'licensing_nonce'    => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
-				'license_status'     => sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) ),
+				'license_status'     => $license_status,
 				'admin_email'        => $admin_site_email_address,
 				'site_title'         => $site_title,
 				'site_description'   => $site_description,
