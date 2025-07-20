@@ -162,11 +162,9 @@ function Settings() {
 		},
 	], []);
 
-	// Memoized computed values
-	const licenseEnabled = useMemo(() =>
-		'licensed' === ((typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status) || ''),
-		[]
-	);
+	// Memoized computed values - Use Redux state instead of localized data
+	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
+	const licenseEnabled = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
 
 	const siteDetailedUnfilled = useMemo(() =>
 		!siteTitle || !siteFor || !siteDescription,
