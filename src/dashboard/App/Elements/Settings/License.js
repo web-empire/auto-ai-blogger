@@ -5,101 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
-import { RefreshCw, Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import { updateApiData } from '@Utils/ApiData';
-
-// Enhanced license status component
-const LicenseStatus = memo(({ status, tokensUsed, totalTokens, onRefresh, isRefreshing }) => {
-	const statusConfig = useMemo(() => {
-		switch (status) {
-			case 'licensed':
-				return {
-					icon: <CheckCircle2 className="w-5 h-5 text-green-600" />,
-					text: __('Active License', 'wp-ai-blogger'),
-					bgColor: 'bg-green-50',
-					textColor: 'text-green-800',
-					borderColor: 'border-green-200'
-				};
-			default:
-				return {
-					icon: <AlertCircle className="w-5 h-5 text-amber-600" />,
-					text: __('No Active License', 'wp-ai-blogger'),
-					bgColor: 'bg-amber-50',
-					textColor: 'text-amber-800',
-					borderColor: 'border-amber-200'
-				};
-		}
-	}, [status]);
-
-	const usagePercentage = useMemo(() => {
-		if (!totalTokens || totalTokens === 0) return 0;
-		return Math.min((tokensUsed / totalTokens) * 100, 100);
-	}, [tokensUsed, totalTokens]);
-
-	return (
-		<div className={`p-4 rounded-lg border ${statusConfig.bgColor} ${statusConfig.borderColor}`}>
-			<div className="flex items-center justify-between mb-3">
-				<div className="flex items-center gap-2">
-					{statusConfig.icon}
-					<span className={`font-medium ${statusConfig.textColor}`}>
-						{statusConfig.text}
-					</span>
-				</div>
-
-				<button
-					type="button"
-					onClick={onRefresh}
-					disabled={status === 'licensed' ? false : true}
-					className={`p-1 ${status === 'licensed' ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:text-green-800 hover:bg-green-100'} rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1`}
-					aria-label={__('Refresh token data', 'wp-ai-blogger')}
-				>
-					<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-				</button>
-			</div>
-
-			<div className="space-y-2 transition-opacity duration-200">
-				<div className="flex justify-between text-sm">
-					<span className="text-gray-600">
-						{__('Tokens Used', 'wp-ai-blogger')}
-					</span>
-					<span className="font-medium text-gray-900">
-						{tokensUsed.toLocaleString()} / {totalTokens.toLocaleString()}
-					</span>
-				</div>
-
-				<div className="w-full bg-gray-200 rounded-full h-2">
-					<div
-						className={`h-2 rounded-full transition-all duration-300 ${
-							usagePercentage > 90 ? 'bg-red-500' :
-							usagePercentage > 75 ? 'bg-amber-500' : 'bg-green-500'
-						}`}
-						style={{ width: `${usagePercentage}%` }}
-						role="progressbar"
-						aria-valuenow={usagePercentage}
-						aria-valuemin={0}
-						aria-valuemax={100}
-						aria-label={__(`Token usage: ${usagePercentage.toFixed(1)}%`, 'wp-ai-blogger')}
-					/>
-				</div>
-
-				<p className="text-xs text-gray-500">
-					{status === 'licensed' ? (
-						<>
-							{usagePercentage > 90 && __('⚠️ Running low on tokens', 'wp-ai-blogger')}
-							{usagePercentage <= 90 && usagePercentage > 75 && __('📊 Moderate usage', 'wp-ai-blogger')}
-							{usagePercentage <= 75 && __('✅ Plenty of tokens available', 'wp-ai-blogger')}
-						</>
-					) : (
-						__('🔑 Activate license to access tokens', 'wp-ai-blogger')
-					)}
-				</p>
-			</div>
-		</div>
-	);
-});
-
-LicenseStatus.displayName = 'LicenseStatus';
 
 // Enhanced license activation form
 const LicenseForm = memo(({
@@ -225,148 +133,16 @@ const License = memo(() => {
 
 	// Redux selectors with fallbacks
 	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
-	const tokenTotal = useSelector((state) => state.tokenTotal) || 0;
-	const tokenRemaining = useSelector((state) => state.tokenRemaining) || 0;
 	const license = useSelector((state) => state.license) || '';
 
 	// Local state
 	const [processing, setProcessing] = useState(false);
-	const [refreshing, setRefreshing] = useState(false);
 	const [licenseKey, setLicenseKey] = useState('');
 	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
 	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
-	const [isTokenFetching, setIsTokenFetching] = useState(false);
-
-	// Local token state to prevent Redux conflicts
-	const [localTokenData, setLocalTokenData] = useState({
-		total: 0,
-		remaining: 0,
-		lastUpdated: null
-	});
-
-	// Initialize and sync local token data from Redux
-	useEffect(() => {
-		// Always sync token data from Redux state, regardless of activation status
-		setLocalTokenData({
-			total: tokenTotal,
-			remaining: tokenRemaining,
-			lastUpdated: new Date().toISOString()
-		});
-	}, [tokenTotal, tokenRemaining]);
 
 	// Computed values
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
-
-	// Use Redux state as primary source, with local state as enhancement for real-time updates
-	const displayTokenTotal = useMemo(() => {
-		// If we have fresh local data that's different from Redux, use it
-		if (localTokenData.lastUpdated && localTokenData.total !== tokenTotal) {
-			return localTokenData.total;
-		}
-		// Otherwise, always use Redux state as source of truth
-		return tokenTotal;
-	}, [localTokenData.total, localTokenData.lastUpdated, tokenTotal]);
-
-	const displayTokenRemaining = useMemo(() => {
-		// If we have fresh local data that's different from Redux, use it
-		if (localTokenData.lastUpdated && localTokenData.remaining !== tokenRemaining) {
-			return localTokenData.remaining;
-		}
-		// Otherwise, always use Redux state as source of truth
-		return tokenRemaining;
-	}, [localTokenData.remaining, localTokenData.lastUpdated, tokenRemaining]);
-
-	const tokensUsed = useMemo(() =>
-		activated ? displayTokenTotal - displayTokenRemaining : 0,
-		[activated, displayTokenTotal, displayTokenRemaining]
-	);
-
-	// Function to fetch token data from external API
-	const fetchTokenData = useCallback(async () => {
-		if (!license) {
-			console.log('No license available for token fetch:', license);
-			return;
-		}
-
-		// Prevent multiple simultaneous token fetches and don't interfere with license operations
-		if (isTokenFetching || processing) {
-			console.log('Token fetch skipped - already in progress or license operation active');
-			return;
-		}
-
-		console.log('Fetching token data for license:', license);
-		setIsTokenFetching(true);
-
-		try {
-			const response = await fetch(
-				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
-				{
-					method: 'GET',
-					headers: { 'Content-Type': 'application/json' },
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const tokenData = await response.json();
-
-			if (tokenData?.success && tokenData?.data) {
-				console.log('TOKEN TOTAL:', tokenData.data.total);
-				console.log('TOKEN REMAINING:', tokenData.data.remaining);
-
-				// Store the data for later use
-				const fetchedData = {
-					total: tokenData.data.total,
-					remaining: tokenData.data.remaining
-				};
-
-				// Step 1: Update local state first for immediate UI feedback
-				setLocalTokenData({
-					total: fetchedData.total,
-					remaining: fetchedData.remaining,
-					lastUpdated: new Date().toISOString()
-				});
-
-				// Step 2: Sequential Redux updates to prevent conflicts
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: fetchedData.total,
-				});
-
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: fetchedData.remaining,
-				});
-
-				// Step 3: Sequential backend updates with proper awaiting
-				try {
-					console.log('Attempting to save tokenTotal:', fetchedData.total);
-					await updateApiData('tokenTotal', fetchedData.total, dispatch);
-					console.log('Successfully saved tokenTotal');
-
-					console.log('Attempting to save tokenRemaining:', fetchedData.remaining);
-					await updateApiData('tokenRemaining', fetchedData.remaining, dispatch);
-					console.log('Successfully saved tokenRemaining');
-				} catch (saveError) {
-					console.error('Backend save failed (non-critical):', saveError);
-					// Don't throw error here - token data was successfully fetched and UI updated
-				}
-
-				// Return success - token data was fetched successfully
-				return { success: true, data: tokenData.data };
-			} else {
-				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
-			}
-		} catch (error) {
-			console.error('Token fetch error:', error);
-			throw error;
-		} finally {
-			// Reset the flag after operations complete
-			setIsTokenFetching(false);
-		}
-	}, [license, dispatch, isTokenFetching, processing]);
 
 	// Cleanup effect
 	useEffect(() => {
@@ -422,25 +198,12 @@ const License = memo(() => {
 
 			console.log('License key set in Redux:', licenseKey);
 
-			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
-
-			// Fetch token data after successful license activation
-			try {
-				const tokenResult = await fetchTokenData();
-				if (!tokenResult?.success) {
-					console.warn('Token fetch failed after activation, but license is still active');
-				}
-			} catch (tokenError) {
-				console.error('Token fetch error after activation:', tokenError);
-				// Don't fail license activation if token fetch fails
-			}
-
 			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setLicenseKey('');
 
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('License activated and token data loaded successfully!', 'wp-ai-blogger'),
+				payload: __('License activated successfully!', 'wp-ai-blogger'),
 			});
 		} catch (error) {
 			if (error.name === 'AbortError') return;
@@ -485,37 +248,20 @@ const License = memo(() => {
 				signal: abortController.signal
 			});
 
-			if (response.success) {
-				setLicenseKey('');
-				dispatch({
-					type: 'UPDATE_LICENSE_STATUS',
-					payload: 'unlicensed',
-				});
-				dispatch({
-					type: 'UPDATE_LICENSE',
-					payload: '',
-				});
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: 0,
-				});
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: 0,
-				});
-
-				// Also reset local token data
-				setLocalTokenData({
-					total: 0,
-					remaining: 0,
-					lastUpdated: new Date().toISOString()
-				});
-
-				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
-				setActivationText(__('Activate', 'wp-ai-blogger'));
-			}
-
+		if (response.success) {
+			setLicenseKey('');
 			dispatch({
+				type: 'UPDATE_LICENSE_STATUS',
+				payload: 'unlicensed',
+			});
+			dispatch({
+				type: 'UPDATE_LICENSE',
+				payload: '',
+			});
+
+			setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
+			setActivationText(__('Activate', 'wp-ai-blogger'));
+		}			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
 			});
@@ -529,37 +275,6 @@ const License = memo(() => {
 			delete abortControllerRef.current['deactivation'];
 		}
 	}, [processing, dispatch]);
-
-	// Enhanced token refresh
-	const refreshTokens = useCallback(async () => {
-		if (licenseStatus !== 'licensed' || refreshing || !license || isTokenFetching) return;
-
-		setRefreshing(true);
-
-		try {
-			const result = await fetchTokenData();
-
-			// Check if token data was successfully fetched (even if backend save failed)
-			if (result?.success) {
-				dispatch({
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
-				});
-			} else {
-				throw new Error(__('Failed to fetch token data from server', 'wp-ai-blogger'));
-			}
-		} catch (error) {
-			console.error('Token refresh error:', error);
-
-			// Only show error if the external API call actually failed
-			dispatch({
-				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: error.message || __('Failed to refresh token data', 'wp-ai-blogger'),
-			});
-		} finally {
-			setRefreshing(false);
-		}
-	}, [licenseStatus, refreshing, license, isTokenFetching, fetchTokenData, dispatch]);
 
 	// Reset button states when activation status changes
 	useEffect(() => {
@@ -581,22 +296,13 @@ const License = memo(() => {
 				</div>
 				<div>
 					<h2 className="text-xl font-bold text-gray-900">
-						{__('License & Token Management', 'wp-ai-blogger')}
+						{__('License Management', 'wp-ai-blogger')}
 					</h2>
 					<p className="text-gray-600 text-sm">
-						{__('Manage your license and monitor AI token usage', 'wp-ai-blogger')}
+						{__('Activate your license to unlock premium AI features', 'wp-ai-blogger')}
 					</p>
 				</div>
 			</div>
-
-			{/* License status overview */}
-			<LicenseStatus
-				status={licenseStatus}
-				tokensUsed={tokensUsed}
-				totalTokens={displayTokenTotal}
-				onRefresh={refreshTokens}
-				isRefreshing={refreshing}
-			/>
 
 			{/* Settings container */}
 			<SettingsContainer
@@ -620,7 +326,7 @@ const License = memo(() => {
 			{/* Screen reader status */}
 			<div className="sr-only" aria-live="polite">
 				{activated
-					? __(`License is active with ${displayTokenRemaining} tokens remaining`, 'wp-ai-blogger')
+					? __('License is active', 'wp-ai-blogger')
 					: __('No active license', 'wp-ai-blogger')
 				}
 			</div>
