@@ -50,17 +50,15 @@ const LicenseStatus = memo(({ status, tokensUsed, totalTokens, onRefresh, isRefr
 				<button
 					type="button"
 					onClick={onRefresh}
-					disabled={isRefreshing}
-					className={`p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${
-						status === 'licensed' ? 'opacity-100 visible' : 'opacity-0 invisible'
-					}`}
+					disabled={true}
+					className="p-1 text-gray-400 cursor-not-allowed rounded transition-all duration-200"
 					aria-label={__('Refresh token data', 'wp-ai-blogger')}
 				>
-					<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+					<RefreshCw className="w-4 h-4" />
 				</button>
 			</div>
 
-			<div className={`space-y-2 transition-opacity duration-200 ${status === 'licensed' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
+			<div className="space-y-2 transition-opacity duration-200">
 				<div className="flex justify-between text-sm">
 					<span className="text-gray-600">
 						{__('Tokens Used', 'wp-ai-blogger')}
@@ -86,9 +84,15 @@ const LicenseStatus = memo(({ status, tokensUsed, totalTokens, onRefresh, isRefr
 				</div>
 
 				<p className="text-xs text-gray-500">
-					{usagePercentage > 90 && __('⚠️ Running low on tokens', 'wp-ai-blogger')}
-					{usagePercentage <= 90 && usagePercentage > 75 && __('📊 Moderate usage', 'wp-ai-blogger')}
-					{usagePercentage <= 75 && __('✅ Plenty of tokens available', 'wp-ai-blogger')}
+					{status === 'licensed' ? (
+						<>
+							{usagePercentage > 90 && __('⚠️ Running low on tokens', 'wp-ai-blogger')}
+							{usagePercentage <= 90 && usagePercentage > 75 && __('📊 Moderate usage', 'wp-ai-blogger')}
+							{usagePercentage <= 75 && __('✅ Plenty of tokens available', 'wp-ai-blogger')}
+						</>
+					) : (
+						__('🔑 Activate license to access tokens', 'wp-ai-blogger')
+					)}
 				</p>
 			</div>
 		</div>
