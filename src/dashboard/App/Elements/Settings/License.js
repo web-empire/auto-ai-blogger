@@ -228,9 +228,6 @@ const License = memo(() => {
 	const tokenRemaining = useSelector((state) => state.tokenRemaining) || 0;
 	const license = useSelector((state) => state.license) || '';
 
-	// Debug: Log current Redux state values
-	console.log('Current Redux state - licenseStatus:', licenseStatus, 'tokenTotal:', tokenTotal, 'tokenRemaining:', tokenRemaining);
-
 	// Local state
 	const [processing, setProcessing] = useState(false);
 	const [licenseKey, setLicenseKey] = useState('');
@@ -240,6 +237,64 @@ const License = memo(() => {
 	// Computed values
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
 	const tokensUsed = useMemo(() => activated ? tokenTotal - tokenRemaining : 0, [activated, tokenTotal, tokenRemaining]);
+
+	// Function to fetch token data from external API
+	const fetchTokenData = useCallback(async () => {
+		if (!license || !isMountedRef.current) return;
+
+		try {
+			const response = await fetch(
+				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
+				{
+					method: 'GET',
+					headers: { 'Content-Type': 'application/json' },
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const tokenData = await response.json();
+
+			if (!isMountedRef.current) return;
+
+			console.log('Token data response:', tokenData);
+
+			if (tokenData?.success && tokenData?.data) {
+				// Update Redux store with token data
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: tokenData.data.total,
+				});
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: tokenData.data.remaining,
+				});
+
+				// Also save to backend for persistence
+				try {
+					await apiFetch({
+						path: '/wp-ai-blogger/v1/admin/settings/',
+						method: 'POST',
+						data: {
+							tokenTotal: tokenData.data.total,
+							tokenRemaining: tokenData.data.remaining,
+						},
+					});
+				} catch (saveError) {
+					console.error('Failed to save token data to backend:', saveError);
+				}
+
+				return tokenData;
+			} else {
+				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
+			}
+		} catch (error) {
+			console.error('Token fetch error:', error);
+			throw error;
+		}
+	}, [license, dispatch]);
 
 	// Cleanup effect to prevent memory leaks and React errors
 	useEffect(() => {
@@ -286,65 +341,22 @@ const License = memo(() => {
 				throw new Error(response?.data?.message || __('License activation failed', 'wp-ai-blogger'));
 			}
 
-			// Debug: Log the activation response
-			console.log('License activation response:', response);
-
 			// Update license status
 			dispatch({
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'licensed',
 			});
 
-			// Update token data directly from activation response if available
-			if (response.data && typeof response.data.tokenTotal !== 'undefined') {
-				console.log('Updating tokenTotal from activation response:', response.data.tokenTotal);
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: response.data.tokenTotal,
-				});
-			}
-			if (response.data && typeof response.data.tokenRemaining !== 'undefined') {
-				console.log('Updating tokenRemaining from activation response:', response.data.tokenRemaining);
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: response.data.tokenRemaining,
-				});
-			}
-
 			if (!isMountedRef.current) return;
 
-			setActivationText(__('Loading token data...', 'wp-ai-blogger'));
+			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
 
-			// Also refresh settings to ensure we have the latest data
+			// Fetch token data directly from external API
 			try {
-				const settingsResponse = await apiFetch({
-					path: '/wp-ai-blogger/v1/admin/settings/',
-					signal: abortController.signal
-				});
-
-				if (settingsResponse && !isMountedRef.current) return;
-
-				// Debug: Log the settings response
-				console.log('Settings refresh response:', settingsResponse);
-
-				// Update Redux store with any additional settings data (backup in case activation response didn't include tokens)
-				if (settingsResponse.tokenTotal !== undefined && !response.data?.tokenTotal) {
-					console.log('Updating tokenTotal from settings refresh:', settingsResponse.tokenTotal);
-					dispatch({
-						type: 'UPDATE_TOKEN_TOTAL',
-						payload: settingsResponse.tokenTotal,
-					});
-				}
-				if (settingsResponse.tokenRemaining !== undefined && !response.data?.tokenRemaining) {
-					console.log('Updating tokenRemaining from settings refresh:', settingsResponse.tokenRemaining);
-					dispatch({
-						type: 'UPDATE_TOKEN_REMAINING',
-						payload: settingsResponse.tokenRemaining,
-					});
-				}
-			} catch (settingsError) {
-				console.error('Failed to refresh settings:', settingsError);
-				// Continue with activation success even if settings refresh fails
+				await fetchTokenData();
+			} catch (tokenError) {
+				console.error('Token fetch error:', tokenError);
+				// Don't fail license activation if token fetch fails
 			}
 
 			if (!isMountedRef.current) return;
@@ -452,53 +464,18 @@ const License = memo(() => {
 
 		setProcessing(true);
 
-		// Create abort controller for this request
-		const abortController = new AbortController();
-		abortControllerRef.current['refresh'] = abortController;
-
 		try {
-			const response = await fetch(
-				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
-				{
-					method: 'GET',
-					headers: { 'Content-Type': 'application/json' },
-					signal: abortController.signal
-				}
-			);
+			await fetchTokenData();
 
-			// Check if component is still mounted before updating state
-			if (!isMountedRef.current) return;
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const tokenData = await response.json();
-
-			if (!isMountedRef.current) return;
-
-			if (tokenData?.success && tokenData?.data) {
+			if (isMountedRef.current) {
 				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.data.total,
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
 				});
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.data.remaining,
-				});
-
-				if (isMountedRef.current) {
-					dispatch({
-						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-						payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
-					});
-				}
-			} else {
-				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
 			}
 		} catch (error) {
-			// Don't update state if component is unmounted or request was aborted
-			if (!isMountedRef.current || error.name === 'AbortError') return;
+			// Don't update state if component is unmounted
+			if (!isMountedRef.current) return;
 
 			console.error('Token refresh error:', error);
 			dispatch({
@@ -509,10 +486,8 @@ const License = memo(() => {
 			if (isMountedRef.current) {
 				setProcessing(false);
 			}
-			// Clean up abort controller
-			delete abortControllerRef.current['refresh'];
 		}
-	}, [licenseStatus, processing, license, dispatch]);
+	}, [licenseStatus, processing, license, fetchTokenData, dispatch]);
 
 	// Reset button states when activation status changes
 	useEffect(() => {

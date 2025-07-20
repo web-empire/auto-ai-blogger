@@ -232,22 +232,12 @@ class Licensing {
 			// Save license data to admin settings for frontend access
 			Helper::update_option( 'license_status', 'licensed' );
 
-			// Fetch and save token data - ensure it completes before responding
-			$token_fetch_success = $this->fetch_and_save_token_data( $license_key );
-
 			// Log successful activation
 			$this->log_license_activity( 'activate', $license_key, get_current_user_id() );
 
-			// Get the token data for the response
-			$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
-			$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
-
 			wp_send_json_success( [
 				'message' => __( 'License activated successfully.', 'wp-ai-blogger' ),
-				'status' => 'licensed',
-				'tokenTotal' => $token_total,
-				'tokenRemaining' => $token_remaining,
-				'tokenFetchSuccess' => $token_fetch_success
+				'status' => 'licensed'
 			] );
 
 		} catch ( \Exception $e ) {
