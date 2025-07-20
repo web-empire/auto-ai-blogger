@@ -38,13 +38,94 @@ class Scheduler {
 
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
 
-		// add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
-		// foreach ( $this->schedules as $campaign_id => $days ) {
-		// if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
-		// $args = [ $campaign_id ];
-		// wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
-		// }
-		// }
+		// Initialize WP Cron schedules for campaigns.
+		add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
+		$this->setup_campaign_schedules();
+	}
+
+	/**
+	 * Setup individual campaign schedules.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	private function setup_campaign_schedules(): void {
+		foreach ( $this->schedules as $campaign_id => $schedule_data ) {
+			try {
+				// Validate campaign ID.
+				$campaign_id = absint( $campaign_id );
+				if ( ! $campaign_id ) {
+					continue;
+				}
+
+				// Check if the target is reached..
+				if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
+					wpaib_clear_campaign_schedule( $campaign_id );
+					continue;
+				}
+
+				// Validate schedule data.
+				if ( ! is_array( $schedule_data ) || empty( $schedule_data['interval'] ) || empty( $schedule_data['unit'] ) ) {
+					continue;
+				}
+
+				$schedule_name = $this->get_schedule_name( $schedule_data );
+
+				// Check if event is already scheduled.
+				$hook_name = 'wp_ai_blogger_create_blog_post';
+				$args      = [ $campaign_id ];
+
+				if ( ! wp_next_scheduled( $hook_name, $args ) ) {
+					// Schedule the event.
+					wp_schedule_event( time(), $schedule_name, $hook_name, $args );
+				}
+			} catch ( \Exception $e ) {
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * Get schedule interval in seconds.
+	 *
+	 * @param array $schedule_data Schedule data with interval and unit.
+	 * @return int Interval in seconds.
+	 * @since x.x.x
+	 */
+	private function get_schedule_interval_seconds( $schedule_data ): int {
+		$interval = absint( $schedule_data['interval'] ?? 1 );
+		$unit     = sanitize_text_field( $schedule_data['unit'] ?? 'day' );
+
+		$multipliers = [
+			'day'   => DAY_IN_SECONDS,
+			'week'  => WEEK_IN_SECONDS,
+			'month' => MONTH_IN_SECONDS,
+			'year'  => YEAR_IN_SECONDS,
+		];
+
+		// Fallback for missing constants.
+		if ( ! defined( 'MONTH_IN_SECONDS' ) ) {
+			$multipliers['month'] = 30 * DAY_IN_SECONDS;
+		}
+		if ( ! defined( 'YEAR_IN_SECONDS' ) ) {
+			$multipliers['year'] = 365 * DAY_IN_SECONDS;
+		}
+
+		return $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
+	}
+
+	/**
+	 * Get schedule name for WP Cron.
+	 *
+	 * @param array $schedule_data Schedule data with interval and unit.
+	 * @return string Schedule name.
+	 * @since x.x.x
+	 */
+	private function get_schedule_name( $schedule_data ): string {
+		$interval = absint( $schedule_data['interval'] ?? 1 );
+		$unit     = sanitize_text_field( $schedule_data['unit'] ?? 'day' );
+
+		return "wpaib_every_{$interval}_{$unit}" . ( $interval > 1 ? 's' : '' );
 	}
 
 	/**
@@ -55,27 +136,31 @@ class Scheduler {
 	 * @return array
 	 */
 	public function custom_cron_schedules( $schedules ) {
-		// $this->schedules has the days so adjust them in schedules.
-		foreach ( $this->schedules as $campaign_id => $days ) {
+		foreach ( $this->schedules as $campaign_id => $schedule_data ) {
 			// Check if the target is reached.
 			if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
 				continue;
 			}
 
-			// Add the schedule.
-			$days = absint( $days );
+			$schedule_name    = $this->get_schedule_name( $schedule_data );
+			$interval_seconds = $this->get_schedule_interval_seconds( $schedule_data );
 
 			// Check if the schedule already exists.
-			if ( isset( $schedules[ 'per_' . $days . '_days' ] ) ) {
+			if ( isset( $schedules[ $schedule_name ] ) ) {
 				continue;
 			}
 
-			$schedules[ 'per_' . $days . '_days' ] = [
-				'interval' => $days * 24 * 60 * 60,
+			$interval   = absint( $schedule_data['interval'] ?? 1 );
+			$unit       = sanitize_text_field( $schedule_data['unit'] ?? 'day' );
+			$unit_label = $interval > 1 ? $unit . 's' : $unit;
+
+			$schedules[ $schedule_name ] = [
+				'interval' => $interval_seconds,
 				'display'  => sprintf(
-					/* translators: %d: number of days */
-					__( 'Every %d days', 'wp-ai-blogger' ),
-					$days
+					/* translators: %1$d: interval number, %2$s: time unit */
+					__( 'Every %1$d %2$s', 'wp-ai-blogger' ),
+					$interval,
+					$unit_label
 				),
 			];
 		}
@@ -92,26 +177,36 @@ class Scheduler {
 	 * @return string|void|int|WP_Error
 	 */
 	public function create_blog_post( $campaign_id ) {
+		// Validate campaign ID.
+		$campaign_id = absint( $campaign_id );
+		if ( ! $campaign_id ) {
+			return new \WP_Error( 'invalid_campaign_id', __( 'Invalid campaign ID.', 'wp-ai-blogger' ) );
+		}
+
 		// Get the campaign instance.
 		$campaign = get_post( $campaign_id );
 
 		// Check if the campaign is valid.
-		if ( ! $campaign ) {
-			return __( 'Invalid campaign ID.', 'wp-ai-blogger' );
+		if ( ! $campaign || WP_AI_BLOGGER_CPT_CAMPAIGN !== $campaign->post_type ) {
+			return new \WP_Error( 'campaign_not_found', __( 'Campaign not found.', 'wp-ai-blogger' ) );
 		}
 
-		// Check if the campaign is valid.
+		// Check if the campaign is active.
 		$campaign_status = Metadata::get_campaign_meta( $campaign_id, 'status' );
-		if ( empty( $campaign_status ) || $campaign_status !== 'publish' ) {
-			return __( 'Campaign is not active.', 'wp-ai-blogger' );
+		if ( empty( $campaign_status ) || 'publish' !== $campaign_status ) {
+			return new \WP_Error( 'campaign_inactive', __( 'Campaign is not active.', 'wp-ai-blogger' ) );
 		}
 
 		// Check if the target is reached.
 		if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
-			return __( 'Campaign posts target already achieved.', 'wp-ai-blogger' );
+			// Clean up schedule since target is reached.
+			wpaib_clear_campaign_schedule( $campaign_id );
+			return new \WP_Error( 'target_achieved', __( 'Campaign posts target already achieved.', 'wp-ai-blogger' ) );
 		}
 
 		// Create the blog post.
-		return wpaib_create_blog_post( $campaign_id );
+		$result = wpaib_create_blog_post( $campaign_id );
+
+		return $result;
 	}
 }

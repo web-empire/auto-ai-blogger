@@ -48,6 +48,7 @@ class Ajax {
 		'wpaib_create_post',
 		'wpaib_run_campaign',
 		'wpaib_get_campaign_analytics',
+		'wpaib_delete_campaign',
 	];
 
 	/**
@@ -165,8 +166,8 @@ class Ajax {
 		}
 
 		// Add schedule data in DB separately to manage effectively.
-		if ( ! empty( $formatted_campaign_data['meta_input']['frequency'] ) ) {
-			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['frequency'] );
+		if ( ! empty( $formatted_campaign_data['meta_input']['repeatInterval'] ) && ! empty( $formatted_campaign_data['meta_input']['repeatUnit'] ) ) {
+			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['repeatInterval'], $formatted_campaign_data['meta_input']['repeatUnit'] );
 		}
 
 		wp_send_json_success(
@@ -215,8 +216,8 @@ class Ajax {
 		}
 
 		// Add schedule data in DB separately to manage effectively.
-		if ( ! empty( $formatted_campaign_data['meta_input']['frequency'] ) ) {
-			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['frequency'] );
+		if ( ! empty( $formatted_campaign_data['meta_input']['repeatInterval'] ) && ! empty( $formatted_campaign_data['meta_input']['repeatUnit'] ) ) {
+			wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['repeatInterval'], $formatted_campaign_data['meta_input']['repeatUnit'] );
 		}
 
 		if ( $updated ) {
@@ -451,9 +452,49 @@ class Ajax {
 			'daysActive'     => $days_active,
 			'authorName'     => $author_name,
 			'topPosts'       => $top_posts,
-			'lastRun'        => Metadata::get_campaign_meta( $campaign_id, 'last_run' ) ?: __( 'Never', 'wp-ai-blogger' ),
+			'lastRun'        => Metadata::get_campaign_meta( $campaign_id, 'lastRun' ),
 		];
 
 		wp_send_json_success( $analytics_data );
+	}
+
+	/**
+	 * Handler to delete campaign.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function wpaib_delete_campaign(): void {
+		if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+		}
+
+		$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+		if ( ! $campaign_id ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+
+		// Security check: Verify the post exists and is a campaign post type.
+		$campaign_post = get_post( $campaign_id );
+		if ( ! $campaign_post || WP_AI_BLOGGER_CPT_CAMPAIGN !== $campaign_post->post_type ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid campaign ID or unauthorized access.', 'wp-ai-blogger' ) ] );
+		}
+
+		// Additional permission check: Ensure user can delete this campaign.
+		if ( ! current_user_can( 'delete_post', $campaign_id ) ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
+		}
+
+		// Delete the campaign and related data.
+		$deleted = wp_delete_post( $campaign_id, true ); // Force delete (bypass trash).
+
+		if ( $deleted ) {
+			// Clean up any related metadata.
+			delete_post_meta( $campaign_id, 'wp_aib_campaign_data' );
+
+			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
+		} else {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
 	}
 }

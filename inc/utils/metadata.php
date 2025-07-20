@@ -59,6 +59,14 @@ class Metadata {
 					'default' => '',
 					'type'    => 'number',
 				],
+				'repeatInterval'          => [
+					'default' => 1,
+					'type'    => 'number',
+				],
+				'repeatUnit'              => [
+					'default' => 'day',
+					'type'    => 'string',
+				],
 				'postType'                => [
 					'default' => 'post',
 					'type'    => 'string',
@@ -252,11 +260,11 @@ class Metadata {
 	}
 
 	/**
-	 * Format post metadata in a way that it can be saved in the database via wp_insert_post.
+	 * Format the data.
 	 *
-	 * @param array $postdata The metadata to format.
+	 * @param array $postdata The post data.
+	 * @return array
 	 * @since x.x.x
-	 * @return array The formatted metadata.
 	 */
 	public static function format_data( $postdata ) {
 		$defaults = self::get_default_settings();
@@ -267,6 +275,16 @@ class Metadata {
 			if ( in_array( $key, $skippable_keys, true ) ) {
 				continue;
 			}
+
+			// Special validation for repeat interval fields.
+			if ( 'repeatInterval' === $key ) {
+				$value = absint( $value );
+				$value = max( 1, min( 365, $value ) ); // Between 1 and 365.
+			} elseif ( 'repeatUnit' === $key ) {
+				$allowed_units = [ 'day', 'week', 'month', 'year' ];
+				$value         = in_array( $value, $allowed_units, true ) ? $value : 'day';
+			}
+
 			$meta_data[ $key ] = $value;
 		}
 
@@ -324,14 +342,36 @@ class Metadata {
 		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
 		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
 		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
+		$repeat_interval    = absint( $metadata['repeatInterval'] ?? 1 );
+		$repeat_unit        = sanitize_text_field( $metadata['repeatUnit'] ?? 'day' );
 		$last_run_on        = absint( $metadata['lastRun'] ?? 0 );
 
 		if ( ! $plain_metadata ) {
 			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
 			$metadata['postsTarget'] = $meta_posts_target;
 
-			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
-			$metadata['frequency'] = $meta_frequency;
+			// Use new repeat system if available, fallback to old frequency.
+			if ( $repeat_interval && $repeat_unit ) {
+				$unit_labels         = [
+					'day'   => _n( 'Day', 'Days', $repeat_interval, 'wp-ai-blogger' ),
+					'week'  => _n( 'Week', 'Weeks', $repeat_interval, 'wp-ai-blogger' ),
+					'month' => _n( 'Month', 'Months', $repeat_interval, 'wp-ai-blogger' ),
+					'year'  => _n( 'Year', 'Years', $repeat_interval, 'wp-ai-blogger' ),
+				];
+				$unit_label          = $unit_labels[ $repeat_unit ] ?? ucfirst( $repeat_unit );
+				$formatted_frequency = sprintf(
+					/* translators: %1$s: Every, %2$d: interval number, %3$s: time unit */
+					__( '%1$s %2$d %3$s', 'wp-ai-blogger' ),
+					__( 'Every', 'wp-ai-blogger' ),
+					$repeat_interval,
+					$unit_label
+				);
+			} else {
+				// Fallback to old frequency display.
+				$formatted_frequency = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
+			}
+
+			$metadata['frequency'] = $formatted_frequency;
 		}
 
 		if ( $last_run_on ) {

@@ -270,12 +270,23 @@ function wpaib_get_schedules() {
 		return [];
 	}
 
-	foreach ( $schedules as $campaign_id => $days ) {
+	foreach ( $schedules as $campaign_id => $schedule_data ) {
 		$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 		$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 
 		if ( $posts_target <= $posts_created ) {
 			unset( $schedules[ $campaign_id ] );
+			continue;
+		} elseif ( is_array( $schedule_data ) ) {
+			// Ensure new format has all required fields.
+			$schedules[ $campaign_id ] = wp_parse_args(
+				$schedule_data,
+				[
+					'interval' => 1,
+					'unit'     => 'day',
+					'days'     => 1,
+				]
+			);
 		}
 	}
 
@@ -283,23 +294,155 @@ function wpaib_get_schedules() {
 }
 
 /**
- * Get all custom schedules to schedule auto blog posts.
+ * Update campaign schedules with interval and unit.
  *
- * @param int $campaign_id Campaign ID.
- * @param int $days       Days.
+ * @param int    $campaign_id Campaign ID.
+ * @param int    $interval    Repeat interval (number).
+ * @param string $unit        Repeat unit (day, week, month, year).
  * @return void
  * @since x.x.x
  */
-function wpaib_update_schedules( $campaign_id, $days ): void {
-	$schedules = wpaib_get_schedules();
+function wpaib_update_schedules( $campaign_id, $interval, $unit = 'day' ): void {
+	// Validate inputs.
+	$campaign_id = absint( $campaign_id );
+	$interval    = absint( $interval );
+	$unit        = sanitize_text_field( $unit );
 
-	if ( ! empty( $schedules[ $campaign_id ] ) ) {
-		$schedules[ $campaign_id ] = $days;
-	} else {
-		$schedules[ $campaign_id ] = $days;
+	if ( ! $campaign_id || ! $interval ) {
+		return;
 	}
 
+	// Validate unit.
+	$allowed_units = [ 'day', 'week', 'month', 'year' ];
+	if ( ! in_array( $unit, $allowed_units, true ) ) {
+		$unit = 'day';
+	}
+
+	// Validate interval limits based on unit.
+	$max_intervals = [
+		'day'   => 365, // Max 1 year in days.
+		'week'  => 52,  // Max 1 year in weeks.
+		'month' => 24,  // Max 2 years in months.
+		'year'  => 5,   // Max 5 years.
+	];
+
+	if ( $interval > $max_intervals[ $unit ] ) {
+		$interval = $max_intervals[ $unit ];
+	}
+
+	$schedules = wpaib_get_schedules();
+
+	// Store both interval and unit for new system.
+	$schedules[ $campaign_id ] = [
+		'interval' => $interval,
+		'unit'     => $unit,
+		'days'     => wpaib_convert_to_days( $interval, $unit ), // For backward compatibility.
+	];
+
 	update_option( 'wpaib_auto_blogging_schedules', $schedules );
+}
+
+/**
+ * Convert interval and unit to days for scheduler compatibility.
+ *
+ * @param int    $interval Repeat interval.
+ * @param string $unit     Repeat unit.
+ * @return int Days equivalent.
+ * @since x.x.x
+ */
+function wpaib_convert_to_days( $interval, $unit ): int {
+	$multipliers = [
+		'day'   => 1,
+		'week'  => 7,
+		'month' => 30, // Approximate.
+		'year'  => 365, // Approximate.
+	];
+
+	return absint( $interval * ( $multipliers[ $unit ] ?? 1 ) );
+}
+
+/**
+ * Clear campaign schedule from WP Cron.
+ *
+ * @param int $campaign_id Campaign ID.
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_clear_campaign_schedule( $campaign_id ): void {
+	$campaign_id = absint( $campaign_id );
+	if ( ! $campaign_id ) {
+		return;
+	}
+
+	$hook_name = 'wp_ai_blogger_create_blog_post';
+	$args      = [ $campaign_id ];
+
+	// Get next scheduled time.
+	$timestamp = wp_next_scheduled( $hook_name, $args );
+
+	if ( $timestamp ) {
+		wp_unschedule_event( $timestamp, $hook_name, $args );
+	}
+
+	// Remove from schedules option.
+	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
+	if ( isset( $schedules[ $campaign_id ] ) ) {
+		unset( $schedules[ $campaign_id ] );
+		update_option( 'wpaib_auto_blogging_schedules', $schedules );
+	}
+}
+
+/**
+ * Get formatted schedule display text.
+ *
+ * @param int $campaign_id Campaign ID.
+ * @return string Formatted schedule text.
+ * @since x.x.x
+ */
+function wpaib_get_campaign_schedule_display( $campaign_id ): string {
+	$schedules = wpaib_get_schedules();
+
+	if ( ! isset( $schedules[ $campaign_id ] ) ) {
+		return __( 'Not scheduled', 'wp-ai-blogger' );
+	}
+
+	$schedule_data = $schedules[ $campaign_id ];
+	$interval      = absint( $schedule_data['interval'] ?? 1 );
+	$unit          = sanitize_text_field( $schedule_data['unit'] ?? 'day' );
+
+	$unit_labels = [
+		'day'   => _n( 'day', 'days', $interval, 'wp-ai-blogger' ),
+		'week'  => _n( 'week', 'weeks', $interval, 'wp-ai-blogger' ),
+		'month' => _n( 'month', 'months', $interval, 'wp-ai-blogger' ),
+		'year'  => _n( 'year', 'years', $interval, 'wp-ai-blogger' ),
+	];
+
+	$unit_label = $unit_labels[ $unit ] ?? $unit;
+
+	return sprintf(
+		/* translators: %1$d: interval number, %2$s: time unit */
+		__( 'Every %1$d %2$s', 'wp-ai-blogger' ),
+		$interval,
+		$unit_label
+	);
+}
+
+/**
+ * Cleanup function for plugin deactivation or campaign deletion.
+ * Removes all scheduled events and clears schedules.
+ *
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_cleanup_all_schedules(): void {
+	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
+
+	foreach ( array_keys( $schedules ) as $campaign_id ) {
+		wpaib_clear_campaign_schedule( $campaign_id );
+	}
+
+	// Clear all scheduled events for this plugin.
+	wp_clear_scheduled_hook( 'wp_ai_blogger_create_blog_post' );
 }
 
 /**

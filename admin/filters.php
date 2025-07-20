@@ -44,8 +44,8 @@ class Filters {
 
 		// Check if we're on a supported post type page.
 		$current_post_type = $typenow;
-		if ( empty( $current_post_type ) && isset( $_GET['post_type'] ) ) {
-			$current_post_type = sanitize_text_field( $_GET['post_type'] );
+		if ( empty( $current_post_type ) && isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.
@@ -58,11 +58,11 @@ class Filters {
 		}
 
 		$campaigns         = wpaib_get_all_campaigns();
-		$selected_campaign = isset( $_GET['wp_aib_campaign_id'] ) ? absint( $_GET['wp_aib_campaign_id'] ) : '';
+		$selected_campaign = isset( $_GET['wp_aib_campaign_id'] ) ? absint( $_GET['wp_aib_campaign_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as handled by absint().
 
 		if ( ! empty( $campaigns ) ) {
 			echo '<select name="wp_aib_campaign_id">';
-			echo '<option value="">' . _e( 'All Campaigns', 'wp-ai-blogger' ) . '</option>';
+			echo '<option value="">' . esc_html__( 'All Campaigns', 'wp-ai-blogger' ) . '</option>';
 
 			foreach ( $campaigns as $campaign_id => $campaign_data ) {
 				$selected = selected( $selected_campaign, $campaign_id, false );
@@ -89,8 +89,8 @@ class Filters {
 
 		// Check if we're filtering a supported post type.
 		$current_post_type = $typenow;
-		if ( empty( $current_post_type ) && isset( $_GET['post_type'] ) ) {
-			$current_post_type = sanitize_text_field( $_GET['post_type'] );
+		if ( empty( $current_post_type ) && ! empty( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.
@@ -102,11 +102,11 @@ class Filters {
 			return $query;
 		}
 
-		if ( ! isset( $_GET['wp_aib_campaign_id'] ) ) {
+		if ( ! isset( $_GET['wp_aib_campaign_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as handled by absint().
 			return $query;
 		}
 
-		$campaign_id = absint( $_GET['wp_aib_campaign_id'] ?? 0 );
+		$campaign_id = absint( $_GET['wp_aib_campaign_id'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as handled by absint().
 
 		if ( $campaign_id ) {
 			$meta_query = $query->get( 'meta_query' );

@@ -18,6 +18,9 @@ export default function CampaignsInsights() {
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
+	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults );
+	const [ openViewDrawer, setOpenViewDrawer ] = useState( false );
+	const [ openingViewDrawer, setOpeningViewDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 
 	const handlePersonaClick = ( event ) => {
@@ -75,6 +78,34 @@ export default function CampaignsInsights() {
 			} );
 
 		setOpeningConfigureDrawer( false );
+	};
+
+	const viewCampaignConfiguration = ( e ) => {
+		e.preventDefault();
+		setOpeningViewDrawer( true );
+
+		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
+		if ( ! campaignId ) {
+			return;
+		}
+
+		fetchCampaignMetaData( campaignId )
+			.then( ( data ) => {
+				if ( data ) {
+					setViewConfigureData(
+						{
+							...data,
+							type: 'view',
+						}
+					);
+					setOpenViewDrawer( true );
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+
+		setOpeningViewDrawer( false );
 	};
 
 	const openCampaignAnalytics = ( e, campaignId ) => {
@@ -172,8 +203,22 @@ export default function CampaignsInsights() {
 
 						<div className="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
 							<div className="text-sm flex campaigns-center justify-between w-full">
-								<a href="#" className="font-medium text-indigo-600 hover:text-indigo-700 wpaib-truncate">
-									<span> { campaign.name } </span>
+								<a
+									href="#"
+									className="font-medium text-indigo-600 hover:text-indigo-700 wpaib-truncate"
+									data-campaign_id={ campaign.id }
+									onClick={ viewCampaignConfiguration }
+								>
+									<span>
+										{ openingViewDrawer ? (
+											<span className="flex items-center gap-1">
+												<RotateCw className="w-3 h-3 animate-spin" />
+												{ campaign.name }
+											</span>
+										) : (
+											campaign.name
+										) }
+									</span>
 								</a>
 								<div className="flex items-center gap-x-3">
 									<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
@@ -223,6 +268,14 @@ export default function CampaignsInsights() {
 				openDrawer={ openDrawer }
 				setOpenDrawer={ setOpenDrawer }
 				configureData={ configureData }
+				mode="edit"
+			/>
+
+			<ConfigureDrawer
+				openDrawer={ openViewDrawer }
+				setOpenDrawer={ setOpenViewDrawer }
+				configureData={ viewConfigureData }
+				mode="view"
 			/>
 
 			<CampaignAnalyticsModal

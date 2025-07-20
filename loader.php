@@ -92,7 +92,7 @@ class Loader {
 			/* Admin Menu init */
 			Menu::get_instance();
 		} else {
-			// Load Frontend Support */
+			/* Load Frontend Support */
 			Frontend::get_instance();
 		}
 	}

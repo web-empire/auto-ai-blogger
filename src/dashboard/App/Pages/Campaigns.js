@@ -6,6 +6,7 @@ import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
+import DeleteCampaignModal from '@Components/DeleteCampaignModal';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function Campaigns() {
@@ -16,6 +17,7 @@ export default function Campaigns() {
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
+	const [ deleteModal, setDeleteModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -104,6 +106,26 @@ export default function Campaigns() {
 		window.open( filterUrl, '_blank' );
 	};
 
+	const openDeleteModal = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
+
+		// Open delete modal
+		setDeleteModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
+
+	const handleCampaignDeleted = () => {
+		// Refresh the page or update the campaigns list
+		// For now, we'll refresh the page to update the campaigns list
+		window.location.reload();
+	};
+
 	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
 		return (
 			<>
@@ -139,6 +161,13 @@ export default function Campaigns() {
 					onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
 					campaignId={ analyticsModal.campaignId }
 					campaignData={ analyticsModal.campaignData }
+				/>
+
+				<DeleteCampaignModal
+					isOpen={ deleteModal.isOpen }
+					onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+					campaignId={ deleteModal.campaignId }
+					onDeleted={ handleCampaignDeleted }
 				/>
 			</>
 		);
@@ -281,7 +310,9 @@ export default function Campaigns() {
 																</Tooltip>
 															</a>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900">
+															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																openDeleteModal( e, campaign.id );
+															} }>
 																<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
@@ -313,6 +344,13 @@ export default function Campaigns() {
 				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
 				campaignId={ analyticsModal.campaignId }
 				campaignData={ analyticsModal.campaignData }
+			/>
+
+			<DeleteCampaignModal
+				isOpen={ deleteModal.isOpen }
+				onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ deleteModal.campaignId }
+				onDeleted={ handleCampaignDeleted }
 			/>
 		</>
 	);
