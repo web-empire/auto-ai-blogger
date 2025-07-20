@@ -218,7 +218,8 @@ class Menu {
 		}
 
 		try {
-			$license = $this->sanitize_license_data( Helper::get_option( 'license', '' ) );
+			// License is always stored as a string
+			$license = sanitize_text_field( Helper::get_option( 'license', '' ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get license - ' . $e->getMessage() );
 		}
@@ -379,6 +380,7 @@ class Menu {
 
 		// Debug logging in development
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'WP AI Blogger License Debug: ' . print_r( $license, true ) );
 			error_log( 'WP AI Blogger Localized Data: ' . print_r( $localized_data, true ) );
 		}
 

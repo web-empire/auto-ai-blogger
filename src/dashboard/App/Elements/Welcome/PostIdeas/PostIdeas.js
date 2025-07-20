@@ -43,8 +43,6 @@ export default function PostIdeas() {
 	const licenseEnabled = licenseStatus === 'licensed';
 
 	const fetchPostIdeas = useCallback( async () => {
-		console.log( 'Fetching post ideas...' );
-
 		setLoading( true );
 		setError( null );
 		setIsApiError( false );
@@ -56,23 +54,33 @@ export default function PostIdeas() {
 			return;
 		}
 
+		// Check if license is available - license is always a string
+		if ( ! license || typeof license !== 'string' || license.trim() === '' ) {
+			setError( 'License key is not available. Please check your license configuration.' );
+			setIsApiError( false ); // Not an API error - configuration issue
+			setLoading( false );
+			return;
+		}
+
+		const requestBody = {
+			site_title: siteTitle,
+			site_purpose: siteFor,
+			site_description: siteDescription,
+			temperature,
+			harassment,
+			hate,
+			sexually_explicit: sexuallyExplicit,
+			dangerous_content: dangerousContent,
+			license: license.trim(),
+		};
+
 		try {
 			const response = await fetch( 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post-ideas', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify( {
-					site_title: siteTitle,
-					site_purpose: siteFor,
-					site_description: siteDescription,
-					temperature,
-					harassment,
-					hate,
-					sexually_explicit: sexuallyExplicit,
-					dangerous_content: dangerousContent,
-					license,
-				} ),
+				body: JSON.stringify( requestBody ),
 			} );
 
 			if ( ! response.ok ) {
@@ -232,6 +240,29 @@ export default function PostIdeas() {
 					<a
 						href="#"
 						onClick={ handlePersonaClick }
+						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 gap-1"
+						style={ { color: 'white' } } // Inline style to ensure white color.
+					>
+						{ buttonText }
+						<MoveRight className="h-5 w-5" />
+					</a>
+				</div>
+			);
+		}
+
+		if ( error === 'License key is not available. Please check your license configuration.' ) {
+			const title = __( 'License key is missing. Please activate your license to use this feature.', 'wp-ai-blogger' );
+			const buttonText = __( 'Go to License Settings', 'wp-ai-blogger' );
+
+			return (
+				<div className="p-4 text-red-500 flex flex-col items-center">
+					<p> { title } </p>
+					<a
+						href="#"
+						onClick={ ( event ) => {
+							event.preventDefault();
+							navigate( `?page=${ homeSlug }&path=settings&tab=license` );
+						} }
 						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 gap-1"
 						style={ { color: 'white' } } // Inline style to ensure white color.
 					>
