@@ -111,7 +111,7 @@ const LicenseForm = memo(({
 				<p id="license-help" className="text-xs text-gray-500">
 					{__('Don\'t have a license? ', 'wp-ai-blogger')}
 					<a
-						href={(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.upgrade_link) || '#'}
+						href={upgradeLink}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-indigo-600 hover:text-indigo-800 underline"
@@ -134,6 +134,8 @@ const License = memo(() => {
 	// Redux selectors with fallbacks
 	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
 	const license = useSelector((state) => state.license) || '';
+	const upgradeLink = useSelector((state) => state.upgradeLink) || '#';
+	const licensingNonce = useSelector((state) => state.licensingNonce) || '';
 
 	// Local state
 	const [processing, setProcessing] = useState(false);
@@ -171,10 +173,10 @@ const License = memo(() => {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_activate_license');
 			formData.append('license_key', licenseKey);
-			formData.append('wp_ai_blogger_licensing_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
+			formData.append('wp_ai_blogger_licensing_nonce', licensingNonce);
 
 			const response = await apiFetch({
-				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
+				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
 				signal: abortController.signal
@@ -277,10 +279,10 @@ const License = memo(() => {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_deactivate_license');
-			formData.append('wp_ai_blogger_licensing_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
+			formData.append('wp_ai_blogger_licensing_nonce', licensingNonce);
 
 			const response = await apiFetch({
-				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
+				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
 				signal: abortController.signal

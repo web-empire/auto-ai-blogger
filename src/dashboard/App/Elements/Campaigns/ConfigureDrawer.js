@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
+import { useSelector } from 'react-redux';
 import {
 	X,
 	Save,
@@ -83,6 +84,9 @@ StatusIndicator.displayName = 'CampaignStatusIndicator';
 
 // Main ConfigureDrawer component
 export const ConfigureDrawer = memo(({ openDrawer, setOpenDrawer, configureData }) => {
+	// Redux selectors
+	const postTypesData = useSelector(state => state.postTypes);
+
 	// State management
 	const [formData, setFormData] = useState({});
 	const [expandedSections, setExpandedSections] = useState({
@@ -97,11 +101,8 @@ export const ConfigureDrawer = memo(({ openDrawer, setOpenDrawer, configureData 
 
 	// Memoized post types with safety check
 	const postTypes = useMemo(() => {
-		if (typeof wpaib_localized_data === 'undefined' || !wpaib_localized_data) {
-			return {};
-		}
-		return wpaib_localized_data.post_types || {};
-	}, []);
+		return postTypesData || {};
+	}, [postTypesData]);
 
 	// Initialize form data when configureData changes
 	useEffect(() => {

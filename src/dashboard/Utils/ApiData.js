@@ -23,18 +23,19 @@ const validateApiInput = ( key, value ) => {
 };
 
 /**
- * Creates a secure FormData object for API requests.
+ * Creates a secure FormData object with authentication data.
  *
- * @param {string} action - The action to perform.
- * @param {string} key    - Settings key.
+ * @param {string} action - WordPress action name.
+ * @param {string} key    - Setting key.
  * @param {*}      value  - The data to send.
+ * @param {Object} config - Configuration object with nonce and ajaxUrl.
  * @return {FormData} Configured FormData object.
  */
-const createSecureFormData = ( action, key, value ) => {
+const createSecureFormData = ( action, key, value, config = {} ) => {
 	const formData = new window.FormData();
 
 	formData.append( 'action', action );
-	formData.append( 'security', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '' );
+	formData.append( 'security', config.nonce || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '' );
 	formData.append( 'key', key );
 
 	// Properly serialize complex values
@@ -56,7 +57,7 @@ const createSecureFormData = ( action, key, value ) => {
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
-const updateApiData = async ( key, value, dispatch ) => {
+const updateApiData = async ( key, value, dispatch, config = {} ) => {
 	// Validate inputs
 	if ( ! validateApiInput( key, value ) ) {
 		return Promise.reject( new Error( 'Invalid input parameters' ) );
@@ -68,19 +69,19 @@ const updateApiData = async ( key, value, dispatch ) => {
 	}
 
 	try {
-		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value );
+		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value, config );
 
 		// Debug logging
 		console.log('Sending API request:', {
 			action: 'wpaib_update_admin_setting',
 			key: key,
 			value: value,
-			nonce: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || 'NO_NONCE',
-			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php'
+			nonce: config.nonce || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || 'NO_NONCE',
+			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php'
 		});
 
 		const response = await apiFetch( {
-			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			timeout: 30000, // 30 second timeout
@@ -123,7 +124,7 @@ const updateApiData = async ( key, value, dispatch ) => {
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
-const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
+const updateCampaign = async ( value, isNew, abortControllerRef = null, config = {} ) => {
 	// Validate campaign data
 	if ( ! value || typeof value !== 'object' ) {
 		const error = new Error( 'Invalid campaign data provided' );
@@ -144,10 +145,10 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
 
 	try {
 		const action = isNew ? 'wpaib_create_campaign' : 'wpaib_update_campaign';
-		const formData = createSecureFormData( action, 'campaign_details', value );
+		const formData = createSecureFormData( action, 'campaign_details', value, config );
 
 		const response = await apiFetch( {
-			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			signal: abortController.signal,

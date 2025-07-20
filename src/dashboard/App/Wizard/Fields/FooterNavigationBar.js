@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Loader2, Check } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // Enhanced progress indicator component
 const ProgressIndicator = memo(({ currentStep, maxSteps }) => {
@@ -98,6 +98,9 @@ const FooterNavigationBar = memo((props) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
+	// Redux selectors
+	const adminAppUrl = useSelector(state => state.adminAppUrl);
+
 	const { previousStep, nextStep, currentStep, maxSteps } = props;
 
 	// Enhanced URL parameter handling
@@ -115,7 +118,7 @@ const FooterNavigationBar = memo((props) => {
 		setIsNavigating(true);
 		try {
 			await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UX
-			navigate(`${wpaib_localized_data.admin_app_url}&step=${previousStep}`);
+			navigate(`${adminAppUrl}&step=${previousStep}`);
 		} finally {
 			setIsNavigating(false);
 		}
@@ -128,7 +131,7 @@ const FooterNavigationBar = memo((props) => {
 			setIsNavigating(true);
 			try {
 				await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UX
-				navigate(`${wpaib_localized_data.admin_app_url}&step=${nextStep}`);
+				navigate(`${adminAppUrl}&step=${nextStep}`);
 			} finally {
 				setIsNavigating(false);
 			}
