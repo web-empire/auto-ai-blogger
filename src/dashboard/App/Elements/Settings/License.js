@@ -227,6 +227,7 @@ const License = memo(() => {
 
 	// Local state
 	const [processing, setProcessing] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
 	const [licenseKey, setLicenseKey] = useState('');
 	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
 	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
@@ -276,9 +277,9 @@ const License = memo(() => {
 			return;
 		}
 
-		// Prevent multiple simultaneous token fetches
-		if (isTokenFetching) {
-			console.log('Token fetch already in progress, skipping...');
+		// Prevent multiple simultaneous token fetches and don't interfere with license operations
+		if (isTokenFetching || processing) {
+			console.log('Token fetch skipped - already in progress or license operation active');
 			return;
 		}
 
@@ -354,7 +355,7 @@ const License = memo(() => {
 			// Reset the flag after operations complete
 			setIsTokenFetching(false);
 		}
-	}, [license, dispatch, isTokenFetching]);
+	}, [license, dispatch, isTokenFetching, processing]);
 
 	// Cleanup effect
 	useEffect(() => {
@@ -520,9 +521,9 @@ const License = memo(() => {
 
 	// Enhanced token refresh
 	const refreshTokens = useCallback(async () => {
-		if (licenseStatus !== 'licensed' || processing || !license || isTokenFetching) return;
+		if (licenseStatus !== 'licensed' || refreshing || !license || isTokenFetching) return;
 
-		setProcessing(true);
+		setRefreshing(true);
 
 		try {
 			const result = await fetchTokenData();
@@ -545,9 +546,9 @@ const License = memo(() => {
 				payload: error.message || __('Failed to refresh token data', 'wp-ai-blogger'),
 			});
 		} finally {
-			setProcessing(false);
+			setRefreshing(false);
 		}
-	}, [licenseStatus, processing, license, isTokenFetching, fetchTokenData, dispatch]);
+	}, [licenseStatus, refreshing, license, isTokenFetching, fetchTokenData, dispatch]);
 
 	// Reset button states when activation status changes
 	useEffect(() => {
@@ -583,7 +584,7 @@ const License = memo(() => {
 				tokensUsed={tokensUsed}
 				totalTokens={displayTokenTotal}
 				onRefresh={refreshTokens}
-				isRefreshing={processing}
+				isRefreshing={refreshing}
 			/>
 
 			{/* Settings container */}
