@@ -230,6 +230,7 @@ const License = memo(() => {
 	const [licenseKey, setLicenseKey] = useState('');
 	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
 	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
+	const [isTokenFetching, setIsTokenFetching] = useState(false);
 
 	// Local token state to prevent Redux conflicts
 	const [localTokenData, setLocalTokenData] = useState({
@@ -275,7 +276,14 @@ const License = memo(() => {
 			return;
 		}
 
+		// Prevent multiple simultaneous token fetches
+		if (isTokenFetching) {
+			console.log('Token fetch already in progress, skipping...');
+			return;
+		}
+
 		console.log('Fetching token data for license:', license);
+		setIsTokenFetching(true);
 
 		try {
 			const response = await fetch(
@@ -296,60 +304,57 @@ const License = memo(() => {
 				console.log('TOKEN TOTAL:', tokenData.data.total);
 				console.log('TOKEN REMAINING:', tokenData.data.remaining);
 
-				// Only update local state immediately for UI responsiveness
-				setLocalTokenData({
+				// Store the data for later use
+				const fetchedData = {
 					total: tokenData.data.total,
-					remaining: tokenData.data.remaining,
+					remaining: tokenData.data.remaining
+				};
+
+				// Step 1: Update local state first for immediate UI feedback
+				setLocalTokenData({
+					total: fetchedData.total,
+					remaining: fetchedData.remaining,
 					lastUpdated: new Date().toISOString()
 				});
 
-				// Delay Redux and backend updates to prevent DOM conflicts
-				setTimeout(() => {
-					// Update Redux state
-					dispatch({
-						type: 'UPDATE_TOKEN_TOTAL',
-						payload: tokenData.data.total,
-					});
+				// Step 2: Sequential Redux updates to prevent conflicts
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: fetchedData.total,
+				});
 
-					dispatch({
-						type: 'UPDATE_TOKEN_REMAINING',
-						payload: tokenData.data.remaining,
-					});
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: fetchedData.remaining,
+				});
 
-					// Backend updates in a separate timeout to further reduce conflicts
-					setTimeout(async () => {
-						try {
-							console.log('Attempting to save tokenTotal:', tokenData.data.total);
-							console.log('Available nonce:', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce));
+				// Step 3: Sequential backend updates with proper awaiting
+				try {
+					console.log('Attempting to save tokenTotal:', fetchedData.total);
+					await updateApiData('tokenTotal', fetchedData.total, dispatch);
+					console.log('Successfully saved tokenTotal');
 
-							// Re-enable backend save to test with debug logging
-							console.log('Testing backend save with debug logging enabled');
+					console.log('Attempting to save tokenRemaining:', fetchedData.remaining);
+					await updateApiData('tokenRemaining', fetchedData.remaining, dispatch);
+					console.log('Successfully saved tokenRemaining');
+				} catch (saveError) {
+					console.error('Backend save failed (non-critical):', saveError);
+					// Don't throw error here - token data was successfully fetched and UI updated
+				}
 
-							await updateApiData('tokenTotal', tokenData.data.total, dispatch);
-							console.log('Successfully saved tokenTotal');
-
-							await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch);
-							console.log('Successfully saved tokenRemaining');
-						} catch (saveError) {
-							console.error('Detailed save error:', saveError);
-							console.error('Error details:', {
-								message: saveError.message,
-								stack: saveError.stack,
-								name: saveError.name
-							});
-						}
-					}, 100);
-				}, 200);
-
-				return tokenData;
+				// Return success - token data was fetched successfully
+				return { success: true, data: tokenData.data };
 			} else {
 				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
 			}
 		} catch (error) {
 			console.error('Token fetch error:', error);
 			throw error;
+		} finally {
+			// Reset the flag after operations complete
+			setIsTokenFetching(false);
 		}
-	}, [license, dispatch]);
+	}, [license, dispatch, isTokenFetching]);
 
 	// Cleanup effect
 	useEffect(() => {
@@ -409,7 +414,10 @@ const License = memo(() => {
 
 			// Fetch token data after successful license activation
 			try {
-				await fetchTokenData();
+				const tokenResult = await fetchTokenData();
+				if (!tokenResult?.success) {
+					console.warn('Token fetch failed after activation, but license is still active');
+				}
 			} catch (tokenError) {
 				console.error('Token fetch error after activation:', tokenError);
 				// Don't fail license activation if token fetch fails
@@ -512,27 +520,34 @@ const License = memo(() => {
 
 	// Enhanced token refresh
 	const refreshTokens = useCallback(async () => {
-		if (licenseStatus !== 'licensed' || processing || !license) return;
+		if (licenseStatus !== 'licensed' || processing || !license || isTokenFetching) return;
 
 		setProcessing(true);
 
 		try {
-			await fetchTokenData();
+			const result = await fetchTokenData();
 
-			dispatch({
-				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
-			});
+			// Check if token data was successfully fetched (even if backend save failed)
+			if (result?.success) {
+				dispatch({
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
+				});
+			} else {
+				throw new Error(__('Failed to fetch token data from server', 'wp-ai-blogger'));
+			}
 		} catch (error) {
 			console.error('Token refresh error:', error);
+
+			// Only show error if the external API call actually failed
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('Failed to refresh token data', 'wp-ai-blogger'),
+				payload: error.message || __('Failed to refresh token data', 'wp-ai-blogger'),
 			});
 		} finally {
 			setProcessing(false);
 		}
-	}, [licenseStatus, processing, license, fetchTokenData, dispatch]);
+	}, [licenseStatus, processing, license, isTokenFetching, fetchTokenData, dispatch]);
 
 	// Reset button states when activation status changes
 	useEffect(() => {
