@@ -59,7 +59,7 @@ const getInitialState = () => {
 			postIdeas: [],
 			tokenTotal: 0,
 			tokenRemaining: 0,
-			licenseStatus: 'inactive',
+			license_status: 'inactive',
 			isLoading: false,
 			error: null,
 		};
@@ -88,7 +88,7 @@ const getInitialState = () => {
 		postIdeas: safeParseLocalizedData( wpaib_localized_data.post_ideas, 'array', [] ),
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
-		licenseStatus: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
+		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
 		isLoading: false,
 		error: null,
 	};
@@ -144,7 +144,7 @@ const createEnhancedStore = () => {
 				postIdeas: [],
 				tokenTotal: 0,
 				tokenRemaining: 0,
-				licenseStatus: 'inactive',
+				license_status: 'inactive',
 				isLoading: false,
 				error: null,
 			};
@@ -186,8 +186,11 @@ const createEnhancedStore = () => {
 		// Return a minimal store as fallback
 		const fallbackState = {
 			initialStateSetFlag: false,
-			error: 'Failed to initialize store',
+			tokenTotal: 0,
+			tokenRemaining: 0,
+			license_status: 'inactive',
 			isLoading: false,
+			error: 'Failed to initialize store',
 		};
 		return createStore( globalDataReducer, fallbackState );
 	}

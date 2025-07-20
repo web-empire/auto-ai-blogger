@@ -259,23 +259,10 @@ class Menu {
 			error_log( 'WP AI Blogger: Failed to get postIdeas - ' . $e->getMessage() );
 		}
 
-		try {
-			$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get tokenTotal - ' . $e->getMessage() );
-		}
-
-		try {
-			$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get tokenRemaining - ' . $e->getMessage() );
-		}
-
-		try {
-			$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get license_status - ' . $e->getMessage() );
-		}
+		// Get token and license data with proper defaults
+		$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
+		$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
+		$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
 		// Get data with error handling
 		$post_statuses = [];

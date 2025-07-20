@@ -228,6 +228,9 @@ const License = memo(() => {
 	const tokenRemaining = useSelector((state) => state.tokenRemaining) || 0;
 	const license = useSelector((state) => state.license) || '';
 
+	// Debug: Log current Redux state values
+	console.log('Current Redux state - licenseStatus:', licenseStatus, 'tokenTotal:', tokenTotal, 'tokenRemaining:', tokenRemaining);
+
 	// Local state
 	const [processing, setProcessing] = useState(false);
 	const [licenseKey, setLicenseKey] = useState('');
@@ -283,17 +286,36 @@ const License = memo(() => {
 				throw new Error(response?.data?.message || __('License activation failed', 'wp-ai-blogger'));
 			}
 
+			// Debug: Log the activation response
+			console.log('License activation response:', response);
+
 			// Update license status
 			dispatch({
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'licensed',
 			});
 
+			// Update token data directly from activation response if available
+			if (response.data && typeof response.data.tokenTotal !== 'undefined') {
+				console.log('Updating tokenTotal from activation response:', response.data.tokenTotal);
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: response.data.tokenTotal,
+				});
+			}
+			if (response.data && typeof response.data.tokenRemaining !== 'undefined') {
+				console.log('Updating tokenRemaining from activation response:', response.data.tokenRemaining);
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: response.data.tokenRemaining,
+				});
+			}
+
 			if (!isMountedRef.current) return;
 
 			setActivationText(__('Loading token data...', 'wp-ai-blogger'));
 
-			// Refresh settings to get the token data that was saved by the backend
+			// Also refresh settings to ensure we have the latest data
 			try {
 				const settingsResponse = await apiFetch({
 					path: '/wp-ai-blogger/v1/admin/settings/',
@@ -302,14 +324,19 @@ const License = memo(() => {
 
 				if (settingsResponse && !isMountedRef.current) return;
 
-				// Update Redux store with refreshed settings including token data
-				if (settingsResponse.tokenTotal !== undefined) {
+				// Debug: Log the settings response
+				console.log('Settings refresh response:', settingsResponse);
+
+				// Update Redux store with any additional settings data (backup in case activation response didn't include tokens)
+				if (settingsResponse.tokenTotal !== undefined && !response.data?.tokenTotal) {
+					console.log('Updating tokenTotal from settings refresh:', settingsResponse.tokenTotal);
 					dispatch({
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: settingsResponse.tokenTotal,
 					});
 				}
-				if (settingsResponse.tokenRemaining !== undefined) {
+				if (settingsResponse.tokenRemaining !== undefined && !response.data?.tokenRemaining) {
+					console.log('Updating tokenRemaining from settings refresh:', settingsResponse.tokenRemaining);
 					dispatch({
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: settingsResponse.tokenRemaining,

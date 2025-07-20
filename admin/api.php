@@ -696,9 +696,20 @@ class API extends \WP_REST_Controller {
 	private function sanitize_settings_for_response( $settings ) {
 		$safe_settings = [];
 
+		// Fields that should not be masked even if they contain sensitive keywords
+		$non_sensitive_fields = [
+			'tokenTotal',
+			'tokenRemaining',
+			'token_total',
+			'token_remaining'
+		];
+
 		foreach ( $settings as $key => $value ) {
-			// Mask sensitive data
-			if ( strpos( $key, 'key' ) !== false || strpos( $key, 'token' ) !== false ) {
+			// Mask sensitive data but exclude token count fields
+			if ( in_array( $key, $non_sensitive_fields, true ) ) {
+				// Don't mask token count fields - these are safe to expose
+				$safe_settings[ $key ] = $value;
+			} elseif ( strpos( $key, 'key' ) !== false || strpos( $key, 'token' ) !== false ) {
 				$safe_settings[ $key ] = empty( $value ) ? '' : '***masked***';
 			} else {
 				$safe_settings[ $key ] = $value;
@@ -726,8 +737,11 @@ class API extends \WP_REST_Controller {
 			'max_words',
 			'max_title_words',
 			'post_ideas',
+			'tokenTotal',
+			'tokenRemaining',
 			'token_total',
 			'token_remaining',
+			'license_status',
 		];
 	}
 
