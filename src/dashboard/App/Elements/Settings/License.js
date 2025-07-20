@@ -50,11 +50,11 @@ const LicenseStatus = memo(({ status, tokensUsed, totalTokens, onRefresh, isRefr
 				<button
 					type="button"
 					onClick={onRefresh}
-					disabled={true}
-					className="p-1 text-gray-400 cursor-not-allowed rounded transition-all duration-200"
+					disabled={status === 'licensed' ? false : true}
+					className={`p-1 ${status === 'licensed' ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:text-green-800 hover:bg-green-100'} rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1`}
 					aria-label={__('Refresh token data', 'wp-ai-blogger')}
 				>
-					<RefreshCw className="w-4 h-4" />
+					<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
 				</button>
 			</div>
 
