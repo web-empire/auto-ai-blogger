@@ -240,30 +240,37 @@ const License = memo(() => {
 		lastUpdated: null
 	});
 
-	// Initialize local token data from Redux on mount
+	// Initialize and sync local token data from Redux
 	useEffect(() => {
-		if (activated && (tokenTotal > 0 || tokenRemaining > 0)) {
-			setLocalTokenData({
-				total: tokenTotal,
-				remaining: tokenRemaining,
-				lastUpdated: new Date().toISOString()
-			});
-		}
-	}, []);
+		// Always sync token data from Redux state, regardless of activation status
+		setLocalTokenData({
+			total: tokenTotal,
+			remaining: tokenRemaining,
+			lastUpdated: new Date().toISOString()
+		});
+	}, [tokenTotal, tokenRemaining]);
 
 	// Computed values
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
 
-	// Use local token data for UI display to prevent Redux conflicts
-	const displayTokenTotal = useMemo(() =>
-		activated && localTokenData.total > 0 ? localTokenData.total : tokenTotal,
-		[activated, localTokenData.total, tokenTotal]
-	);
+	// Use Redux state as primary source, with local state as enhancement for real-time updates
+	const displayTokenTotal = useMemo(() => {
+		// If we have fresh local data that's different from Redux, use it
+		if (localTokenData.lastUpdated && localTokenData.total !== tokenTotal) {
+			return localTokenData.total;
+		}
+		// Otherwise, always use Redux state as source of truth
+		return tokenTotal;
+	}, [localTokenData.total, localTokenData.lastUpdated, tokenTotal]);
 
-	const displayTokenRemaining = useMemo(() =>
-		activated && localTokenData.remaining >= 0 ? localTokenData.remaining : tokenRemaining,
-		[activated, localTokenData.remaining, tokenRemaining]
-	);
+	const displayTokenRemaining = useMemo(() => {
+		// If we have fresh local data that's different from Redux, use it
+		if (localTokenData.lastUpdated && localTokenData.remaining !== tokenRemaining) {
+			return localTokenData.remaining;
+		}
+		// Otherwise, always use Redux state as source of truth
+		return tokenRemaining;
+	}, [localTokenData.remaining, localTokenData.lastUpdated, tokenRemaining]);
 
 	const tokensUsed = useMemo(() =>
 		activated ? displayTokenTotal - displayTokenRemaining : 0,
