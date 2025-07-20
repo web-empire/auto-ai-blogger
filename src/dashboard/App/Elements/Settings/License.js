@@ -300,33 +300,23 @@ const License = memo(() => {
 					lastUpdated: new Date().toISOString()
 				});
 
-				// Only save to backend for persistence - avoid Redux conflicts entirely
+				// Update Redux state properly to maintain consistency
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: tokenData.data.total,
+				});
+
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: tokenData.data.remaining,
+				});
+
+				// Save to backend using the centralized API utility to prevent conflicts
 				try {
-					// Save without triggering Redux updates to prevent DOM conflicts
-					const formData1 = new FormData();
-					formData1.append('action', 'wp_ai_blogger_save_settings');
-					formData1.append('field', 'tokenTotal');
-					formData1.append('value', tokenData.data.total);
-					formData1.append('wp_ai_blogger_security_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.security_nonce) || '');
-
-					const formData2 = new FormData();
-					formData2.append('action', 'wp_ai_blogger_save_settings');
-					formData2.append('field', 'tokenRemaining');
-					formData2.append('value', tokenData.data.remaining);
-					formData2.append('wp_ai_blogger_security_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.security_nonce) || '');
-
-					// Save both values in parallel without Redux updates
+					// Use the centralized updateApiData function for consistent state management
 					await Promise.all([
-						apiFetch({
-							url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
-							method: 'POST',
-							body: formData1
-						}),
-						apiFetch({
-							url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
-							method: 'POST',
-							body: formData2
-						})
+						updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef),
+						updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef)
 					]);
 				} catch (saveError) {
 					console.error('Failed to save token data to backend:', saveError);
