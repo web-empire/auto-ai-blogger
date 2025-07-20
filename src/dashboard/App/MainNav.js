@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
  */
 export default function MainNav() {
 	const location = useLocation();
-	
+
 	// Redux selectors for dynamic data
 	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
 	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';

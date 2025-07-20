@@ -22,7 +22,7 @@ const ProButton = forwardRef( ( {
 }, ref ) => {
 	// Get pro purchase URL from Redux store
 	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
-	
+
 	// Determine the URL to use
 	const proUrl = useMemo( () => {
 		return url || proPurchaseUrl;

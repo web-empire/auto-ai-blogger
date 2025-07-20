@@ -24,7 +24,7 @@ const initialState = {
 	tokenTotal: 0,
 	tokenRemaining: 0,
 	license_status: 'inactive',
-	
+
 	// Static configuration data that doesn't change during app lifecycle
 	homeSlug: 'wp-ai-blogger',
 	adminNonce: '',
@@ -42,7 +42,7 @@ const initialState = {
 	version: '1.0.0',
 	proVersion: '',
 	postTypes: {},
-	
+
 	// Add loading and error states for better UX
 	isLoading: false,
 	error: null,
@@ -132,7 +132,7 @@ const globalDataReducer = ( state = initialState, action ) => {
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
 		UPDATE_LICENSE_STATUS: () => ( { ...state, license_status: String( action.payload || 'inactive' ) } ),
-		
+
 		// Static configuration updates (rarely used but available if needed)
 		UPDATE_HOME_SLUG: () => ( { ...state, homeSlug: String( action.payload || 'wp-ai-blogger' ) } ),
 		UPDATE_ADMIN_NONCE: () => ( { ...state, adminNonce: String( action.payload || '' ) } ),
@@ -159,7 +159,7 @@ const globalDataReducer = ( state = initialState, action ) => {
 			const postTypes = action.payload && typeof action.payload === 'object' ? action.payload : {};
 			return { ...state, postTypes: postTypes };
 		},
-		
+
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
 		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),
 		RESET_STATE: () => initialState,

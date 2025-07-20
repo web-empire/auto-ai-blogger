@@ -89,7 +89,7 @@ const getInitialState = () => {
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
-		
+
 		// Static configuration data that doesn't change during app lifecycle
 		homeSlug: safeParseLocalizedData( wpaib_localized_data.home_slug, 'string', 'wp-ai-blogger' ),
 		adminNonce: safeParseLocalizedData( wpaib_localized_data.admin_nonce, 'string', '' ),
@@ -107,7 +107,7 @@ const getInitialState = () => {
 		version: safeParseLocalizedData( wpaib_localized_data.version, 'string', '1.0.0' ),
 		proVersion: safeParseLocalizedData( wpaib_localized_data.pro_version, 'string', '' ),
 		postTypes: safeParseLocalizedData( wpaib_localized_data.post_types, 'object', {} ),
-		
+
 		isLoading: false,
 		error: null,
 	};
