@@ -231,9 +231,51 @@ const License = memo(() => {
 	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
 	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
 
+	// Local token state to prevent Redux conflicts
+	const [localTokenData, setLocalTokenData] = useState({
+		total: tokenTotal,
+		remaining: tokenRemaining,
+		lastUpdated: null
+	});
+
 	// Computed values
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
-	const tokensUsed = useMemo(() => activated ? tokenTotal - tokenRemaining : 0, [activated, tokenTotal, tokenRemaining]);
+
+	// Use local token data for UI display to prevent Redux conflicts
+	const displayTokenTotal = useMemo(() =>
+		activated && localTokenData.total > 0 ? localTokenData.total : tokenTotal,
+		[activated, localTokenData.total, tokenTotal]
+	);
+
+	const displayTokenRemaining = useMemo(() =>
+		activated && localTokenData.remaining >= 0 ? localTokenData.remaining : tokenRemaining,
+		[activated, localTokenData.remaining, tokenRemaining]
+	);
+
+	const tokensUsed = useMemo(() =>
+		activated ? displayTokenTotal - displayTokenRemaining : 0,
+		[activated, displayTokenTotal, displayTokenRemaining]
+	);
+
+	// Debounced Redux update function to prevent rapid state changes
+	const debouncedReduxUpdate = useMemo(() => {
+		let timeoutId = null;
+		return (tokenData) => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+			timeoutId = setTimeout(() => {
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: tokenData.total,
+				});
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: tokenData.remaining,
+				});
+			}, 500); // 500ms debounce
+		};
+	}, [dispatch]);
 
 	// Function to fetch token data from external API
 	const fetchTokenData = useCallback(async () => {
@@ -260,15 +302,15 @@ const License = memo(() => {
 			const tokenData = await response.json();
 
 			if (tokenData?.success && tokenData?.data) {
-				// Update Redux store with token data
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.data.total,
+				// Update local state immediately for UI responsiveness
+				setLocalTokenData({
+					total: tokenData.data.total,
+					remaining: tokenData.data.remaining,
+					lastUpdated: new Date().toISOString()
 				});
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.data.remaining,
-				});
+
+				// Update Redux store with debounced dispatch to prevent DOM conflicts
+				debouncedReduxUpdate(tokenData.data);
 
 				// Also save to backend for persistence using existing API
 				try {
@@ -286,7 +328,7 @@ const License = memo(() => {
 			console.error('Token fetch error:', error);
 			throw error;
 		}
-	}, [license, dispatch]);
+	}, [license, dispatch, debouncedReduxUpdate]);
 
 	// Cleanup effect
 	useEffect(() => {
@@ -421,6 +463,13 @@ const License = memo(() => {
 					payload: 0,
 				});
 
+				// Also reset local token data
+				setLocalTokenData({
+					total: 0,
+					remaining: 0,
+					lastUpdated: new Date().toISOString()
+				});
+
 				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
 				setActivationText(__('Activate', 'wp-ai-blogger'));
 			}
@@ -464,6 +513,17 @@ const License = memo(() => {
 		}
 	}, [licenseStatus, processing, license, fetchTokenData, dispatch]);
 
+	// Sync local token data with Redux on mount and when Redux changes
+	useEffect(() => {
+		if (activated) {
+			setLocalTokenData(prev => ({
+				...prev,
+				total: tokenTotal,
+				remaining: tokenRemaining
+			}));
+		}
+	}, [activated, tokenTotal, tokenRemaining]);
+
 	// Reset button states when activation status changes
 	useEffect(() => {
 		if (activated) {
@@ -496,7 +556,7 @@ const License = memo(() => {
 			<LicenseStatus
 				status={licenseStatus}
 				tokensUsed={tokensUsed}
-				totalTokens={tokenTotal}
+				totalTokens={displayTokenTotal}
 				onRefresh={refreshTokens}
 				isRefreshing={processing}
 			/>
@@ -523,7 +583,7 @@ const License = memo(() => {
 			{/* Screen reader status */}
 			<div className="sr-only" aria-live="polite">
 				{activated
-					? __(`License is active with ${tokenRemaining} tokens remaining`, 'wp-ai-blogger')
+					? __(`License is active with ${displayTokenRemaining} tokens remaining`, 'wp-ai-blogger')
 					: __('No active license', 'wp-ai-blogger')
 				}
 			</div>
