@@ -147,7 +147,10 @@ const CampaignRow = memo(({
 						className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md max-w-xs"
 					>
 						<span className="cursor-help border-b border-dotted border-gray-400">
-							{TrimWordsContent(campaign.last_post_title)}
+							<TrimWordsContent
+								content={campaign.last_post_title || ''}
+								count={40}
+							/>
 						</span>
 					</Tooltip>
 				) : (
@@ -530,17 +533,25 @@ export default function Campaigns() {
 									</thead>
 
 									<tbody className="divide-y divide-gray-200 bg-white" role="rowgroup">
-										{campaignData.map((campaign) => (
-											<CampaignRow
-												key={campaign.id || campaign.name}
-												campaign={campaign}
-												onConfigure={configureCampaign}
-												onRun={runCampaign}
-												onToggleStatus={toggleCampaignStatus}
-												onDelete={deleteCampaign}
-												openingConfigureDrawer={openingConfigureDrawer}
-											/>
-										))}
+										{campaignData && Array.isArray(campaignData) && campaignData.length > 0 ? (
+											campaignData.map((campaign, index) => (
+												<CampaignRow
+													key={campaign?.id || campaign?.name || `campaign-${index}`}
+													campaign={campaign}
+													onConfigure={configureCampaign}
+													onRun={runCampaign}
+													onToggleStatus={toggleCampaignStatus}
+													onDelete={deleteCampaign}
+													openingConfigureDrawer={openingConfigureDrawer}
+												/>
+											))
+										) : (
+											<tr>
+												<td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+													{__('No campaigns available.', 'wp-ai-blogger')}
+												</td>
+											</tr>
+										)}
 									</tbody>
 								</table>
 							</div>

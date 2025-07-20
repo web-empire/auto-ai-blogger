@@ -43,8 +43,8 @@ const CampaignCard = memo(({ campaign, onViewDetails }) => {
 		}
 	}, [campaign, onViewDetails]);
 
-	const statusColor = campaign.status === 'active' ? 'text-green-600' : 'text-gray-500';
-	const isPerformant = campaign.postsVisit > 100;
+	const statusColor = campaign?.status === 'active' ? 'text-green-600' : 'text-gray-500';
+	const isPerformant = (campaign?.postsVisit || 0) > 100;
 
 	return (
 		<div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 group">
@@ -59,10 +59,10 @@ const CampaignCard = memo(({ campaign, onViewDetails }) => {
 				{/* Campaign header */}
 				<div className="mb-4">
 					<h4 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
-						{campaign.name}
+						{campaign?.name || __('Unnamed Campaign', 'wp-ai-blogger')}
 					</h4>
 					<span className={`text-sm font-medium ${statusColor}`}>
-						{campaign.status === 'active' ? __('Active', 'wp-ai-blogger') : __('Inactive', 'wp-ai-blogger')}
+						{campaign?.status === 'active' ? __('Active', 'wp-ai-blogger') : __('Inactive', 'wp-ai-blogger')}
 					</span>
 				</div>
 
@@ -70,20 +70,20 @@ const CampaignCard = memo(({ campaign, onViewDetails }) => {
 				<div className="grid grid-cols-3 gap-4 mb-6">
 					<MetricCard
 						metric={__('Posts', 'wp-ai-blogger')}
-						value={campaign.postsCreated || '0'}
+						value={campaign?.postsCreated || '0'}
 						icon={BarChart3}
 						className="bg-blue-50 border-blue-200"
 					/>
 					<MetricCard
 						metric={__('Visits', 'wp-ai-blogger')}
-						value={campaign.postsVisit || '0'}
+						value={campaign?.postsVisit || '0'}
 						icon={Eye}
-						trend={campaign.visitTrend}
+						trend={campaign?.visitTrend}
 						className="bg-green-50 border-green-200"
 					/>
 					<MetricCard
 						metric={__('Last Run', 'wp-ai-blogger')}
-						value={campaign.lastRun || __('Never', 'wp-ai-blogger')}
+						value={campaign?.lastRun || __('Never', 'wp-ai-blogger')}
 						icon={Calendar}
 						className="bg-purple-50 border-purple-200"
 					/>
@@ -284,13 +284,25 @@ function CampaignsInsights({ onError }) {
 				role="region"
 				aria-label={__('Campaigns list', 'wp-ai-blogger')}
 			>
-				{campaignsData.campaigns.map((campaign, index) => (
-					<CampaignCard
-						key={campaign.id || `campaign-${index}`}
-						campaign={campaign}
-						onViewDetails={handleViewCampaignDetails}
-					/>
-				))}
+				{campaignsData?.campaigns && Array.isArray(campaignsData.campaigns) && campaignsData.campaigns.length > 0 ? (
+					campaignsData.campaigns.map((campaign, index) => (
+						<CampaignCard
+							key={campaign?.id || `campaign-${index}`}
+							campaign={campaign}
+							onViewDetails={handleViewCampaignDetails}
+						/>
+					))
+				) : (
+					<div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+						<BarChart3 className="w-12 h-12 mb-4 text-gray-300" />
+						<p className="text-lg font-medium mb-2">
+							{__('No campaigns found', 'wp-ai-blogger')}
+						</p>
+						<p className="text-sm">
+							{__('Create your first campaign to start generating content automatically.', 'wp-ai-blogger')}
+						</p>
+					</div>
+				)}
 			</div>
 
 			{/* Screen reader summary */}
