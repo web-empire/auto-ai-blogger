@@ -218,6 +218,7 @@ LicenseForm.displayName = 'LicenseForm';
 const License = memo(() => {
 	const dispatch = useDispatch();
 	const abortControllerRef = useRef({});
+	const tokenUpdateRef = useRef({}); // Dedicated ref for token updates
 
 	// Redux selectors with fallbacks
 	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
@@ -314,10 +315,10 @@ const License = memo(() => {
 					lastUpdated: new Date().toISOString()
 				});
 
-				// Save to backend sequentially without complex timing
+				// Update API data using dedicated token ref to prevent conflicts
 				try {
-					await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+					await updateApiData('tokenTotal', tokenData.data.total, dispatch, tokenUpdateRef);
+					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, tokenUpdateRef);
 				} catch (saveError) {
 					console.warn('Failed to save token data to backend:', saveError);
 				}
@@ -337,6 +338,12 @@ const License = memo(() => {
 		return () => {
 			// Cancel any ongoing requests
 			Object.values(abortControllerRef.current).forEach(controller => {
+				if (controller && typeof controller.abort === 'function') {
+					controller.abort();
+				}
+			});
+			// Also cleanup token update requests
+			Object.values(tokenUpdateRef.current).forEach(controller => {
 				if (controller && typeof controller.abort === 'function') {
 					controller.abort();
 				}
