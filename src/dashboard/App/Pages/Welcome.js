@@ -1,14 +1,9 @@
-import React, { Suspense, useCallback, memo } from 'react';
+import React, { useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
-// Lazy load components for better performance
-const PostIdeas = React.lazy(() =>
-	import('@Elements/Welcome').then(module => ({ default: module.PostIdeas }))
-);
-const CampaignsInsights = React.lazy(() =>
-	import('@Elements/Welcome').then(module => ({ default: module.CampaignsInsights }))
-);
+// Import components directly to avoid lazy loading issues
+import { PostIdeas, CampaignsInsights } from '@Elements/Welcome';
 
 // Error boundary for component failures
 class WelcomeErrorBoundary extends React.Component {
@@ -57,27 +52,6 @@ class WelcomeErrorBoundary extends React.Component {
 	}
 }
 
-// Loading skeleton component
-const LoadingSkeleton = memo(() => (
-	<div className="space-y-6" aria-label={__('Loading welcome content...', 'wp-ai-blogger')}>
-		<div className="animate-pulse">
-			<div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-			<div className="h-32 bg-gray-200 rounded mb-4"></div>
-			<div className="space-y-2">
-				<div className="h-3 bg-gray-200 rounded w-full"></div>
-				<div className="h-3 bg-gray-200 rounded w-5/6"></div>
-				<div className="h-3 bg-gray-200 rounded w-4/6"></div>
-			</div>
-		</div>
-		<div className="animate-pulse">
-			<div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-			<div className="h-40 bg-gray-200 rounded"></div>
-		</div>
-	</div>
-));
-
-LoadingSkeleton.displayName = 'WelcomeLoadingSkeleton';
-
 // Main Welcome component with enhanced features
 function Welcome() {
 	const handleComponentError = useCallback((error, errorInfo) => {
@@ -97,35 +71,27 @@ function Welcome() {
 					{__('Welcome page content loaded', 'wp-ai-blogger')}
 				</div>
 
-				<Suspense
-					fallback={
-						<div className="space-y-6">
-							<LoadingSkeleton />
-						</div>
-					}
+				{/* Campaigns insights section */}
+				<section
+					aria-labelledby="campaigns-heading"
+					className="mb-8"
 				>
-					{/* Campaigns insights section */}
-					<section
-						aria-labelledby="campaigns-heading"
-						className="mb-8"
-					>
-						<h2 id="campaigns-heading" className="sr-only">
-							{__('Campaigns Insights', 'wp-ai-blogger')}
-						</h2>
-						<CampaignsInsights onError={handleComponentError} />
-					</section>
+					<h2 id="campaigns-heading" className="sr-only">
+						{__('Campaigns Insights', 'wp-ai-blogger')}
+					</h2>
+					<CampaignsInsights onError={handleComponentError} />
+				</section>
 
-					{/* Post ideas section */}
-					<section
-						aria-labelledby="ideas-heading"
-						className="mb-8"
-					>
-						<h2 id="ideas-heading" className="sr-only">
-							{__('Post Ideas', 'wp-ai-blogger')}
-						</h2>
-						<PostIdeas onError={handleComponentError} />
-					</section>
-				</Suspense>
+				{/* Post ideas section */}
+				<section
+					aria-labelledby="ideas-heading"
+					className="mb-8"
+				>
+					<h2 id="ideas-heading" className="sr-only">
+						{__('Post Ideas', 'wp-ai-blogger')}
+					</h2>
+					<PostIdeas onError={handleComponentError} />
+				</section>
 			</main>
 		</WelcomeErrorBoundary>
 	);
