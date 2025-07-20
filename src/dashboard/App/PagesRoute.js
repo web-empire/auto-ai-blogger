@@ -78,10 +78,16 @@ const RouteError = ( { type = 'not-found', message } ) => {
 };
 
 // Import components directly to avoid lazy loading issues temporarily
-import Welcome from '@DashboardApp/Pages/Welcome';
-import Settings from '@DashboardApp/Pages/Settings';
-import FreeVsPro from '@DashboardApp/Pages/FreeVsPro';
-import Campaigns from '@DashboardApp/Pages/Campaigns';
+// import Welcome from '@DashboardApp/Pages/Welcome';
+// import Settings from '@DashboardApp/Pages/Settings';
+// import FreeVsPro from '@DashboardApp/Pages/FreeVsPro';
+// import Campaigns from '@DashboardApp/Pages/Campaigns';
+
+// Temporary simple test components to isolate the issue
+const Welcome = () => <div className="p-6"><h1>Welcome Page</h1><p>This is a simple test component.</p></div>;
+const Settings = () => <div className="p-6"><h1>Settings Page</h1><p>This is a simple test component.</p></div>;
+const FreeVsPro = () => <div className="p-6"><h1>Free vs Pro Page</h1><p>This is a simple test component.</p></div>;
+const Campaigns = () => <div className="p-6"><h1>Campaigns Page</h1><p>This is a simple test component.</p></div>;
 
 /**
  * Route mapping with metadata
