@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { forwardRef, useCallback, useMemo } from 'react';
 import { aiClassNames } from '@Utils/aiClassNames';
+import { useSelector } from 'react-redux';
 
 /**
  * Enhanced ProButton component with better accessibility and customization
@@ -19,10 +20,13 @@ const ProButton = forwardRef( ( {
 	'aria-label': ariaLabel,
 	...props
 }, ref ) => {
+	// Get pro purchase URL from Redux store
+	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
+	
 	// Determine the URL to use
 	const proUrl = useMemo( () => {
-		return url || wpaib_localized_data?.pro_purchase_url || 'https://wpaiblogger.com/';
-	}, [ url ] );
+		return url || proPurchaseUrl;
+	}, [ url, proPurchaseUrl ] );
 
 	// Enhanced click handler with error handling
 	const handleUpgrade = useCallback( ( event ) => {

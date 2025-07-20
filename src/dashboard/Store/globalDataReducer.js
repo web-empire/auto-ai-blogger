@@ -24,6 +24,25 @@ const initialState = {
 	tokenTotal: 0,
 	tokenRemaining: 0,
 	license_status: 'inactive',
+	
+	// Static configuration data that doesn't change during app lifecycle
+	homeSlug: 'wp-ai-blogger',
+	adminNonce: '',
+	ajaxUrl: '/wp-admin/admin-ajax.php',
+	editPostLink: '/wp-admin/post.php?post={{POST_ID}}&action=edit',
+	allCampaigns: {},
+	postmetaDefaults: {},
+	licensingNonce: '',
+	upgradeLink: '#',
+	adminEmail: '',
+	adminAppUrl: '',
+	adminBaseUrl: '',
+	proPurchaseUrl: 'https://wpaiblogger.com/',
+	proAvailable: false,
+	version: '1.0.0',
+	proVersion: '',
+	postTypes: {},
+	
 	// Add loading and error states for better UX
 	isLoading: false,
 	error: null,
@@ -113,6 +132,34 @@ const globalDataReducer = ( state = initialState, action ) => {
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
 		UPDATE_LICENSE_STATUS: () => ( { ...state, license_status: String( action.payload || 'inactive' ) } ),
+		
+		// Static configuration updates (rarely used but available if needed)
+		UPDATE_HOME_SLUG: () => ( { ...state, homeSlug: String( action.payload || 'wp-ai-blogger' ) } ),
+		UPDATE_ADMIN_NONCE: () => ( { ...state, adminNonce: String( action.payload || '' ) } ),
+		UPDATE_AJAX_URL: () => ( { ...state, ajaxUrl: String( action.payload || '/wp-admin/admin-ajax.php' ) } ),
+		UPDATE_EDIT_POST_LINK: () => ( { ...state, editPostLink: String( action.payload || '/wp-admin/post.php?post={{POST_ID}}&action=edit' ) } ),
+		UPDATE_ALL_CAMPAIGNS: () => {
+			const campaigns = action.payload && typeof action.payload === 'object' ? action.payload : {};
+			return { ...state, allCampaigns: campaigns };
+		},
+		UPDATE_POSTMETA_DEFAULTS: () => {
+			const defaults = action.payload && typeof action.payload === 'object' ? action.payload : {};
+			return { ...state, postmetaDefaults: defaults };
+		},
+		UPDATE_LICENSING_NONCE: () => ( { ...state, licensingNonce: String( action.payload || '' ) } ),
+		UPDATE_UPGRADE_LINK: () => ( { ...state, upgradeLink: String( action.payload || '#' ) } ),
+		UPDATE_ADMIN_EMAIL: () => ( { ...state, adminEmail: String( action.payload || '' ) } ),
+		UPDATE_ADMIN_APP_URL: () => ( { ...state, adminAppUrl: String( action.payload || '' ) } ),
+		UPDATE_ADMIN_BASE_URL: () => ( { ...state, adminBaseUrl: String( action.payload || '' ) } ),
+		UPDATE_PRO_PURCHASE_URL: () => ( { ...state, proPurchaseUrl: String( action.payload || 'https://wpaiblogger.com/' ) } ),
+		UPDATE_PRO_AVAILABLE: () => ( { ...state, proAvailable: Boolean( action.payload ) } ),
+		UPDATE_VERSION: () => ( { ...state, version: String( action.payload || '1.0.0' ) } ),
+		UPDATE_PRO_VERSION: () => ( { ...state, proVersion: String( action.payload || '' ) } ),
+		UPDATE_POST_TYPES: () => {
+			const postTypes = action.payload && typeof action.payload === 'object' ? action.payload : {};
+			return { ...state, postTypes: postTypes };
+		},
+		
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
 		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),
 		RESET_STATE: () => initialState,

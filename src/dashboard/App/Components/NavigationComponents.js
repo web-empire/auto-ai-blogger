@@ -9,9 +9,9 @@ import { updateApiData } from '@Utils/ApiData';
  * Core version display component with enhanced accessibility
  */
 export const CoreVersion = () => {
-	const coreVersion = wpaib_localized_data?.version || '1.0.0';
-	const proVersion = wpaib_localized_data?.pro_version || '';
-	const proAvailable = Boolean( wpaib_localized_data?.pro_available );
+	const version = useSelector((state) => state.version) || '1.0.0';
+	const proVersion = useSelector((state) => state.proVersion) || '';
+	const proAvailable = useSelector((state) => state.proAvailable) || false;
 
 	return (
 		<>
@@ -23,9 +23,9 @@ export const CoreVersion = () => {
 				>
 					<span
 						className="select-none cursor-help"
-						aria-label={ `Core version ${ coreVersion }` }
+						aria-label={ `Core version ${ version }` }
 					>
-						V-{ coreVersion }
+						V-{ version }
 					</span>
 				</Tooltip>
 			</div>

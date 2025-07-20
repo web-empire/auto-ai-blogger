@@ -3,43 +3,50 @@ import { Fragment, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import BrandIcon from '@AppImages/crown.svg';
 import { CoreVersion, TokenDisplayAndRefresh } from '@Components/NavigationComponents';
+import { useSelector } from 'react-redux';
 
 /**
  * Enhanced MainNav component with better performance and accessibility
  */
 export default function MainNav() {
 	const location = useLocation();
+	
+	// Redux selectors for dynamic data
+	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
+	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
+	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
+	const proAvailable = useSelector((state) => state.proAvailable) || false;
 
 	// Memoize license status to prevent unnecessary recalculations
 	const licenseEnabled = useMemo( () => {
-		return wpaib_localized_data?.license_status === 'licensed';
-	}, [ wpaib_localized_data?.license_status ] );
+		return licenseStatus === 'licensed';
+	}, [ licenseStatus ] );
 
 	// Memoize navigation menus with proper filtering
 	const navMenus = useMemo( () => {
 		const baseMenus = [
 			{
 				name: __( 'Welcome', 'wp-ai-blogger' ),
-				slug: wpaib_localized_data?.home_slug || 'wp-ai-blogger',
+				slug: homeSlug,
 				path: '',
 				icon: null,
 			},
 			{
 				name: __( 'Campaigns', 'wp-ai-blogger' ),
-				slug: wpaib_localized_data?.home_slug || 'wp-ai-blogger',
+				slug: homeSlug,
 				path: 'campaigns',
 				icon: null,
 				requiresLicense: true,
 			},
 			{
 				name: __( 'Settings', 'wp-ai-blogger' ),
-				slug: wpaib_localized_data?.home_slug || 'wp-ai-blogger',
+				slug: homeSlug,
 				path: 'settings',
 				icon: null,
 			},
 			{
 				name: __( 'Free vs Pro', 'wp-ai-blogger' ),
-				slug: wpaib_localized_data?.home_slug || 'wp-ai-blogger',
+				slug: homeSlug,
 				path: 'free-vs-pro',
 				icon: null,
 			},
@@ -52,37 +59,31 @@ export default function MainNav() {
 
 		// Apply WordPress hooks filter
 		return wp?.hooks?.applyFilters?.( 'wp_ai_blogger_dashboard.main_navigation', filteredMenus ) || filteredMenus;
-	}, [ licenseEnabled ] );
+	}, [ licenseEnabled, homeSlug ] );
 
 	// Memoize URL query parsing
 	const { activePage, activePath } = useMemo( () => {
 		const query = new URLSearchParams( location?.search );
 		return {
-			activePage: query.get( 'page' ) || wpaib_localized_data?.home_slug || 'wp-ai-blogger',
+			activePage: query.get( 'page' ) || homeSlug,
 			activePath: query.get( 'path' ) || '',
 		};
-	}, [ location?.search ] );
+	}, [ location?.search, homeSlug ] );
 
 	// Memoized pro purchase handler
 	const handleProPurchase = useCallback( ( event ) => {
 		event.preventDefault();
 
-		const proUrl = wpaib_localized_data?.pro_purchase_url;
-		if ( proUrl ) {
+		if ( proPurchaseUrl ) {
 			try {
-				window.open( proUrl, '_blank', 'noopener,noreferrer' );
+				window.open( proPurchaseUrl, '_blank', 'noopener,noreferrer' );
 			} catch ( error ) {
 				console.error( 'Failed to open pro purchase URL:', error );
 				// Fallback to location.href
-				window.location.href = proUrl;
+				window.location.href = proPurchaseUrl;
 			}
 		}
-	}, [ wpaib_localized_data?.pro_purchase_url ] );
-
-	// Memoized pro availability check
-	const proAvailable = useMemo( () => {
-		return Boolean( wpaib_localized_data?.pro_available );
-	}, [ wpaib_localized_data?.pro_available ] );
+	}, [ proPurchaseUrl ] );
 
 	return (
 		<section className="bg-white header-nav" role="navigation" aria-label="Main navigation">

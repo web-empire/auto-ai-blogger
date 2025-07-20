@@ -33,7 +33,7 @@ export default function PostIdeas() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 
-	const licenseEnabled = 'licensed' === ((typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status) || '');
+	const licenseEnabled = licenseStatus === 'licensed';
 
 	const fetchPostIdeas = async () => {
 		console.log( 'Fetching post ideas...', postIdeasFromRedux );
