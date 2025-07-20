@@ -109,6 +109,46 @@ const NavigationItem = memo(({
 
 NavigationItem.displayName = 'SettingsNavigationItem';
 
+// Error boundary for settings components
+class SettingsErrorBoundary extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = { hasError: false, error: null };
+	}
+
+	static getDerivedStateFromError(error) {
+		return { hasError: true, error };
+	}
+
+	componentDidCatch(error, errorInfo) {
+		console.error(`Error in ${this.props.componentName} component:`, error, errorInfo);
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return (
+				<div className="flex flex-col items-center justify-center p-8 text-center bg-red-50 border border-red-200 rounded-lg">
+					<TriangleAlert className="w-12 h-12 text-red-500 mb-4" aria-hidden="true" />
+					<h3 className="text-lg font-semibold text-red-800 mb-2">
+						{__('Component Error', 'wp-ai-blogger')}
+					</h3>
+					<p className="text-red-600 mb-4">
+						{__(`Failed to load ${this.props.componentName} settings. Please refresh the page or contact support.`, 'wp-ai-blogger')}
+					</p>
+					<button
+						onClick={() => this.setState({ hasError: false, error: null })}
+						className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+					>
+						{__('Try Again', 'wp-ai-blogger')}
+					</button>
+				</div>
+			);
+		}
+
+		return this.props.children;
+	}
+}
+
 function Settings() {
 	const siteTitle = useSelector((state) => state.siteTitle) || '';
 	const siteFor = useSelector((state) => state.siteFor) || '';
@@ -126,21 +166,21 @@ function Settings() {
 			name: __('General', 'wp-ai-blogger'),
 			slug: TAB_IDS.GENERAL,
 			icon: UserCircleIcon,
-			element: <General />,
+			component: General,
 			description: __('Basic site settings and configuration', 'wp-ai-blogger')
 		},
 		{
 			name: __('Notifications', 'wp-ai-blogger'),
 			slug: TAB_IDS.NOTIFICATIONS,
 			icon: BellIcon,
-			element: <Notifications />,
+			component: Notifications,
 			description: __('Manage email and push notifications', 'wp-ai-blogger')
 		},
 		{
 			name: __('License', 'wp-ai-blogger'),
 			slug: TAB_IDS.LICENSE,
 			icon: CubeIcon,
-			element: <License />,
+			component: License,
 			description: __('License activation and management', 'wp-ai-blogger')
 		},
 	], []);
@@ -321,7 +361,11 @@ function Settings() {
 										</span>
 									</div>
 								) : (
-									currentTab === item.slug && item.element
+									currentTab === item.slug && (
+										<SettingsErrorBoundary componentName={item.name}>
+											{React.createElement(item.component)}
+										</SettingsErrorBoundary>
+									)
 								)}
 							</div>
 						))}
