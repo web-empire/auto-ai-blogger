@@ -291,55 +291,44 @@ const License = memo(() => {
 
 			if (!isMountedRef.current) return;
 
-			setActivationText(__('Fetching tokens...', 'wp-ai-blogger'));
+			setActivationText(__('Loading token data...', 'wp-ai-blogger'));
 
-			// Fetch token data
-			const tokenResponse = await fetch(
-				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`,
-				{
-					method: 'GET',
-					headers: { 'Content-Type': 'application/json' },
+			// Refresh settings to get the token data that was saved by the backend
+			try {
+				const settingsResponse = await apiFetch({
+					path: '/wp-ai-blogger/v1/admin/settings/',
 					signal: abortController.signal
+				});
+
+				if (settingsResponse && !isMountedRef.current) return;
+
+				// Update Redux store with refreshed settings including token data
+				if (settingsResponse.tokenTotal !== undefined) {
+					dispatch({
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: settingsResponse.tokenTotal,
+					});
 				}
-			);
+				if (settingsResponse.tokenRemaining !== undefined) {
+					dispatch({
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: settingsResponse.tokenRemaining,
+					});
+				}
+			} catch (settingsError) {
+				console.error('Failed to refresh settings:', settingsError);
+				// Continue with activation success even if settings refresh fails
+			}
 
 			if (!isMountedRef.current) return;
 
-			if (!tokenResponse.ok) {
-				throw new Error(`HTTP error! status: ${tokenResponse.status}`);
-			}
+			setActivationText(__('Activated', 'wp-ai-blogger'));
+			setLicenseKey('');
 
-			const tokenData = await tokenResponse.json();
-
-			if (!isMountedRef.current) return;
-
-			if (tokenData?.success && tokenData?.data) {
-				// Update Redux store
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.data.total,
-				});
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.data.remaining,
-				});
-
-				// Save token values to local database to avoid repeated API calls
-				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
-
-				if (!isMountedRef.current) return;
-
-				setActivationText(__('Activated', 'wp-ai-blogger'));
-				setLicenseKey('');
-
-				dispatch({
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __('License activated successfully!', 'wp-ai-blogger'),
-				});
-			} else {
-				throw new Error(__('Invalid token response', 'wp-ai-blogger'));
-			}
+			dispatch({
+				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+				payload: __('License activated successfully!', 'wp-ai-blogger'),
+			});
 		} catch (error) {
 			// Don't update state if component is unmounted or request was aborted
 			if (!isMountedRef.current || error.name === 'AbortError') return;
@@ -470,10 +459,6 @@ const License = memo(() => {
 					type: 'UPDATE_TOKEN_REMAINING',
 					payload: tokenData.data.remaining,
 				});
-
-				// Save token values to local database to avoid repeated API calls
-				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 
 				if (isMountedRef.current) {
 					dispatch({
