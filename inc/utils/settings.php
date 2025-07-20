@@ -100,8 +100,8 @@ class Settings {
 					'type'    => 'int',
 				],
 				'postIdeas'        => [
-					'default' => null,
-					'type'    => 'array',
+					'default' => '',
+					'type'    => 'string',
 				],
 			]
 		);

@@ -194,7 +194,7 @@ class Menu {
 		$hate = 0;
 		$sexually_explicit = 0;
 		$dangerous_content = 0;
-		$post_ideas = [];
+		$post_ideas = '';
 		$token_total = 0;
 		$token_remaining = 0;
 		$license_status = 'unlicensed';
@@ -255,7 +255,7 @@ class Menu {
 		}
 
 		try {
-			$post_ideas = $this->sanitize_post_ideas( Helper::get_option( 'postIdeas', [] ) );
+			$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get postIdeas - ' . $e->getMessage() );
 		}
@@ -349,7 +349,7 @@ class Menu {
 				'site_title'         => $site_title,
 				'site_description'   => $site_description,
 				'site_for'           => $site_for,
-				'post_ideas'         => $post_ideas,
+				'postIdeas'          => $post_ideas,
 				'token_total'        => $token_total,
 				'token_remaining'    => $token_remaining,
 				'license'            => $license,
