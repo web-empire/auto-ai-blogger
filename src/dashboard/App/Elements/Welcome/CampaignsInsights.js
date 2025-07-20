@@ -159,11 +159,13 @@ EmptyState.displayName = 'CampaignsEmptyState';
 // Main component with enhanced features
 function CampaignsInsights({ onError }) {
 	const navigate = useNavigate();
-	const licenseStatus = useSelector((state) => state.licenseStatus) || 'unlicensed';
+	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
+	const allCampaigns = useSelector((state) => state.allCampaigns) || {};
+	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
 
 	// Memoized campaigns data with enhancements
 	const campaignsData = useMemo(() => {
-		const campaigns = (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.all_campaigns) || {};
+		const campaigns = allCampaigns;
 
 		if (!campaigns || typeof campaigns !== 'object') {
 			return { campaigns: [], totalCampaigns: 0, activeCampaigns: 0, totalPosts: 0, totalVisits: 0 };
@@ -181,30 +183,30 @@ function CampaignsInsights({ onError }) {
 			totalPosts,
 			totalVisits
 		};
-	}, []);
+	}, [allCampaigns]);
 
 	// Enhanced navigation handlers
 	const handleNavigateToLicense = useCallback((event) => {
 		event.preventDefault();
 		try {
-			navigate(`?page=${(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug) || 'wp-ai-blogger'}&path=settings&tab=license`);
+			navigate(`?page=${homeSlug}&path=settings&tab=license`);
 		} catch (error) {
 			console.error('Navigation error:', error);
 			onError?.(error, { component: 'CampaignsInsights', action: 'navigate_to_license' });
 		}
-	}, [navigate, onError]);
+	}, [navigate, onError, homeSlug]);
 
 	const handleViewCampaignDetails = useCallback((campaign) => {
 		try {
-			navigate(`?page=${(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug) || 'wp-ai-blogger'}&path=campaigns&id=${campaign.id}`);
+			navigate(`?page=${homeSlug}&path=campaigns&id=${campaign.id}`);
 		} catch (error) {
 			console.error('Navigation error:', error);
 			onError?.(error, { component: 'CampaignsInsights', action: 'view_campaign_details' });
 		}
-	}, [navigate, onError]);
+	}, [navigate, onError, homeSlug]);
 
 	// License check
-	if (licenseStatus === 'unlicensed') {
+	if (licenseStatus !== 'licensed') {
 		return <LicenseRequiredState onNavigateToLicense={handleNavigateToLicense} />;
 	}
 
