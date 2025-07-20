@@ -201,7 +201,7 @@ const LicenseForm = memo(({
 				<p id="license-help" className="text-xs text-gray-500">
 					{__('Don\'t have a license? ', 'wp-ai-blogger')}
 					<a
-						href={wpaib_localized_data.upgrade_link}
+						href={(typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.upgrade_link) || '#'}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-indigo-600 hover:text-indigo-800 underline"
@@ -248,10 +248,10 @@ const License = memo(() => {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_activate_license');
 			formData.append('license_key', licenseKey);
-			formData.append('nonce', wpaib_localized_data.licensing_nonce);
+			formData.append('nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
 
 			const response = await apiFetch({
-				url: ajaxurl,
+				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
 			});
@@ -335,10 +335,10 @@ const License = memo(() => {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_deactivate_license');
-			formData.append('nonce', wpaib_localized_data.licensing_nonce);
+			formData.append('nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
 
 			const response = await apiFetch({
-				url: ajaxurl,
+				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
 			});

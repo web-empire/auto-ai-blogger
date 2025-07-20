@@ -100,7 +100,7 @@ export default function PostIdeas() {
 	useEffect( () => {
 		fetchPostIdeas();
 
-		if ( licenseEnabled && postIdeas ) {
+		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' ) {
 			let formattedPostIdeas = postIdeas;
 
 			if ( ! postIdeas.includes( '\n' ) ) {

@@ -147,7 +147,7 @@ function Settings() {
 
 	// Memoized computed values
 	const licenseEnabled = useMemo(() =>
-		'licensed' === wpaib_localized_data.license_status,
+		'licensed' === ((typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status) || ''),
 		[]
 	);
 

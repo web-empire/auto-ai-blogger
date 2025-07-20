@@ -153,7 +153,7 @@ const Notifications = memo(() => {
 	const [notifications, setNotifications] = useState({
 		email: {
 			enabled: false,
-			value: wpaib_localized_data.admin_email || ''
+			value: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email) || ''
 		},
 		whatsapp: {
 			enabled: false,
