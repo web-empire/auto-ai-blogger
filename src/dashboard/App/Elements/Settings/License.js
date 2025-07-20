@@ -277,6 +277,15 @@ const License = memo(() => {
 
 		console.log('Fetching token data for license:', license);
 
+		// Cancel any existing token update request
+		if (abortControllerRef.current?.tokenUpdate) {
+			abortControllerRef.current.tokenUpdate.abort();
+		}
+
+		// Create new abort controller for this request
+		const abortController = new AbortController();
+		abortControllerRef.current.tokenUpdate = abortController;
+
 		try {
 			const response = await fetch(
 				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
@@ -311,16 +320,24 @@ const License = memo(() => {
 					payload: tokenData.data.remaining,
 				});
 
-				// Save to backend using the centralized API utility to prevent conflicts
-				try {
-					// Use the centralized updateApiData function for consistent state management
-					await Promise.all([
-						updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef),
-						updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef)
-					]);
-				} catch (saveError) {
-					console.error('Failed to save token data to backend:', saveError);
-				}
+				// Delayed backend save to prevent DOM conflicts
+				setTimeout(async () => {
+					try {
+						// Save token data to backend using individual calls with delay
+						await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
+
+						// Small delay between calls to prevent conflicts
+						setTimeout(async () => {
+							try {
+								await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+							} catch (error) {
+								console.warn('Failed to save tokenRemaining to backend:', error);
+							}
+						}, 100);
+					} catch (error) {
+						console.warn('Failed to save tokenTotal to backend:', error);
+					}
+				}, 500); // Wait 500ms for UI to stabilize
 
 				return tokenData;
 			} else {
@@ -329,8 +346,13 @@ const License = memo(() => {
 		} catch (error) {
 			console.error('Token fetch error:', error);
 			throw error;
+		} finally {
+			// Clean up abort controller
+			if (abortControllerRef.current?.tokenUpdate) {
+				delete abortControllerRef.current.tokenUpdate;
+			}
 		}
-	}, [license]);
+	}, [license, dispatch]);
 
 	// Cleanup effect
 	useEffect(() => {
