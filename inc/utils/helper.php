@@ -264,16 +264,7 @@ class Helper {
 				return max( 0, min( 4, $level ) );
 
 			case 'postIdeas':
-				if ( ! is_array( $value ) ) {
-					return [];
-				}
-				$sanitized = [];
-				foreach ( array_slice( $value, 0, 50 ) as $idea ) {
-					if ( is_string( $idea ) ) {
-						$sanitized[] = sanitize_textarea_field( $idea );
-					}
-				}
-				return $sanitized;
+				return sanitize_textarea_field( $value );
 
 			case 'tokenTotal':
 			case 'tokenRemaining':

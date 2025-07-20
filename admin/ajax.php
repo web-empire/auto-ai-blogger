@@ -515,7 +515,7 @@ class Ajax {
 
 			// Debug logging for postIdeas
 			if ( $sub_option_key === 'postIdeas' ) {
-				error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $sub_option_key . ', Value: ' . print_r( $sub_option_value, true ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
+				error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $sub_option_key . ', Original Value: ' . print_r( $_POST['value'], true ) . ', Sanitized Value: ' . print_r( $sub_option_value, true ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
 			}
 
 			if ( false === $update_result ) {

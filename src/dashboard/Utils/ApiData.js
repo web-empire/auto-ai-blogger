@@ -71,17 +71,6 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
 	try {
 		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value, config );
 
-		// Debug logging
-		console.log('Sending API request:', {
-			action: 'wpaib_update_admin_setting',
-			key: key,
-			value: value,
-			valueType: typeof value,
-			valueLength: typeof value === 'string' ? value.length : 'N/A',
-			nonce: config.nonce || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || 'NO_NONCE',
-			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php'
-		});
-
 		const response = await apiFetch( {
 			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
