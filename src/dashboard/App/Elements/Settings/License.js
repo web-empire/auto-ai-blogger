@@ -233,10 +233,21 @@ const License = memo(() => {
 
 	// Local token state to prevent Redux conflicts
 	const [localTokenData, setLocalTokenData] = useState({
-		total: tokenTotal,
-		remaining: tokenRemaining,
+		total: 0,
+		remaining: 0,
 		lastUpdated: null
 	});
+
+	// Initialize local token data from Redux on mount
+	useEffect(() => {
+		if (activated && (tokenTotal > 0 || tokenRemaining > 0)) {
+			setLocalTokenData({
+				total: tokenTotal,
+				remaining: tokenRemaining,
+				lastUpdated: new Date().toISOString()
+			});
+		}
+	}, []);
 
 	// Computed values
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
@@ -256,26 +267,6 @@ const License = memo(() => {
 		activated ? displayTokenTotal - displayTokenRemaining : 0,
 		[activated, displayTokenTotal, displayTokenRemaining]
 	);
-
-	// Debounced Redux update function to prevent rapid state changes
-	const debouncedReduxUpdate = useMemo(() => {
-		let timeoutId = null;
-		return (tokenData) => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-			timeoutId = setTimeout(() => {
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.total,
-				});
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.remaining,
-				});
-			}, 500); // 500ms debounce
-		};
-	}, [dispatch]);
 
 	// Function to fetch token data from external API
 	const fetchTokenData = useCallback(async () => {
@@ -309,13 +300,34 @@ const License = memo(() => {
 					lastUpdated: new Date().toISOString()
 				});
 
-				// Update Redux store with debounced dispatch to prevent DOM conflicts
-				debouncedReduxUpdate(tokenData.data);
-
-				// Also save to backend for persistence using existing API
+				// Only save to backend for persistence - avoid Redux conflicts entirely
 				try {
-					await updateApiData('tokenTotal', tokenData.data.total, dispatch);
-					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch);
+					// Save without triggering Redux updates to prevent DOM conflicts
+					const formData1 = new FormData();
+					formData1.append('action', 'wp_ai_blogger_save_settings');
+					formData1.append('field', 'tokenTotal');
+					formData1.append('value', tokenData.data.total);
+					formData1.append('wp_ai_blogger_security_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.security_nonce) || '');
+
+					const formData2 = new FormData();
+					formData2.append('action', 'wp_ai_blogger_save_settings');
+					formData2.append('field', 'tokenRemaining');
+					formData2.append('value', tokenData.data.remaining);
+					formData2.append('wp_ai_blogger_security_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.security_nonce) || '');
+
+					// Save both values in parallel without Redux updates
+					await Promise.all([
+						apiFetch({
+							url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
+							method: 'POST',
+							body: formData1
+						}),
+						apiFetch({
+							url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
+							method: 'POST',
+							body: formData2
+						})
+					]);
 				} catch (saveError) {
 					console.error('Failed to save token data to backend:', saveError);
 				}
@@ -328,7 +340,7 @@ const License = memo(() => {
 			console.error('Token fetch error:', error);
 			throw error;
 		}
-	}, [license, dispatch, debouncedReduxUpdate]);
+	}, [license]);
 
 	// Cleanup effect
 	useEffect(() => {
@@ -512,17 +524,6 @@ const License = memo(() => {
 			setProcessing(false);
 		}
 	}, [licenseStatus, processing, license, fetchTokenData, dispatch]);
-
-	// Sync local token data with Redux on mount and when Redux changes
-	useEffect(() => {
-		if (activated) {
-			setLocalTokenData(prev => ({
-				...prev,
-				total: tokenTotal,
-				remaining: tokenRemaining
-			}));
-		}
-	}, [activated, tokenTotal, tokenRemaining]);
 
 	// Reset button states when activation status changes
 	useEffect(() => {
