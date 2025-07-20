@@ -2,69 +2,6 @@ import React, { useMemo, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
-// Lazy load components for better performance
-const Welcome = React.lazy( () =>
-	import( '@DashboardApp/pages' ).then( module => ( { default: module.Welcome } ) )
-);
-const Settings = React.lazy( () =>
-	import( '@DashboardApp/pages' ).then( module => ( { default: module.Settings } ) )
-);
-const FreeVsPro = React.lazy( () =>
-	import( '@DashboardApp/pages' ).then( module => ( { default: module.FreeVsPro } ) )
-);
-const Campaigns = React.lazy( () =>
-	import( '@DashboardApp/pages' ).then( module => ( { default: module.Campaigns } ) )
-);
-
-/**
- * Route mapping with metadata
- */
-const ROUTE_MAP = {
-	'getting-started': {
-		component: Welcome,
-		title: __( 'Getting Started', 'wp-ai-blogger' ),
-		requiresLicense: false,
-	},
-	'': {
-		component: Welcome,
-		title: __( 'Welcome', 'wp-ai-blogger' ),
-		requiresLicense: false,
-	},
-	settings: {
-		component: Settings,
-		title: __( 'Settings', 'wp-ai-blogger' ),
-		requiresLicense: false,
-	},
-	'free-vs-pro': {
-		component: FreeVsPro,
-		title: __( 'Free vs Pro', 'wp-ai-blogger' ),
-		requiresLicense: false,
-	},
-	campaigns: {
-		component: Campaigns,
-		title: __( 'Campaigns', 'wp-ai-blogger' ),
-		requiresLicense: true,
-	},
-};
-
-/**
- * Loading component for Suspense fallback
- */
-const PageLoader = () => (
-	<div
-		className="flex items-center justify-center min-h-[400px] p-6"
-		aria-live="polite"
-		aria-label={ __( 'Loading page content', 'wp-ai-blogger' ) }
-	>
-		<div className="flex items-center space-x-3 text-slate-600">
-			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-			<span className="text-lg font-medium">
-				{ __( 'Loading...', 'wp-ai-blogger' ) }
-			</span>
-		</div>
-	</div>
-);
-
 /**
  * Error component for invalid routes or access denied
  */
@@ -119,7 +56,17 @@ const RouteError = ( { type = 'not-found', message } ) => {
 					{ errorMessages[ type ] }
 				</p>
 				<button
-					onClick={ () => window.location.href = `?page=${ wpaib_localized_data?.home_slug || 'wp-ai-blogger' }` }
+					onClick={ () => {
+						try {
+							const homeSlug = ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug )
+								? wpaib_localized_data.home_slug
+								: 'wp-ai-blogger';
+							window.location.href = `?page=${ homeSlug }`;
+						} catch ( error ) {
+							console.warn( 'Error navigating to home page:', error );
+							window.location.href = '?page=wp-ai-blogger';
+						}
+					} }
 					className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
 					type="button"
 				>
@@ -130,29 +77,130 @@ const RouteError = ( { type = 'not-found', message } ) => {
 	);
 };
 
+// Lazy load components for better performance with error handling
+const Welcome = React.lazy( () =>
+	import( '@DashboardApp/pages' )
+		.then( module => ( { default: module.Welcome } ) )
+		.catch( error => {
+			console.error( 'Failed to load Welcome component:', error );
+			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
+		} )
+);
+const Settings = React.lazy( () =>
+	import( '@DashboardApp/pages' )
+		.then( module => ( { default: module.Settings } ) )
+		.catch( error => {
+			console.error( 'Failed to load Settings component:', error );
+			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
+		} )
+);
+const FreeVsPro = React.lazy( () =>
+	import( '@DashboardApp/pages' )
+		.then( module => ( { default: module.FreeVsPro } ) )
+		.catch( error => {
+			console.error( 'Failed to load FreeVsPro component:', error );
+			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
+		} )
+);
+const Campaigns = React.lazy( () =>
+	import( '@DashboardApp/pages' )
+		.then( module => ( { default: module.Campaigns } ) )
+		.catch( error => {
+			console.error( 'Failed to load Campaigns component:', error );
+			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
+		} )
+);
+
+/**
+ * Route mapping with metadata
+ */
+const ROUTE_MAP = {
+	'getting-started': {
+		component: Welcome,
+		title: __( 'Getting Started', 'wp-ai-blogger' ),
+		requiresLicense: false,
+	},
+	'': {
+		component: Welcome,
+		title: __( 'Welcome', 'wp-ai-blogger' ),
+		requiresLicense: false,
+	},
+	settings: {
+		component: Settings,
+		title: __( 'Settings', 'wp-ai-blogger' ),
+		requiresLicense: false,
+	},
+	'free-vs-pro': {
+		component: FreeVsPro,
+		title: __( 'Free vs Pro', 'wp-ai-blogger' ),
+		requiresLicense: false,
+	},
+	campaigns: {
+		component: Campaigns,
+		title: __( 'Campaigns', 'wp-ai-blogger' ),
+		requiresLicense: true,
+	},
+};
+
+/**
+ * Loading component for Suspense fallback
+ */
+const PageLoader = () => (
+	<div
+		className="flex items-center justify-center min-h-[400px] p-6"
+		aria-live="polite"
+		aria-label={ __( 'Loading page content', 'wp-ai-blogger' ) }
+	>
+		<div className="flex items-center space-x-3 text-slate-600">
+			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+			<span className="text-lg font-medium">
+				{ __( 'Loading...', 'wp-ai-blogger' ) }
+			</span>
+		</div>
+	</div>
+);
+
 /**
  * Enhanced PagesRoute component with better error handling and performance
  */
 const PagesRoute = () => {
 	const { search } = useLocation();
 
-	// Memoize URL parsing
+	// Memoize URL parsing with safe data access
 	const { page, path, isValidPage } = useMemo( () => {
-		const query = new URLSearchParams( search );
-		const currentPage = query.get( 'page' ) || '';
-		const currentPath = query.get( 'path' ) || '';
-		const homeSlug = wpaib_localized_data?.home_slug || 'wp-ai-blogger';
+		try {
+			const query = new URLSearchParams( search );
+			const currentPage = query.get( 'page' ) || '';
+			const currentPath = query.get( 'path' ) || '';
 
-		return {
-			page: currentPage,
-			path: currentPath,
-			isValidPage: currentPage === homeSlug,
-		};
+			// Safely access localized data
+			const homeSlug = ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.home_slug )
+				? wpaib_localized_data.home_slug
+				: 'wp-ai-blogger';
+
+			return {
+				page: currentPage,
+				path: currentPath,
+				isValidPage: currentPage === homeSlug,
+			};
+		} catch ( error ) {
+			console.warn( 'Error parsing URL parameters:', error );
+			return {
+				page: '',
+				path: '',
+				isValidPage: false,
+			};
+		}
 	}, [ search ] );
 
-	// Memoize license status
+	// Memoize license status with safe data access
 	const isLicensed = useMemo( () => {
-		return wpaib_localized_data?.license_status === 'licensed';
+		try {
+			return ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.license_status === 'licensed' );
+		} catch ( error ) {
+			console.warn( 'Error accessing license status:', error );
+			return false;
+		}
 	}, [ wpaib_localized_data?.license_status ] );
 
 	// Handle invalid page parameter
@@ -160,7 +208,7 @@ const PagesRoute = () => {
 		return <RouteError type="invalid-page" />;
 	}
 
-	// Get route configuration
+	// Get route configuration safely
 	const routeConfig = ROUTE_MAP[ path ] || ROUTE_MAP[ '' ];
 
 	// Handle route not found
@@ -177,24 +225,34 @@ const PagesRoute = () => {
 
 	// Set document title for better UX and SEO
 	React.useEffect( () => {
-		if ( title ) {
-			const originalTitle = document.title;
-			document.title = `${ title } - WP AI Blogger`;
+		try {
+			if ( title ) {
+				const originalTitle = document.title;
+				document.title = `${ title } - WP AI Blogger`;
 
-			// Cleanup on unmount
-			return () => {
-				document.title = originalTitle;
-			};
+				// Cleanup on unmount
+				return () => {
+					document.title = originalTitle;
+				};
+			}
+		} catch ( error ) {
+			console.warn( 'Error setting document title:', error );
 		}
 	}, [ title ] );
 
-	return (
-		<Suspense fallback={ <PageLoader /> }>
-			<div className="wp-ai-blogger-page" data-page={ path || 'welcome' }>
-				<Component />
-			</div>
-		</Suspense>
-	);
+	// Render with error handling
+	try {
+		return (
+			<Suspense fallback={ <PageLoader /> }>
+				<div className="wp-ai-blogger-page" data-page={ path || 'welcome' }>
+					<Component />
+				</div>
+			</Suspense>
+		);
+	} catch ( error ) {
+		console.error( 'Error rendering PagesRoute:', error );
+		return <RouteError type="generic" message="Failed to render page" />;
+	}
 };
 
 export default PagesRoute;

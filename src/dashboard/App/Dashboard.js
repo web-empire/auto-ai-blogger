@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import MainNav from './MainNav';
-import { Route, Routes } from 'react-router-dom';
 import PagesRoute from './PagesRoute';
 import SettingsSavedNotification from './SettingsSavedNotification';
 import ErrorBoundary from '@Components/ErrorBoundary';
@@ -49,45 +48,6 @@ const LoadingFallback = () => (
 );
 
 /**
- * Custom Error Boundary component
- */
-class DashboardErrorBoundary extends React.Component {
-	constructor( props ) {
-		super( props );
-		this.state = { hasError: false, error: null };
-	}
-
-	static getDerivedStateFromError( error ) {
-		return { hasError: true, error };
-	}
-
-	componentDidCatch( error, errorInfo ) {
-		// Log error for debugging
-		console.error( 'Dashboard Error Boundary:', error, errorInfo );
-
-		// You can also log to an error reporting service here
-		// Example: logErrorToService(error, errorInfo);
-	}
-
-	resetError = () => {
-		this.setState( { hasError: false, error: null } );
-	};
-
-	render() {
-		if ( this.state.hasError ) {
-			return (
-				<ErrorFallback
-					error={ this.state.error }
-					resetErrorBoundary={ this.resetError }
-				/>
-			);
-		}
-
-		return this.props.children;
-	}
-}
-
-/**
  * Enhanced Dashboard component with error handling and performance optimization
  */
 const Dashboard = () => {
@@ -97,9 +57,7 @@ const Dashboard = () => {
 				<MainNav />
 				<SettingsSavedNotification />
 				<Suspense fallback={ <LoadingFallback /> }>
-					<Routes>
-						<Route path="*" element={ <PagesRoute /> } />
-					</Routes>
+					<PagesRoute />
 				</Suspense>
 			</ErrorBoundary>
 		</div>
