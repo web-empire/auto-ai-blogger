@@ -60,10 +60,15 @@ class Helper {
 			return $default;
 		}
 
-		// Check if key is in allowed list
-		if ( ! in_array( $key, self::$allowed_keys, true ) ) {
+		// Check if key is in allowed list (compare sanitized versions)
+		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			return $default;
 		}
+
+		// Get the original camelCase key for further processing
+		$original_key_index = array_search($key, $sanitized_allowed_keys);
+		$original_key = self::$allowed_keys[$original_key_index];
 
 		$settings = Settings::get_ai_blogger_settings();
 
@@ -83,8 +88,8 @@ class Helper {
 			return $default;
 		}
 
-		// Sanitize output based on key type
-		return self::sanitize_output( $key, $value );
+		// Sanitize output based on key type (use original camelCase key)
+		return self::sanitize_output( $original_key, $value );
 	}
 
 	/**
@@ -122,16 +127,22 @@ class Helper {
 			return false;
 		}
 
-		// Check if key is in allowed list
-		if ( ! in_array( $key, self::$allowed_keys, true ) ) {
+		// Check if key is in allowed list (compare sanitized versions)
+		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			error_log('WPAIB HELPER DEBUG: Key not in allowed list: ' . $key);
-			error_log('WPAIB HELPER DEBUG: Allowed keys: ' . print_r(self::$allowed_keys, true));
+			error_log('WPAIB HELPER DEBUG: Sanitized allowed keys: ' . print_r($sanitized_allowed_keys, true));
 			return false;
 		}
 		error_log('WPAIB HELPER DEBUG: Key in allowed list check passed');
 
-		// Sanitize value based on key type
-		$sanitized_value = self::sanitize_input( $key, $value );
+		// Get the original camelCase key for switch statements
+		$original_key_index = array_search($key, $sanitized_allowed_keys);
+		$original_key = self::$allowed_keys[$original_key_index];
+		error_log('WPAIB HELPER DEBUG: Original camelCase key: ' . $original_key);
+
+		// Sanitize value based on key type (use original camelCase key for switch)
+		$sanitized_value = self::sanitize_input( $original_key, $value );
 		error_log('WPAIB HELPER DEBUG: Sanitized value result: ' . print_r($sanitized_value, true));
 		error_log('WPAIB HELPER DEBUG: Sanitized value === false: ' . ($sanitized_value === false ? 'true' : 'false'));
 
@@ -148,13 +159,13 @@ class Helper {
 			$settings = [];
 		}
 
-		// Get default value for comparison
-		$default_value = Settings::get_default_option( $key );
-		error_log('WPAIB HELPER DEBUG: Default value for key ' . $key . ': ' . print_r($default_value, true));
+		// Get default value for comparison (use original camelCase key)
+		$default_value = Settings::get_default_option( $original_key );
+		error_log('WPAIB HELPER DEBUG: Default value for key ' . $original_key . ': ' . print_r($default_value, true));
 		error_log('WPAIB HELPER DEBUG: Comparing sanitized_value === default_value: ' . ($sanitized_value === $default_value ? 'true' : 'false'));
 
 		// If the value is same as default then remove it from the DB.
-		if ( Settings::get_default_option( $key ) === $sanitized_value ) {
+		if ( Settings::get_default_option( $original_key ) === $sanitized_value ) {
 			error_log('WPAIB HELPER DEBUG: Value matches default, unsetting from array');
 			unset( $settings[ $key ] );
 		} else {
@@ -199,8 +210,9 @@ class Helper {
 			return false;
 		}
 
-		// Check if key is in allowed list
-		if ( ! in_array( $key, self::$allowed_keys, true ) ) {
+		// Check if key is in allowed list (compare sanitized versions)
+		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			return false;
 		}
 
@@ -387,11 +399,16 @@ class Helper {
 	 */
 	private static function validate_settings_array( array $settings ): array {
 		$validated = [];
+		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
 
 		foreach ( $settings as $key => $value ) {
-			// Only include allowed keys
-			if ( in_array( $key, self::$allowed_keys, true ) ) {
-				$sanitized_value = self::sanitize_input( $key, $value );
+			// Only include allowed keys (compare with sanitized versions)
+			if ( in_array( $key, $sanitized_allowed_keys, true ) ) {
+				// Get original camelCase key for sanitization
+				$original_key_index = array_search($key, $sanitized_allowed_keys);
+				$original_key = self::$allowed_keys[$original_key_index];
+
+				$sanitized_value = self::sanitize_input( $original_key, $value );
 				if ( $sanitized_value !== false ) {
 					$validated[ $key ] = $sanitized_value;
 				}
@@ -422,14 +439,20 @@ class Helper {
 
 		$updated = false;
 
+		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+
 		foreach ( $options as $key => $value ) {
 			$key = sanitize_key( $key );
 
-			if ( ! in_array( $key, self::$allowed_keys, true ) ) {
+			if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 				continue;
 			}
 
-			$sanitized_value = self::sanitize_input( $key, $value );
+			// Get original camelCase key for sanitization
+			$original_key_index = array_search($key, $sanitized_allowed_keys);
+			$original_key = self::$allowed_keys[$original_key_index];
+
+			$sanitized_value = self::sanitize_input( $original_key, $value );
 
 			if ( $sanitized_value !== false ) {
 				$settings[ $key ] = $sanitized_value;
