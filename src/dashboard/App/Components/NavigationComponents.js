@@ -136,17 +136,57 @@ export const TokenDisplayAndRefresh = () => {
 	const formattedTokensUsed = tokensUsed.toLocaleString();
 	const formattedTotalTokens = totalTokens.toLocaleString();
 
+	// Calculate progress percentage and status
+	const progressPercentage = totalTokens > 0 ? ((totalTokens - tokenRemaining) / totalTokens) * 100 : 0;
+	const getTokenStatus = () => {
+		const remaining = tokenRemaining;
+		if (remaining >= 1000) {
+			return {
+				text: __('Plenty of tokens', 'wp-ai-blogger'),
+				color: 'bg-green-500'
+			};
+		}
+		if (remaining >= 100) {
+			return {
+				text: __('Moderate', 'wp-ai-blogger'),
+				color: 'bg-amber-500'
+			};
+		}
+		return {
+			text: __('Low', 'wp-ai-blogger'),
+			color: 'bg-red-500'
+		};
+	};
+	const tokenStatus = getTokenStatus();
+
 	return (
-		<div className="flex items-center gap-2 border-r">
-			<p className={ `text-sm m-0 p-0 ${
-				isError ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
-			}` }>
-				{ formattedTokensUsed }
-				{ '/' }
-				{ formattedTotalTokens }
-				{ ' ' }
-				{ __( 'Tokens', 'wp-ai-blogger' ) }
-			</p>
+		<div className="flex items-center gap-2">
+			<div className="flex flex-col gap-1">
+				<p className={ `text-sm m-0 p-0 ${
+					isError ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
+				}` }>
+					{ formattedTokensUsed }
+					{ '/' }
+					{ formattedTotalTokens }
+					{ ' ' }
+					{ __( 'Tokens', 'wp-ai-blogger' ) }
+				</p>
+
+				{/* Progress bar */}
+				<Tooltip
+					text={ tokenStatus.text }
+					delay={ 100 }
+					className="z-[99999] bg-black text-xs text-white shadow-md p-2 rounded-md"
+				>
+					<div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-help">
+						<div
+							className={ `h-full transition-all duration-500 ease-in-out ${tokenStatus.color}` }
+							style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+						/>
+					</div>
+				</Tooltip>
+			</div>
+
 			<button
 				disabled={ licenseStatus !== 'licensed' || processing || ! license }
 				className={ `

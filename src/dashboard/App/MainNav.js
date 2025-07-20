@@ -131,9 +131,9 @@ export default function MainNav() {
 						</nav>
 					</div>
 
-					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex gap-6 items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
+					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0 divide-x divide-slate-200">
 						{ ! proAvailable && (
-							<div className="text-sm font-medium text-slate-600 border-r hover:text-[#1E293B] hover:svg-hover-color">
+							<div className="text-sm font-medium text-slate-600 hover:text-[#1E293B] hover:svg-hover-color pr-6">
 								<button
 									onClick={ handleProPurchase }
 									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded px-2 py-1 transition-colors duration-200"
@@ -162,10 +162,12 @@ export default function MainNav() {
 							</div>
 						) }
 
-						<TokenDisplayAndRefresh />
+						<div className={ `${ ! proAvailable ? 'pl-6' : '' }` }>
+							<TokenDisplayAndRefresh />
+						</div>
 
 						<div
-							className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 divide-x divide-slate-200 gap-2 border-r"
+							className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 gap-2 pl-6"
 							aria-label="Version information"
 						>
 							<CoreVersion />

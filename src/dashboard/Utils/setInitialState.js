@@ -9,11 +9,12 @@ const setInitialState = ( store ) => {
 			const currentState = store.getState();
 
 			// Debug logging for license preservation
-			console.log('setInitialState - License preservation check:', {
+			console.log('setInitialState - License selection:', {
 				currentLicense: currentState.license,
 				currentLicenseStatus: currentState.license_status,
 				apiLicense: wpAiBloggerSettings.license,
-				shouldPreserveLicense: !!(currentState.license && !wpAiBloggerSettings.license)
+				selectedLicense: currentState.license || wpAiBloggerSettings.license || '',
+				source: currentState.license ? 'current_state' : (wpAiBloggerSettings.license ? 'api' : 'none')
 			});
 
 			// Only update specific fields that should come from the API, preserve others
@@ -31,11 +32,8 @@ const setInitialState = ( store ) => {
 				...(wpAiBloggerSettings.sexually_explicit !== undefined && { sexuallyExplicit: wpAiBloggerSettings.sexually_explicit }),
 				...(wpAiBloggerSettings.dangerous_content !== undefined && { dangerousContent: wpAiBloggerSettings.dangerous_content }),
 				...(wpAiBloggerSettings.post_ideas && { postIdeas: wpAiBloggerSettings.post_ideas }),
-				// Preserve license and license_status from initial state (they come from PHP localized data)
-				// Only update license if API provides one AND current state doesn't have one
-				...(wpAiBloggerSettings.license && !currentState.license && { license: wpAiBloggerSettings.license }),
-				// Always preserve existing license in current state - never override with empty API data
-				...(currentState.license && { license: currentState.license }),
+				// License handling: Use current state license if it exists, otherwise use API license
+				license: currentState.license || wpAiBloggerSettings.license || '',
 				// Only update tokens if API returns better data than what we already have
 				...(wpAiBloggerSettings.tokenTotal > currentState.tokenTotal && { tokenTotal: wpAiBloggerSettings.tokenTotal }),
 				...(wpAiBloggerSettings.tokenRemaining > currentState.tokenRemaining && { tokenRemaining: wpAiBloggerSettings.tokenRemaining }),
