@@ -1,4 +1,4 @@
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
@@ -77,39 +77,11 @@ const RouteError = ( { type = 'not-found', message } ) => {
 	);
 };
 
-// Lazy load components for better performance with error handling
-const Welcome = React.lazy( () =>
-	import( '@DashboardApp/pages' )
-		.then( module => ( { default: module.Welcome } ) )
-		.catch( error => {
-			console.error( 'Failed to load Welcome component:', error );
-			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
-		} )
-);
-const Settings = React.lazy( () =>
-	import( '@DashboardApp/pages' )
-		.then( module => ( { default: module.Settings } ) )
-		.catch( error => {
-			console.error( 'Failed to load Settings component:', error );
-			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
-		} )
-);
-const FreeVsPro = React.lazy( () =>
-	import( '@DashboardApp/pages' )
-		.then( module => ( { default: module.FreeVsPro } ) )
-		.catch( error => {
-			console.error( 'Failed to load FreeVsPro component:', error );
-			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
-		} )
-);
-const Campaigns = React.lazy( () =>
-	import( '@DashboardApp/pages' )
-		.then( module => ( { default: module.Campaigns } ) )
-		.catch( error => {
-			console.error( 'Failed to load Campaigns component:', error );
-			return { default: () => <RouteError type="generic" message="Failed to load page component" /> };
-		} )
-);
+// Import components directly to avoid lazy loading issues temporarily
+import Welcome from '@DashboardApp/Pages/Welcome';
+import Settings from '@DashboardApp/Pages/Settings';
+import FreeVsPro from '@DashboardApp/Pages/FreeVsPro';
+import Campaigns from '@DashboardApp/Pages/Campaigns';
 
 /**
  * Route mapping with metadata
@@ -242,12 +214,16 @@ const PagesRoute = () => {
 
 	// Render with error handling
 	try {
+		// Validate component before rendering
+		if ( ! Component || typeof Component !== 'function' ) {
+			console.error( 'Invalid component:', Component );
+			return <RouteError type="generic" message="Invalid component configuration" />;
+		}
+
 		return (
-			<Suspense fallback={ <PageLoader /> }>
-				<div className="wp-ai-blogger-page" data-page={ path || 'welcome' }>
-					<Component />
-				</div>
-			</Suspense>
+			<div className="wp-ai-blogger-page" data-page={ path || 'welcome' }>
+				<Component />
+			</div>
 		);
 	} catch ( error ) {
 		console.error( 'Error rendering PagesRoute:', error );

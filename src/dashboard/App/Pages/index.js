@@ -1,11 +1,9 @@
-// Enhanced Pages module exports with lazy loading support and better organization
-import { lazy } from 'react';
-
-// Lazy load page components for better performance
-const Welcome = lazy(() => import('./Welcome'));
-const Settings = lazy(() => import('./Settings'));
-const FreeVsPro = lazy(() => import('./FreeVsPro'));
-const Campaigns = lazy(() => import('./Campaigns'));
+// Enhanced Pages module exports with better organization
+// Import page components directly (lazy loading handled at routing level)
+import Welcome from './Welcome';
+import Settings from './Settings';
+import FreeVsPro from './FreeVsPro';
+import Campaigns from './Campaigns';
 
 // Page metadata for better organization and routing
 export const pageMetadata = {
