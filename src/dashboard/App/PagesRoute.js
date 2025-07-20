@@ -214,12 +214,6 @@ const PagesRoute = () => {
 
 	// Render with error handling
 	try {
-		// Validate component before rendering
-		if ( ! Component || typeof Component !== 'function' ) {
-			console.error( 'Invalid component:', Component );
-			return <RouteError type="generic" message="Invalid component configuration" />;
-		}
-
 		return (
 			<div className="wp-ai-blogger-page" data-page={ path || 'welcome' }>
 				<Component />
