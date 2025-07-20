@@ -114,6 +114,7 @@ const globalDataReducer = ( state = initialState, action ) => {
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
 		UPDATE_LICENSE_STATUS: () => ( { ...state, licenseStatus: String( action.payload || 'inactive' ) } ),
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
+		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),
 		RESET_STATE: () => initialState,
 	};
 

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import globalDataStore from '@AdminRoot/store/globalDataStore';
 import setInitialState from '@Utils/setInitialState';
 import Entry from '@DashboardApp/Entry';
+import ErrorBoundary from '@Components/ErrorBoundary';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 const currentState = globalDataStore.getState();
@@ -18,10 +19,12 @@ if ( container ) {
 	const root = createRoot( container );
 
 	root.render(
-		<Provider store={ globalDataStore }>
-			<Router>
-				<Entry />
-			</Router>
-		</Provider>
+		<ErrorBoundary>
+			<Provider store={ globalDataStore }>
+				<Router>
+					<Entry />
+				</Router>
+			</Provider>
+		</ErrorBoundary>
 	);
 }

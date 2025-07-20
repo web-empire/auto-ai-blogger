@@ -277,12 +277,63 @@ class Menu {
 			error_log( 'WP AI Blogger: Failed to get license_status - ' . $e->getMessage() );
 		}
 
-		// Validate numeric ranges
-		$temperature = max( 0, min( 2, $temperature ) );
-		$harassment = max( 0, min( 4, $harassment ) );
-		$hate = max( 0, min( 4, $hate ) );
-		$sexually_explicit = max( 0, min( 4, $sexually_explicit ) );
-		$dangerous_content = max( 0, min( 4, $dangerous_content ) );
+		// Get data with error handling
+		$post_statuses = [];
+		$categories = [];
+		$tags = [];
+		$authors = [];
+		$post_types = [];
+		$postmeta_defaults = [];
+		$all_campaigns = [];
+		$generated_posts = [];
+
+		try {
+			$post_statuses = $this->get_sanitized_post_statuses();
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get post statuses - ' . $e->getMessage() );
+		}
+
+		try {
+			$categories = $this->get_sanitized_categories();
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get categories - ' . $e->getMessage() );
+		}
+
+		try {
+			$tags = $this->get_sanitized_tags();
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get tags - ' . $e->getMessage() );
+		}
+
+		try {
+			$authors = $this->get_sanitized_authors();
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get authors - ' . $e->getMessage() );
+		}
+
+		try {
+			$post_types = $this->get_sanitized_post_types();
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get post types - ' . $e->getMessage() );
+		}
+
+		try {
+			$postmeta_defaults = $this->sanitize_metadata_defaults( Metadata::get_default_settings() );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get metadata defaults - ' . $e->getMessage() );
+		}
+
+		try {
+			$all_campaigns = $this->sanitize_campaigns_data( wpaib_get_all_campaigns() );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get campaigns - ' . $e->getMessage() );
+		}
+
+		try {
+			$generated_posts = $this->sanitize_posts_data( wpaib_get_generated_posts() );
+		} catch ( Exception $e ) {
+			error_log( 'WP AI Blogger: Failed to get generated posts - ' . $e->getMessage() );
+		}
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',
@@ -290,7 +341,7 @@ class Menu {
 				'ajax_url'           => admin_url( 'admin-ajax.php' ),
 				'rest_url'           => rest_url( WP_AI_BLOGGER_SLUG . '/v1/' ),
 				'version'            => WP_AI_BLOGGER_VERSION,
-				'upgrade_link'       => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
+				'upgrade_link'       => defined( 'WP_AI_BLOGGER_UPGRADE_LINK' ) ? esc_url( WP_AI_BLOGGER_UPGRADE_LINK ) : '',
 				'admin_nonce'        => wp_create_nonce( 'wpaib_admin_nonce' ),
 				'rest_nonce'         => wp_create_nonce( 'wp_rest' ),
 				'admin_page_nonce'   => wp_create_nonce( 'wp_ai_blogger_admin_page' ),
@@ -338,6 +389,11 @@ class Menu {
 				'security_level'     => 'enhanced',
 			]
 		);
+
+		// Debug logging in development
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'WP AI Blogger Localized Data: ' . print_r( $localized_data, true ) );
+		}
 
 		$handle = 'wp_ai_auto_blogger_admin_scripts';
 		$build_path = WP_AI_BLOGGER_BASE_URL . 'assets/build/';

@@ -66,7 +66,7 @@ const Entry = () => {
 				payload: true,
 			} );
 		}
-	}, [] ); // Empty dependency array for mount-only effect
+	}, [ appState.initialStateSetFlag, dispatch ] ); // Include dependencies
 
 	// Error recovery function
 	const handleErrorRecovery = () => {

@@ -37,12 +37,45 @@ const getInitialState = () => {
 	// Ensure wpaib_localized_data exists
 	if ( typeof wpaib_localized_data === 'undefined' ) {
 		console.warn( 'wpaib_localized_data is not defined, using default state' );
-		return {};
+		return {
+			initialStateSetFlag: false,
+			activeSettingsNavigationTab: 'general',
+			settingsSavedNotification: false,
+			confettiShow: false,
+			onboardingTab: 0,
+			siteTitle: '',
+			siteFor: '',
+			siteDescription: '',
+			license: '',
+			userOnboarded: false,
+			userName: '',
+			userEmail: '',
+			pluginSettings: {},
+			temperature: 0.7,
+			harassment: false,
+			hate: false,
+			sexuallyExplicit: false,
+			dangerousContent: false,
+			postIdeas: [],
+			tokenTotal: 0,
+			tokenRemaining: 0,
+			licenseStatus: 'inactive',
+			isLoading: false,
+			error: null,
+		};
 	}
 
 	// Build initial state with safe parsing
 	const parsedState = {
-		...( wpaib_localized_data.defaults || {} ),
+		initialStateSetFlag: false,
+		activeSettingsNavigationTab: 'general',
+		settingsSavedNotification: false,
+		confettiShow: false,
+		onboardingTab: 0,
+		userName: safeParseLocalizedData( wpaib_localized_data.current_user_name, 'string', '' ),
+		userEmail: safeParseLocalizedData( wpaib_localized_data.current_user_email, 'string', '' ),
+		userOnboarded: safeParseLocalizedData( wpaib_localized_data.userOnboarded, 'boolean', false ),
+		pluginSettings: {},
 		siteTitle: safeParseLocalizedData( wpaib_localized_data.site_title, 'string', '' ),
 		siteFor: safeParseLocalizedData( wpaib_localized_data.site_for, 'string', '' ),
 		siteDescription: safeParseLocalizedData( wpaib_localized_data.site_description, 'string', '' ),
@@ -56,6 +89,8 @@ const getInitialState = () => {
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		licenseStatus: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
+		isLoading: false,
+		error: null,
 	};
 
 	// Apply WordPress hooks filter if available
@@ -83,6 +118,38 @@ const createEnhancedStore = () => {
 	try {
 		const initialState = getInitialState();
 		const devTools = configureDevTools();
+
+		// Validate initial state
+		if ( ! initialState || typeof initialState !== 'object' ) {
+			console.error( 'Invalid initial state, using fallback' );
+			const fallbackState = {
+				initialStateSetFlag: false,
+				activeSettingsNavigationTab: 'general',
+				settingsSavedNotification: false,
+				confettiShow: false,
+				onboardingTab: 0,
+				siteTitle: '',
+				siteFor: '',
+				siteDescription: '',
+				license: '',
+				userOnboarded: false,
+				userName: '',
+				userEmail: '',
+				pluginSettings: {},
+				temperature: 0.7,
+				harassment: false,
+				hate: false,
+				sexuallyExplicit: false,
+				dangerousContent: false,
+				postIdeas: [],
+				tokenTotal: 0,
+				tokenRemaining: 0,
+				licenseStatus: 'inactive',
+				isLoading: false,
+				error: null,
+			};
+			return createStore( globalDataReducer, fallbackState );
+		}
 
 		// Use compose to properly combine enhancers
 		const enhancers = devTools ? compose( devTools ) : undefined;
@@ -117,7 +184,12 @@ const createEnhancedStore = () => {
 	} catch ( error ) {
 		console.error( 'Failed to create Redux store:', error );
 		// Return a minimal store as fallback
-		return createStore( globalDataReducer, {} );
+		const fallbackState = {
+			initialStateSetFlag: false,
+			error: 'Failed to initialize store',
+			isLoading: false,
+		};
+		return createStore( globalDataReducer, fallbackState );
 	}
 };
 

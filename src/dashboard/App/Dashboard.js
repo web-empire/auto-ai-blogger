@@ -1,8 +1,9 @@
-import React, { Suspense, ErrorBoundary } from 'react';
+import React, { Suspense } from 'react';
 import MainNav from './MainNav';
 import { Route, Routes } from 'react-router-dom';
 import PagesRoute from './PagesRoute';
 import SettingsSavedNotification from './SettingsSavedNotification';
+import ErrorBoundary from '@Components/ErrorBoundary';
 
 /**
  * Error fallback component for error boundaries
@@ -92,17 +93,15 @@ class DashboardErrorBoundary extends React.Component {
 const Dashboard = () => {
 	return (
 		<div className="wp-ai-blogger-dashboard" role="main">
-			<DashboardErrorBoundary>
+			<ErrorBoundary>
 				<MainNav />
 				<SettingsSavedNotification />
 				<Suspense fallback={ <LoadingFallback /> }>
-					<DashboardErrorBoundary>
-						<Routes>
-							<Route path="*" element={ <PagesRoute /> } />
-						</Routes>
-					</DashboardErrorBoundary>
+					<Routes>
+						<Route path="*" element={ <PagesRoute /> } />
+					</Routes>
 				</Suspense>
-			</DashboardErrorBoundary>
+			</ErrorBoundary>
 		</div>
 	);
 };
