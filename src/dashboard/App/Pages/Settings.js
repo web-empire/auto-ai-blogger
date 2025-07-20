@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect, memo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { aiClassNames } from '@Utils/aiClassNames';
 import { BellIcon, UserCircleIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { General, Notifications, License } from '@Elements/Settings';
@@ -112,6 +112,7 @@ NavigationItem.displayName = 'SettingsNavigationItem';
 
 function Settings() {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const siteTitle = useSelector((state) => state.siteTitle) || '';
 	const siteFor = useSelector((state) => state.siteFor) || '';
 	const siteDescription = useSelector((state) => state.siteDescription) || '';
@@ -136,9 +137,7 @@ function Settings() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [loadError, setLoadError] = useState(null);
 
-	const settings = useSettingsSelector();
-
-	// Memoized navigation configuration
+	const settings = useSettingsSelector();	// Memoized navigation configuration
 	const navigationConfig = useMemo(() => [
 		{
 			name: __('General', 'wp-ai-blogger'),
@@ -182,7 +181,7 @@ function Settings() {
 		return navigationConfig;
 	}, [navigationConfig, licenseEnabled]);
 
-	// Enhanced tab change handler with loading state
+	// Enhanced tab change handler with URL sync
 	const handleTabChange = useCallback(async (newTab) => {
 		if (newTab === currentTab) return;
 
@@ -191,13 +190,27 @@ function Settings() {
 
 		try {
 			setCurrentTab(newTab);
+
+			// Update URL to reflect tab change
+			const searchParams = new URLSearchParams(location.search);
+			if (newTab === TAB_IDS.GENERAL) {
+				// Remove tab parameter for general tab (default)
+				searchParams.delete('tab');
+			} else {
+				searchParams.set('tab', newTab);
+			}
+
+			// Update URL without triggering a page reload
+			const newSearch = searchParams.toString();
+			const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+			navigate(newUrl, { replace: true });
 		} catch (error) {
 			console.error('Error changing tab:', error);
 			setLoadError(__('Failed to load settings page', 'wp-ai-blogger'));
 		} finally {
 			setIsLoading(false);
 		}
-	}, [currentTab]);
+	}, [currentTab, location.search, location.pathname, navigate]);
 
 	// Get current tab data
 	const currentTabData = useMemo(() =>
@@ -229,13 +242,14 @@ function Settings() {
 		}
 	}, [availableNavigation, currentTab]);
 
-	// Handle URL tab parameter changes
+	// Handle external URL tab parameter changes (like from "Activate License" button)
 	useEffect(() => {
-		const newTab = getInitialTab();
-		if (newTab !== currentTab && availableNavigation.some(item => item.slug === newTab)) {
-			setCurrentTab(newTab);
+		const urlTab = getInitialTab();
+		// Only update if the URL tab is different from current tab and is valid
+		if (urlTab !== currentTab && availableNavigation.some(item => item.slug === urlTab)) {
+			setCurrentTab(urlTab);
 		}
-	}, [location.search, getInitialTab, currentTab, availableNavigation]);
+	}, [location.search, getInitialTab, availableNavigation]); // Removed currentTab to prevent conflicts
 
 	if (loadError) {
 		return (
