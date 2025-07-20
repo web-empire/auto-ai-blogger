@@ -1,14 +1,6 @@
-</**
+<?php
+/**
  * Licensing Class for WP AI Blogger.
- *
- * This class handles all licensing related operations with security measures.
- * Implements input validation, data sanitization, rate limiting,
- * and secure license management.
- *
- * @package wp-ai-blogger
- * @subpackage Admin
- * @since 1.0.0
- */* Licensing Class for WP AI Blogger.
  *
  * This class handles all licensing related operations with security measures.
  * Implements comprehensive input validation, data sanitization, rate limiting,
@@ -80,6 +72,17 @@ class Licensing {
 			return;
 		}
 
+		// Initialize licensing on init hook to ensure WordPress is fully loaded
+		add_action( 'init', [ $this, 'initialize_licensing' ], 1 );
+	}
+
+	/**
+	 * Initialize licensing functionality.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function initialize_licensing(): void {
 		// Check if user has appropriate capabilities early
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_ajax() ) {
 			return;
