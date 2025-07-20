@@ -322,6 +322,9 @@ const License = memo(() => {
 							console.log('Attempting to save tokenTotal:', tokenData.data.total);
 							console.log('Available nonce:', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce));
 
+							// Re-enable backend save to test with debug logging
+							console.log('Testing backend save with debug logging enabled');
+
 							await updateApiData('tokenTotal', tokenData.data.total, dispatch);
 							console.log('Successfully saved tokenTotal');
 

@@ -90,6 +90,8 @@ const updateApiData = async ( key, value, dispatch ) => {
 		if ( response?.success ) {
 			return response;
 		} else {
+			// Log the full response for debugging
+			console.error('Full API response:', response);
 			throw new Error( response?.data?.message || 'API request failed' );
 		}
 	} catch ( error ) {
