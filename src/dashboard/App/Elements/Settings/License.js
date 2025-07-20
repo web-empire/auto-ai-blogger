@@ -136,6 +136,7 @@ const License = memo(() => {
 	const license = useSelector((state) => state.license) || '';
 	const upgradeLink = useSelector((state) => state.upgradeLink) || '#';
 	const licensingNonce = useSelector((state) => state.licensingNonce) || '';
+	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
 
 	// Local state
 	const [processing, setProcessing] = useState(false);
