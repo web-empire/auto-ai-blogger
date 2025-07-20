@@ -220,6 +220,7 @@ LicenseForm.displayName = 'LicenseForm';
 const License = memo(() => {
 	const dispatch = useDispatch();
 	const abortControllerRef = useRef({});
+	const isMountedRef = useRef(true);
 
 	// Redux selectors with fallbacks
 	const licenseStatus = useSelector((state) => state.licenseStatus) || 'unlicensed';
@@ -237,24 +238,46 @@ const License = memo(() => {
 	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
 	const tokensUsed = useMemo(() => activated ? tokenTotal - tokenRemaining : 0, [activated, tokenTotal, tokenRemaining]);
 
+	// Cleanup effect to prevent memory leaks and React errors
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+			// Cancel any ongoing requests
+			Object.values(abortControllerRef.current).forEach(controller => {
+				if (controller && typeof controller.abort === 'function') {
+					controller.abort();
+				}
+			});
+		};
+	}, []);
+
 	// Enhanced license activation with better error handling
 	const activateLicense = useCallback(async () => {
-		if (!licenseKey.trim() || processing) return;
+		if (!licenseKey.trim() || processing || !isMountedRef.current) return;
 
 		setActivationText(__('Activating...', 'wp-ai-blogger'));
 		setProcessing(true);
+
+		// Create abort controller for this request
+		const abortController = new AbortController();
+		abortControllerRef.current['activation'] = abortController;
 
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_activate_license');
 			formData.append('license_key', licenseKey);
-			formData.append('nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
+			formData.append('wp_ai_blogger_licensing_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
 
 			const response = await apiFetch({
 				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
+				signal: abortController.signal
 			});
+
+			// Check if component is still mounted before updating state
+			if (!isMountedRef.current) return;
 
 			if (!response.success) {
 				throw new Error(response?.data?.message || __('License activation failed', 'wp-ai-blogger'));
@@ -266,6 +289,8 @@ const License = memo(() => {
 				payload: 'licensed',
 			});
 
+			if (!isMountedRef.current) return;
+
 			setActivationText(__('Fetching tokens...', 'wp-ai-blogger'));
 
 			// Fetch token data
@@ -274,14 +299,19 @@ const License = memo(() => {
 				{
 					method: 'GET',
 					headers: { 'Content-Type': 'application/json' },
+					signal: abortController.signal
 				}
 			);
+
+			if (!isMountedRef.current) return;
 
 			if (!tokenResponse.ok) {
 				throw new Error(`HTTP error! status: ${tokenResponse.status}`);
 			}
 
 			const tokenData = await tokenResponse.json();
+
+			if (!isMountedRef.current) return;
 
 			if (tokenData?.success && tokenData?.data) {
 				// Update Redux store
@@ -298,6 +328,8 @@ const License = memo(() => {
 				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
 				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 
+				if (!isMountedRef.current) return;
+
 				setActivationText(__('Activated', 'wp-ai-blogger'));
 				setLicenseKey('');
 
@@ -309,6 +341,9 @@ const License = memo(() => {
 				throw new Error(__('Invalid token response', 'wp-ai-blogger'));
 			}
 		} catch (error) {
+			// Don't update state if component is unmounted or request was aborted
+			if (!isMountedRef.current || error.name === 'AbortError') return;
+
 			console.error('License activation error:', error);
 
 			setActivationText(__('Activate', 'wp-ai-blogger'));
@@ -321,27 +356,39 @@ const License = memo(() => {
 				payload: error.message || __('Failed to activate license', 'wp-ai-blogger'),
 			});
 		} finally {
-			setProcessing(false);
+			if (isMountedRef.current) {
+				setProcessing(false);
+			}
+			// Clean up abort controller
+			delete abortControllerRef.current['activation'];
 		}
 	}, [licenseKey, processing, dispatch]);
 
 	// Enhanced license deactivation
 	const deactivateLicense = useCallback(async () => {
-		if (processing) return;
+		if (processing || !isMountedRef.current) return;
 
 		setDeactivationText(__('Deactivating...', 'wp-ai-blogger'));
 		setProcessing(true);
 
+		// Create abort controller for this request
+		const abortController = new AbortController();
+		abortControllerRef.current['deactivation'] = abortController;
+
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_deactivate_license');
-			formData.append('nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
+			formData.append('wp_ai_blogger_licensing_nonce', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.licensing_nonce) || '');
 
 			const response = await apiFetch({
 				url: (typeof ajaxurl !== 'undefined' && ajaxurl) || '/wp-admin/admin-ajax.php',
 				method: 'POST',
 				body: formData,
+				signal: abortController.signal
 			});
+
+			// Check if component is still mounted before updating state
+			if (!isMountedRef.current) return;
 
 			if (response.success) {
 				setLicenseKey('');
@@ -358,8 +405,10 @@ const License = memo(() => {
 					payload: 0,
 				});
 
-				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
-				setActivationText(__('Activate', 'wp-ai-blogger'));
+				if (isMountedRef.current) {
+					setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
+					setActivationText(__('Activate', 'wp-ai-blogger'));
+				}
 			}
 
 			dispatch({
@@ -367,18 +416,29 @@ const License = memo(() => {
 				payload: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
 			});
 		} catch (error) {
+			// Don't update state if component is unmounted or request was aborted
+			if (!isMountedRef.current || error.name === 'AbortError') return;
+
 			console.error('Deactivation error:', error);
 			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
 		} finally {
-			setProcessing(false);
+			if (isMountedRef.current) {
+				setProcessing(false);
+			}
+			// Clean up abort controller
+			delete abortControllerRef.current['deactivation'];
 		}
 	}, [processing, dispatch]);
 
 	// Enhanced token refresh
 	const refreshTokens = useCallback(async () => {
-		if (licenseStatus !== 'licensed' || processing || !license) return;
+		if (licenseStatus !== 'licensed' || processing || !license || !isMountedRef.current) return;
 
 		setProcessing(true);
+
+		// Create abort controller for this request
+		const abortController = new AbortController();
+		abortControllerRef.current['refresh'] = abortController;
 
 		try {
 			const response = await fetch(
@@ -386,14 +446,20 @@ const License = memo(() => {
 				{
 					method: 'GET',
 					headers: { 'Content-Type': 'application/json' },
+					signal: abortController.signal
 				}
 			);
+
+			// Check if component is still mounted before updating state
+			if (!isMountedRef.current) return;
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 
 			const tokenData = await response.json();
+
+			if (!isMountedRef.current) return;
 
 			if (tokenData?.success && tokenData?.data) {
 				dispatch({
@@ -408,21 +474,30 @@ const License = memo(() => {
 				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
 				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 
-				dispatch({
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
-				});
+				if (isMountedRef.current) {
+					dispatch({
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
+					});
+				}
 			} else {
 				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
 			}
 		} catch (error) {
+			// Don't update state if component is unmounted or request was aborted
+			if (!isMountedRef.current || error.name === 'AbortError') return;
+
 			console.error('Token refresh error:', error);
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: __('Failed to refresh token data', 'wp-ai-blogger'),
 			});
 		} finally {
-			setProcessing(false);
+			if (isMountedRef.current) {
+				setProcessing(false);
+			}
+			// Clean up abort controller
+			delete abortControllerRef.current['refresh'];
 		}
 	}, [licenseStatus, processing, license, dispatch]);
 
