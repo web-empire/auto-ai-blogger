@@ -1,9 +1,7 @@
-// Enhanced Welcome Elements module with lazy loading and metadata
-import { lazy } from 'react';
-
-// Lazy load components for better performance
-const CampaignsInsights = lazy(() => import('./CampaignsInsights'));
-const PostIdeas = lazy(() => import('./PostIdeas/PostIdeas'));
+// Enhanced Welcome Elements module with direct imports (lazy loading handled at page level)
+// Import components directly to avoid double lazy loading
+import CampaignsInsights from './CampaignsInsights';
+import PostIdeas from './PostIdeas/PostIdeas';
 
 // Component metadata for better organization
 export const welcomeComponents = {

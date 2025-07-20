@@ -1,31 +1,10 @@
-import React, { memo, Suspense } from 'react';
+import React, { memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Settings } from 'lucide-react';
 import SettingsContainer from '@Components/SettingsContainer';
 
-// Lazy load the Persona component for better performance
-const Persona = React.lazy(() => import('@Elements/Settings/Group').then(module => ({ default: module.Persona })));
-
-// Loading fallback component
-const PersonaLoader = memo(() => (
-	<div className="animate-pulse space-y-6" role="status" aria-label={__('Loading persona settings...', 'wp-ai-blogger')}>
-		<div className="space-y-4">
-			<div className="h-4 bg-gray-300 rounded w-1/4"></div>
-			<div className="h-10 bg-gray-200 rounded"></div>
-		</div>
-		<div className="space-y-4">
-			<div className="h-4 bg-gray-300 rounded w-1/3"></div>
-			<div className="h-10 bg-gray-200 rounded"></div>
-		</div>
-		<div className="space-y-4">
-			<div className="h-4 bg-gray-300 rounded w-1/2"></div>
-			<div className="h-24 bg-gray-200 rounded"></div>
-		</div>
-		<div className="sr-only">{__('Loading settings form...', 'wp-ai-blogger')}</div>
-	</div>
-));
-
-PersonaLoader.displayName = 'PersonaLoader';
+// Import the Persona component directly to avoid double lazy loading
+import { Persona } from '@Elements/Settings/Group';
 
 // Enhanced General settings component
 const General = memo(() => {
@@ -52,34 +31,30 @@ const General = memo(() => {
 				</div>
 			</header>
 
-			{/* Settings content with error boundary */}
+			{/* Settings content */}
 			<section aria-labelledby="persona-section-heading">
-				<Suspense
-					fallback={<PersonaLoader />}
-				>
-					<SettingsContainer
-						title={__('Site Persona', 'wp-ai-blogger')}
-						description={__('Help AI understand your site\'s personality and target audience to generate more relevant and engaging content.', 'wp-ai-blogger')}
-						element={
-							<div className="space-y-4">
-								<Persona />
+				<SettingsContainer
+					title={__('Site Persona', 'wp-ai-blogger')}
+					description={__('Help AI understand your site\'s personality and target audience to generate more relevant and engaging content.', 'wp-ai-blogger')}
+					element={
+						<div className="space-y-4">
+							<Persona />
 
-								{/* Additional help text */}
-								<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-									<h3 className="text-sm font-medium text-blue-900 mb-2">
-										{__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
-									</h3>
-									<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-										<li>{__('Be specific about your target audience and industry', 'wp-ai-blogger')}</li>
-										<li>{__('Include your brand voice and tone preferences', 'wp-ai-blogger')}</li>
-										<li>{__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')}</li>
-									</ul>
-								</div>
+							{/* Additional help text */}
+							<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+								<h3 className="text-sm font-medium text-blue-900 mb-2">
+									{__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
+								</h3>
+								<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+									<li>{__('Be specific about your target audience and industry', 'wp-ai-blogger')}</li>
+									<li>{__('Include your brand voice and tone preferences', 'wp-ai-blogger')}</li>
+									<li>{__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')}</li>
+								</ul>
 							</div>
-						}
-						className="bg-white shadow-sm rounded-lg border border-gray-200"
-					/>
-				</Suspense>
+						</div>
+					}
+					className="bg-white shadow-sm rounded-lg border border-gray-200"
+				/>
 			</section>
 
 			{/* Screen reader navigation summary */}
