@@ -109,46 +109,6 @@ const NavigationItem = memo(({
 
 NavigationItem.displayName = 'SettingsNavigationItem';
 
-// Error boundary for settings components
-class SettingsErrorBoundary extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { hasError: false, error: null };
-	}
-
-	static getDerivedStateFromError(error) {
-		return { hasError: true, error };
-	}
-
-	componentDidCatch(error, errorInfo) {
-		console.error(`Error in ${this.props.componentName} component:`, error, errorInfo);
-	}
-
-	render() {
-		if (this.state.hasError) {
-			return (
-				<div className="flex flex-col items-center justify-center p-8 text-center bg-red-50 border border-red-200 rounded-lg">
-					<TriangleAlert className="w-12 h-12 text-red-500 mb-4" aria-hidden="true" />
-					<h3 className="text-lg font-semibold text-red-800 mb-2">
-						{__('Component Error', 'wp-ai-blogger')}
-					</h3>
-					<p className="text-red-600 mb-4">
-						{__(`Failed to load ${this.props.componentName} settings. Please refresh the page or contact support.`, 'wp-ai-blogger')}
-					</p>
-					<button
-						onClick={() => this.setState({ hasError: false, error: null })}
-						className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-					>
-						{__('Try Again', 'wp-ai-blogger')}
-					</button>
-				</div>
-			);
-		}
-
-		return this.props.children;
-	}
-}
-
 function Settings() {
 	const siteTitle = useSelector((state) => state.siteTitle) || '';
 	const siteFor = useSelector((state) => state.siteFor) || '';
@@ -180,7 +140,7 @@ function Settings() {
 			name: __('License', 'wp-ai-blogger'),
 			slug: TAB_IDS.LICENSE,
 			icon: CubeIcon,
-			component: License,
+			renderContent: () => <div>Test tab</div>,
 			description: __('License activation and management', 'wp-ai-blogger')
 		},
 	], []);
@@ -208,12 +168,13 @@ function Settings() {
 	const handleTabChange = useCallback(async (newTab) => {
 		if (newTab === currentTab) return;
 
+		console.log('Switching to tab:', newTab);
+
 		setIsLoading(true);
 		setLoadError(null);
 
 		try {
-			// Simulate async operation (e.g., loading tab-specific data)
-			await new Promise(resolve => setTimeout(resolve, 150));
+			// Immediate tab switch for testing
 			setCurrentTab(newTab);
 		} catch (error) {
 			console.error('Error changing tab:', error);
@@ -322,12 +283,22 @@ function Settings() {
 			>
 				<div className="mx-auto max-w-3xl">
 					{/* Enhanced content header with current tab info */}
-					<ContentHeader
-						title={currentTabData?.name}
-						description={currentTabData?.description}
-						tab={currentTab}
-						{...settings}
-					/>
+					{(() => {
+						console.log('ContentHeader props:', {
+							title: currentTabData?.name,
+							description: currentTabData?.description,
+							tab: currentTab,
+							settings
+						});
+						return (
+							<ContentHeader
+								title={currentTabData?.name}
+								description={currentTabData?.description}
+								tab={currentTab}
+								{...settings}
+							/>
+						);
+					})()}
 
 					{/* Tab panels with proper ARIA roles */}
 					<div className="mt-6">
@@ -361,11 +332,23 @@ function Settings() {
 										</span>
 									</div>
 								) : (
-									currentTab === item.slug && (
-										<SettingsErrorBoundary componentName={item.name}>
-											{React.createElement(item.component)}
-										</SettingsErrorBoundary>
-									)
+									currentTab === item.slug && (() => {
+										console.log('Rendering tab content for:', item.slug, 'item:', item);
+										try {
+											if (item.component) {
+												console.log('Rendering component:', item.component.name || 'Unknown');
+												return React.createElement(item.component);
+											} else if (item.renderContent) {
+												console.log('Rendering content function');
+												return item.renderContent();
+											}
+											console.log('No content to render');
+											return null;
+										} catch (error) {
+											console.error('Error rendering content:', error);
+											return <div>Error: {error.message}</div>;
+										}
+									})()
 								)}
 							</div>
 						))}
