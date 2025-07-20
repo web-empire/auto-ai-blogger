@@ -289,6 +289,10 @@ const License = memo(() => {
 				payload: 'licensed',
 			});
 
+			// Save license key and status to local database
+			await updateApiData('license', licenseKey, dispatch, abortControllerRef);
+			await updateApiData('licenseStatus', 'licensed', dispatch, abortControllerRef);
+
 			if (!isMountedRef.current) return;
 
 			setActivationText(__('Fetching tokens...', 'wp-ai-blogger'));
@@ -324,7 +328,7 @@ const License = memo(() => {
 					payload: tokenData.data.remaining,
 				});
 
-				// Update API data
+				// Save token values to local database to avoid repeated API calls
 				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
 				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 
@@ -405,6 +409,12 @@ const License = memo(() => {
 					payload: 0,
 				});
 
+				// Clear license data from local database
+				await updateApiData('license', '', dispatch, abortControllerRef);
+				await updateApiData('licenseStatus', 'unlicensed', dispatch, abortControllerRef);
+				await updateApiData('tokenTotal', 0, dispatch, abortControllerRef);
+				await updateApiData('tokenRemaining', 0, dispatch, abortControllerRef);
+
 				if (isMountedRef.current) {
 					setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
 					setActivationText(__('Activate', 'wp-ai-blogger'));
@@ -471,6 +481,7 @@ const License = memo(() => {
 					payload: tokenData.data.remaining,
 				});
 
+				// Save token values to local database to avoid repeated API calls
 				await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
 				await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 

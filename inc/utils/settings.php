@@ -87,6 +87,18 @@ class Settings {
 					'default' => '',
 					'type'    => 'string',
 				],
+				'licenseStatus'    => [
+					'default' => 'unlicensed',
+					'type'    => 'string',
+				],
+				'tokenTotal'       => [
+					'default' => 0,
+					'type'    => 'int',
+				],
+				'tokenRemaining'   => [
+					'default' => 0,
+					'type'    => 'int',
+				],
 				'postIdeas'        => [
 					'default' => null,
 					'type'    => 'array',
