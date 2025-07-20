@@ -20,7 +20,7 @@ const initialState = {
 	hate: false,
 	sexuallyExplicit: false,
 	dangerousContent: false,
-	postIdeas: [],
+	postIdeas: '',
 	tokenTotal: 0,
 	tokenRemaining: 0,
 	license_status: 'inactive',
@@ -126,7 +126,7 @@ const globalDataReducer = ( state = initialState, action ) => {
 		UPDATE_SEXUALLY_EXPLICIT: () => ( { ...state, sexuallyExplicit: Boolean( action.payload ) } ),
 		UPDATE_DANGEROUS_CONTENT: () => ( { ...state, dangerousContent: Boolean( action.payload ) } ),
 		UPDATE_POST_IDEAS: () => {
-			const ideas = Array.isArray( action.payload ) ? action.payload : [];
+			const ideas = typeof action.payload === 'string' ? action.payload : '';
 			return { ...state, postIdeas: ideas };
 		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Plus, MoveRight, RotateCw } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
@@ -14,6 +14,7 @@ const UPDATE_POST_IDEAS = 'UPDATE_POST_IDEAS';
 export default function PostIdeas() {
 	const dispatch = useDispatch();
 	const abortControllerRef = useRef( {} );
+	const hasFetchedRef = useRef( false );
 	const navigate = useNavigate();
 
 	// Fetch data from Redux store using selectors.
@@ -37,22 +38,20 @@ export default function PostIdeas() {
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
+	const [ isApiError, setIsApiError ] = useState( false );
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
-	const fetchPostIdeas = async () => {
-		console.log( 'Fetching post ideas...', postIdeasFromRedux );
-		// Check if all required data is populated in Redux
-		if ( postIdeasFromRedux ) {
-			setLoading( false );
-			return;
-		}
+	const fetchPostIdeas = useCallback( async () => {
+		console.log( 'Fetching post ideas...' );
 
 		setLoading( true );
 		setError( null );
+		setIsApiError( false );
 
 		if ( ! siteTitle || ! siteFor || ! siteDescription ) {
 			setError( 'Missing required fields' );
+			setIsApiError( false ); // Not an API error
 			setLoading( false );
 			return;
 		}
@@ -79,7 +78,11 @@ export default function PostIdeas() {
 			if ( ! response.ok ) {
 				const errorData = await response.json();
 				console.error( 'API Error:', errorData );
-				throw new Error( errorData.message || 'Failed to fetch post ideas.' );
+				const errorMessage = errorData.message || 'Failed to fetch post ideas.';
+				setError( errorMessage );
+				setIsApiError( true ); // This is an API error
+				setLoading( false );
+				return;
 			}
 
 			const data = await response.json();
@@ -94,18 +97,42 @@ export default function PostIdeas() {
 				setLoading( false );
 			} else {
 				console.error( 'API Error: Invalid response from API' );
-				throw new Error( 'Invalid response from API.' );
+				setError( 'Invalid response from API.' );
+				setIsApiError( true ); // This is an API error
+				setLoading( false );
 			}
 		} catch ( err ) {
 			console.error( 'API Error:', err );
 			setError( err.message );
+			setIsApiError( true ); // This is an API error
 			setLoading( false );
 		}
-	};
+	}, [
+		siteTitle,
+		siteFor,
+		siteDescription,
+		temperature,
+		harassment,
+		hate,
+		sexuallyExplicit,
+		dangerousContent,
+		license,
+		dispatch
+	] );
 
 	useEffect( () => {
-		fetchPostIdeas();
+		// Only fetch post ideas if we don't have them, license is enabled, and we haven't already tried to fetch
+		if ( licenseEnabled && ( ! postIdeasFromRedux || postIdeasFromRedux.trim() === '' ) && ! hasFetchedRef.current ) {
+			hasFetchedRef.current = true;
+			fetchPostIdeas();
+		} else if ( postIdeasFromRedux && postIdeasFromRedux.trim() !== '' ) {
+			// If we already have post ideas, just stop loading
+			setLoading( false );
+		}
+	}, [ licenseEnabled, postIdeasFromRedux, fetchPostIdeas ] );
 
+	useEffect( () => {
+		// Process post ideas when they change (separate from fetching)
 		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' ) {
 			let formattedPostIdeas = postIdeas;
 
@@ -133,12 +160,18 @@ export default function PostIdeas() {
 			setPostIdeasArr( ideasArray );
 			setLoading( false );
 		}
-	}, [ postIdeas ] );
+	}, [ postIdeas, licenseEnabled ] );
 
 	const handleRefresh = () => {
+		dispatch( {
+			type: UPDATE_POST_IDEAS,
+			payload: '',
+		} );
 		setPostIdeas( '' );
 		setLoading( true );
 		setError( null );
+		setIsApiError( false );
+		hasFetchedRef.current = false; // Reset the fetch flag to allow refetch
 		fetchPostIdeas();
 	};
 
@@ -176,6 +209,15 @@ export default function PostIdeas() {
 					>
 						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
 					</ProButton>
+					{ isApiError && (
+						<button
+							onClick={ handleRefresh }
+							className="mt-4 flex items-center gap-2 bg-gray-600 text-white rounded px-4 py-2"
+						>
+							<RotateCw className="h-4 w-4" />
+							{ __( 'Retry', 'wp-ai-blogger' ) }
+						</button>
+					) }
 				</div>
 			);
 		}
@@ -203,13 +245,15 @@ export default function PostIdeas() {
 		return (
 			<div className="p-4 text-red-500 flex flex-col items-center">
 				<p> { __( 'Error while loading post ideas:', 'wp-ai-blogger' ) } { error } </p>
-				<button
-					onClick={ handleRefresh }
-					className="mt-4 flex items-center gap-2 bg-indigo-600 text-white rounded px-4 py-2"
-				>
-					<RotateCw className="h-4 w-4" />
-					{ __( 'Retry', 'wp-ai-blogger' ) }
-				</button>
+				{ isApiError && (
+					<button
+						onClick={ handleRefresh }
+						className="mt-4 flex items-center gap-2 bg-indigo-600 text-white rounded px-4 py-2"
+					>
+						<RotateCw className="h-4 w-4" />
+						{ __( 'Retry', 'wp-ai-blogger' ) }
+					</button>
+				) }
 			</div>
 		);
 	}
