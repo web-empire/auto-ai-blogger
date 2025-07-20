@@ -223,7 +223,7 @@ const License = memo(() => {
 			setProcessing(false);
 			delete abortControllerRef.current['activation'];
 		}
-	}, [licenseKey, processing, dispatch, fetchTokenData]);
+	}, [licenseKey, processing, dispatch]);
 
 	// Enhanced license deactivation
 	const deactivateLicense = useCallback(async () => {
@@ -248,20 +248,22 @@ const License = memo(() => {
 				signal: abortController.signal
 			});
 
-		if (response.success) {
-			setLicenseKey('');
-			dispatch({
-				type: 'UPDATE_LICENSE_STATUS',
-				payload: 'unlicensed',
-			});
-			dispatch({
-				type: 'UPDATE_LICENSE',
-				payload: '',
-			});
+			if (response.success) {
+				setLicenseKey('');
+				dispatch({
+					type: 'UPDATE_LICENSE_STATUS',
+					payload: 'unlicensed',
+				});
+				dispatch({
+					type: 'UPDATE_LICENSE',
+					payload: '',
+				});
 
-			setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
-			setActivationText(__('Activate', 'wp-ai-blogger'));
-		}			dispatch({
+				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
+				setActivationText(__('Activate', 'wp-ai-blogger'));
+			}
+
+			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
 			});
