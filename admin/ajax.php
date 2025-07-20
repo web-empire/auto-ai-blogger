@@ -451,6 +451,7 @@ class Ajax {
 			'daysActive'     => $days_active,
 			'authorName'     => $author_name,
 			'topPosts'       => $top_posts,
+			'lastRun'        => Metadata::get_campaign_meta( $campaign_id, 'last_run' ) ?: __( 'Never', 'wp-ai-blogger' ),
 		];
 
 		wp_send_json_success( $analytics_data );
