@@ -156,14 +156,20 @@ const LicenseStep = memo(() => {
 	const reduxLicense = useSelector((state) => state.license);
 
 	// Component state
-	const [license, setLicense] = useState(reduxLicense || wpaib_localized_data.license || '');
+	const [license, setLicense] = useState(() => {
+		// Ensure we always have a string value
+		const initialLicense = reduxLicense || wpaib_localized_data?.license || '';
+		return typeof initialLicense === 'string' ? initialLicense : '';
+	});
 	const [licenseStatus, setLicenseStatus] = useState(wpaib_localized_data?.license_status);
 	const [processing, setProcessing] = useState(false);
 	const [error, setError] = useState('');
 
 	// Enhanced license activation
 	const activateLicense = useCallback(async () => {
-		if (!license.trim() || processing) return false;
+		// Ensure license is a string and not empty
+		const licenseValue = typeof license === 'string' ? license.trim() : '';
+		if (!licenseValue || processing) return false;
 
 		setProcessing(true);
 		setError('');
@@ -171,7 +177,7 @@ const LicenseStep = memo(() => {
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_activate_license');
-			formData.append('license_key', license);
+			formData.append('license_key', licenseValue);
 			formData.append('nonce', wpaib_localized_data.licensing_nonce);
 
 			const response = await apiFetch({
@@ -187,12 +193,12 @@ const LicenseStep = memo(() => {
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'licensed',
 				});
-				dispatch({ type: 'UPDATE_LICENSE', payload: license });
+				dispatch({ type: 'UPDATE_LICENSE', payload: licenseValue });
 
 				setLicenseStatus('licensed');
 
 				// Update API data
-				await updateApiData('license', license, dispatch, abortControllerRef);
+				await updateApiData('license', licenseValue, dispatch, abortControllerRef);
 
 				return true;
 			} else {
@@ -210,7 +216,9 @@ const LicenseStep = memo(() => {
 
 	// Enhanced form submission
 	const handleSubmit = useCallback(async () => {
-		if (!license.trim()) {
+		// Ensure license is a string and not empty
+		const licenseValue = typeof license === 'string' ? license.trim() : '';
+		if (!licenseValue) {
 			setError(__('License key is required.', 'wp-ai-blogger'));
 			return;
 		}
@@ -226,7 +234,9 @@ const LicenseStep = memo(() => {
 
 	// Handle license input change
 	const handleLicenseChange = useCallback((value) => {
-		setLicense(value);
+		// Ensure we always set a string value
+		const stringValue = typeof value === 'string' ? value : '';
+		setLicense(stringValue);
 		if (error) setError(''); // Clear error when user types
 	}, [error]);
 
@@ -291,7 +301,7 @@ const LicenseStep = memo(() => {
 							<div className="flex justify-center pt-4">
 								<SubmitButton
 									onClick={handleSubmit}
-									disabled={!license.trim()}
+									disabled={!(typeof license === 'string' && license.trim())}
 									loading={processing}
 								>
 									{getButtonText()}
