@@ -414,7 +414,7 @@ class Licensing {
 	 */
 	private function validate_license_security() {
 		// CSRF protection
-		if ( ! check_ajax_referer( 'wp_ai_blogger_licensing_nonce', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'wp_ai_blogger_licensing_nonce', 'wp_ai_blogger_licensing_nonce', false ) ) {
 			return new \WP_Error( 'invalid_nonce', $this->error_messages['nonce'] );
 		}
 
