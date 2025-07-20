@@ -216,53 +216,10 @@ const LicenseForm = memo(({
 
 LicenseForm.displayName = 'LicenseForm';
 
-// Error boundary wrapper for safer DOM operations
-const SafeLicenseWrapper = memo(({ children }) => {
-	const [hasError, setHasError] = useState(false);
-
-	useEffect(() => {
-		const handleError = (event) => {
-			// Handle specific DOM errors that might occur
-			if (event.error && event.error.message &&
-				(event.error.message.includes('removeChild') ||
-				 event.error.message.includes('Node') ||
-				 event.error.message.includes('NotFoundError'))) {
-				setHasError(true);
-				event.preventDefault();
-				console.warn('DOM error caught and handled:', event.error.message);
-			}
-		};
-
-		window.addEventListener('error', handleError);
-		return () => window.removeEventListener('error', handleError);
-	}, []);
-
-	if (hasError) {
-		return (
-			<div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-				<p className="text-yellow-800">
-					{__('Component temporarily unavailable. Please refresh the page.', 'wp-ai-blogger')}
-				</p>
-				<button
-					onClick={() => setHasError(false)}
-					className="mt-2 px-3 py-1 bg-yellow-200 text-yellow-800 rounded text-sm hover:bg-yellow-300"
-				>
-					{__('Retry', 'wp-ai-blogger')}
-				</button>
-			</div>
-		);
-	}
-
-	return children;
-});
-
-SafeLicenseWrapper.displayName = 'SafeLicenseWrapper';
-
 // Main License component
 const License = memo(() => {
 	const dispatch = useDispatch();
 	const abortControllerRef = useRef({});
-	const isMountedRef = useRef(true);
 
 	// Redux selectors with fallbacks
 	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
@@ -282,11 +239,10 @@ const License = memo(() => {
 
 	// Function to fetch token data from external API
 	const fetchTokenData = useCallback(async () => {
-		if (!license || !isMountedRef.current) return;
+		if (!license) return;
 
-		let response;
 		try {
-			response = await fetch(
+			const response = await fetch(
 				`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${license}`,
 				{
 					method: 'GET',
@@ -300,40 +256,23 @@ const License = memo(() => {
 
 			const tokenData = await response.json();
 
-			// Check if component is still mounted before proceeding
-			if (!isMountedRef.current) return;
-
 			if (tokenData?.success && tokenData?.data) {
-				// Only update Redux if component is still mounted
-				if (isMountedRef.current) {
-					dispatch({
-						type: 'UPDATE_TOKEN_TOTAL',
-						payload: tokenData.data.total,
-					});
-					dispatch({
-						type: 'UPDATE_TOKEN_REMAINING',
-						payload: tokenData.data.remaining,
-					});
-				}
+				// Update Redux store with token data
+				dispatch({
+					type: 'UPDATE_TOKEN_TOTAL',
+					payload: tokenData.data.total,
+				});
+				dispatch({
+					type: 'UPDATE_TOKEN_REMAINING',
+					payload: tokenData.data.remaining,
+				});
 
-				// Also save to backend for persistence
+				// Also save to backend for persistence using existing API
 				try {
-					// Only save if component is still mounted
-					if (isMountedRef.current) {
-						await apiFetch({
-							path: '/wp-ai-blogger/v1/admin/settings/',
-							method: 'POST',
-							data: {
-								tokenTotal: tokenData.data.total,
-								tokenRemaining: tokenData.data.remaining,
-							},
-						});
-					}
+					await updateApiData('tokenTotal', tokenData.data.total, dispatch);
+					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch);
 				} catch (saveError) {
-					// Only log if component is still mounted
-					if (isMountedRef.current) {
-						console.error('Failed to save token data to backend:', saveError);
-					}
+					console.error('Failed to save token data to backend:', saveError);
 				}
 
 				return tokenData;
@@ -341,56 +280,26 @@ const License = memo(() => {
 				throw new Error(__('Invalid response from token API', 'wp-ai-blogger'));
 			}
 		} catch (error) {
-			// Only log errors if component is still mounted and it's not an abort error
-			if (isMountedRef.current && error.name !== 'AbortError') {
-				console.error('Token fetch error:', error);
-			}
+			console.error('Token fetch error:', error);
 			throw error;
 		}
 	}, [license, dispatch]);
 
-	// Cleanup effect to prevent memory leaks and React errors
+	// Cleanup effect
 	useEffect(() => {
-		isMountedRef.current = true;
-
-		// Cleanup function to prevent DOM errors
 		return () => {
-			isMountedRef.current = false;
-
-			// Cancel any ongoing requests with error handling
-			try {
-				Object.values(abortControllerRef.current).forEach(controller => {
-					if (controller && typeof controller.abort === 'function') {
-						try {
-							controller.abort();
-						} catch (abortError) {
-							// Silently ignore abort errors during cleanup
-						}
-					}
-				});
-
-				// Clear the abort controllers
-				abortControllerRef.current = {};
-			} catch (cleanupError) {
-				// Silently ignore cleanup errors
-			}
+			// Cancel any ongoing requests
+			Object.values(abortControllerRef.current).forEach(controller => {
+				if (controller && typeof controller.abort === 'function') {
+					controller.abort();
+				}
+			});
 		};
 	}, []);
 
-	// Additional safety effect to handle component unmounting during async operations
-	useEffect(() => {
-		// This effect runs on every render to ensure isMountedRef is current
-		return () => {
-			// Double-check mounted state in cleanup
-			if (!isMountedRef.current) {
-				return;
-			}
-		};
-	});
-
 	// Enhanced license activation with better error handling
 	const activateLicense = useCallback(async () => {
-		if (!licenseKey.trim() || processing || !isMountedRef.current) return;
+		if (!licenseKey.trim() || processing) return;
 
 		setActivationText(__('Activating...', 'wp-ai-blogger'));
 		setProcessing(true);
@@ -412,9 +321,6 @@ const License = memo(() => {
 				signal: abortController.signal
 			});
 
-			// Check if component is still mounted before updating state
-			if (!isMountedRef.current) return;
-
 			if (!response.success) {
 				throw new Error(response?.data?.message || __('License activation failed', 'wp-ai-blogger'));
 			}
@@ -424,8 +330,6 @@ const License = memo(() => {
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'licensed',
 			});
-
-			if (!isMountedRef.current) return;
 
 			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
 
@@ -437,8 +341,6 @@ const License = memo(() => {
 				// Don't fail license activation if token fetch fails
 			}
 
-			if (!isMountedRef.current) return;
-
 			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setLicenseKey('');
 
@@ -447,8 +349,7 @@ const License = memo(() => {
 				payload: __('License activated and token data loaded successfully!', 'wp-ai-blogger'),
 			});
 		} catch (error) {
-			// Don't update state if component is unmounted or request was aborted
-			if (!isMountedRef.current || error.name === 'AbortError') return;
+			if (error.name === 'AbortError') return;
 
 			console.error('License activation error:', error);
 
@@ -462,27 +363,14 @@ const License = memo(() => {
 				payload: error.message || __('Failed to activate license', 'wp-ai-blogger'),
 			});
 		} finally {
-			// Always clean up, even if there are errors
-			try {
-				if (isMountedRef.current) {
-					setProcessing(false);
-				}
-			} catch (stateError) {
-				// Ignore state update errors during cleanup
-			}
-
-			// Clean up abort controller safely
-			try {
-				delete abortControllerRef.current['activation'];
-			} catch (cleanupError) {
-				// Ignore cleanup errors
-			}
+			setProcessing(false);
+			delete abortControllerRef.current['activation'];
 		}
-	}, [licenseKey, processing, dispatch]);
+	}, [licenseKey, processing, dispatch, fetchTokenData]);
 
 	// Enhanced license deactivation
 	const deactivateLicense = useCallback(async () => {
-		if (processing || !isMountedRef.current) return;
+		if (processing) return;
 
 		setDeactivationText(__('Deactivating...', 'wp-ai-blogger'));
 		setProcessing(true);
@@ -503,9 +391,6 @@ const License = memo(() => {
 				signal: abortController.signal
 			});
 
-			// Check if component is still mounted before updating state
-			if (!isMountedRef.current) return;
-
 			if (response.success) {
 				setLicenseKey('');
 				dispatch({
@@ -521,10 +406,8 @@ const License = memo(() => {
 					payload: 0,
 				});
 
-				if (isMountedRef.current) {
-					setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
-					setActivationText(__('Activate', 'wp-ai-blogger'));
-				}
+				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
+				setActivationText(__('Activate', 'wp-ai-blogger'));
 			}
 
 			dispatch({
@@ -532,63 +415,37 @@ const License = memo(() => {
 				payload: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
 			});
 		} catch (error) {
-			// Don't update state if component is unmounted or request was aborted
-			if (!isMountedRef.current || error.name === 'AbortError') return;
+			if (error.name === 'AbortError') return;
 
 			console.error('Deactivation error:', error);
 			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
 		} finally {
-			// Always clean up, even if there are errors
-			try {
-				if (isMountedRef.current) {
-					setProcessing(false);
-				}
-			} catch (stateError) {
-				// Ignore state update errors during cleanup
-			}
-
-			// Clean up abort controller safely
-			try {
-				delete abortControllerRef.current['deactivation'];
-			} catch (cleanupError) {
-				// Ignore cleanup errors
-			}
+			setProcessing(false);
+			delete abortControllerRef.current['deactivation'];
 		}
 	}, [processing, dispatch]);
 
 	// Enhanced token refresh
 	const refreshTokens = useCallback(async () => {
-		if (licenseStatus !== 'licensed' || processing || !license || !isMountedRef.current) return;
+		if (licenseStatus !== 'licensed' || processing || !license) return;
 
 		setProcessing(true);
 
 		try {
 			await fetchTokenData();
 
-			if (isMountedRef.current) {
-				dispatch({
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
-				});
-			}
+			dispatch({
+				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+				payload: __('Token data refreshed successfully!', 'wp-ai-blogger'),
+			});
 		} catch (error) {
-			// Don't update state if component is unmounted
-			if (!isMountedRef.current) return;
-
 			console.error('Token refresh error:', error);
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: __('Failed to refresh token data', 'wp-ai-blogger'),
 			});
 		} finally {
-			// Always clean up, even if there are errors
-			try {
-				if (isMountedRef.current) {
-					setProcessing(false);
-				}
-			} catch (stateError) {
-				// Ignore state update errors during cleanup
-			}
+			setProcessing(false);
 		}
 	}, [licenseStatus, processing, license, fetchTokenData, dispatch]);
 
@@ -604,60 +461,58 @@ const License = memo(() => {
 	}, [activated]);
 
 	return (
-		<SafeLicenseWrapper>
-			<div className="space-y-6">
-				{/* Enhanced header */}
-				<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-					<div className="p-2 bg-indigo-100 rounded-lg">
-						<Zap className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-					</div>
-					<div>
-						<h2 className="text-xl font-bold text-gray-900">
-							{__('License & Token Management', 'wp-ai-blogger')}
-						</h2>
-						<p className="text-gray-600 text-sm">
-							{__('Manage your license and monitor AI token usage', 'wp-ai-blogger')}
-						</p>
-					</div>
+		<div className="space-y-6">
+			{/* Enhanced header */}
+			<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+				<div className="p-2 bg-indigo-100 rounded-lg">
+					<Zap className="w-5 h-5 text-indigo-600" aria-hidden="true" />
 				</div>
-
-				{/* License status overview */}
-				<LicenseStatus
-					status={licenseStatus}
-					tokensUsed={tokensUsed}
-					totalTokens={tokenTotal}
-					onRefresh={refreshTokens}
-					isRefreshing={processing}
-				/>
-
-				{/* Settings container */}
-				<SettingsContainer
-					title={__('License Configuration', 'wp-ai-blogger')}
-					description={__('Activate your license to unlock premium AI features and token access.', 'wp-ai-blogger')}
-					element={
-						<LicenseForm
-							licenseKey={licenseKey}
-							setLicenseKey={setLicenseKey}
-							activated={activated}
-							processing={processing}
-							activationText={activationText}
-							deactivationText={deactivationText}
-							onActivate={activateLicense}
-							onDeactivate={deactivateLicense}
-						/>
-					}
-					className="bg-white shadow-sm rounded-lg border border-gray-200"
-				/>
-
-				{/* Screen reader status */}
-				<div className="sr-only" aria-live="polite">
-					{activated
-						? __(`License is active with ${tokenRemaining} tokens remaining`, 'wp-ai-blogger')
-						: __('No active license', 'wp-ai-blogger')
-					}
+				<div>
+					<h2 className="text-xl font-bold text-gray-900">
+						{__('License & Token Management', 'wp-ai-blogger')}
+					</h2>
+					<p className="text-gray-600 text-sm">
+						{__('Manage your license and monitor AI token usage', 'wp-ai-blogger')}
+					</p>
 				</div>
 			</div>
-		</SafeLicenseWrapper>
+
+			{/* License status overview */}
+			<LicenseStatus
+				status={licenseStatus}
+				tokensUsed={tokensUsed}
+				totalTokens={tokenTotal}
+				onRefresh={refreshTokens}
+				isRefreshing={processing}
+			/>
+
+			{/* Settings container */}
+			<SettingsContainer
+				title={__('License Configuration', 'wp-ai-blogger')}
+				description={__('Activate your license to unlock premium AI features and token access.', 'wp-ai-blogger')}
+				element={
+					<LicenseForm
+						licenseKey={licenseKey}
+						setLicenseKey={setLicenseKey}
+						activated={activated}
+						processing={processing}
+						activationText={activationText}
+						deactivationText={deactivationText}
+						onActivate={activateLicense}
+						onDeactivate={deactivateLicense}
+					/>
+				}
+				className="bg-white shadow-sm rounded-lg border border-gray-200"
+			/>
+
+			{/* Screen reader status */}
+			<div className="sr-only" aria-live="polite">
+				{activated
+					? __(`License is active with ${tokenRemaining} tokens remaining`, 'wp-ai-blogger')
+					: __('No active license', 'wp-ai-blogger')
+				}
+			</div>
+		</div>
 	);
 });
 
