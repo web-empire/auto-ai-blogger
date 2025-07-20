@@ -45,18 +45,18 @@ const createSecureFormData = ( action, key, value ) => {
 };
 
 /**
- * A function to send form data via API fetch with enhanced error handling.
+ * A simplified function to send form data via API fetch for admin use.
+ * Focuses on basic security and reliability without complex abort controller management.
  *
  * @function
  *
- * @param {string}   key                - Settings key.
- * @param {*}        value              - The data to send.
- * @param {Function} dispatch           - Redux dispatch function.
- * @param {Object}   abortControllerRef - The ref object to hold abort controller.
+ * @param {string}   key      - Settings key.
+ * @param {*}        value    - The data to send.
+ * @param {Function} dispatch - Redux dispatch function.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
-const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) => {
+const updateApiData = async ( key, value, dispatch ) => {
 	// Validate inputs
 	if ( ! validateApiInput( key, value ) ) {
 		return Promise.reject( new Error( 'Invalid input parameters' ) );
@@ -67,17 +67,6 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 		return Promise.reject( new Error( 'Invalid dispatch function' ) );
 	}
 
-	// Abort any previous request for this key
-	if ( abortControllerRef?.current?.[ key ] ) {
-		abortControllerRef.current[ key ].abort();
-	}
-
-	// Create a new AbortController
-	const abortController = new AbortController();
-	if ( abortControllerRef?.current ) {
-		abortControllerRef.current[ key ] = abortController;
-	}
-
 	try {
 		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value );
 
@@ -85,7 +74,6 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
-			signal: abortController.signal,
 			timeout: 30000, // 30 second timeout
 		} );
 
@@ -96,13 +84,7 @@ const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) 
 			throw new Error( response?.data?.message || 'API request failed' );
 		}
 	} catch ( error ) {
-		// Handle different types of errors
-		if ( error.name === 'AbortError' ) {
-			console.log( `Request for key "${ key }" was aborted` );
-			return Promise.reject( error );
-		}
-
-		console.error( 'API Error:', error.message );
+		console.error( `API Error for key "${key}":`, error.message );
 
 		// Dispatch error state if provided
 		if ( dispatch ) {
