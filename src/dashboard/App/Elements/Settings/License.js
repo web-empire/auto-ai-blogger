@@ -198,6 +198,44 @@ const License = memo(() => {
 
 			console.log('License key set in Redux:', licenseKey);
 
+			// Fetch token data immediately after successful activation
+			try {
+				const tokenResponse = await fetch(`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					signal: abortController.signal
+				});
+
+				if (tokenResponse.ok) {
+					const tokenData = await tokenResponse.json();
+
+					if (tokenData && tokenData.success && tokenData.data) {
+						// Update Redux store with token data
+						dispatch({
+							type: 'UPDATE_TOKEN_TOTAL',
+							payload: tokenData.data.total,
+						});
+						dispatch({
+							type: 'UPDATE_TOKEN_REMAINING',
+							payload: tokenData.data.remaining,
+						});
+
+						// Update API data in database
+						await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
+						await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+
+						console.log('Token data fetched and updated:', tokenData.data);
+					}
+				} else {
+					console.warn('Failed to fetch token data after license activation');
+				}
+			} catch (tokenError) {
+				// Don't fail the license activation if token fetch fails
+				console.warn('Token data fetch error after license activation:', tokenError);
+			}
+
 			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setLicenseKey('');
 
