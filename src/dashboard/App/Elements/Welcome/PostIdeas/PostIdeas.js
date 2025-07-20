@@ -284,19 +284,36 @@ export default function PostIdeas() {
 								</thead>
 
 								<tbody className="divide-y divide-gray-200 bg-white">
-									{ postIdeasArr.map( ( post ) => (
-										<tr key={ post.title } className="even:bg-gray-50">
-											<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6">
-												{ TrimWordsContent( post.title, 120 ) }
-											</td>
-											<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-												<a target="_blank" href="#" onClick={ ( e ) => wpaib_create_post( e, post.title ) } className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer" data-type="create">
-													<Plus className="w-5 h-5" />
-													{ __( 'Create', 'wp-ai-blogger' ) }
-												</a>
+									{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
+										postIdeasArr.map( ( post, index ) => (
+											<tr key={ `post-idea-${ index }-${ post?.title?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
+												<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6">
+													<TrimWordsContent
+														content={ post?.title || '' }
+														count={ 120 }
+													/>
+												</td>
+												<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
+													<a
+														target="_blank"
+														href="#"
+														onClick={ ( e ) => wpaib_create_post( e, post?.title || '' ) }
+														className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
+														data-type="create"
+													>
+														<Plus className="w-5 h-5" />
+														{ __( 'Create', 'wp-ai-blogger' ) }
+													</a>
+												</td>
+											</tr>
+										) )
+									) : (
+										<tr>
+											<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
+												{ __( 'No post ideas available.', 'wp-ai-blogger' ) }
 											</td>
 										</tr>
-									) ) }
+									) }
 								</tbody>
 
 								<tfoot className="bg-gray-50">
