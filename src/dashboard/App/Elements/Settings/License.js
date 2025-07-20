@@ -296,31 +296,47 @@ const License = memo(() => {
 				console.log('TOKEN TOTAL:', tokenData.data.total);
 				console.log('TOKEN REMAINING:', tokenData.data.remaining);
 
-				// Update Redux state immediately
-				dispatch({
-					type: 'UPDATE_TOKEN_TOTAL',
-					payload: tokenData.data.total,
-				});
-
-				dispatch({
-					type: 'UPDATE_TOKEN_REMAINING',
-					payload: tokenData.data.remaining,
-				});
-
-				// Update local state for immediate UI response
+				// Only update local state immediately for UI responsiveness
 				setLocalTokenData({
 					total: tokenData.data.total,
 					remaining: tokenData.data.remaining,
 					lastUpdated: new Date().toISOString()
 				});
 
-				// Update API data using simplified function without abort controllers
-				try {
-					await updateApiData('tokenTotal', tokenData.data.total, dispatch);
-					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch);
-				} catch (saveError) {
-					console.warn('Failed to save token data to backend:', saveError);
-				}
+				// Delay Redux and backend updates to prevent DOM conflicts
+				setTimeout(() => {
+					// Update Redux state
+					dispatch({
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: tokenData.data.total,
+					});
+
+					dispatch({
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: tokenData.data.remaining,
+					});
+
+					// Backend updates in a separate timeout to further reduce conflicts
+					setTimeout(async () => {
+						try {
+							console.log('Attempting to save tokenTotal:', tokenData.data.total);
+							console.log('Available nonce:', (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce));
+
+							await updateApiData('tokenTotal', tokenData.data.total, dispatch);
+							console.log('Successfully saved tokenTotal');
+
+							await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch);
+							console.log('Successfully saved tokenRemaining');
+						} catch (saveError) {
+							console.error('Detailed save error:', saveError);
+							console.error('Error details:', {
+								message: saveError.message,
+								stack: saveError.stack,
+								name: saveError.name
+							});
+						}
+					}, 100);
+				}, 200);
 
 				return tokenData;
 			} else {

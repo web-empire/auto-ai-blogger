@@ -70,6 +70,15 @@ const updateApiData = async ( key, value, dispatch ) => {
 	try {
 		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value );
 
+		// Debug logging
+		console.log('Sending API request:', {
+			action: 'wpaib_update_admin_setting',
+			key: key,
+			value: value,
+			nonce: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || 'NO_NONCE',
+			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php'
+		});
+
 		const response = await apiFetch( {
 			url: (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
