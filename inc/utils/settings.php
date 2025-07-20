@@ -87,7 +87,7 @@ class Settings {
 					'default' => '',
 					'type'    => 'string',
 				],
-				'licenseStatus'    => [
+				'license_status'   => [
 					'default' => 'unlicensed',
 					'type'    => 'string',
 				],

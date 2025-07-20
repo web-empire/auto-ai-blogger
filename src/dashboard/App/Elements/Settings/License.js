@@ -223,7 +223,7 @@ const License = memo(() => {
 	const isMountedRef = useRef(true);
 
 	// Redux selectors with fallbacks
-	const licenseStatus = useSelector((state) => state.licenseStatus) || 'unlicensed';
+	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
 	const tokenTotal = useSelector((state) => state.tokenTotal) || 0;
 	const tokenRemaining = useSelector((state) => state.tokenRemaining) || 0;
 	const license = useSelector((state) => state.license) || '';
@@ -288,10 +288,6 @@ const License = memo(() => {
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'licensed',
 			});
-
-			// Save license key and status to local database
-			await updateApiData('license', licenseKey, dispatch, abortControllerRef);
-			await updateApiData('licenseStatus', 'licensed', dispatch, abortControllerRef);
 
 			if (!isMountedRef.current) return;
 
@@ -408,12 +404,6 @@ const License = memo(() => {
 					type: 'UPDATE_TOKEN_REMAINING',
 					payload: 0,
 				});
-
-				// Clear license data from local database
-				await updateApiData('license', '', dispatch, abortControllerRef);
-				await updateApiData('licenseStatus', 'unlicensed', dispatch, abortControllerRef);
-				await updateApiData('tokenTotal', 0, dispatch, abortControllerRef);
-				await updateApiData('tokenRemaining', 0, dispatch, abortControllerRef);
 
 				if (isMountedRef.current) {
 					setDeactivationText(__('Deactivated', 'wp-ai-blogger'));

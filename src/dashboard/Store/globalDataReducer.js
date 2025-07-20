@@ -23,7 +23,7 @@ const initialState = {
 	postIdeas: [],
 	tokenTotal: 0,
 	tokenRemaining: 0,
-	licenseStatus: 'inactive',
+	license_status: 'inactive',
 	// Add loading and error states for better UX
 	isLoading: false,
 	error: null,
@@ -112,7 +112,7 @@ const globalDataReducer = ( state = initialState, action ) => {
 		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
-		UPDATE_LICENSE_STATUS: () => ( { ...state, licenseStatus: String( action.payload || 'inactive' ) } ),
+		UPDATE_LICENSE_STATUS: () => ( { ...state, license_status: String( action.payload || 'inactive' ) } ),
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
 		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),
 		RESET_STATE: () => initialState,

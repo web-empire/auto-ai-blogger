@@ -194,6 +194,9 @@ class Licensing {
 			// Securely update license status
 			$this->update_license_status( $license_key, 'licensed' );
 
+			// Save license data to admin settings for frontend access
+			Helper::update_option( 'license_status', 'licensed' );
+
 			// Log successful activation
 			$this->log_license_activity( 'activate', $license_key, get_current_user_id() );
 
@@ -246,6 +249,11 @@ class Licensing {
 
 			// Securely update license status
 			$this->update_license_status( '', 'unlicensed' );
+
+			// Clear license data from admin settings
+			Helper::update_option( 'license_status', 'unlicensed' );
+			Helper::update_option( 'tokenTotal', 0 );
+			Helper::update_option( 'tokenRemaining', 0 );
 
 			// Log successful deactivation
 			$this->log_license_activity( 'deactivate', $current_license, get_current_user_id() );
@@ -536,6 +544,9 @@ class Licensing {
 		// Update options securely
 		Helper::update_option( 'license', $license_key );
 		Helper::update_option( 'license_status', $status );
+
+		// Also update admin settings for frontend access
+		Helper::update_option( 'licenseStatus', $status );
 
 		// Update cache
 		self::update_license_cache( $license_key, $status );
