@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
-	X,
 	TrendingUp,
-	Eye,
 	Activity,
 	Calendar,
 	User,
@@ -12,9 +12,8 @@ import {
 	Crown,
 	Zap,
 	BarChart3,
-	ArrowUpRight,
-	Clock,
 	CheckCircle,
+	CalendarCheck,
 } from 'lucide-react';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -22,12 +21,19 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 	const [ analyticsData, setAnalyticsData ] = useState( null );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState( null );
+	const [ open, setOpen ] = useState( isOpen );
 
 	useEffect( () => {
+		setOpen( isOpen );
 		if ( isOpen && campaignId ) {
 			fetchAnalyticsData();
 		}
 	}, [ isOpen, campaignId ] );
+
+	const closeModal = () => {
+		setOpen( false );
+		onClose();
+	};
 
 	const fetchAnalyticsData = async () => {
 		setLoading( true );
@@ -68,14 +74,6 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 		return num?.toString() || '0';
 	};
 
-	const formatDate = ( timestamp ) => {
-		if ( ! timestamp ) {
-			return __( 'Never', 'wp-ai-blogger' );
-		}
-		const date = new Date( timestamp * 1000 );
-		return date.toLocaleDateString();
-	};
-
 	const getHealthColor = ( health ) => {
 		switch ( health ) {
 			case 'excellent':
@@ -98,228 +96,222 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 		window.open( wpaib_localized_data.pro_purchase_url, '_blank' );
 	};
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
 	return (
-		<div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-			<div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-				<div className="fixed inset-0 bg-black opacity-75 transition-opacity" aria-hidden="true" onClick={ onClose }></div>
+		<Dialog open={ open } onClose={ closeModal } className="relative z-[999999] ai-blogger-container">
+			<div className="fixed inset-0 bg-black/50 transition-opacity" />
 
-				<span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-				<div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full sm:p-6">
-					{ /* Header */ }
-					<div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-						<div className="flex items-center space-x-3">
-							<div className="p-2 bg-indigo-100 rounded-lg">
-								<BarChart3 className="w-6 h-6 text-indigo-600" />
-							</div>
-							<div>
-								<h3 className="text-lg font-semibold text-gray-900 m-0">
-									{ __( 'Campaign Analytics', 'wp-ai-blogger' ) }
-								</h3>
-								<p className="text-sm text-gray-500 m-0">
-									{ campaignData?.name || __( 'Campaign', 'wp-ai-blogger' ) }
-								</p>
-							</div>
-						</div>
-						<button
-							type="button"
-							className="text-gray-400 hover:text-gray-500 focus:outline-none rounded"
-							onClick={ onClose }
-						>
-							<X className="w-6 h-6 flex" />
-						</button>
-					</div>
-
-					{ /* Content */ }
-					{ loading ? (
-						<div className="flex items-center justify-center py-12">
-							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-							<span className="ml-3 text-gray-600">{ __( 'Loading analytics…', 'wp-ai-blogger' ) }</span>
-						</div>
-					) : error ? (
-						<div className="text-center py-12">
-							<div className="text-red-500 mb-2">{ error }</div>
-							<button
-								onClick={ fetchAnalyticsData }
-								className="text-indigo-600 hover:text-indigo-500 text-sm"
-							>
-								{ __( 'Try again', 'wp-ai-blogger' ) }
-							</button>
-						</div>
-					) : (
-						<div className="space-y-8">
-							{ /* Top Stats */ }
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								{ /* Published Posts & Views */ }
-								<div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-									<div className="flex items-center justify-between">
-										<div className="flex flex-col gap-2">
-											<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Published Posts', 'wp-ai-blogger' ) }</p>
-											<p className="text-3xl font-bold text-blue-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
-											<div className="flex items-center">
-												<Eye className="w-4 h-4 text-blue-500 mr-1" />
-												<span className="text-sm text-blue-600">{ formatNumber( analyticsData?.totalViews || 0 ) } { __( 'views', 'wp-ai-blogger' ) }</span>
-											</div>
-										</div>
-										<TrendingUp className="w-8 h-8 text-blue-500" />
+			<div className="fixed inset-0 z-[999999] w-screen overflow-y-auto">
+				<div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+					<DialogPanel
+						transition
+						className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-6xl sm:max-h-[800px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+					>
+						<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 h-full flex flex-col">
+							{ /* Header */ }
+							<div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6 flex-shrink-0">
+								<div className="flex items-center space-x-3">
+									<div className="p-2 bg-indigo-100 rounded-lg">
+										<BarChart3 className="w-6 h-6 text-indigo-600" />
+									</div>
+									<div>
+										<h3 className="text-lg font-semibold text-gray-900 m-0">
+											{ __( 'Campaign Analytics', 'wp-ai-blogger' ) }
+										</h3>
+										<p className="text-sm text-gray-500 m-0">
+											{ campaignData?.name || __( 'Campaign', 'wp-ai-blogger' ) }
+										</p>
 									</div>
 								</div>
-
-								{ /* Success Rate */ }
-								<div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
-									<div className="flex items-center justify-between">
-										<div className="flex flex-col gap-2">
-											<p className="text-sm font-medium text-green-600 m-0">{ __( 'Success Rate', 'wp-ai-blogger' ) }</p>
-											<p className="text-3xl font-bold text-green-900 m-0">{ analyticsData?.successRate || '95' }%</p>
-											<p className="text-sm text-green-600 m-0">{ __( 'Generation success', 'wp-ai-blogger' ) }</p>
-										</div>
-										<CheckCircle className="w-8 h-8 text-green-500" />
-									</div>
-								</div>
-
-								{ /* Comments */ }
-								<div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-									<div className="flex items-center justify-between">
-										<div className="flex flex-col gap-2">
-											<p className="text-sm font-medium text-purple-600 m-0">{ __( 'Total Comments', 'wp-ai-blogger' ) }</p>
-											<p className="text-3xl font-bold text-purple-900 m-0">{ formatNumber( analyticsData?.totalComments || 0 ) }</p>
-											<p className="text-sm text-purple-600 m-0">{ __( 'Engagement', 'wp-ai-blogger' ) }</p>
-										</div>
-										<MessageSquare className="w-8 h-8 text-purple-500" />
-									</div>
-								</div>
+								<button
+									type="button"
+									onClick={ closeModal }
+									className="text-gray-400 hover:text-gray-500 focus:outline-none rounded"
+								>
+									<span className="sr-only">Close</span>
+									<XMarkIcon className="h-5 w-5 flex" />
+								</button>
 							</div>
 
-							{ /* Campaign Health */ }
-							<div className="bg-white border border-gray-200 rounded-lg">
-								<div className="flex items-center mb-4">
-									<Activity className="w-5 h-5 text-gray-600 mr-2" />
-									<h4 className="text-lg font-semibold text-gray-900 m-0">{ __( 'Campaign Health', 'wp-ai-blogger' ) }</h4>
-								</div>
-
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-									<div className="text-center p-4 bg-gray-50 rounded-lg">
-										<div className={ `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${ getHealthColor( analyticsData?.health || 'good' ) }` }>
-											{ analyticsData?.health || 'Good' }
-										</div>
-										<p className="text-xs text-gray-500 mt-2 m-0 wpaib-force-mt-2">{ __( 'Status', 'wp-ai-blogger' ) }</p>
+							{ /* Content */ }
+							<div className="flex-1 overflow-y-auto">
+								{ loading ? (
+									<div className="flex items-center justify-center py-12">
+										<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+										<span className="ml-3 text-gray-600">{ __( 'Loading analytics…', 'wp-ai-blogger' ) }</span>
 									</div>
-
-									<div className="text-center p-4 bg-gray-50 rounded-lg">
-										<div className="flex items-center justify-center">
-											<Clock className="w-4 h-4 text-gray-500 mr-1" />
-											<span className="text-sm font-medium text-gray-900">{ formatDate( campaignData?.lastRun ) }</span>
-										</div>
-										<p className="text-xs text-gray-500 m-0 wpaib-force-mt-2">{ __( 'Last Run', 'wp-ai-blogger' ) }</p>
-									</div>
-
-									<div className="text-center p-4 bg-gray-50 rounded-lg">
-										<div className="flex items-center justify-center">
-											<Calendar className="w-4 h-4 text-gray-500 mr-1" />
-											<span className="text-sm font-medium text-gray-900">{ analyticsData?.daysActive || 0 }</span>
-										</div>
-										<p className="text-xs text-gray-500 m-0 wpaib-force-mt-2">{ __( 'Days Active', 'wp-ai-blogger' ) }</p>
-									</div>
-
-									<div className="text-center p-4 bg-gray-50 rounded-lg">
-										<div className="flex items-center justify-center">
-											<User className="w-4 h-4 text-gray-500 mr-1" />
-											<span className="text-sm font-medium text-gray-900">{ analyticsData?.authorName || __( 'Unknown', 'wp-ai-blogger' ) }</span>
-										</div>
-										<p className="text-xs text-gray-500 m-0 wpaib-force-mt-2">{ __( 'Author', 'wp-ai-blogger' ) }</p>
-									</div>
-								</div>
-							</div>
-
-							{ /* Top Performing Posts */ }
-							<div className="bg-white border border-gray-200 rounded-lg">
-								<div className="flex items-center justify-between mb-4">
-									<div className="flex items-center">
-										<Trophy className="w-5 h-5 text-yellow-600 mr-2" />
-										<h4 className="text-lg font-semibold text-gray-900 m-0">{ __( 'Top Performing Posts', 'wp-ai-blogger' ) }</h4>
-									</div>
-									<span className="text-sm text-gray-500">{ __( 'By views', 'wp-ai-blogger' ) }</span>
-								</div>
-
-								<div className="space-y-3">
-									{ analyticsData?.topPosts?.length > 0 ? (
-										analyticsData.topPosts.map( ( post, index ) => (
-											<div key={ post.id } className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-												<div className="flex items-center space-x-3">
-													<div className="flex-shrink-0">
-														<span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
-															{ index + 1 }
-														</span>
-													</div>
-													<div className="min-w-0 flex-1">
-														<p className="text-sm font-medium text-gray-900 truncate m-0">{ post.title }</p>
-														<p className="text-xs text-gray-500 m-0">{ formatDate( post.date ) }</p>
-													</div>
-												</div>
-												<div className="flex items-center space-x-4">
-													<div className="text-right">
-														<p className="text-sm font-medium text-gray-900 m-0">{ formatNumber( post.views ) }</p>
-														<p className="text-xs text-gray-500 m-0">{ __( 'views', 'wp-ai-blogger' ) }</p>
-													</div>
-													<ArrowUpRight className="w-4 h-4 text-gray-400" />
-												</div>
-											</div>
-										) )
-									) : (
-										<div className="text-center py-8">
-											<Trophy className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-											<p className="text-gray-500 text-sm">{ __( 'No posts data available yet', 'wp-ai-blogger' ) }</p>
-										</div>
-									) }
-								</div>
-							</div>
-
-							{ /* Pro Upgrade CTA */ }
-							<div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white">
-								<div className="flex items-center justify-between">
-									<div className="flex items-center space-x-4">
-										<div className="p-3 bg-white bg-opacity-20 rounded-lg">
-											<Crown className="w-8 h-8 text-white" />
-										</div>
-										<div>
-											<h4 className="text-xl font-bold mb-1 m-0">{ __( 'Unlock AI Based Advanced Analytics', 'wp-ai-blogger' ) }</h4>
-											<p className="text-indigo-100 text-sm m-0">
-												{ __( 'Get detailed insights, keyword performance, conversion tracking, and AI-powered recommendations.', 'wp-ai-blogger' ) }
-											</p>
-										</div>
-									</div>
-									<div className="text-right">
-										<button className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2" onClick={ onUpgradePro }>
-											<Zap className="w-4 h-4" />
-											<span>{ __( 'Upgrade to Pro', 'wp-ai-blogger' ) }</span>
+								) : error ? (
+									<div className="text-center py-12">
+										<div className="text-red-500 mb-2">{ error }</div>
+										<button
+											onClick={ fetchAnalyticsData }
+											className="text-indigo-600 hover:text-indigo-500 text-sm"
+										>
+											{ __( 'Try again', 'wp-ai-blogger' ) }
 										</button>
 									</div>
-								</div>
+								) : (
+									<div className="space-y-6">
+										{ /* Top Stats */ }
+										<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+											{ /* Published Posts & Views */ }
+											<div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+												<div className="flex items-center justify-between">
+													<div className="flex flex-col gap-2">
+														<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Published Posts', 'wp-ai-blogger' ) }</p>
+														<p className="text-2xl font-bold text-blue-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
+														<p className="text-sm text-blue-600 m-0">{ __( 'Total Views', 'wp-ai-blogger' ) }</p>
+													</div>
+													<TrendingUp className="w-6 h-6 text-blue-500" />
+												</div>
+											</div>
 
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-									<div className="flex items-center space-x-2">
-										<CheckCircle className="w-5 h-5 text-green-300" />
-										<span className="text-sm">{ __( 'AI Based Content Quality Score', 'wp-ai-blogger' ) }</span>
+											{ /* Success Rate */ }
+											<div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+												<div className="flex items-center justify-between">
+													<div className="flex flex-col gap-2">
+														<p className="text-sm font-medium text-green-600 m-0">{ __( 'Success Rate', 'wp-ai-blogger' ) }</p>
+														<p className="text-2xl font-bold text-green-900 m-0">{ analyticsData?.successRate || '95' }%</p>
+														<p className="text-sm text-green-600 m-0">{ __( 'Generation success', 'wp-ai-blogger' ) }</p>
+													</div>
+													<CheckCircle className="w-6 h-6 text-green-500" />
+												</div>
+											</div>
+
+											{ /* Comments */ }
+											<div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+												<div className="flex items-center justify-between">
+													<div className="flex flex-col gap-2">
+														<p className="text-sm font-medium text-purple-600 m-0">{ __( 'Total Comments', 'wp-ai-blogger' ) }</p>
+														<p className="text-2xl font-bold text-purple-900 m-0">{ formatNumber( analyticsData?.totalComments || 0 ) }</p>
+														<p className="text-sm text-purple-600 m-0">{ __( 'Engagement', 'wp-ai-blogger' ) }</p>
+													</div>
+													<MessageSquare className="w-6 h-6 text-purple-500" />
+												</div>
+											</div>
+										</div>
+
+										{ /* Campaign Health */ }
+										<div className="bg-white border border-gray-200 rounded-lg p-4">
+											<div className="flex items-center mb-3">
+												<Activity className="w-4 h-4 text-gray-600 mr-2" />
+												<h4 className="text-base font-semibold text-gray-900 m-0">{ __( 'Campaign Health', 'wp-ai-blogger' ) }</h4>
+											</div>
+
+											<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+												<div className="text-center p-3 bg-gray-50 rounded-lg">
+													<div className={ `inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${ getHealthColor( analyticsData?.health || 'good' ) }` }>
+														{ analyticsData?.health || 'Good' }
+													</div>
+													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Status', 'wp-ai-blogger' ) }</p>
+												</div>
+
+												<div className="text-center p-3 bg-gray-50 rounded-lg">
+													<div className="flex items-center justify-center">
+														<CalendarCheck className="w-4 h-4 text-gray-500 mr-1" />
+														<span className="text-sm font-medium text-gray-900">{ campaignData?.lastRun }</span>
+													</div>
+													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Last Run', 'wp-ai-blogger' ) }</p>
+												</div>
+
+												<div className="text-center p-3 bg-gray-50 rounded-lg">
+													<div className="flex items-center justify-center">
+														<Calendar className="w-4 h-4 text-gray-500 mr-1" />
+														<span className="text-sm font-medium text-gray-900">{ analyticsData?.daysActive || 0 }</span>
+													</div>
+													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Days Active', 'wp-ai-blogger' ) }</p>
+												</div>
+
+												<div className="text-center p-3 bg-gray-50 rounded-lg">
+													<div className="flex items-center justify-center">
+														<User className="w-4 h-4 text-gray-500 mr-1" />
+														<span className="text-sm font-medium text-gray-900">{ analyticsData?.authorName || __( 'Unknown', 'wp-ai-blogger' ) }</span>
+													</div>
+													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Author', 'wp-ai-blogger' ) }</p>
+												</div>
+											</div>
+										</div>
+
+										{ /* Top Performing Posts */ }
+										<div className="bg-white border border-gray-200 rounded-lg p-4">
+											<div className="flex items-center justify-between mb-3">
+												<div className="flex items-center">
+													<Trophy className="w-4 h-4 text-yellow-600 mr-2" />
+													<h4 className="text-base font-semibold text-gray-900 m-0">{ __( 'Top Performing Posts', 'wp-ai-blogger' ) }</h4>
+												</div>
+												<span className="text-xs text-gray-500">{ __( 'By views', 'wp-ai-blogger' ) }</span>
+											</div>
+
+											<div className="space-y-2">
+												{ analyticsData?.topPosts?.length > 0 ? (
+													analyticsData.topPosts.slice( 0, 3 ).map( ( post, index ) => (
+														<div key={ post.id } className="flex items-center justify-between p-2 bg-gray-50 rounded">
+															<div className="flex items-center space-x-2">
+																<span className="inline-flex items-center justify-center w-5 h-5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+																	{ index + 1 }
+																</span>
+																<div className="min-w-0 flex flex-col flex-1 gap-1">
+																	<p className="text-xs font-medium text-gray-900 truncate m-0">{ post.title }</p>
+																	<p className="text-xs text-gray-500 m-0">{ post.date }</p>
+																</div>
+															</div>
+															<div className="text-right flex flex-col gap-1">
+																<p className="text-xs font-medium text-gray-900 m-0">{ formatNumber( post.views ) }</p>
+																<p className="text-xs text-gray-500 m-0">{ __( 'views', 'wp-ai-blogger' ) }</p>
+															</div>
+														</div>
+													) )
+												) : (
+													<div className="text-center py-4">
+														<Trophy className="w-6 h-6 text-gray-300 mx-auto mb-1" />
+														<p className="text-gray-500 text-xs">{ __( 'No posts data available yet', 'wp-ai-blogger' ) }</p>
+													</div>
+												) }
+											</div>
+										</div>
+
+										{ /* Pro Upgrade CTA */ }
+										<div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
+											<div className="flex items-center justify-between">
+												<div className="flex items-center space-x-3">
+													<div className="p-2 bg-white bg-opacity-20 rounded-lg">
+														<Crown className="w-5 h-5 text-white" />
+													</div>
+													<div>
+														<h4 className="text-base font-bold m-0">{ __( 'Unlock AI Backed Analytics', 'wp-ai-blogger' ) }</h4>
+														<p className="text-indigo-100 text-sm m-0">
+															{ __( 'Drive better results with in-depth analytics, keyword performance tracking, and smart AI recommendations — all backed by real data.', 'wp-ai-blogger' ) }
+														</p>
+													</div>
+												</div>
+												<button className="bg-white text-indigo-600 px-4 py-2 rounded font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-1 text-sm" onClick={ onUpgradePro }>
+													<Zap className="w-4 h-4" />
+													<span>{ __( 'Upgrade', 'wp-ai-blogger' ) }</span>
+												</button>
+											</div>
+
+											<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+												<div className="flex items-center space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'AI Based Content Quality Score', 'wp-ai-blogger' ) }</span>
+												</div>
+												<div className="flex items-center space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'Advanced Conversion Tracking', 'wp-ai-blogger' ) }</span>
+												</div>
+												<div className="flex items-center space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'AI Performance Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
+												</div>
+											</div>
+										</div>
 									</div>
-									<div className="flex items-center space-x-2">
-										<CheckCircle className="w-5 h-5 text-green-300" />
-										<span className="text-sm">{ __( 'Advanced Conversion Tracking', 'wp-ai-blogger' ) }</span>
-									</div>
-									<div className="flex items-center space-x-2">
-										<CheckCircle className="w-5 h-5 text-green-300" />
-										<span className="text-sm">{ __( 'AI Performance Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
-									</div>
-								</div>
+								) }
 							</div>
 						</div>
-					) }
+					</DialogPanel>
 				</div>
 			</div>
-		</div>
+		</Dialog>
 	);
 };
 

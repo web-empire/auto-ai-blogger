@@ -269,3 +269,18 @@
 .wpaib-force-mt-2 {
 	margin-top: 8px !important;
 }
+
+.wpaib-vertical-divider {
+	width: 1px;
+	height: 24px;
+	border-left: 1px solid #e5e7eb;
+	border-right: 1px solid #e5e7eb;
+}
+
+.wpaib-truncate {
+	max-width: 70%;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

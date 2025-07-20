@@ -102,13 +102,13 @@ class Filters {
 			return $query;
 		}
 
-		if ( ! isset( $_GET['wp_aib_campaign_id'] ) || empty( $_GET['wp_aib_campaign_id'] ) ) {
+		if ( ! isset( $_GET['wp_aib_campaign_id'] ) ) {
 			return $query;
 		}
 
 		$campaign_id = absint( $_GET['wp_aib_campaign_id'] ?? 0 );
 
-		if ( ! $campaign_id ) {
+		if ( $campaign_id ) {
 			$meta_query = $query->get( 'meta_query' );
 			if ( ! is_array( $meta_query ) ) {
 				$meta_query = [];

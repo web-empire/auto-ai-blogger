@@ -125,24 +125,13 @@ const TokenDisplayAndRefresh = () => {
 			</p>
 			<button
 				disabled={ licenseStatus !== 'licensed' || processing || ! license }
-				className={ `
-					text-indigo-700
-					bg-indigo-50
-					border border-indigo-200
-					rounded-md px-2 py-1
-					flex items-center justify-center
-					font-medium
-					focus:outline-none focus:ring-0
-					${ licenseStatus !== 'licensed' || processing || ! license
-			? 'opacity-50 cursor-not-allowed'
-			: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
-					${ processing ? 'pointer-events-none' : '' }
+				className={ `text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-md p-1 flex items-center justify-center font-medium focus:outline-none focus:ring-0 ${ licenseStatus !== 'licensed' || processing || ! license ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' } ${ processing ? 'pointer-events-none' : '' }
 				` }
 				onClick={ refreshTokens }
 			>
 				<Tooltip text={ __( 'Refresh', 'wp-ai-blogger' ) } delay={ 100 } className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md">
 					<div className="relative">
-						<RefreshCw className={ `w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
+						<RefreshCw className={ `flex w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
 					</div>
 				</Tooltip>
 			</button>
@@ -229,35 +218,39 @@ export default function MainNav() {
 						</div>
 					</div>
 
-					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex gap-6 items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
+					<div className="absolute bottom-2 lg:inset-y-0 right-0 flex gap-4 items-center sm:static sm:inset-auto ml-auto lg:ml-6 sm:pr-0">
 						{ ! wpaib_localized_data.pro_available && (
-							<div className="text-sm font-medium text-slate-600 border-r hover:text-[#1E293B] hover:svg-hover-color">
-								<a
-									onClick={ redirectToProPurchase }
-									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B]"
-								>
-									<svg
-										width="16"
-										height="12"
-										viewBox="0 0 16 12"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-										className="mr-2 svg-focusable"
+							<>
+								<div className="text-sm font-medium text-slate-600 border-r hover:text-[#1E293B] hover:svg-hover-color">
+									<a
+										onClick={ redirectToProPurchase }
+										className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B]"
 									>
-										<path
-											d="M3.3335 11.3337H12.6668M1.3335 0.666992L3.3335 8.66699H12.6668L14.6668 0.666992L10.6668 5.33366L8.00016 0.666992L5.3335 5.33366L1.3335 0.666992Z"
-											stroke="#046BD2"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="svg-path"
-										/>
-									</svg>
-									{ __( 'Unlock Pro Features', 'wp-ai-blogger' ) }
-								</a>
-							</div>
+										<svg
+											width="16"
+											height="12"
+											viewBox="0 0 16 12"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+											className="mr-2 svg-focusable"
+										>
+											<path
+												d="M3.3335 11.3337H12.6668M1.3335 0.666992L3.3335 8.66699H12.6668L14.6668 0.666992L10.6668 5.33366L8.00016 0.666992L5.3335 5.33366L1.3335 0.666992Z"
+												stroke="#046BD2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												className="svg-path"
+											/>
+										</svg>
+										{ __( 'Unlock Pro Features', 'wp-ai-blogger' ) }
+									</a>
+								</div>
+								<span className="wpaib-vertical-divider" />
+							</>
 						) }
 
 						<TokenDisplayAndRefresh />
+						<span className="wpaib-vertical-divider" />
 
 						<div className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 divide-x divide-slate-200 gap-2 border-r">
 							<CoreVersion />

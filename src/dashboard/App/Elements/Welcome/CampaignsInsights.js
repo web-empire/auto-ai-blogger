@@ -1,18 +1,115 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MoveRight, Lock } from 'lucide-react';
+import { Settings, RotateCw, List, ChartNoAxesColumn, MoveRight, Lock } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip } from '@wordpress/components';
+import { ConfigureDrawer } from '@Elements/Campaigns';
+import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
+import apiFetch from '@wordpress/api-fetch';
 
 const campaigns = wpaib_localized_data.all_campaigns || {};
 
 export default function CampaignsInsights() {
 	const navigate = useNavigate();
 	const licenseStatus = useSelector( ( state ) => state.licenseStatus ) || 'unlicensed';
+	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
+
+	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
+	const [ openDrawer, setOpenDrawer ] = useState( false );
+	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
+	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
 		navigate( `?page=${ wpaib_localized_data.home_slug }&path=settings` ); // Navigate to the settings tab
+	};
+
+	const fetchCampaignMetaData = async ( campaignId ) => {
+		const formData = new window.FormData();
+
+		formData.append( 'action', 'wpaib_get_campaign_metadata' );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
+		formData.append( 'campaign_id', campaignId );
+
+		const response = await apiFetch( {
+			url: wpaib_localized_data.ajax_url,
+			method: 'POST',
+			body: formData,
+		} )
+			.then( ( data ) => {
+				if ( data.success ) {
+					return data.data;
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+
+		return response;
+	};
+
+	const configureCampaign = ( e ) => {
+		e.preventDefault();
+		setOpeningConfigureDrawer( true );
+
+		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
+		if ( ! campaignId ) {
+			return;
+		}
+
+		fetchCampaignMetaData( campaignId )
+			.then( ( data ) => {
+				if ( data ) {
+					setConfigureData(
+						{
+							...data,
+							type: 'edit',
+						}
+					);
+					setOpenDrawer( true );
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+
+		setOpeningConfigureDrawer( false );
+	};
+
+	const openCampaignAnalytics = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
+
+		// Open analytics modal
+		setAnalyticsModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
+
+	const viewCampaignPosts = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data to determine the post type
+		const campaignData = campaigns[ campaignId ];
+		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found
+
+		// Redirect to All Posts page with campaign filter
+		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		let filterUrl;
+
+		// For 'post' type, we don't need to specify post_type parameter
+		if ( postType === 'post' ) {
+			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+		} else {
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+		}
+
+		window.open( filterUrl, '_blank' );
 	};
 
 	if ( 'unlicensed' === licenseStatus ) {
@@ -74,16 +171,66 @@ export default function CampaignsInsights() {
 						</div>
 
 						<div className="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
-							<div className="text-sm">
-								<a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 flex campaigns-center justify-between w-full">
+							<div className="text-sm flex campaigns-center justify-between w-full">
+								<a href="#" className="font-medium text-indigo-600 hover:text-indigo-700 wpaib-truncate">
 									<span> { campaign.name } </span>
-									<MoveRight className="w-5 h-5" />
 								</a>
+								<div className="flex items-center gap-x-3">
+									<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+										viewCampaignPosts( e, campaign.id );
+									} }>
+										<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
+											delay={ 100 }
+											className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+										>
+											<List className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+										</Tooltip>
+									</a>
+
+									<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
+										<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
+											delay={ 100 }
+											className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+										>
+											{
+												openingConfigureDrawer ? (
+													<RotateCw className="w-4 h-4 animate-spin text-indigo-600 hover:text-indigo-700" />
+												) : (
+													<Settings className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+												)
+											}
+										</Tooltip>
+									</a>
+
+									<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+										openCampaignAnalytics( e, campaign.id );
+									} }>
+										<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
+											delay={ 100 }
+											className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+										>
+											<ChartNoAxesColumn className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+										</Tooltip>
+									</a>
+								</div>
 							</div>
 						</div>
 					</div>
 				) ) }
 			</dl>
+
+			<ConfigureDrawer
+				openDrawer={ openDrawer }
+				setOpenDrawer={ setOpenDrawer }
+				configureData={ configureData }
+			/>
+
+			<CampaignAnalyticsModal
+				isOpen={ analyticsModal.isOpen }
+				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ analyticsModal.campaignId }
+				campaignData={ analyticsModal.campaignData }
+			/>
 		</div>
 	);
 }

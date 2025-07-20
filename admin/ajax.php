@@ -426,7 +426,7 @@ class Ajax {
 						'id'    => $post_id,
 						'title' => $post->post_title,
 						'views' => $views,
-						'date'  => strtotime( $post->post_date ),
+						'date'  => $post->post_date,
 					];
 				}
 			}

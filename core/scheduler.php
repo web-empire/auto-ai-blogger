@@ -36,10 +36,9 @@ class Scheduler {
 			return;
 		}
 
-		// add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
-
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
 
+		// add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
 		// foreach ( $this->schedules as $campaign_id => $days ) {
 		// if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
 		// $args = [ $campaign_id ];

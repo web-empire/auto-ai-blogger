@@ -93,7 +93,7 @@ function wpaib_get_generated_posts() {
 			'update_post_meta_cache' => false,
 			'meta_query'             => [
 				[
-					'key'     => 'wp_aib_reference',
+					'key'     => 'wp_aib_campaign_id',
 					'value'   => 1,
 					'compare' => '=',
 				],
@@ -503,7 +503,7 @@ function wpaib_create_blog_post( $campaign_id ) {
  */
 function wpaib_track_post_view( $post_id ): void {
 	// Only track for campaign posts.
-	$is_campaign_post = get_post_meta( $post_id, 'wp_aib_reference', true );
+	$is_campaign_post = get_post_meta( $post_id, 'wp_aib_campaign_id', true );
 	if ( ! $is_campaign_post ) {
 		return;
 	}
