@@ -15,6 +15,7 @@ const LicenseForm = memo(({
 	setLicenseKey,
 	activated,
 	processing,
+	tokenLoading,
 	activationText,
 	deactivationText,
 	onActivate,
@@ -91,18 +92,19 @@ const LicenseForm = memo(({
 					<button
 						type="button"
 						onClick={onActivate}
-						disabled={!licenseKey.trim() || processing}
+						disabled={!licenseKey.trim() || processing || tokenLoading}
 						className={`
 							inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium
 							bg-indigo-600 text-white rounded-lg
 							hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
 							transition-all duration-200 transform hover:scale-105
-							${(!licenseKey.trim() || processing) ? 'opacity-70 cursor-not-allowed hover:scale-100' : 'cursor-pointer shadow-sm'}
+							${(!licenseKey.trim() || processing || tokenLoading) ? 'opacity-70 cursor-not-allowed hover:scale-100' : 'cursor-pointer shadow-sm'}
+							${tokenLoading ? 'bg-green-600 hover:bg-green-700' : ''}
 						`}
 						aria-label={__('Activate license', 'wp-ai-blogger')}
 					>
-						{processing && <Loader2 className="w-4 h-4 animate-spin" />}
-						{!processing && <Shield className="w-4 h-4" />}
+						{(processing || tokenLoading) && <Loader2 className="w-4 h-4 animate-spin" />}
+						{!processing && !tokenLoading && <Shield className="w-4 h-4" />}
 						{activationText}
 					</button>
 				)}
@@ -120,6 +122,21 @@ const LicenseForm = memo(({
 						{__('Get one here', 'wp-ai-blogger')}
 					</a>
 				</p>
+			)}
+
+			{/* Token loading indicator */}
+			{tokenLoading && (
+				<div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+					<Loader2 className="w-5 h-5 animate-spin text-green-600" />
+					<div>
+						<p className="text-sm font-medium text-green-800">
+							{__('Fetching your token data...', 'wp-ai-blogger')}
+						</p>
+						<p className="text-xs text-green-600">
+							{__('This may take a few seconds', 'wp-ai-blogger')}
+						</p>
+					</div>
+				</div>
 			)}
 		</div>
 	);
@@ -141,6 +158,7 @@ const License = memo(() => {
 
 	// Local state
 	const [processing, setProcessing] = useState(false);
+	const [tokenLoading, setTokenLoading] = useState(false);
 	const [licenseKey, setLicenseKey] = useState('');
 	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
 	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
@@ -202,6 +220,10 @@ const License = memo(() => {
 
 			console.log('License key set in Redux:', licenseKey);
 
+			// Show token loading state
+			setTokenLoading(true);
+			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
+
 			// Fetch token data immediately after successful activation
 			try {
 				const tokenResponse = await fetch(`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`, {
@@ -231,16 +253,20 @@ const License = memo(() => {
 						await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
 
 						console.log('Token data fetched and updated:', tokenData.data);
+						setActivationText(__('License Activated & Tokens Updated!', 'wp-ai-blogger'));
 					}
 				} else {
 					console.warn('Failed to fetch token data after license activation');
+					setActivationText(__('License Activated (Token fetch failed)', 'wp-ai-blogger'));
 				}
 			} catch (tokenError) {
 				// Don't fail the license activation if token fetch fails
 				console.warn('Token data fetch error after license activation:', tokenError);
+				setActivationText(__('License Activated (Token fetch failed)', 'wp-ai-blogger'));
+			} finally {
+				setTokenLoading(false);
 			}
 
-			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setLicenseKey('');
 
 			dispatch({
@@ -358,6 +384,7 @@ const License = memo(() => {
 						setLicenseKey={setLicenseKey}
 						activated={activated}
 						processing={processing}
+						tokenLoading={tokenLoading}
 						activationText={activationText}
 						deactivationText={deactivationText}
 						onActivate={activateLicense}
