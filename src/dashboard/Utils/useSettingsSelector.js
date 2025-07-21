@@ -10,11 +10,10 @@ const selectSettings = ( state ) => ( {
 	siteDescription: state.siteDescription || '',
 	license: state.license || '',
 	temperature: typeof state.temperature === 'number' ? state.temperature : 0.7,
-	harassment: Boolean( state.harassment ),
-	hate: Boolean( state.hate ),
-	sexuallyExplicit: Boolean( state.sexuallyExplicit ),
-	dangerousContent: Boolean( state.dangerousContent ),
-	// Add loading and error states
+	harassment: typeof state.harassment === 'number' ? state.harassment : 2,
+	hate: typeof state.hate === 'number' ? state.hate : 2,
+	sexuallyExplicit: typeof state.sexuallyExplicit === 'number' ? state.sexuallyExplicit : 2,
+	dangerousContent: typeof state.dangerousContent === 'number' ? state.dangerousContent : 2,
 	isLoading: state.isLoading || false,
 	error: state.error || null,
 } );
@@ -64,13 +63,13 @@ export const useSettingSelector = ( settingKey ) => {
 			case 'temperature':
 				return typeof state.temperature === 'number' ? state.temperature : 0.7;
 			case 'harassment':
-				return Boolean( state.harassment );
+				return typeof state.harassment === 'number' ? state.harassment : 2;
 			case 'hate':
-				return Boolean( state.hate );
+				return typeof state.hate === 'number' ? state.hate : 2;
 			case 'sexuallyExplicit':
-				return Boolean( state.sexuallyExplicit );
+				return typeof state.sexuallyExplicit === 'number' ? state.sexuallyExplicit : 2;
 			case 'dangerousContent':
-				return Boolean( state.dangerousContent );
+				return typeof state.dangerousContent === 'number' ? state.dangerousContent : 2;
 			case 'isLoading':
 				return state.isLoading || false;
 			case 'error':

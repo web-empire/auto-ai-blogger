@@ -231,25 +231,25 @@ class Menu {
 		}
 
 		try {
-			$harassment = absint( Helper::get_option( 'harassment', 0 ) );
+			$harassment = absint( Helper::get_option( 'harassment', 2 ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get harassment - ' . $e->getMessage() );
 		}
 
 		try {
-			$hate = absint( Helper::get_option( 'hate', 0 ) );
+			$hate = absint( Helper::get_option( 'hate', 2 ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get hate - ' . $e->getMessage() );
 		}
 
 		try {
-			$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 0 ) );
+			$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get sexuallyExplicit - ' . $e->getMessage() );
 		}
 
 		try {
-			$dangerous_content = absint( Helper::get_option( 'dangerousContent', 0 ) );
+			$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
 		} catch ( Exception $e ) {
 			error_log( 'WP AI Blogger: Failed to get dangerousContent - ' . $e->getMessage() );
 		}
