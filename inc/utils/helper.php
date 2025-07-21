@@ -168,9 +168,14 @@ class Helper {
 
 		// Debug logging for troubleshooting
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $original_key === 'postIdeas' ) {
-			error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $original_key . ', Original Value: ' . json_encode( $value ) . ', Sanitized Value: ' . json_encode( $sanitized_value ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
+			$existing_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+			$key_exists_before = isset( $existing_option[ $key ] );
+			$key_exists_after = isset( $validated_settings[ $key ] );
+			error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $original_key . ', Original Value: ' . json_encode( $value ) . ', Sanitized Value: ' . json_encode( $sanitized_value ) . ', Is Default: ' . ( $is_default ? 'true' : 'false' ) . ', Key Exists Before: ' . ( $key_exists_before ? 'true' : 'false' ) . ', Key Exists After: ' . ( $key_exists_after ? 'true' : 'false' ) . ', Existing DB: ' . json_encode( $existing_option ) . ', Validated Settings: ' . json_encode( $validated_settings ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
 		}
 
+		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error
+		// We return the sanitized value regardless, as the operation was successful
 		return $sanitized_value;
 	}	/**
 	 * Delete option from the database for the admin settings.
@@ -280,9 +285,22 @@ class Helper {
 				return max( 0, min( 4, $level ) );
 
 			case 'postIdeas':
+				// Handle both array and JSON string input
+				if ( is_string( $value ) ) {
+					// Try to decode JSON string
+					$decoded = json_decode( $value, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						$value = $decoded;
+					} else {
+						// If not valid JSON, return empty array
+						return [];
+					}
+				}
+
 				if ( ! is_array( $value ) ) {
 					return [];
 				}
+
 				$sanitized = [];
 				foreach ( $value as $idea ) {
 					if ( is_string( $idea ) ) {
@@ -405,13 +423,10 @@ class Helper {
 		foreach ( $settings as $key => $value ) {
 			// Only include allowed keys (compare with sanitized versions)
 			if ( in_array( $key, $sanitized_allowed_keys, true ) ) {
-				// Get original camelCase key for sanitization
-				$original_key_index = array_search($key, $sanitized_allowed_keys);
-				$original_key = self::$allowed_keys[$original_key_index];
-
-				$sanitized_value = self::sanitize_input( $original_key, $value );
-				if ( $sanitized_value !== false ) {
-					$validated[ $key ] = $sanitized_value;
+				// Skip re-sanitization - the value should already be sanitized from update_option
+				// Only validate that the key is allowed and the value is not false
+				if ( $value !== false ) {
+					$validated[ $key ] = $value;
 				}
 			}
 		}
