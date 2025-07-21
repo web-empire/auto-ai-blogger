@@ -32,6 +32,7 @@ const ContentHeader = ( {
 	const dispatch = useDispatch();
 	const [ processing, setProcessing ] = useState( false );
 	const [ lastSaveTime, setLastSaveTime ] = useState( null );
+	const [ saveProgress, setSaveProgress ] = useState( { current: 0, total: 0 } );
 
 	// Memoize settings object to prevent unnecessary re-renders
 	const settingsToSave = useMemo( () => {
@@ -70,6 +71,7 @@ const ContentHeader = ( {
 
 		try {
 			setProcessing( true );
+			setSaveProgress( { current: 0, total: Object.keys( settingsToSave ).length } );
 			onSaveStart?.();
 
 			// Validate settings before saving
@@ -77,13 +79,44 @@ const ContentHeader = ( {
 				throw new Error( __( 'No settings to save', 'wp-ai-blogger' ) );
 			}
 
-			// Save settings with proper error propagation
-			const savePromises = Object.entries( settingsToSave ).map( async ( [ key, value ] ) => {
-				console.log( `Saving setting: ${ key }`, value );
-				return updateApiData( key, value, dispatch, abortControllerRef );
-			} );
+			// Save settings sequentially to avoid race conditions and database conflicts
+			const saveResults = [];
+			const totalSettings = Object.entries( settingsToSave ).length;
+			let currentIndex = 0;
 
-			await Promise.all( savePromises );
+			for ( const [ key, value ] of Object.entries( settingsToSave ) ) {
+				currentIndex++;
+				console.log( `Saving setting (${ currentIndex }/${ totalSettings }): ${ key }`, value );
+
+				// Update progress state
+				setSaveProgress( { current: currentIndex, total: totalSettings } );
+
+				// Update processing state to show progress
+				dispatch( {
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: {
+						message: __( `Saving setting ${ currentIndex } of ${ totalSettings }...`, 'wp-ai-blogger' ),
+						type: 'info',
+						duration: 0, // Don't auto-hide while saving
+					},
+				} );
+
+				try {
+					const result = await updateApiData( key, value, dispatch, abortControllerRef );
+					saveResults.push( { key, success: true, result } );
+				} catch ( error ) {
+					console.error( `Failed to save setting: ${ key }`, error );
+					saveResults.push( { key, success: false, error } );
+					// Continue with other settings instead of failing completely
+				}
+			}
+
+			// Check if any settings failed to save
+			const failedSettings = saveResults.filter( result => ! result.success );
+			if ( failedSettings.length > 0 ) {
+				const failedKeys = failedSettings.map( result => result.key ).join( ', ' );
+				throw new Error( `Failed to save some settings: ${ failedKeys }` );
+			}
 
 			// Success feedback
 			const successMessage = __( 'Settings saved successfully', 'wp-ai-blogger' );
@@ -117,6 +150,7 @@ const ContentHeader = ( {
 			onSaveError?.( error );
 		} finally {
 			setProcessing( false );
+			setSaveProgress( { current: 0, total: 0 } );
 		}
 	}, [ processing, settingsToSave, dispatch, onSaveStart, onSaveComplete, onSaveError ] );
 
@@ -186,7 +220,12 @@ const ContentHeader = ( {
 								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 							/>
 						</svg>
-						<span>{ __( 'Saving…', 'wp-ai-blogger' ) }</span>
+						<span>
+							{ saveProgress.total > 1
+								? __( `Saving ${ saveProgress.current }/${ saveProgress.total }...`, 'wp-ai-blogger' )
+								: __( 'Saving…', 'wp-ai-blogger' )
+							}
+						</span>
 					</>
 				) : (
 					<>
