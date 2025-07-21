@@ -149,26 +149,21 @@ const WelcomeStep = memo(() => {
 					</h1>
 
 					{/* Enhanced description with better typography */}
-					<p className="text-lg text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed font-medium text-center">
+					<p className="text-lg text-gray-700 mx-auto mb-12 leading-relaxed font-medium">
 						{__(
-							"Generate high-quality blog content automatically. Boost your SEO and grow your audience with AI.",
+							"Set once and forget - automatically publish high-quality blog posts on schedule.",
 							'wp-ai-blogger'
 						)}
 					</p>
 
 					{/* Enhanced CTA section */}
-					<div className="mb-16">
+					<div className="mb-12">
 						<ActionButton
 							onClick={handleStepRedirection}
 							icon={ArrowRight}
 						>
 							{__("Start Building", 'wp-ai-blogger')}
 						</ActionButton>
-
-						{/* Additional CTA context */}
-						<p className="mt-4 text-gray-500 font-medium text-sm">
-							{__("No credit card required • Setup in minutes", 'wp-ai-blogger')}
-						</p>
 					</div>
 				</div>
 
