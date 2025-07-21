@@ -194,7 +194,7 @@ class Menu {
 		$hate = absint( Helper::get_option( 'hate', 2 ) );
 		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
 		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
-		$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
+		$post_ideas = $this->sanitize_post_ideas_data( Helper::get_option( 'postIdeas', [] ) );
 		$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
 		$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
 		$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
@@ -414,6 +414,52 @@ class Menu {
 		}
 
 		return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+	}
+
+	/**
+	 * Sanitizes post ideas data (handles both new array format and legacy string format)
+	 *
+	 * @since 1.0.0
+	 * @param mixed $post_ideas Post ideas data from database
+	 * @return array Sanitized post ideas array
+	 */
+	private function sanitize_post_ideas_data( $post_ideas ): array {
+		// Handle new array format
+		if ( is_array( $post_ideas ) ) {
+			$sanitized = [];
+			foreach ( $post_ideas as $idea ) {
+				if ( is_string( $idea ) ) {
+					$sanitized_idea = sanitize_textarea_field( $idea );
+					if ( ! empty( $sanitized_idea ) ) {
+						$sanitized[] = $sanitized_idea;
+					}
+				}
+			}
+			return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+		}
+
+		// Handle legacy string format for backward compatibility
+		if ( is_string( $post_ideas ) && ! empty( $post_ideas ) ) {
+			// Parse legacy string format (e.g., "IDEA: Title 1\nIDEA: Title 2")
+			$ideas = explode( "\n", $post_ideas );
+			$sanitized = [];
+
+			foreach ( $ideas as $idea ) {
+				$idea = trim( $idea );
+				if ( ! empty( $idea ) ) {
+					// Remove "IDEA:" prefix if present
+					$cleaned_idea = preg_replace( '/^IDEA:\s*/i', '', $idea );
+					$sanitized_idea = sanitize_textarea_field( $cleaned_idea );
+					if ( ! empty( $sanitized_idea ) ) {
+						$sanitized[] = $sanitized_idea;
+					}
+				}
+			}
+			return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+		}
+
+		// Return empty array for any other data type
+		return [];
 	}
 
 	/**

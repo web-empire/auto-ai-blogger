@@ -17,26 +17,30 @@ export default function PostIdeas() {
 	const hasFetchedRef = useRef( false );
 	const navigate = useNavigate();
 
-	// Fetch data from Redux store using selectors.
-	const siteTitle = useSelector( ( state ) => state.siteTitle ) || '';
-	const siteFor = useSelector( ( state ) => state.siteFor ) || '';
-	const siteDescription = useSelector( ( state ) => state.siteDescription ) || '';
-	const temperature = useSelector( ( state ) => state.temperature ) || '';
-	const harassment = useSelector( ( state ) => state.harassment ) || '';
-	const hate = useSelector( ( state ) => state.hate ) || '';
-	const sexuallyExplicit = useSelector( ( state ) => state.sexuallyExplicit ) || '';
-	const dangerousContent = useSelector( ( state ) => state.dangerousContent ) || '';
-	const license = useSelector( ( state ) => state.license ) || '';
-	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas ) || '';
-	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
-	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
-	const adminNonce = useSelector( ( state ) => state.adminNonce ) || '';
-	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
-	const editPostLink = useSelector( ( state ) => state.editPostLink ) || '/wp-admin/post.php?post={{POST_ID}}&action=edit';
+	// Fetch data from Redux store using selectors - defaults handled by menu.php
+	const siteTitle = useSelector( ( state ) => state.siteTitle );
+	const siteFor = useSelector( ( state ) => state.siteFor );
+	const siteDescription = useSelector( ( state ) => state.siteDescription );
+	const temperature = useSelector( ( state ) => state.temperature );
+	const harassment = useSelector( ( state ) => state.harassment );
+	const hate = useSelector( ( state ) => state.hate );
+	const sexuallyExplicit = useSelector( ( state ) => state.sexuallyExplicit );
+	const dangerousContent = useSelector( ( state ) => state.dangerousContent );
+	const license = useSelector( ( state ) => state.license );
+	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
+	const licenseStatus = useSelector( ( state ) => state.license_status );
+	const homeSlug = useSelector( ( state ) => state.homeSlug );
+	const adminNonce = useSelector( ( state ) => state.adminNonce );
+	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
+	const editPostLink = useSelector( ( state ) => state.editPostLink );
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
-	const [ loading, setLoading ] = useState( ! postIdeasFromRedux || postIdeasFromRedux.trim() === '' );
+	const [ loading, setLoading ] = useState(
+		! postIdeasFromRedux ||
+		( Array.isArray( postIdeasFromRedux ) ? postIdeasFromRedux.length === 0 :
+		  ( typeof postIdeasFromRedux === 'string' ? postIdeasFromRedux.trim() === '' : true ) )
+	);
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 
@@ -95,7 +99,8 @@ export default function PostIdeas() {
 
 			const data = await response.json();
 
-			if ( data && data.post_ideas ) {
+			if ( data && data.post_ideas && Array.isArray( data.post_ideas ) ) {
+				// Store the post ideas array directly (now contains strings)
 				dispatch( {
 					type: UPDATE_POST_IDEAS,
 					payload: data.post_ideas,
@@ -136,7 +141,9 @@ export default function PostIdeas() {
 		}
 
 		// If we already have post ideas from Redux/DB, use them and don't fetch
-		if ( postIdeasFromRedux && postIdeasFromRedux.trim() !== '' ) {
+		if ( postIdeasFromRedux &&
+			 ( ( Array.isArray( postIdeasFromRedux ) && postIdeasFromRedux.length > 0 ) ||
+			   ( typeof postIdeasFromRedux === 'string' && postIdeasFromRedux.trim() !== '' ) ) ) {
 			setPostIdeas( postIdeasFromRedux );
 			setLoading( false );
 			return;
@@ -154,41 +161,69 @@ export default function PostIdeas() {
 
 	useEffect( () => {
 		// Process post ideas when they change (separate from fetching)
-		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' ) {
-			let formattedPostIdeas = postIdeas;
-
-			if ( ! postIdeas.includes( '\n' ) ) {
-				formattedPostIdeas = postIdeas.replace( /IDEA:\s/g, '\nIDEA: ' );
-			}
-
-			const ideasArray = formattedPostIdeas
-				.split( '\n' )
-				.filter( ( item ) => item.trim() !== '' )
-				.map( ( item ) => {
-					const match = item.match( /^IDEA:\s*(.*)$/ );
-					if ( match ) {
+		if ( licenseEnabled && postIdeas ) {
+			// Handle new string array format
+			if ( Array.isArray( postIdeas ) ) {
+				// Map the new API response format to the expected structure
+				const ideasArray = postIdeas.map( ( idea ) => {
+					// Handle both new string format and legacy object format
+					if ( typeof idea === 'string' ) {
 						return {
-							title: match[ 1 ].trim(),
+							title: idea,
+							volume: 'N/A',
+							position: 'N/A',
+							visits: 'N/A',
+						};
+					} else {
+						// Legacy object format with title/description
+						return {
+							title: idea.title || '',
 							volume: 'N/A',
 							position: 'N/A',
 							visits: 'N/A',
 						};
 					}
-					return null;
-				} )
-				.filter( ( item ) => item !== null );
+				} );
+				setPostIdeasArr( ideasArray );
+				setLoading( false );
+			}
+			// Handle legacy string format for backward compatibility
+			else if ( typeof postIdeas === 'string' ) {
+				let formattedPostIdeas = postIdeas;
 
-			setPostIdeasArr( ideasArray );
-			setLoading( false );
+				if ( ! postIdeas.includes( '\n' ) ) {
+					formattedPostIdeas = postIdeas.replace( /IDEA:\s/g, '\nIDEA: ' );
+				}
+
+				const ideasArray = formattedPostIdeas
+					.split( '\n' )
+					.filter( ( item ) => item.trim() !== '' )
+					.map( ( item ) => {
+						const match = item.match( /^IDEA:\s*(.*)$/ );
+						if ( match ) {
+							return {
+								title: match[ 1 ].trim(),
+								volume: 'N/A',
+								position: 'N/A',
+								visits: 'N/A',
+							};
+						}
+						return null;
+					} )
+					.filter( ( item ) => item !== null );
+
+				setPostIdeasArr( ideasArray );
+				setLoading( false );
+			}
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
 	const handleRefresh = () => {
 		dispatch( {
 			type: UPDATE_POST_IDEAS,
-			payload: '',
+			payload: [], // Use empty array instead of empty string
 		} );
-		setPostIdeas( '' );
+		setPostIdeas( [] );
 		setLoading( true );
 		setError( null );
 		setIsApiError( false );
@@ -380,11 +415,13 @@ export default function PostIdeas() {
 									{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										postIdeasArr.map( ( post, index ) => (
 											<tr key={ `post-idea-${ index }-${ post?.title?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
-												<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6">
-													<TrimWordsContent
-														content={ post?.title || '' }
-														count={ 120 }
-													/>
+												<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
+													<div className="font-medium">
+														<TrimWordsContent
+															content={ post?.title || '' }
+															count={ 120 }
+														/>
+													</div>
 												</td>
 												<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
 													<a

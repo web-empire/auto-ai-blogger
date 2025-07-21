@@ -100,8 +100,8 @@ class Settings {
 					'type'    => 'int',
 				],
 				'postIdeas'        => [
-					'default' => '',
-					'type'    => 'string',
+					'default' => [],
+					'type'    => 'array',
 				],
 			]
 		);
@@ -227,6 +227,10 @@ class Settings {
 
 			case 'array':
 				$output = ! empty( $value ) ? wpaib_clean_data( $value ) : '';
+				break;
+
+			case 'array':
+				$output = ! empty( $value ) && is_array( $value ) ? array_map( 'sanitize_textarea_field', $value ) : [];
 				break;
 
 			case 'html':

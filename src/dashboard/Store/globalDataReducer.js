@@ -96,6 +96,11 @@ const globalDataReducer = ( state = {}, action ) => {
 			return { ...state, dangerousContent: validValue };
 		},
 		UPDATE_POST_IDEAS: () => {
+			// Handle both array (new format) and string (legacy format)
+			if ( Array.isArray( action.payload ) ) {
+				return { ...state, postIdeas: action.payload };
+			}
+			// Legacy string format - keep for backward compatibility
 			const ideas = typeof action.payload === 'string' ? action.payload : '';
 			return { ...state, postIdeas: ideas };
 		},
