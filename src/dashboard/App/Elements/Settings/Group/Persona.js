@@ -176,13 +176,14 @@ const Persona = memo(() => {
 	const sexuallyExplicit = parseInt(useSelector((state) => state.sexuallyExplicit) || 2);
 	const dangerousContent = parseInt(useSelector((state) => state.dangerousContent) || 2);
 
-	// Enhanced validation
+	// Enhanced validation with better UX
 	const validateSiteTitle = useCallback((value) => {
-		if (!value.trim()) {
+		const trimmedValue = value.trim();
+		if (!trimmedValue) {
 			setErrors(prev => ({ ...prev, siteTitle: __('Site title is required', 'wp-ai-blogger') }));
 			return false;
 		}
-		if (value.length > 100) {
+		if (trimmedValue.length > 100) {
 			setErrors(prev => ({ ...prev, siteTitle: __('Site title must be 100 characters or less', 'wp-ai-blogger') }));
 			return false;
 		}
@@ -191,11 +192,12 @@ const Persona = memo(() => {
 	}, []);
 
 	const validateSiteFor = useCallback((value) => {
-		if (!value.trim()) {
+		const trimmedValue = value.trim();
+		if (!trimmedValue) {
 			setErrors(prev => ({ ...prev, siteFor: __('Site description is required', 'wp-ai-blogger') }));
 			return false;
 		}
-		if (value.length > 200) {
+		if (trimmedValue.length > 200) {
 			setErrors(prev => ({ ...prev, siteFor: __('Description must be 200 characters or less', 'wp-ai-blogger') }));
 			return false;
 		}
@@ -203,17 +205,19 @@ const Persona = memo(() => {
 		return true;
 	}, []);
 
-	// Enhanced handlers with validation
+	// Optimized handlers with better performance
 	const handleSiteTitleChange = useCallback((e) => {
 		const value = e.target.value;
-		validateSiteTitle(value);
 		dispatch({ type: 'UPDATE_SITE_TITLE', payload: value });
+		// Debounced validation to avoid excessive calls
+		setTimeout(() => validateSiteTitle(value), 300);
 	}, [dispatch, validateSiteTitle]);
 
 	const handleSiteForChange = useCallback((e) => {
 		const value = e.target.value;
-		validateSiteFor(value);
 		dispatch({ type: 'UPDATE_SITE_FOR', payload: value });
+		// Debounced validation to avoid excessive calls
+		setTimeout(() => validateSiteFor(value), 300);
 	}, [dispatch, validateSiteFor]);
 
 	const handleSiteDescriptionChange = useCallback((e) => {
@@ -222,28 +226,36 @@ const Persona = memo(() => {
 	}, [dispatch]);
 
 	const handleTemperatureChange = useCallback((value) => {
-		dispatch({ type: 'UPDATE_TEMPERATURE', payload: value });
+		// Ensure value is within valid range and properly formatted
+		const clampedValue = Math.max(0, Math.min(2, parseFloat(value) || 0.7));
+		dispatch({ type: 'UPDATE_TEMPERATURE', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleHarassmentChange = useCallback((value) => {
-		dispatch({ type: 'UPDATE_HARASSMENT', payload: value });
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		dispatch({ type: 'UPDATE_HARASSMENT', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleHateChange = useCallback((value) => {
-		dispatch({ type: 'UPDATE_HATE', payload: value });
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		dispatch({ type: 'UPDATE_HATE', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleSexuallyExplicitChange = useCallback((value) => {
-		dispatch({ type: 'UPDATE_SEXUALLY_EXPLICIT', payload: value });
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		dispatch({ type: 'UPDATE_SEXUALLY_EXPLICIT', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleDangerousContentChange = useCallback((value) => {
-		dispatch({ type: 'UPDATE_DANGEROUS_CONTENT', payload: value });
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		dispatch({ type: 'UPDATE_DANGEROUS_CONTENT', payload: clampedValue });
 	}, [dispatch]);
 
-	// Character count for textarea
+	// Optimized character count with bounds checking
 	const descriptionCount = siteDescription.length;
 	const maxDescriptionLength = 1000;
+	const descriptionProgress = Math.min(100, (descriptionCount / maxDescriptionLength) * 100);
+	const isDescriptionNearLimit = descriptionProgress > 90;
 
 	return (
 		<div className="space-y-8">
@@ -419,7 +431,7 @@ const Persona = memo(() => {
 							placeholder={__('Provide detailed information about your site, target audience, content style, and any specific requirements...', 'wp-ai-blogger')}
 							aria-describedby="description-count"
 						/>
-						<div className="absolute bottom-2 right-3 text-xs text-gray-400 bg-white px-1">
+						<div className={`absolute bottom-2 right-3 text-xs px-1 bg-white rounded ${isDescriptionNearLimit ? 'text-orange-600 font-medium' : 'text-gray-400'}`}>
 							{descriptionCount}/{maxDescriptionLength}
 						</div>
 					</div>
