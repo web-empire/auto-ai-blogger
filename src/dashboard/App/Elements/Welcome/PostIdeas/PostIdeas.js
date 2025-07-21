@@ -211,15 +211,6 @@ export default function PostIdeas() {
 					>
 						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
 					</ProButton>
-					{ isApiError && (
-						<button
-							onClick={ handleRefresh }
-							className="mt-4 flex items-center gap-2 bg-gray-600 text-white rounded px-4 py-2"
-						>
-							<RotateCw className="h-4 w-4" />
-							{ __( 'Retry', 'wp-ai-blogger' ) }
-						</button>
-					) }
 				</div>
 			);
 		}

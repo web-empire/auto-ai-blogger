@@ -144,7 +144,18 @@ class Helper {
 		}
 
 		// If the value is same as default then remove it from the DB.
-		if ( Settings::get_default_option( $original_key ) === $sanitized_value ) {
+		$default_value = Settings::get_default_option( $original_key );
+		$is_default = false;
+
+		if ( is_array( $sanitized_value ) && is_array( $default_value ) ) {
+			// For arrays, check if they're both empty or exactly equal
+			$is_default = ( empty( $sanitized_value ) && empty( $default_value ) ) || ( $sanitized_value === $default_value );
+		} else {
+			// For non-arrays, use direct comparison
+			$is_default = ( $default_value === $sanitized_value );
+		}
+
+		if ( $is_default ) {
 			unset( $settings[ $key ] );
 		} else {
 			$settings[ $key ] = $sanitized_value;
@@ -153,7 +164,12 @@ class Helper {
 		// Validate final settings array
 		$validated_settings = self::validate_settings_array( $settings );
 
-		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
+		$update_result = update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
+
+		// Debug logging for troubleshooting
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $original_key === 'postIdeas' ) {
+			error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $original_key . ', Original Value: ' . json_encode( $value ) . ', Sanitized Value: ' . json_encode( $sanitized_value ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
+		}
 
 		return $sanitized_value;
 	}	/**
