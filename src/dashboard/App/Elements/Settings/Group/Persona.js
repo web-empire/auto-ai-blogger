@@ -166,15 +166,15 @@ const Persona = memo(() => {
 	const dispatch = useDispatch();
 	const [errors, setErrors] = useState({});
 
-	// Redux selectors with proper fallbacks that allow 0 values
-	const siteTitle = useSelector((state) => state?.siteTitle || '');
-	const siteFor = useSelector((state) => state?.siteFor || '');
-	const siteDescription = useSelector((state) => state?.siteDescription || '');
-	const temperature = parseFloat(useSelector((state) => state?.temperature ?? 1.0));
-	const harassment = parseInt(useSelector((state) => state?.harassment ?? 2));
-	const hate = parseInt(useSelector((state) => state?.hate ?? 2));
-	const sexuallyExplicit = parseInt(useSelector((state) => state?.sexuallyExplicit ?? 2));
-	const dangerousContent = parseInt(useSelector((state) => state?.dangerousContent ?? 2));
+	// Redux selectors - values are already initialized from menu.php through Redux store
+	const siteTitle = useSelector((state) => state.siteTitle);
+	const siteFor = useSelector((state) => state.siteFor);
+	const siteDescription = useSelector((state) => state.siteDescription);
+	const temperature = useSelector((state) => state.temperature);
+	const harassment = useSelector((state) => state.harassment);
+	const hate = useSelector((state) => state.hate);
+	const sexuallyExplicit = useSelector((state) => state.sexuallyExplicit);
+	const dangerousContent = useSelector((state) => state.dangerousContent);
 
 	// Enhanced validation with better UX
 	const validateSiteTitle = useCallback((value) => {

@@ -181,147 +181,33 @@ class Menu {
 		}
 
 		// Sanitized data collection
-		$blog_name = sanitize_text_field( get_bloginfo( 'name' ) );
-		$admin_site_email_address = sanitize_email( get_option( 'admin_email' ) );
+		$blog_name = sanitize_text_field( Helper::get_option( 'blogName', get_bloginfo( 'name' ) ) );
+		$admin_site_email_address = sanitize_email( Helper::get_option( 'adminEmail', get_option( 'admin_email' ) ) );
 
-		// Safely get settings with error handling
-		$site_title = '';
-		$site_description = '';
-		$site_for = '';
-		$license = '';
-		$temperature = 1.0;
-		$harassment = 2;
-		$hate = 2;
-		$sexually_explicit = 2;
-		$dangerous_content = 2;
-		$post_ideas = '';
-		$token_total = 0;
-		$token_remaining = 0;
-		$license_status = 'unlicensed';
-
-		try {
-			$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', '' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get siteTitle - ' . $e->getMessage() );
-		}
-
-		try {
-			$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get siteDescription - ' . $e->getMessage() );
-		}
-
-		try {
-			$site_for = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get siteFor - ' . $e->getMessage() );
-		}
-
-		try {
-			// License is always stored as a string
-			$license = sanitize_text_field( Helper::get_option( 'license', '' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get license - ' . $e->getMessage() );
-		}
-
-		try {
-			$temperature = (float) Helper::get_option( 'temperature', 1 );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get temperature - ' . $e->getMessage() );
-		}
-
-		try {
-			$harassment = absint( Helper::get_option( 'harassment', 2 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get harassment - ' . $e->getMessage() );
-		}
-
-		try {
-			$hate = absint( Helper::get_option( 'hate', 2 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get hate - ' . $e->getMessage() );
-		}
-
-		try {
-			$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get sexuallyExplicit - ' . $e->getMessage() );
-		}
-
-		try {
-			$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get dangerousContent - ' . $e->getMessage() );
-		}
-
-		try {
-			$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get postIdeas - ' . $e->getMessage() );
-		}
-
-		// Get token and license data with proper defaults
+		// Get settings with proper defaults - no need for redundant variables
+		$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', '' ) );
+		$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
+		$site_for = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
+		$license = sanitize_text_field( Helper::get_option( 'license', '' ) );
+		$temperature = (float) Helper::get_option( 'temperature', 1.0 );
+		$harassment = absint( Helper::get_option( 'harassment', 2 ) );
+		$hate = absint( Helper::get_option( 'hate', 2 ) );
+		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
+		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
+		$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
 		$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
 		$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
 		$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
-		// Get data with error handling
-		$post_statuses = [];
-		$categories = [];
-		$tags = [];
-		$authors = [];
-		$post_types = [];
-		$postmeta_defaults = [];
-		$all_campaigns = [];
-		$generated_posts = [];
-
-		try {
-			$post_statuses = $this->get_sanitized_post_statuses();
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get post statuses - ' . $e->getMessage() );
-		}
-
-		try {
-			$categories = $this->get_sanitized_categories();
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get categories - ' . $e->getMessage() );
-		}
-
-		try {
-			$tags = $this->get_sanitized_tags();
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get tags - ' . $e->getMessage() );
-		}
-
-		try {
-			$authors = $this->get_sanitized_authors();
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get authors - ' . $e->getMessage() );
-		}
-
-		try {
-			$post_types = $this->get_sanitized_post_types();
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get post types - ' . $e->getMessage() );
-		}
-
-		try {
-			$postmeta_defaults = $this->sanitize_metadata_defaults( Metadata::get_default_settings() );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get metadata defaults - ' . $e->getMessage() );
-		}
-
-		try {
-			$all_campaigns = $this->sanitize_campaigns_data( wpaib_get_all_campaigns() );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get campaigns - ' . $e->getMessage() );
-		}
-
-		try {
-			$generated_posts = $this->sanitize_posts_data( wpaib_get_generated_posts() );
-		} catch ( Exception $e ) {
-			error_log( 'WP AI Blogger: Failed to get generated posts - ' . $e->getMessage() );
-		}
+		// Get data with proper error handling in the methods themselves
+		$post_statuses = $this->get_sanitized_post_statuses();
+		$categories = $this->get_sanitized_categories();
+		$tags = $this->get_sanitized_tags();
+		$authors = $this->get_sanitized_authors();
+		$post_types = $this->get_sanitized_post_types();
+		$postmeta_defaults = $this->sanitize_metadata_defaults( Metadata::get_default_settings() );
+		$all_campaigns = $this->sanitize_campaigns_data( wpaib_get_all_campaigns() );
+		$generated_posts = $this->sanitize_posts_data( wpaib_get_generated_posts() );
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',

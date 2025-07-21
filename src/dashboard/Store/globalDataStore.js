@@ -38,32 +38,15 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 const getInitialState = () => {
 	// Ensure wpaib_localized_data exists
 	if ( typeof wpaib_localized_data === 'undefined' ) {
-		console.warn( 'wpaib_localized_data is not defined, using default state' );
+		console.warn( 'wpaib_localized_data is not defined, using minimal fallback state' );
 		return {
 			initialStateSetFlag: false,
 			activeSettingsNavigationTab: 'general',
 			settingsSavedNotification: false,
 			confettiShow: false,
 			onboardingTab: 0,
-			siteTitle: '',
-			siteFor: '',
-			siteDescription: '',
-			license: '',
-			userOnboarded: false,
-			userName: '',
-			userEmail: '',
-			pluginSettings: {},
-			temperature: 1.0,
-			harassment: 2,
-			hate: 2,
-			sexuallyExplicit: 2,
-			dangerousContent: 2,
-			postIdeas: [],
-			tokenTotal: 0,
-			tokenRemaining: 0,
-			license_status: 'inactive',
 			isLoading: false,
-			error: null,
+			error: 'Localized data not available',
 		};
 	}
 
@@ -142,32 +125,11 @@ const createEnhancedStore = () => {
 
 		// Validate initial state
 		if ( ! initialState || typeof initialState !== 'object' ) {
-			console.error( 'Invalid initial state, using fallback' );
+			console.error( 'Invalid initial state, using minimal fallback' );
 			const fallbackState = {
 				initialStateSetFlag: false,
-				activeSettingsNavigationTab: 'general',
-				settingsSavedNotification: false,
-				confettiShow: false,
-				onboardingTab: 0,
-				siteTitle: '',
-				siteFor: '',
-				siteDescription: '',
-				license: '',
-				userOnboarded: false,
-				userName: '',
-				userEmail: '',
-				pluginSettings: {},
-				temperature: 1.0,
-				harassment: 2,
-				hate: 2,
-				sexuallyExplicit: 2,
-				dangerousContent: 2,
-				postIdeas: '',
-				tokenTotal: 0,
-				tokenRemaining: 0,
-				license_status: 'inactive',
 				isLoading: false,
-				error: null,
+				error: 'Invalid initial state',
 			};
 			return createStore( globalDataReducer, fallbackState );
 		}
@@ -204,17 +166,9 @@ const createEnhancedStore = () => {
 		return store;
 	} catch ( error ) {
 		console.error( 'Failed to create Redux store:', error );
-		// Return a minimal store as fallback
+		// Return a minimal store as fallback for critical error
 		const fallbackState = {
 			initialStateSetFlag: false,
-			tokenTotal: 0,
-			tokenRemaining: 0,
-			license_status: 'inactive',
-			temperature: 1.0,
-			harassment: 2,
-			hate: 2,
-			sexuallyExplicit: 2,
-			dangerousContent: 2,
 			isLoading: false,
 			error: 'Failed to initialize store',
 		};
