@@ -121,10 +121,26 @@ const globalDataReducer = ( state = initialState, action ) => {
 			const validTemp = isNaN( temp ) ? 0.7 : Math.max( 0, Math.min( 2, temp ) ); // Clamp between 0 and 2
 			return { ...state, temperature: validTemp };
 		},
-		UPDATE_HARASSMENT: () => ( { ...state, harassment: Boolean( action.payload ) } ),
-		UPDATE_HATE: () => ( { ...state, hate: Boolean( action.payload ) } ),
-		UPDATE_SEXUALLY_EXPLICIT: () => ( { ...state, sexuallyExplicit: Boolean( action.payload ) } ),
-		UPDATE_DANGEROUS_CONTENT: () => ( { ...state, dangerousContent: Boolean( action.payload ) } ),
+		UPDATE_HARASSMENT: () => {
+			const value = Number( action.payload );
+			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
+			return { ...state, harassment: validValue };
+		},
+		UPDATE_HATE: () => {
+			const value = Number( action.payload );
+			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
+			return { ...state, hate: validValue };
+		},
+		UPDATE_SEXUALLY_EXPLICIT: () => {
+			const value = Number( action.payload );
+			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
+			return { ...state, sexuallyExplicit: validValue };
+		},
+		UPDATE_DANGEROUS_CONTENT: () => {
+			const value = Number( action.payload );
+			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
+			return { ...state, dangerousContent: validValue };
+		},
 		UPDATE_POST_IDEAS: () => {
 			const ideas = typeof action.payload === 'string' ? action.payload : '';
 			return { ...state, postIdeas: ideas };

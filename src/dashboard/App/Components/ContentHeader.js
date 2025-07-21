@@ -32,7 +32,6 @@ const ContentHeader = ( {
 	const dispatch = useDispatch();
 	const [ processing, setProcessing ] = useState( false );
 	const [ lastSaveTime, setLastSaveTime ] = useState( null );
-	const [ saveProgress, setSaveProgress ] = useState( { current: 0, total: 0 } );
 
 	// Memoize settings object to prevent unnecessary re-renders
 	const settingsToSave = useMemo( () => {
@@ -71,7 +70,6 @@ const ContentHeader = ( {
 
 		try {
 			setProcessing( true );
-			setSaveProgress( { current: 0, total: Object.keys( settingsToSave ).length } );
 			onSaveStart?.();
 
 			// Validate settings before saving
@@ -86,10 +84,6 @@ const ContentHeader = ( {
 
 			for ( const [ key, value ] of Object.entries( settingsToSave ) ) {
 				currentIndex++;
-				console.log( `Saving setting (${ currentIndex }/${ totalSettings }): ${ key }`, value );
-
-				// Update progress state
-				setSaveProgress( { current: currentIndex, total: totalSettings } );
 
 				// Update processing state to show progress
 				dispatch( {
@@ -150,7 +144,6 @@ const ContentHeader = ( {
 			onSaveError?.( error );
 		} finally {
 			setProcessing( false );
-			setSaveProgress( { current: 0, total: 0 } );
 		}
 	}, [ processing, settingsToSave, dispatch, onSaveStart, onSaveComplete, onSaveError ] );
 
@@ -220,12 +213,7 @@ const ContentHeader = ( {
 								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 							/>
 						</svg>
-						<span>
-							{ saveProgress.total > 1
-								? __( `Saving ${ saveProgress.current }/${ saveProgress.total }...`, 'wp-ai-blogger' )
-								: __( 'Saving…', 'wp-ai-blogger' )
-							}
-						</span>
+						<span>{ __( 'Saving…', 'wp-ai-blogger' ) }</span>
 					</>
 				) : (
 					<>
