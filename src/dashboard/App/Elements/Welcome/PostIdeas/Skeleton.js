@@ -47,58 +47,11 @@ const Skeleton = memo(({ rows = 5, className = '' }) => {
 		[rows]
 	);
 
+	// Return just the skeleton rows without table wrapper for inline use
 	return (
-		<div
-			className={`flow-root ${className}`}
-			role="status"
-			aria-live="polite"
-			aria-label={__('Loading post ideas...', 'wp-ai-blogger')}
-		>
-			<div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-				<div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-					<div className="overflow-hidden shadow-lg ring-1 ring-black/5 sm:rounded-xl">
-						<table
-							className="w-full divide-y divide-gray-300"
-							role="table"
-							aria-label={__('Loading post ideas table', 'wp-ai-blogger')}
-						>
-							<caption className="sr-only">
-								{__('Loading table content, please wait...', 'wp-ai-blogger')}
-							</caption>
-
-							<thead className="bg-gradient-to-r from-gray-50 to-gray-100" role="rowgroup">
-								<tr role="row">
-									<th
-										scope="col"
-										className="py-4 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-									>
-										{__('Post Idea', 'wp-ai-blogger')}
-									</th>
-									<th
-										scope="col"
-										className="px-3 py-4 text-center text-sm font-semibold text-gray-900"
-									>
-										{__('Action', 'wp-ai-blogger')}
-									</th>
-								</tr>
-							</thead>
-
-							<tbody
-								className="divide-y divide-gray-200 bg-white"
-								role="rowgroup"
-							>
-								{skeletonRows}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-
-			{/* Loading indicator for screen readers */}
-			<div className="sr-only" aria-live="polite">
-				{__('Loading content, please wait...', 'wp-ai-blogger')}
-			</div>
-		</div>
+		<>
+			{skeletonRows}
+		</>
 	);
 });
 
