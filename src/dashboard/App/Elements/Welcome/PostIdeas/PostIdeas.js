@@ -150,6 +150,7 @@ export default function PostIdeas() {
 		if ( ! hasFetchedRef.current ) {
 			hasFetchedRef.current = true;
 			// Keep loading true while we fetch
+			setLoading( true );
 			fetchPostIdeas();
 		} else {
 			// We've already tried fetching but have no data, so stop loading
@@ -163,14 +164,9 @@ export default function PostIdeas() {
 			// Convert string to array by splitting on newlines
 			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
-			setLoading( false );
-		} else if ( licenseEnabled ) {
-			// If licensed but no post ideas, only stop loading if we've already tried fetching
-			if ( hasFetchedRef.current ) {
-				setPostIdeasArr( [] );
-				setLoading( false );
-			}
-			// Otherwise keep loading while we fetch
+		} else {
+			// Clear the array if no post ideas
+			setPostIdeasArr( [] );
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
