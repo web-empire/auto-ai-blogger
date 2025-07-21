@@ -68,19 +68,19 @@ class Settings {
 					'type'    => 'float',
 				],
 				'harassment'       => [
-					'default' => 0,
+					'default' => 2,
 					'type'    => 'float',
 				],
 				'hate'             => [
-					'default' => 0,
+					'default' => 2,
 					'type'    => 'float',
 				],
 				'sexuallyExplicit' => [
-					'default' => 0,
+					'default' => 2,
 					'type'    => 'float',
 				],
 				'dangerousContent' => [
-					'default' => 0,
+					'default' => 2,
 					'type'    => 'float',
 				],
 				'license'          => [

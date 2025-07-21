@@ -190,10 +190,10 @@ class Menu {
 		$site_for = '';
 		$license = '';
 		$temperature = 1.0;
-		$harassment = 0;
-		$hate = 0;
-		$sexually_explicit = 0;
-		$dangerous_content = 0;
+		$harassment = 2;
+		$hate = 2;
+		$sexually_explicit = 2;
+		$dangerous_content = 2;
 		$post_ideas = '';
 		$token_total = 0;
 		$token_remaining = 0;
