@@ -147,14 +147,9 @@ class Helper {
 		$default_value = Settings::get_default_option( $original_key );
 		$is_default = false;
 
-		if ( is_array( $sanitized_value ) && is_array( $default_value ) ) {
-			// For arrays, only consider it default if both are empty
-			// Don't remove non-empty arrays even if the default is empty
-			$is_default = ( empty( $sanitized_value ) && empty( $default_value ) );
-		} else {
-			// For non-arrays, use direct comparison
-			$is_default = ( $default_value === $sanitized_value );
-		}
+		// For all types, use direct comparison
+		// For postIdeas, empty string is the default
+		$is_default = ( $default_value === $sanitized_value );
 
 		if ( $is_default ) {
 			unset( $settings[ $key ] );
@@ -286,32 +281,45 @@ class Helper {
 				return max( 0, min( 4, $level ) );
 
 			case 'postIdeas':
-				// Handle both array and JSON string input
-				if ( is_string( $value ) ) {
-					// Try to decode JSON string
-					$decoded = json_decode( $value, true );
-					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
-						$value = $decoded;
-					} else {
-						// If not valid JSON, return empty array
-						return [];
-					}
-				}
-
-				if ( ! is_array( $value ) ) {
-					return [];
-				}
-
-				$sanitized = [];
-				foreach ( $value as $idea ) {
-					if ( is_string( $idea ) ) {
-						$sanitized_idea = sanitize_textarea_field( $idea );
-						if ( ! empty( $sanitized_idea ) ) {
-							$sanitized[] = $sanitized_idea;
+				// Convert to simple string format for easier handling
+				if ( is_array( $value ) ) {
+					// Convert array to newline-separated string
+					$cleaned_ideas = [];
+					foreach ( $value as $idea ) {
+						if ( is_string( $idea ) ) {
+							$sanitized_idea = sanitize_textarea_field( $idea );
+							if ( ! empty( $sanitized_idea ) ) {
+								$cleaned_ideas[] = $sanitized_idea;
+							}
 						}
 					}
+					// Limit to 50 ideas and join with newlines
+					$limited_ideas = array_slice( $cleaned_ideas, 0, 50 );
+					return ! empty( $limited_ideas ) ? implode( "\n", $limited_ideas ) : '';
 				}
-				return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+
+				if ( is_string( $value ) ) {
+					// Handle JSON string input by converting to array first, then to string
+					$decoded = json_decode( $value, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						// Recursively call with the decoded array
+						return self::sanitize_input( $key, $decoded );
+					}
+
+					// Try with stripslashes for double-escaped JSON
+					$unescaped = stripslashes( $value );
+					$decoded = json_decode( $unescaped, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						// Recursively call with the decoded array
+						return self::sanitize_input( $key, $decoded );
+					}
+
+					// If not JSON, treat as plain string (newline-separated ideas)
+					return sanitize_textarea_field( $value );
+				}
+
+				// For any other type, return empty string
+				return '';
 
 			case 'blogName':
 			case 'adminEmail':
@@ -396,10 +404,11 @@ class Helper {
 				return absint( $value );
 
 			case 'postIdeas':
-				if ( ! is_array( $value ) ) {
-					return [];
+				// Return string format directly for frontend
+				if ( is_string( $value ) ) {
+					return sanitize_textarea_field( $value );
 				}
-				return array_map( 'sanitize_textarea_field', $value );
+				return '';
 
 			default:
 				// Default sanitization for unknown keys

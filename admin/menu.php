@@ -194,7 +194,7 @@ class Menu {
 		$hate = absint( Helper::get_option( 'hate', 2 ) );
 		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
 		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
-		$post_ideas = $this->sanitize_post_ideas_data( Helper::get_option( 'postIdeas', [] ) );
+		$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
 		$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
 		$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
 		$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
@@ -417,30 +417,6 @@ class Menu {
 	}
 
 	/**
-	 * Sanitizes post ideas data (array format only)
-	 *
-	 * @since 1.0.0
-	 * @param mixed $post_ideas Post ideas data from database
-	 * @return array Sanitized post ideas array
-	 */
-	private function sanitize_post_ideas_data( $post_ideas ): array {
-		// Only handle array format
-		if ( is_array( $post_ideas ) ) {
-			$sanitized = [];
-			foreach ( $post_ideas as $idea ) {
-				if ( is_string( $idea ) ) {
-					$sanitized_idea = sanitize_textarea_field( $idea );
-					if ( ! empty( $sanitized_idea ) ) {
-						$sanitized[] = $sanitized_idea;
-					}
-				}
-			}
-			return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
-		}
-
-		// Return empty array for any other data type
-		return [];
-	}	/**
 	 * Gets sanitized post statuses
 	 *
 	 * @since 1.0.0

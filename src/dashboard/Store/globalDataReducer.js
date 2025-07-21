@@ -96,12 +96,18 @@ const globalDataReducer = ( state = {}, action ) => {
 			return { ...state, dangerousContent: validValue };
 		},
 		UPDATE_POST_IDEAS: () => {
-			// Only handle array format
+			// Convert any input to string format for consistent storage
+			let stringValue = '';
+
 			if ( Array.isArray( action.payload ) ) {
-				return { ...state, postIdeas: action.payload };
+				// Convert array to newline-separated string
+				stringValue = action.payload.filter( idea => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
+			} else if ( typeof action.payload === 'string' ) {
+				// Already a string, just sanitize
+				stringValue = action.payload.trim();
 			}
-			// Return empty array for any non-array data
-			return { ...state, postIdeas: [] };
+
+			return { ...state, postIdeas: stringValue };
 		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),

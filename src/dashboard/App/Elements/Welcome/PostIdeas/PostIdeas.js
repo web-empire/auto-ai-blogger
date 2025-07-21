@@ -37,7 +37,7 @@ export default function PostIdeas() {
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
 	const [ loading, setLoading ] = useState(
-		! postIdeasFromRedux || ! Array.isArray( postIdeasFromRedux ) || postIdeasFromRedux.length === 0
+		! postIdeasFromRedux || typeof postIdeasFromRedux !== 'string' || postIdeasFromRedux.trim() === ''
 	);
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
@@ -98,13 +98,16 @@ export default function PostIdeas() {
 			const data = await response.json();
 
 			if ( data && data.post_ideas && Array.isArray( data.post_ideas ) ) {
-				// Store the post ideas array directly (now contains strings)
+				// Convert array to string for consistent storage
+				const postIdeasString = data.post_ideas.filter( idea => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
+
+				// Store as string in Redux and DB
 				dispatch( {
 					type: UPDATE_POST_IDEAS,
-					payload: data.post_ideas,
+					payload: postIdeasString,
 				} );
-				await updateApiData( 'postIdeas', data.post_ideas, dispatch, abortControllerRef );
-				setPostIdeas( data.post_ideas );
+				await updateApiData( 'postIdeas', postIdeasString, dispatch, abortControllerRef );
+				setPostIdeas( postIdeasString );
 				setLoading( false );
 			} else {
 				console.error( 'API Error: Invalid response from API' );
@@ -139,7 +142,7 @@ export default function PostIdeas() {
 		}
 
 		// If we already have post ideas from Redux/DB, use them and don't fetch
-		if ( postIdeasFromRedux && Array.isArray( postIdeasFromRedux ) && postIdeasFromRedux.length > 0 ) {
+		if ( postIdeasFromRedux && typeof postIdeasFromRedux === 'string' && postIdeasFromRedux.trim() !== '' ) {
 			setPostIdeas( postIdeasFromRedux );
 			setLoading( false );
 			return;
@@ -156,10 +159,15 @@ export default function PostIdeas() {
 	}, [ licenseEnabled, postIdeasFromRedux, fetchPostIdeas ] );
 
 	useEffect( () => {
-		// Process post ideas when they change (separate from fetching)
-		if ( licenseEnabled && postIdeas && Array.isArray( postIdeas ) ) {
-			// Use the string array directly - no need to transform
-			setPostIdeasArr( postIdeas );
+		// Convert string to array for display when postIdeas changes
+		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' ) {
+			// Convert string to array by splitting on newlines
+			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
+			setPostIdeasArr( ideasArray );
+			setLoading( false );
+		} else if ( licenseEnabled && ( ! postIdeas || postIdeas.trim() === '' ) ) {
+			// No post ideas available
+			setPostIdeasArr( [] );
 			setLoading( false );
 		}
 	}, [ postIdeas, licenseEnabled ] );
@@ -167,9 +175,9 @@ export default function PostIdeas() {
 	const handleRefresh = () => {
 		dispatch( {
 			type: UPDATE_POST_IDEAS,
-			payload: [], // Use empty array instead of empty string
+			payload: '', // Use empty string instead of empty array
 		} );
-		setPostIdeas( [] );
+		setPostIdeas( '' );
 		setLoading( true );
 		setError( null );
 		setIsApiError( false );
