@@ -34,7 +34,7 @@ const FormField = memo(({
 	const handleBlur = useCallback(() => setIsFocused(false), []);
 
 	const fieldClasses = `
-		w-full pl-4 pr-10 py-3 text-sm border rounded-lg transition-all duration-200
+		w-full pl-4 !pr-10 py-3 text-sm border rounded-lg transition-all duration-200
 		${error
 			? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
 			: 'border-gray-300 bg-white focus:border-purple-500 focus:ring-purple-500'
