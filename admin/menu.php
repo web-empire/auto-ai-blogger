@@ -417,14 +417,14 @@ class Menu {
 	}
 
 	/**
-	 * Sanitizes post ideas data (handles both new array format and legacy string format)
+	 * Sanitizes post ideas data (array format only)
 	 *
 	 * @since 1.0.0
 	 * @param mixed $post_ideas Post ideas data from database
 	 * @return array Sanitized post ideas array
 	 */
 	private function sanitize_post_ideas_data( $post_ideas ): array {
-		// Handle new array format
+		// Only handle array format
 		if ( is_array( $post_ideas ) ) {
 			$sanitized = [];
 			foreach ( $post_ideas as $idea ) {
@@ -438,31 +438,9 @@ class Menu {
 			return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
 		}
 
-		// Handle legacy string format for backward compatibility
-		if ( is_string( $post_ideas ) && ! empty( $post_ideas ) ) {
-			// Parse legacy string format (e.g., "IDEA: Title 1\nIDEA: Title 2")
-			$ideas = explode( "\n", $post_ideas );
-			$sanitized = [];
-
-			foreach ( $ideas as $idea ) {
-				$idea = trim( $idea );
-				if ( ! empty( $idea ) ) {
-					// Remove "IDEA:" prefix if present
-					$cleaned_idea = preg_replace( '/^IDEA:\s*/i', '', $idea );
-					$sanitized_idea = sanitize_textarea_field( $cleaned_idea );
-					if ( ! empty( $sanitized_idea ) ) {
-						$sanitized[] = $sanitized_idea;
-					}
-				}
-			}
-			return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
-		}
-
 		// Return empty array for any other data type
 		return [];
-	}
-
-	/**
+	}	/**
 	 * Gets sanitized post statuses
 	 *
 	 * @since 1.0.0

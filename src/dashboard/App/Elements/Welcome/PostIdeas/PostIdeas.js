@@ -37,9 +37,7 @@ export default function PostIdeas() {
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
 	const [ loading, setLoading ] = useState(
-		! postIdeasFromRedux ||
-		( Array.isArray( postIdeasFromRedux ) ? postIdeasFromRedux.length === 0 :
-		  ( typeof postIdeasFromRedux === 'string' ? postIdeasFromRedux.trim() === '' : true ) )
+		! postIdeasFromRedux || ! Array.isArray( postIdeasFromRedux ) || postIdeasFromRedux.length === 0
 	);
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
@@ -141,9 +139,7 @@ export default function PostIdeas() {
 		}
 
 		// If we already have post ideas from Redux/DB, use them and don't fetch
-		if ( postIdeasFromRedux &&
-			 ( ( Array.isArray( postIdeasFromRedux ) && postIdeasFromRedux.length > 0 ) ||
-			   ( typeof postIdeasFromRedux === 'string' && postIdeasFromRedux.trim() !== '' ) ) ) {
+		if ( postIdeasFromRedux && Array.isArray( postIdeasFromRedux ) && postIdeasFromRedux.length > 0 ) {
 			setPostIdeas( postIdeasFromRedux );
 			setLoading( false );
 			return;
@@ -161,60 +157,10 @@ export default function PostIdeas() {
 
 	useEffect( () => {
 		// Process post ideas when they change (separate from fetching)
-		if ( licenseEnabled && postIdeas ) {
-			// Handle new string array format
-			if ( Array.isArray( postIdeas ) ) {
-				// Map the new API response format to the expected structure
-				const ideasArray = postIdeas.map( ( idea ) => {
-					// Handle both new string format and legacy object format
-					if ( typeof idea === 'string' ) {
-						return {
-							title: idea,
-							volume: 'N/A',
-							position: 'N/A',
-							visits: 'N/A',
-						};
-					} else {
-						// Legacy object format with title/description
-						return {
-							title: idea.title || '',
-							volume: 'N/A',
-							position: 'N/A',
-							visits: 'N/A',
-						};
-					}
-				} );
-				setPostIdeasArr( ideasArray );
-				setLoading( false );
-			}
-			// Handle legacy string format for backward compatibility
-			else if ( typeof postIdeas === 'string' ) {
-				let formattedPostIdeas = postIdeas;
-
-				if ( ! postIdeas.includes( '\n' ) ) {
-					formattedPostIdeas = postIdeas.replace( /IDEA:\s/g, '\nIDEA: ' );
-				}
-
-				const ideasArray = formattedPostIdeas
-					.split( '\n' )
-					.filter( ( item ) => item.trim() !== '' )
-					.map( ( item ) => {
-						const match = item.match( /^IDEA:\s*(.*)$/ );
-						if ( match ) {
-							return {
-								title: match[ 1 ].trim(),
-								volume: 'N/A',
-								position: 'N/A',
-								visits: 'N/A',
-							};
-						}
-						return null;
-					} )
-					.filter( ( item ) => item !== null );
-
-				setPostIdeasArr( ideasArray );
-				setLoading( false );
-			}
+		if ( licenseEnabled && postIdeas && Array.isArray( postIdeas ) ) {
+			// Use the string array directly - no need to transform
+			setPostIdeasArr( postIdeas );
+			setLoading( false );
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
@@ -413,12 +359,12 @@ export default function PostIdeas() {
 
 								<tbody className="divide-y divide-gray-200 bg-white">
 									{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
-										postIdeasArr.map( ( post, index ) => (
-											<tr key={ `post-idea-${ index }-${ post?.title?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
+										postIdeasArr.map( ( postTitle, index ) => (
+											<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
 												<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
 													<div className="font-medium">
 														<TrimWordsContent
-															content={ post?.title || '' }
+															content={ postTitle || '' }
 															count={ 120 }
 														/>
 													</div>
@@ -427,7 +373,7 @@ export default function PostIdeas() {
 													<a
 														target="_blank"
 														href="#"
-														onClick={ ( e ) => wpaib_create_post( e, post?.title || '' ) }
+														onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
 														className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
 														data-type="create"
 													>

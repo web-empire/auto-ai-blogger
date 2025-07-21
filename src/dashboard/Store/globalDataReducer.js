@@ -96,13 +96,12 @@ const globalDataReducer = ( state = {}, action ) => {
 			return { ...state, dangerousContent: validValue };
 		},
 		UPDATE_POST_IDEAS: () => {
-			// Handle both array (new format) and string (legacy format)
+			// Only handle array format
 			if ( Array.isArray( action.payload ) ) {
 				return { ...state, postIdeas: action.payload };
 			}
-			// Legacy string format - keep for backward compatibility
-			const ideas = typeof action.payload === 'string' ? action.payload : '';
-			return { ...state, postIdeas: ideas };
+			// Return empty array for any non-array data
+			return { ...state, postIdeas: [] };
 		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),

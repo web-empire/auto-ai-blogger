@@ -35,7 +35,7 @@ class Helper {
 		'userOnboarded', 'onboardingTab', 'userName', 'userEmail', 'siteTitle',
 		'siteDescription', 'siteFor', 'license', 'license_status', 'temperature',
 		'harassment', 'hate', 'sexuallyExplicit', 'dangerousContent', 'postIdeas',
-		'tokenTotal', 'tokenRemaining', 'apiKey', 'enableLogging'
+		'tokenTotal', 'tokenRemaining', 'apiKey', 'enableLogging', 'blogName', 'adminEmail'
 	];
 
 	/**
@@ -264,7 +264,27 @@ class Helper {
 				return max( 0, min( 4, $level ) );
 
 			case 'postIdeas':
-				return sanitize_textarea_field( $value );
+				if ( ! is_array( $value ) ) {
+					return [];
+				}
+				$sanitized = [];
+				foreach ( $value as $idea ) {
+					if ( is_string( $idea ) ) {
+						$sanitized_idea = sanitize_textarea_field( $idea );
+						if ( ! empty( $sanitized_idea ) ) {
+							$sanitized[] = $sanitized_idea;
+						}
+					}
+				}
+				return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+
+			case 'blogName':
+			case 'adminEmail':
+				if ( $key === 'adminEmail' ) {
+					$email = sanitize_email( $value );
+					return is_email( $email ) ? $email : false;
+				}
+				return sanitize_text_field( $value );
 
 			case 'tokenTotal':
 			case 'tokenRemaining':
@@ -319,9 +339,11 @@ class Helper {
 			case 'siteFor':
 			case 'license':
 			case 'apiKey':
+			case 'blogName':
 				return sanitize_text_field( $value );
 
 			case 'userEmail':
+			case 'adminEmail':
 				return sanitize_email( $value );
 
 			case 'siteDescription':
