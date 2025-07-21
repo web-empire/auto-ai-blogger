@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
-import { Thermometer, Shield, AlertTriangle, Info, Settings2 } from 'lucide-react';
+import { Thermometer, Shield, AlertTriangle, Info, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
@@ -165,6 +165,7 @@ TemperatureControl.displayName = 'TemperatureControl';
 const Persona = memo(() => {
 	const dispatch = useDispatch();
 	const [errors, setErrors] = useState({});
+	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
 	// Redux selectors - values are already initialized from menu.php through Redux store
 	const siteTitle = useSelector((state) => state.siteTitle);
@@ -336,80 +337,7 @@ const Persona = memo(() => {
 				</div>
 			</div>
 
-			{/* AI generation parameters */}
-			<div className="space-y-6">
-				<h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-					<Thermometer className="w-5 h-5 text-orange-600" />
-					{__('AI Generation Parameters', 'wp-ai-blogger')}
-				</h3>
-
-				{/* Temperature control */}
-				<TemperatureControl
-					value={temperature}
-					onChange={handleTemperatureChange}
-				/>
-
-				{/* Safety filters */}
-				<h4 className="text-md font-semibold text-gray-900 flex items-center gap-2 mt-8">
-					<Shield className="w-5 h-5 text-green-600" />
-					{__('Content Safety Filters', 'wp-ai-blogger')}
-				</h4>
-
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<SafetyFilterControl
-						id="harassment"
-						title={__('Harassment Filter', 'wp-ai-blogger')}
-						description={__('Blocks harassing or bullying content', 'wp-ai-blogger')}
-						value={harassment}
-						onChange={handleHarassmentChange}
-						icon={Shield}
-					/>
-
-					<SafetyFilterControl
-						id="hate"
-						title={__('Hate Speech Filter', 'wp-ai-blogger')}
-						description={__('Blocks hateful or discriminatory content', 'wp-ai-blogger')}
-						value={hate}
-						onChange={handleHateChange}
-						icon={AlertTriangle}
-					/>
-
-					<SafetyFilterControl
-						id="sexually-explicit"
-						title={__('Adult Content Filter', 'wp-ai-blogger')}
-						description={__('Blocks sexually explicit content', 'wp-ai-blogger')}
-						value={sexuallyExplicit}
-						onChange={handleSexuallyExplicitChange}
-						icon={Shield}
-					/>
-
-					<SafetyFilterControl
-						id="dangerous-content"
-						title={__('Dangerous Content Filter', 'wp-ai-blogger')}
-						description={__('Blocks potentially harmful instructions', 'wp-ai-blogger')}
-						value={dangerousContent}
-						onChange={handleDangerousContentChange}
-						icon={AlertTriangle}
-					/>
-				</div>
-
-				{/* Safety info box */}
-				<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-					<div className="flex items-start gap-3">
-						<Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-						<div>
-							<h4 className="text-sm font-medium text-green-900 mb-1">
-								{__('Safety Filter Guidelines', 'wp-ai-blogger')}
-							</h4>
-							<p className="text-sm text-green-700">
-								{__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* Detailed site description */}
+			{/* Detailed site description - moved before temperature */}
 			<div className="space-y-4">
 				<h3 className="text-lg font-semibold text-gray-900">
 					{__('Detailed Site Information', 'wp-ai-blogger')}
@@ -439,6 +367,118 @@ const Persona = memo(() => {
 						{__('This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger')}
 					</p>
 				</SettingField>
+			</div>
+
+			{/* Advanced AI Settings - Accordion Style */}
+			<div className="space-y-4">
+				{/* Accordion Header */}
+				<div className="border border-gray-200 rounded-lg bg-white">
+					<button
+						type="button"
+						onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+						className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset"
+						aria-expanded={isAdvancedOpen}
+						aria-controls="advanced-settings-content"
+					>
+						<div className="flex items-center gap-3">
+							<div className="p-2 bg-orange-100 rounded-lg">
+								<Thermometer className="w-5 h-5 text-orange-600" aria-hidden="true" />
+							</div>
+							<div>
+								<h3 className="text-lg font-semibold text-gray-900">
+									{__('Advanced AI Settings', 'wp-ai-blogger')}
+								</h3>
+								<p className="text-sm text-gray-600">
+									{__('Configure creativity temperature and content safety filters', 'wp-ai-blogger')}
+								</p>
+							</div>
+						</div>
+						<div className="flex-shrink-0">
+							{isAdvancedOpen ? (
+								<ChevronUp className="w-5 h-5 text-gray-500" />
+							) : (
+								<ChevronDown className="w-5 h-5 text-gray-500" />
+							)}
+						</div>
+					</button>
+
+					{/* Accordion Content */}
+					{isAdvancedOpen && (
+						<div
+							id="advanced-settings-content"
+							className="px-4 pb-4 space-y-6 border-t border-gray-100"
+						>
+							{/* Temperature control */}
+							<div className="pt-4">
+								<TemperatureControl
+									value={temperature}
+									onChange={handleTemperatureChange}
+								/>
+							</div>
+
+							{/* Safety filters */}
+							<div className="space-y-4">
+								<h4 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+									<Shield className="w-5 h-5 text-green-600" />
+									{__('Content Safety Filters', 'wp-ai-blogger')}
+								</h4>
+
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<SafetyFilterControl
+										id="harassment"
+										title={__('Harassment Filter', 'wp-ai-blogger')}
+										description={__('Blocks harassing or bullying content', 'wp-ai-blogger')}
+										value={harassment}
+										onChange={handleHarassmentChange}
+										icon={Shield}
+									/>
+
+									<SafetyFilterControl
+										id="hate"
+										title={__('Hate Speech Filter', 'wp-ai-blogger')}
+										description={__('Blocks hateful or discriminatory content', 'wp-ai-blogger')}
+										value={hate}
+										onChange={handleHateChange}
+										icon={AlertTriangle}
+									/>
+
+									<SafetyFilterControl
+										id="sexually-explicit"
+										title={__('Adult Content Filter', 'wp-ai-blogger')}
+										description={__('Blocks sexually explicit content', 'wp-ai-blogger')}
+										value={sexuallyExplicit}
+										onChange={handleSexuallyExplicitChange}
+										icon={Shield}
+									/>
+
+									<SafetyFilterControl
+										id="dangerous-content"
+										title={__('Dangerous Content Filter', 'wp-ai-blogger')}
+										description={__('Blocks potentially harmful instructions', 'wp-ai-blogger')}
+										value={dangerousContent}
+										onChange={handleDangerousContentChange}
+										icon={AlertTriangle}
+									/>
+								</div>
+
+								{/* Safety info box */}
+								<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+									<div className="flex items-start gap-3">
+										<Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+										<div>
+											<h4 className="text-sm font-medium text-green-900 mb-1">
+												{__('Safety Filter Guidelines', 'wp-ai-blogger')}
+											</h4>
+											<p className="text-sm text-green-700">
+												{__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* Screen reader summary */}

@@ -1,61 +1,15 @@
 /**
- * Initial state for the global data reducer
- */
-const initialState = {
-	initialStateSetFlag: false,
-	activeSettingsNavigationTab: 'general',
-	settingsSavedNotification: false,
-	confettiShow: false,
-	onboardingTab: 0,
-	siteTitle: '',
-	siteFor: '',
-	siteDescription: '',
-	license: '',
-	userOnboarded: false,
-	userName: '',
-	userEmail: '',
-	pluginSettings: {},
-	temperature: 1.0,
-	harassment: 2,
-	hate: 2,
-	sexuallyExplicit: 2,
-	dangerousContent: 2,
-	postIdeas: '',
-	tokenTotal: 0,
-	tokenRemaining: 0,
-	license_status: 'inactive',
-
-	// Static configuration data that doesn't change during app lifecycle
-	homeSlug: 'wp-ai-blogger',
-	adminNonce: '',
-	ajaxUrl: '/wp-admin/admin-ajax.php',
-	editPostLink: '/wp-admin/post.php?post={{POST_ID}}&action=edit',
-	allCampaigns: {},
-	postmetaDefaults: {},
-	licensingNonce: '',
-	upgradeLink: '#',
-	adminEmail: '',
-	adminAppUrl: '',
-	adminBaseUrl: '',
-	proPurchaseUrl: 'https://wpaiblogger.com/',
-	proAvailable: false,
-	version: '1.0.0',
-	proVersion: '',
-	postTypes: {},
-
-	// Add loading and error states for better UX
-	isLoading: false,
-	error: null,
-};
-
-/**
  * Global data reducer with improved error handling and structure
  *
- * @param {Object} state  - Current state
+ * This reducer handles state updates for the AI Blogger Dashboard application.
+ * All initial state values are provided through WordPress localized data in menu.php
+ * to maintain a single source of truth for default values and configuration.
+ *
+ * @param {Object} state  - Current state (initialized by globalDataStore.js from WordPress data)
  * @param {Object} action - Action object with type and payload
- * @return {Object} New state
+ * @return {Object} New state object
  */
-const globalDataReducer = ( state = initialState, action ) => {
+const globalDataReducer = ( state = {}, action ) => {
 	// Apply WordPress hooks filter for action type
 	const actionType = wp?.hooks?.applyFilters?.( 'ai_blogger_dashboard/data_reducer_action', action.type ) || action.type;
 
@@ -178,7 +132,14 @@ const globalDataReducer = ( state = initialState, action ) => {
 
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
 		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),
-		RESET_STATE: () => initialState,
+		RESET_STATE: () => {
+			// Reset to minimal state since full initial state comes from WordPress localized data
+			return {
+				initialStateSetFlag: false,
+				isLoading: false,
+				error: 'State reset - please reload',
+			};
+		},
 	};
 
 	const handler = actionHandlers[ actionType ];

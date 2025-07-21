@@ -2,19 +2,19 @@ import { legacy_createStore as createStore, compose } from 'redux';
 import globalDataReducer from './globalDataReducer';
 
 /**
- * Safely parse localized data with fallbacks
+ * Safely parse localized data with type conversion and fallbacks
  *
- * @param {*}      value        - Value to parse
- * @param {string} type         - Type to parse to ('string', 'number', 'boolean', 'array')
- * @param {*}      defaultValue - Default value if parsing fails
- * @return {*} Parsed value or default
+ * @param {*}      value        - Value to parse from localized data
+ * @param {string} type         - Target type: 'string', 'number', 'boolean', 'array', 'object'
+ * @param {*}      defaultValue - Default value returned if parsing fails
+ * @return {*} Parsed value with correct type or default value
  */
 const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => {
 	try {
 		switch ( type ) {
 			case 'number':
 				// Handle 0 values properly - don't treat them as falsy
-				if (value === 0 || value === '0') return 0;
+				if ( value === 0 || value === '0' ) return 0;
 				const num = parseFloat( value );
 				return isNaN( num ) ? defaultValue : num;
 			case 'boolean':
@@ -27,18 +27,24 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 				return value !== undefined && value !== null ? String( value ) : defaultValue;
 		}
 	} catch ( error ) {
-		console.warn( `Failed to parse localized data:`, error );
+		if ( process.env.NODE_ENV === 'development' ) {
+			console.warn( `Failed to parse localized data for type ${ type }:`, error, 'Value:', value );
+		}
 		return defaultValue;
 	}
 };
 
 /**
- * Get safely parsed initial state from localized data
+ * Get safely parsed initial state from WordPress localized data
+ *
+ * @return {Object} Complete initial state object for Redux store
  */
 const getInitialState = () => {
 	// Ensure wpaib_localized_data exists
 	if ( typeof wpaib_localized_data === 'undefined' ) {
-		console.warn( 'wpaib_localized_data is not defined, using minimal fallback state' );
+		if ( process.env.NODE_ENV === 'development' ) {
+			console.warn( 'wpaib_localized_data is not defined, using minimal fallback state' );
+		}
 		return {
 			initialStateSetFlag: false,
 			activeSettingsNavigationTab: 'general',
@@ -102,7 +108,9 @@ const getInitialState = () => {
 };
 
 /**
- * Configure Redux DevTools with enhanced options
+ * Configure Redux DevTools with enhanced debugging options
+ *
+ * @return {Function|undefined} Redux DevTools enhancer or undefined if not available
  */
 const configureDevTools = () => {
 	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
@@ -110,20 +118,29 @@ const configureDevTools = () => {
 			name: 'AI Blogger Dashboard',
 			trace: process.env.NODE_ENV === 'development',
 			traceLimit: 25,
+			maxAge: 50, // Keep last 50 actions for debugging
+			serialize: {
+				options: {
+					undefined: true,
+					function: true,
+				},
+			},
 		} );
 	}
 	return undefined;
 };
 
 /**
- * Create enhanced store with middleware and DevTools
+ * Create enhanced Redux store with middleware, DevTools, and error handling
+ *
+ * @return {Object} Configured Redux store instance
  */
 const createEnhancedStore = () => {
 	try {
 		const initialState = getInitialState();
 		const devTools = configureDevTools();
 
-		// Validate initial state
+		// Validate initial state structure
 		if ( ! initialState || typeof initialState !== 'object' ) {
 			console.error( 'Invalid initial state, using minimal fallback' );
 			const fallbackState = {
@@ -143,39 +160,54 @@ const createEnhancedStore = () => {
 			enhancers
 		);
 
-		// Add error handling for dispatch
+		// Add enhanced error handling for dispatch operations
 		const originalDispatch = store.dispatch;
 		store.dispatch = ( action ) => {
 			try {
 				return originalDispatch( action );
 			} catch ( error ) {
 				console.error( 'Store dispatch error:', error, 'Action:', action );
-				// Dispatch error action instead of throwing
+				// Dispatch error action instead of throwing to maintain app stability
 				return originalDispatch( {
 					type: 'STORE_ERROR',
-					payload: { message: error.message },
+					payload: { message: error.message, action: action.type },
 				} );
 			}
 		};
 
-		// Log store creation in development
+		// Log store creation in development with state summary
 		if ( process.env.NODE_ENV === 'development' ) {
-			console.log( 'AI Blogger Dashboard store created with initial state:', store.getState() );
+			const state = store.getState();
+			console.log( 'AI Blogger Dashboard store created successfully' );
+			console.log( 'Initial state summary:', {
+				userOnboarded: state.userOnboarded,
+				siteTitle: state.siteTitle || 'Not set',
+				temperature: state.temperature,
+				safetyFilters: {
+					harassment: state.harassment,
+					hate: state.hate,
+					sexuallyExplicit: state.sexuallyExplicit,
+					dangerousContent: state.dangerousContent,
+				},
+				licenseStatus: state.license_status,
+				totalProperties: Object.keys( state ).length,
+			} );
 		}
 
 		return store;
 	} catch ( error ) {
-		console.error( 'Failed to create Redux store:', error );
-		// Return a minimal store as fallback for critical error
-		const fallbackState = {
+		console.error( 'Critical error: Failed to create Redux store:', error );
+		// Return a minimal emergency store as final fallback
+		const emergencyState = {
 			initialStateSetFlag: false,
 			isLoading: false,
 			error: 'Failed to initialize store',
 		};
-		return createStore( globalDataReducer, fallbackState );
+		return createStore( globalDataReducer, emergencyState );
 	}
 };
 
+// Create and export the global store instance
 const globalDataStore = createEnhancedStore();
 
 export default globalDataStore;
