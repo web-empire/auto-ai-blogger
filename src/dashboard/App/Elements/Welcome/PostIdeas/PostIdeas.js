@@ -36,9 +36,7 @@ export default function PostIdeas() {
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
-	const [ loading, setLoading ] = useState(
-		! postIdeasFromRedux || typeof postIdeasFromRedux !== 'string' || postIdeasFromRedux.trim() === ''
-	);
+	const [ loading, setLoading ] = useState( true ); // Always start with loading true
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 
@@ -151,6 +149,7 @@ export default function PostIdeas() {
 		// Only fetch if we don't have post ideas and haven't already tried to fetch
 		if ( ! hasFetchedRef.current ) {
 			hasFetchedRef.current = true;
+			// Keep loading true while we fetch
 			fetchPostIdeas();
 		} else {
 			// We've already tried fetching but have no data, so stop loading
@@ -165,10 +164,13 @@ export default function PostIdeas() {
 			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
 			setLoading( false );
-		} else if ( licenseEnabled && ( ! postIdeas || postIdeas.trim() === '' ) ) {
-			// No post ideas available
-			setPostIdeasArr( [] );
-			setLoading( false );
+		} else if ( licenseEnabled ) {
+			// If licensed but no post ideas, only stop loading if we've already tried fetching
+			if ( hasFetchedRef.current ) {
+				setPostIdeasArr( [] );
+				setLoading( false );
+			}
+			// Otherwise keep loading while we fetch
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
