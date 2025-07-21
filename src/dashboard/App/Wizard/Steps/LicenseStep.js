@@ -74,7 +74,7 @@ const LicenseInput = memo(({ value, onChange, error, disabled, processing }) => 
 LicenseInput.displayName = 'LicenseInput';
 
 // Enhanced call-to-action component
-const GetLicenseCard = memo(() => (
+const GetLicenseCard = memo(({ upgradeLink }) => (
 	<div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
 		<div className="flex items-center gap-3 mb-3">
 			<div className="p-2 bg-blue-100 rounded-lg">
@@ -393,7 +393,7 @@ const LicenseStep = memo(() => {
 								processing={processing}
 							/>
 
-							<GetLicenseCard />
+							<GetLicenseCard upgradeLink={upgradeLink} />
 
 							{/* Success message */}
 							{licenseStatus === 'licensed' && !error && (
