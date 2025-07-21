@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useMemo, memo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2 } from 'lucide-react';
+import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2, Info } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateApiData } from '@Utils/ApiData';
@@ -22,6 +22,7 @@ const FormField = memo(({
 }) => {
 	const [isFocused, setIsFocused] = useState(false);
 	const [charCount, setCharCount] = useState(value?.length || 0);
+	const [showTooltip, setShowTooltip] = useState(false);
 
 	const handleChange = useCallback((e) => {
 		const newValue = e.target.value;
@@ -36,7 +37,7 @@ const FormField = memo(({
 		w-full pl-4 pr-10 py-3 text-sm border rounded-lg transition-all duration-200
 		${error
 			? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
-			: 'border-gray-300 bg-white focus:border-indigo-500 focus:ring-indigo-500'
+			: 'border-gray-300 bg-white focus:border-purple-500 focus:ring-purple-500'
 		}
 		${isFocused ? 'shadow-md' : 'shadow-sm'}
 		focus:outline-none focus:ring-2 focus:ring-opacity-50
@@ -52,11 +53,28 @@ const FormField = memo(({
 				{Icon && <Icon className="w-4 h-4 text-gray-600" aria-hidden="true" />}
 				{label}
 				{required && <span className="text-red-500" aria-label={__('Required', 'wp-ai-blogger')}>*</span>}
+				{description && (
+					<div className="relative">
+						<button
+							type="button"
+							onMouseEnter={() => setShowTooltip(true)}
+							onMouseLeave={() => setShowTooltip(false)}
+							onFocus={() => setShowTooltip(true)}
+							onBlur={() => setShowTooltip(false)}
+							className="ml-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+							aria-label={__('Show field description', 'wp-ai-blogger')}
+						>
+							<Info className="w-4 h-4" />
+						</button>
+						{showTooltip && (
+							<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
+								{description}
+								<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+							</div>
+						)}
+					</div>
+				)}
 			</label>
-
-			{description && (
-				<p className="text-xs text-gray-600 mb-2">{description}</p>
-			)}
 
 			<div className="relative">
 				{type === 'textarea' ? (
@@ -345,6 +363,17 @@ const PersonaFormStep = memo(() => {
 		return Math.round((filledFields.length / fields.length) * 100);
 	}, [formData]);
 
+	// Check if form is valid for button state
+	const isFormValid = useMemo(() => {
+		const trimmedTitle = formData.siteTitle?.trim() || '';
+		const trimmedFor = formData.siteFor?.trim() || '';
+		const trimmedDescription = formData.siteDescription?.trim() || '';
+
+		return trimmedTitle.length >= 3 && trimmedTitle.length <= 100 &&
+			   trimmedFor.length >= 10 && trimmedFor.length <= 200 &&
+			   trimmedDescription.length >= 20 && trimmedDescription.length <= 1000;
+	}, [formData]);
+
 	return (
 		<main
 			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6"
@@ -444,7 +473,7 @@ const PersonaFormStep = memo(() => {
 							<SubmitButton
 								onClick={handleSubmit}
 								loading={isSubmitting}
-								disabled={Object.keys(errors).length > 0 && !errors.submit}
+								disabled={!isFormValid}
 							>
 								{isSubmitting ? __('Saving...', 'wp-ai-blogger') : __('Continue', 'wp-ai-blogger')}
 							</SubmitButton>
