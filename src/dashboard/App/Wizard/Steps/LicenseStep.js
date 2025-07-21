@@ -90,7 +90,7 @@ const GetLicenseCard = memo(() => (
 			</div>
 		</div>
 		<a
-			href={wpaib_localized_data.upgrade_link}
+			href={upgradeLink}
 			target="_blank"
 			rel="noopener noreferrer"
 			className="
@@ -156,16 +156,95 @@ const LicenseStep = memo(() => {
 	const reduxLicense = useSelector((state) => state.license);
 	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
 	const licensingNonce = useSelector((state) => state.licensingNonce);
+	const upgradeLink = useSelector((state) => state.upgradeLink);
+	const adminAppUrl = useSelector((state) => state.adminAppUrl);
+	const licenseStatusFromRedux = useSelector((state) => state.licenseStatus);
 
 	// Component state
 	const [license, setLicense] = useState(() => {
 		// Ensure we always have a string value
-		const initialLicense = reduxLicense || wpaib_localized_data?.license || '';
+		const initialLicense = reduxLicense || '';
 		return typeof initialLicense === 'string' ? initialLicense : '';
 	});
-	const [licenseStatus, setLicenseStatus] = useState(wpaib_localized_data?.license_status);
+	const [licenseStatus, setLicenseStatus] = useState(licenseStatusFromRedux);
 	const [processing, setProcessing] = useState(false);
 	const [error, setError] = useState('');
+
+	// Enhanced token fetching in background
+	const fetchTokenDataInBackground = useCallback(async (licenseKey) => {
+		try {
+			console.log('Fetching token data in background for license:', licenseKey.substring(0, 8) + '...');
+
+			const tokenResponse = await fetch(`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+
+			if (tokenResponse.ok) {
+				const tokenData = await tokenResponse.json();
+
+				if (tokenData && tokenData.success && tokenData.data) {
+					// Update Redux store with token data
+					dispatch({
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: tokenData.data.total,
+					});
+					dispatch({
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: tokenData.data.remaining,
+					});
+
+					// Update API data in database
+					await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
+					await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+
+					console.log('Token data fetched and updated:', tokenData.data);
+
+					// Show success notification
+					dispatch({
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: {
+							message: __('License activated and token data updated successfully!', 'wp-ai-blogger'),
+							type: 'success',
+							duration: 4000,
+						},
+					});
+				} else {
+					console.warn('Invalid token data response:', tokenData);
+					dispatch({
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: {
+							message: __('License activated but failed to fetch token data', 'wp-ai-blogger'),
+							type: 'warning',
+							duration: 4000,
+						},
+					});
+				}
+			} else {
+				console.warn('Failed to fetch token data, status:', tokenResponse.status);
+				dispatch({
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: {
+						message: __('License activated but token fetch failed', 'wp-ai-blogger'),
+						type: 'warning',
+						duration: 4000,
+					},
+				});
+			}
+		} catch (tokenError) {
+			console.error('Token data fetch error:', tokenError);
+			dispatch({
+				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+				payload: {
+					message: __('License activated but token fetch failed', 'wp-ai-blogger'),
+					type: 'warning',
+					duration: 4000,
+				},
+			});
+		}
+	}, [dispatch]);
 
 	// Enhanced license activation
 	const activateLicense = useCallback(async () => {
@@ -175,7 +254,7 @@ const LicenseStep = memo(() => {
 
 		// Validate nonce is available
 		if (!licensingNonce) {
-			console.error('LicenseStep: No licensing nonce available', { licensingNonce, wpaib_localized_data: wpaib_localized_data?.licensing_nonce });
+			console.error('LicenseStep: No licensing nonce available', { licensingNonce });
 			setError(__('Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger'));
 			return false;
 		}
@@ -218,6 +297,9 @@ const LicenseStep = memo(() => {
 				// Update API data
 				await updateApiData('license', licenseValue, dispatch, abortControllerRef);
 
+				// Fetch token data in background after successful activation
+				fetchTokenDataInBackground(licenseValue);
+
 				return true;
 			} else {
 				// Handle specific error types
@@ -255,7 +337,7 @@ const LicenseStep = memo(() => {
 		if (success) {
 			// Small delay for better UX
 			setTimeout(() => {
-				navigate(`${wpaib_localized_data.admin_app_url}&step=optin`);
+				navigate(`${adminAppUrl}&step=optin`);
 			}, 1000);
 		}
 	}, [license, activateLicense, navigate]);
@@ -342,7 +424,7 @@ const LicenseStep = memo(() => {
 							<p className="text-sm text-gray-600 leading-relaxed">
 								{__('Your license key connects your site to our AI services and allocates content generation tokens. ', 'wp-ai-blogger')}
 								<a
-									href={wpaib_localized_data.upgrade_link}
+									href={upgradeLink}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-indigo-600 hover:text-indigo-700 underline"
