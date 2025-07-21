@@ -148,8 +148,9 @@ class Helper {
 		$is_default = false;
 
 		if ( is_array( $sanitized_value ) && is_array( $default_value ) ) {
-			// For arrays, check if they're both empty or exactly equal
-			$is_default = ( empty( $sanitized_value ) && empty( $default_value ) ) || ( $sanitized_value === $default_value );
+			// For arrays, only consider it default if both are empty
+			// Don't remove non-empty arrays even if the default is empty
+			$is_default = ( empty( $sanitized_value ) && empty( $default_value ) );
 		} else {
 			// For non-arrays, use direct comparison
 			$is_default = ( $default_value === $sanitized_value );
