@@ -5,28 +5,26 @@ import { ArrowRight, Sparkles, Zap, Globe } from 'lucide-react';
 
 // Enhanced feature card component with modern glass-morphism design
 const FeatureCard = memo(({ icon: Icon, title, description }) => (
-	<div className="group relative flex flex-col items-center p-8 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/20 hover:border-indigo-300/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden">
+	<div className="group relative flex flex-col items-center p-6 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 hover:border-blue-300/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden">
 		{/* Card background glow effect */}
-		<div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+		<div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-indigo-50/40 to-purple-50/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
 
 		{/* Icon container with enhanced styling */}
-		<div className="relative z-10 p-5 bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-sm rounded-3xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg group-hover:shadow-xl">
-			<Icon className="w-10 h-10 text-indigo-600 group-hover:text-purple-600 transition-colors duration-300" aria-hidden="true" />
+		<div className="relative z-10 p-3 bg-gradient-to-br from-blue-100/80 to-indigo-100/80 backdrop-blur-sm rounded-2xl mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg group-hover:shadow-xl">
+			<Icon className="w-7 h-7 text-blue-600 group-hover:text-indigo-600 transition-colors duration-300" aria-hidden="true" />
 		</div>
 
 		{/* Content */}
 		<div className="relative z-10 text-center">
-			<h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-indigo-700 transition-colors duration-300">
+			<h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors duration-300">
 				{title}
 			</h3>
-			<p className="text-gray-600 leading-relaxed font-medium group-hover:text-gray-700 transition-colors duration-300">
+			<p className="text-sm text-gray-600 leading-relaxed font-medium group-hover:text-gray-700 transition-colors duration-300">
 				{description}
 			</p>
 		</div>
 	</div>
-));
-
-FeatureCard.displayName = 'WelcomeFeatureCard';
+));FeatureCard.displayName = 'WelcomeFeatureCard';
 
 // Premium action button with advanced styling and animations
 const ActionButton = memo(({ onClick, children, icon: Icon }) => {
@@ -45,18 +43,19 @@ const ActionButton = memo(({ onClick, children, icon: Icon }) => {
 	return (
 		<div className="relative inline-block">
 			{/* Button glow effect */}
-			<div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+			<div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
 
 			<button
 				type="button"
 				className="
-					group relative inline-flex items-center gap-4 px-12 py-6
-					bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600
-					text-white font-bold text-xl rounded-3xl
+					group relative inline-flex items-center gap-3 px-8 py-4
+					bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600
+					hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700
+					text-white font-bold text-lg rounded-2xl
 					shadow-2xl hover:shadow-3xl
-					focus:outline-none focus:ring-4 focus:ring-purple-300/50 focus:ring-offset-2
+					focus:outline-none focus:ring-4 focus:ring-blue-300/50 focus:ring-offset-2
 					transform transition-all duration-500 hover:scale-105 hover:-translate-y-1
-					overflow-hidden border border-white/20
+					overflow-hidden border border-white/30
 					backdrop-blur-sm
 				"
 				onClick={handleClick}
@@ -64,12 +63,12 @@ const ActionButton = memo(({ onClick, children, icon: Icon }) => {
 				aria-label={__("Start the setup wizard", 'wp-ai-blogger')}
 			>
 				{/* Animated background shimmer */}
-				<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+				<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
 
 				{/* Button content */}
 				<span className="relative z-10 tracking-wide">{children}</span>
 				{Icon && (
-					<Icon className="relative z-10 w-6 h-6 group-hover:translate-x-2 group-hover:scale-110 transition-all duration-300" aria-hidden="true" />
+					<Icon className="relative z-10 w-5 h-5 group-hover:translate-x-2 group-hover:scale-110 transition-all duration-300" aria-hidden="true" />
 				)}
 			</button>
 		</div>
@@ -102,27 +101,27 @@ const WelcomeStep = memo(() => {
 		},
 		{
 			icon: Globe,
-			title: __('SEO Optimized', 'wp-ai-blogger'),
-			description: __('Built for search engine success', 'wp-ai-blogger')
+			title: __('Automated Scheduling', 'wp-ai-blogger'),
+			description: __('Schedule AI-generated blog posts automatically', 'wp-ai-blogger')
 		}
 	];
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/50 to-purple-50 flex items-center justify-center p-6 relative overflow-hidden"
+			className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-6 relative overflow-hidden"
 			role="main"
 			aria-labelledby="welcome-heading"
 		>
 			{/* Enhanced background decorative elements */}
 			<div className="absolute inset-0 pointer-events-none">
-				<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse" />
-				<div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-purple-200/25 to-pink-200/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-				<div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
+				<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/40 to-indigo-200/40 rounded-full blur-3xl animate-pulse" />
+				<div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+				<div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-purple-200/25 to-pink-200/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
 
 				{/* Floating particles */}
-				<div className="absolute top-20 left-20 w-2 h-2 bg-indigo-400/30 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
-				<div className="absolute top-40 right-32 w-3 h-3 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }} />
-				<div className="absolute bottom-32 left-40 w-2 h-2 bg-pink-400/30 rounded-full animate-bounce" style={{ animationDelay: '2.5s' }} />
+				<div className="absolute top-20 left-20 w-2 h-2 bg-blue-400/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
+				<div className="absolute top-40 right-32 w-3 h-3 bg-indigo-400/50 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }} />
+				<div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '2.5s' }} />
 			</div>
 
 			<div className="max-w-6xl mx-auto relative z-10">
@@ -140,17 +139,17 @@ const WelcomeStep = memo(() => {
 					{/* Enhanced main heading */}
 					<h1
 						id="welcome-heading"
-						className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight"
+						className="text-3xl md:text-5xl font-black text-gray-900 mb-6 leading-[1.1] tracking-tight"
 					>
 						{__('Turn Ideas Into', 'wp-ai-blogger')}
 						<br />
-						<span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-sm">
+						<span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent drop-shadow-sm">
 							{__('AI-Powered Blogs', 'wp-ai-blogger')}
 						</span>
 					</h1>
 
 					{/* Enhanced description with better typography */}
-					<p className="text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
+					<p className="text-lg text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed font-medium text-center">
 						{__(
 							"Generate high-quality blog content automatically. Boost your SEO and grow your audience with AI.",
 							'wp-ai-blogger'
@@ -158,7 +157,7 @@ const WelcomeStep = memo(() => {
 					</p>
 
 					{/* Enhanced CTA section */}
-					<div className="mb-20">
+					<div className="mb-16">
 						<ActionButton
 							onClick={handleStepRedirection}
 							icon={ArrowRight}
@@ -167,14 +166,14 @@ const WelcomeStep = memo(() => {
 						</ActionButton>
 
 						{/* Additional CTA context */}
-						<p className="mt-6 text-gray-500 font-medium">
+						<p className="mt-4 text-gray-500 font-medium text-sm">
 							{__("No credit card required • Setup in minutes", 'wp-ai-blogger')}
 						</p>
 					</div>
 				</div>
 
 				{/* Enhanced features grid */}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 					{features.map((feature, index) => (
 						<FeatureCard
 							key={index}
