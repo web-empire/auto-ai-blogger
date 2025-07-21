@@ -45,7 +45,7 @@ const FormField = memo(({
 					disabled={disabled}
 					placeholder={placeholder}
 					className={`
-						w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200
+						w-full pl-4 pr-10 py-3 text-sm border rounded-lg transition-all duration-200
 						${error
 							? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
 							: 'border-gray-300 bg-white focus:border-indigo-500 focus:ring-indigo-500'
