@@ -347,29 +347,29 @@ const PersonaFormStep = memo(() => {
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4"
+			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6"
 			role="main"
 			aria-labelledby="persona-heading"
 		>
-			<div className="w-full max-w-2xl">
+			<div className="w-full max-w-6xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
 					{/* Header */}
-					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
-						<div className="mb-4">
+					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
+						<div className="mb-3">
 							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
 								<User className="w-4 h-4 mr-2" aria-hidden="true" />
 								{__('Step 2 of 5', 'wp-ai-blogger')}
 							</span>
 						</div>
-						<h1 id="persona-heading" className="text-3xl font-bold text-white mb-2">
+						<h1 id="persona-heading" className="text-2xl md:text-3xl font-bold text-white mb-2">
 							{__('Tell Us About Your Site', 'wp-ai-blogger')}
 						</h1>
-						<p className="text-indigo-100 text-lg">
+						<p className="text-indigo-100 text-base md:text-lg">
 							{__('Help us understand your site so we can generate the perfect content for your audience.', 'wp-ai-blogger')}
 						</p>
 
 						{/* Progress bar */}
-						<div className="mt-6">
+						<div className="mt-4">
 							<div className="bg-white bg-opacity-20 rounded-full h-2 overflow-hidden">
 								<div
 									className="bg-white h-full transition-all duration-500 ease-out"
@@ -381,58 +381,64 @@ const PersonaFormStep = memo(() => {
 									aria-label={__(`Form completion: ${completionPercentage}%`, 'wp-ai-blogger')}
 								/>
 							</div>
-							<p className="text-indigo-100 text-sm mt-2">
+							<p className="text-indigo-100 text-sm mt-1">
 								{__(`${completionPercentage}% complete`, 'wp-ai-blogger')}
 							</p>
 						</div>
 					</div>
 
 					{/* Form */}
-					<form className="p-8 space-y-6" onSubmit={handleSubmit} noValidate>
-						<FormField
-							id="wpaib-site-title"
-							label={__('Site Title', 'wp-ai-blogger')}
-							value={formData.siteTitle}
-							onChange={handleFieldChange('siteTitle')}
-							error={errors.siteTitle}
-							placeholder={__('e.g., Tech Insights Blog, Travel Adventures, Cooking Tips', 'wp-ai-blogger')}
-							maxLength={100}
-							icon={Globe}
-							required
-							description={__('The main title of your website or blog', 'wp-ai-blogger')}
-						/>
+					<form className="p-6 md:p-8" onSubmit={handleSubmit} noValidate>
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+							<div className="space-y-5">
+								<FormField
+									id="wpaib-site-title"
+									label={__('Site Title', 'wp-ai-blogger')}
+									value={formData.siteTitle}
+									onChange={handleFieldChange('siteTitle')}
+									error={errors.siteTitle}
+									placeholder={__('e.g., Tech Insights Blog, Travel Adventures', 'wp-ai-blogger')}
+									maxLength={100}
+									icon={Globe}
+									required
+									description={__('The main title of your website or blog', 'wp-ai-blogger')}
+								/>
 
-						<FormField
-							id="wpaib-site-for"
-							label={__('Site Purpose', 'wp-ai-blogger')}
-							value={formData.siteFor}
-							onChange={handleFieldChange('siteFor')}
-							error={errors.siteFor}
-							placeholder={__('e.g., technology enthusiasts, travel lovers, food bloggers', 'wp-ai-blogger')}
-							maxLength={200}
-							icon={User}
-							required
-							description={__('Who is your target audience or what is your site about?', 'wp-ai-blogger')}
-						/>
+								<FormField
+									id="wpaib-site-for"
+									label={__('Site Purpose', 'wp-ai-blogger')}
+									value={formData.siteFor}
+									onChange={handleFieldChange('siteFor')}
+									error={errors.siteFor}
+									placeholder={__('e.g., technology enthusiasts, travel lovers', 'wp-ai-blogger')}
+									maxLength={200}
+									icon={User}
+									required
+									description={__('Who is your target audience?', 'wp-ai-blogger')}
+								/>
+							</div>
 
-						<FormField
-							id="wpaib-site-description"
-							label={__('Detailed Description', 'wp-ai-blogger')}
-							type="textarea"
-							value={formData.siteDescription}
-							onChange={handleFieldChange('siteDescription')}
-							error={errors.siteDescription}
-							placeholder={__('Describe your site in detail: topics you cover, writing style, target audience, goals, etc. This helps AI generate more relevant content.', 'wp-ai-blogger')}
-							maxLength={1000}
-							rows={6}
-							icon={FileText}
-							required
-							description={__('Provide detailed information to help AI understand your content needs', 'wp-ai-blogger')}
-						/>
+							<div className="space-y-5">
+								<FormField
+									id="wpaib-site-description"
+									label={__('Detailed Description', 'wp-ai-blogger')}
+									type="textarea"
+									value={formData.siteDescription}
+									onChange={handleFieldChange('siteDescription')}
+									error={errors.siteDescription}
+									placeholder={__('Describe your site: topics, style, audience, goals...', 'wp-ai-blogger')}
+									maxLength={1000}
+									rows={8}
+									icon={FileText}
+									required
+									description={__('Help AI understand your content needs', 'wp-ai-blogger')}
+								/>
+							</div>
+						</div>
 
 						{/* Submit error */}
 						{errors.submit && (
-							<div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+							<div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
 								<p className="text-red-700 text-sm flex items-center gap-2">
 									<AlertCircle className="w-4 h-4" />
 									{errors.submit}
@@ -454,7 +460,7 @@ const PersonaFormStep = memo(() => {
 				</div>
 
 				{/* Help text */}
-				<div className="text-center mt-6">
+				<div className="text-center mt-4">
 					<p className="text-sm text-gray-600">
 						{__('This information will be used to configure your AI content generator for optimal results.', 'wp-ai-blogger')}
 					</p>

@@ -117,11 +117,6 @@ const WelcomeStep = memo(() => {
 				<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/40 to-indigo-200/40 rounded-full blur-3xl animate-pulse" />
 				<div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 				<div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-purple-200/25 to-pink-200/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
-
-				{/* Floating particles */}
-				<div className="absolute top-20 left-20 w-2 h-2 bg-blue-400/40 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
-				<div className="absolute top-40 right-32 w-3 h-3 bg-indigo-400/50 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }} />
-				<div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '2.5s' }} />
 			</div>
 
 			<div className="max-w-6xl mx-auto relative z-10">
