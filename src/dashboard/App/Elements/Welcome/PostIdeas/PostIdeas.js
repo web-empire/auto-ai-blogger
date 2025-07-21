@@ -129,8 +129,6 @@ export default function PostIdeas() {
 	] );
 
 	useEffect( () => {
-		console.log( 'PostIdeas useEffect - licenseEnabled:', licenseEnabled, 'postIdeasFromRedux:', postIdeasFromRedux?.substring(0, 50) + '...', 'hasFetched:', hasFetchedRef.current );
-
 		// If license is not enabled, don't do anything
 		if ( ! licenseEnabled ) {
 			setLoading( false );
@@ -139,7 +137,6 @@ export default function PostIdeas() {
 
 		// If we already have post ideas from Redux/DB, use them and don't fetch
 		if ( postIdeasFromRedux && postIdeasFromRedux.trim() !== '' ) {
-			console.log( 'Using existing post ideas from Redux' );
 			setPostIdeas( postIdeasFromRedux );
 			setLoading( false );
 			return;
@@ -147,22 +144,13 @@ export default function PostIdeas() {
 
 		// Only fetch if we don't have post ideas and haven't already tried to fetch
 		if ( ! hasFetchedRef.current ) {
-			console.log( 'Fetching new post ideas from API' );
 			hasFetchedRef.current = true;
 			fetchPostIdeas();
 		} else {
 			// We've already tried fetching but have no data, so stop loading
-			console.log( 'Already tried fetching, stopping loading' );
 			setLoading( false );
 		}
 	}, [ licenseEnabled, postIdeasFromRedux, fetchPostIdeas ] );
-
-	// Update local postIdeas state when Redux data changes
-	useEffect( () => {
-		if ( postIdeasFromRedux && postIdeasFromRedux.trim() !== '' ) {
-			setPostIdeas( postIdeasFromRedux );
-		}
-	}, [ postIdeasFromRedux ] );
 
 	useEffect( () => {
 		// Process post ideas when they change (separate from fetching)
