@@ -187,15 +187,7 @@ export default function PostIdeas() {
 		return ( '' );
 	}
 
-	if ( loading ) {
-		return (
-			<div className="p-4">
-				<Suspense fallback={ <div>Loading skeleton...</div> }>
-					<Skeleton />
-				</Suspense>
-			</div>
-		);
-	}
+	// Remove the separate loading return - we'll handle it inline
 
 	const handlePersonaClick = ( event ) => {
 		event.preventDefault(); // Prevent the default link behavior
@@ -355,7 +347,18 @@ export default function PostIdeas() {
 								</thead>
 
 								<tbody className="divide-y divide-gray-200 bg-white">
-									{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
+									{ loading ? (
+										// Show skeleton loader within table
+										<Suspense fallback={
+											<tr>
+												<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
+													{ __( 'Loading...', 'wp-ai-blogger' ) }
+												</td>
+											</tr>
+										}>
+											<Skeleton />
+										</Suspense>
+									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										postIdeasArr.map( ( postTitle, index ) => (
 											<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
 												<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">

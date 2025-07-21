@@ -300,9 +300,6 @@ const OptinStep = memo(() => {
 						<h2 className="text-xl font-semibold text-indigo-100 mb-2">
 							{__('Get personalized growth insights', 'wp-ai-blogger')}
 						</h2>
-						<p className="text-indigo-100 text-lg max-w-2xl mx-auto">
-							{__('Join thousands of successful bloggers who receive our weekly insights, trending topics, and proven marketing strategies to grow their audience.', 'wp-ai-blogger')}
-						</p>
 					</div>
 
 					<div className="p-8">
@@ -361,6 +358,19 @@ const OptinStep = memo(() => {
 											}
 										</SubmitButton>
 									</div>
+
+									{/* Trust indicator */}
+									<div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+										<div className="flex items-center gap-2 mb-2">
+											<CheckCircle2 className="w-5 h-5 text-green-600" aria-hidden="true" />
+											<span className="text-sm font-semibold text-green-800">
+												{__('Privacy Guaranteed', 'wp-ai-blogger')}
+											</span>
+										</div>
+										<p className="text-xs text-green-700">
+											{__('We respect your privacy. No spam, unsubscribe anytime. Your data is secure and never shared.', 'wp-ai-blogger')}
+										</p>
+									</div>
 								</form>
 							</div>
 
@@ -380,19 +390,6 @@ const OptinStep = memo(() => {
 											highlight={benefit.highlight}
 										/>
 									))}
-								</div>
-
-								{/* Trust indicator */}
-								<div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-									<div className="flex items-center gap-2 mb-2">
-										<CheckCircle2 className="w-5 h-5 text-green-600" aria-hidden="true" />
-										<span className="text-sm font-semibold text-green-800">
-											{__('Privacy Guaranteed', 'wp-ai-blogger')}
-										</span>
-									</div>
-									<p className="text-xs text-green-700">
-										{__('We respect your privacy. No spam, unsubscribe anytime. Your data is secure and never shared.', 'wp-ai-blogger')}
-									</p>
 								</div>
 							</div>
 						</div>
