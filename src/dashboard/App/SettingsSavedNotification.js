@@ -44,6 +44,11 @@ export default function SettingsSavedNotification() {
 	const notification = useSelector( ( state ) => {
 		const settingsNotification = state.settingsSavedNotification;
 
+		// Debug logging
+		if (settingsNotification) {
+			console.log('SettingsSavedNotification received:', settingsNotification);
+		}
+
 		// Support both string and object notifications
 		if ( typeof settingsNotification === 'string' ) {
 			return {

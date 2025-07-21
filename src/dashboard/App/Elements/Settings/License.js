@@ -269,9 +269,16 @@ const License = memo(() => {
 
 			setLicenseKey('');
 
+			const notificationPayload = {
+				message: __('License activated successfully!', 'wp-ai-blogger'),
+				type: 'success',
+				duration: 4000
+			};
+
+			console.log('Dispatching notification:', notificationPayload);
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __('License activated successfully!', 'wp-ai-blogger'),
+				payload: notificationPayload,
 			});
 		} catch (error) {
 			if (error.name === 'AbortError') return;
@@ -285,7 +292,11 @@ const License = memo(() => {
 			});
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: error.message || __('Failed to activate license', 'wp-ai-blogger'),
+				payload: {
+					message: error.message || __('Failed to activate license', 'wp-ai-blogger'),
+					type: 'error',
+					duration: 5000
+				},
 			});
 		} finally {
 			setProcessing(false);
@@ -333,7 +344,11 @@ const License = memo(() => {
 
 			dispatch({
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
+				payload: {
+					message: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
+					type: 'success',
+					duration: 3000
+				},
 			});
 		} catch (error) {
 			if (error.name === 'AbortError') return;
