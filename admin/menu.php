@@ -185,7 +185,7 @@ class Menu {
 		$admin_site_email_address = sanitize_email( Helper::get_option( 'adminEmail', get_option( 'admin_email' ) ) );
 
 		// Get settings with proper defaults - no need for redundant variables
-		$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', '' ) );
+		$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', $blog_name ) );
 		$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
 		$site_for = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
 		$license = sanitize_text_field( Helper::get_option( 'license', '' ) );

@@ -191,16 +191,17 @@ const PersonaFormStep = memo(() => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	// Redux selectors with safe fallbacks
+	// Redux selectors - should be populated from localized data
 	const reduxSiteTitle = useSelector((state) => state?.siteTitle || '');
 	const reduxSiteFor = useSelector((state) => state?.siteFor || '');
 	const reduxSiteDescription = useSelector((state) => state?.siteDescription || '');
+	const adminAppUrl = useSelector((state) => state?.adminAppUrl || '');
 
-	// Enhanced form state with fallback chain
+	// Enhanced form state using Redux data directly
 	const [formData, setFormData] = useState({
-		siteTitle: reduxSiteTitle || wpaib_localized_data?.site_title || '',
-		siteFor: reduxSiteFor || wpaib_localized_data?.site_for || '',
-		siteDescription: reduxSiteDescription || wpaib_localized_data?.site_description || '',
+		siteTitle: reduxSiteTitle,
+		siteFor: reduxSiteFor,
+		siteDescription: reduxSiteDescription,
 	});
 
 	const [errors, setErrors] = useState({});
@@ -210,9 +211,9 @@ const PersonaFormStep = memo(() => {
 	useEffect(() => {
 		setFormData(prev => ({
 			...prev,
-			siteTitle: reduxSiteTitle || wpaib_localized_data?.site_title || prev.siteTitle,
-			siteFor: reduxSiteFor || wpaib_localized_data?.site_for || prev.siteFor,
-			siteDescription: reduxSiteDescription || wpaib_localized_data?.site_description || prev.siteDescription,
+			siteTitle: reduxSiteTitle || prev.siteTitle,
+			siteFor: reduxSiteFor || prev.siteFor,
+			siteDescription: reduxSiteDescription || prev.siteDescription,
 		}));
 	}, [reduxSiteTitle, reduxSiteFor, reduxSiteDescription]);
 
@@ -347,7 +348,7 @@ const PersonaFormStep = memo(() => {
 			await Promise.all(apiPromises);
 
 			// Navigate to next step
-			navigate(`${wpaib_localized_data.admin_app_url}&step=license`);
+			navigate(`${adminAppUrl}&step=license`);
 		} catch (error) {
 			console.error('Form submission error:', error);
 			setErrors({ submit: __('Failed to save your information. Please try again.', 'wp-ai-blogger') });
