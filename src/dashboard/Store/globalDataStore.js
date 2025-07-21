@@ -13,6 +13,8 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 	try {
 		switch ( type ) {
 			case 'number':
+				// Handle 0 values properly - don't treat them as falsy
+				if (value === 0 || value === '0') return 0;
 				const num = parseFloat( value );
 				return isNaN( num ) ? defaultValue : num;
 			case 'boolean':
@@ -22,7 +24,7 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 			case 'object':
 				return value && typeof value === 'object' ? value : defaultValue;
 			default:
-				return value ? String( value ) : defaultValue;
+				return value !== undefined && value !== null ? String( value ) : defaultValue;
 		}
 	} catch ( error ) {
 		console.warn( `Failed to parse localized data:`, error );
@@ -51,11 +53,11 @@ const getInitialState = () => {
 			userName: '',
 			userEmail: '',
 			pluginSettings: {},
-			temperature: 0.7,
-			harassment: false,
-			hate: false,
-			sexuallyExplicit: false,
-			dangerousContent: false,
+			temperature: 1.0,
+			harassment: 2,
+			hate: 2,
+			sexuallyExplicit: 2,
+			dangerousContent: 2,
 			postIdeas: [],
 			tokenTotal: 0,
 			tokenRemaining: 0,
@@ -79,11 +81,11 @@ const getInitialState = () => {
 		siteTitle: safeParseLocalizedData( wpaib_localized_data.site_title, 'string', '' ),
 		siteFor: safeParseLocalizedData( wpaib_localized_data.site_for, 'string', '' ),
 		siteDescription: safeParseLocalizedData( wpaib_localized_data.site_description, 'string', '' ),
-		temperature: safeParseLocalizedData( wpaib_localized_data.temperature, 'number', 0.7 ),
-		harassment: safeParseLocalizedData( wpaib_localized_data.harassment, 'boolean', false ),
-		hate: safeParseLocalizedData( wpaib_localized_data.hate, 'boolean', false ),
-		sexuallyExplicit: safeParseLocalizedData( wpaib_localized_data.sexually_explicit, 'boolean', false ),
-		dangerousContent: safeParseLocalizedData( wpaib_localized_data.dangerous_content, 'boolean', false ),
+		temperature: safeParseLocalizedData( wpaib_localized_data.temperature, 'number', 1.0 ),
+		harassment: safeParseLocalizedData( wpaib_localized_data.harassment, 'number', 2 ),
+		hate: safeParseLocalizedData( wpaib_localized_data.hate, 'number', 2 ),
+		sexuallyExplicit: safeParseLocalizedData( wpaib_localized_data.sexually_explicit, 'number', 2 ),
+		dangerousContent: safeParseLocalizedData( wpaib_localized_data.dangerous_content, 'number', 2 ),
 		license: safeParseLocalizedData( wpaib_localized_data.license, 'string', '' ),
 		postIdeas: safeParseLocalizedData( wpaib_localized_data.postIdeas, 'string', '' ),
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
@@ -155,11 +157,11 @@ const createEnhancedStore = () => {
 				userName: '',
 				userEmail: '',
 				pluginSettings: {},
-				temperature: 0.7,
-				harassment: false,
-				hate: false,
-				sexuallyExplicit: false,
-				dangerousContent: false,
+				temperature: 1.0,
+				harassment: 2,
+				hate: 2,
+				sexuallyExplicit: 2,
+				dangerousContent: 2,
 				postIdeas: '',
 				tokenTotal: 0,
 				tokenRemaining: 0,
@@ -208,6 +210,11 @@ const createEnhancedStore = () => {
 			tokenTotal: 0,
 			tokenRemaining: 0,
 			license_status: 'inactive',
+			temperature: 1.0,
+			harassment: 2,
+			hate: 2,
+			sexuallyExplicit: 2,
+			dangerousContent: 2,
 			isLoading: false,
 			error: 'Failed to initialize store',
 		};

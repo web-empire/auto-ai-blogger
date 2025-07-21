@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -173,53 +173,102 @@ const PersonaFormStep = memo(() => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	// Redux selectors
-	const reduxSiteTitle = useSelector((state) => state.siteTitle);
-	const reduxSiteFor = useSelector((state) => state.siteFor);
-	const reduxSiteDescription = useSelector((state) => state.siteDescription);
+	// Redux selectors with safe fallbacks
+	const reduxSiteTitle = useSelector((state) => state?.siteTitle || '');
+	const reduxSiteFor = useSelector((state) => state?.siteFor || '');
+	const reduxSiteDescription = useSelector((state) => state?.siteDescription || '');
 
-	// Enhanced form state
+	// Enhanced form state with fallback chain
 	const [formData, setFormData] = useState({
-		siteTitle: reduxSiteTitle || wpaib_localized_data.site_title || '',
-		siteFor: reduxSiteFor || wpaib_localized_data.site_for || '',
-		siteDescription: reduxSiteDescription || wpaib_localized_data.site_description || '',
+		siteTitle: reduxSiteTitle || wpaib_localized_data?.site_title || '',
+		siteFor: reduxSiteFor || wpaib_localized_data?.site_for || '',
+		siteDescription: reduxSiteDescription || wpaib_localized_data?.site_description || '',
 	});
 
 	const [errors, setErrors] = useState({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	// Enhanced validation
+	// Sync form data with Redux state changes
+	useEffect(() => {
+		setFormData(prev => ({
+			...prev,
+			siteTitle: reduxSiteTitle || wpaib_localized_data?.site_title || prev.siteTitle,
+			siteFor: reduxSiteFor || wpaib_localized_data?.site_for || prev.siteFor,
+			siteDescription: reduxSiteDescription || wpaib_localized_data?.site_description || prev.siteDescription,
+		}));
+	}, [reduxSiteTitle, reduxSiteFor, reduxSiteDescription]);
+
+	// Cleanup function for abort controllers
+	useEffect(() => {
+		return () => {
+			// Cancel any pending API requests when component unmounts
+			Object.values(abortControllerRef.current).forEach(controller => {
+				if (controller && typeof controller.abort === 'function') {
+					controller.abort();
+				}
+			});
+		};
+	}, []);
+
+	// Enhanced validation with better error messages
 	const validateForm = useCallback(() => {
 		const newErrors = {};
 
-		if (!formData.siteTitle.trim()) {
+		// Validate siteTitle
+		const trimmedTitle = formData.siteTitle?.trim() || '';
+		if (!trimmedTitle) {
 			newErrors.siteTitle = __('Site title is required', 'wp-ai-blogger');
-		} else if (formData.siteTitle.length < 3) {
+		} else if (trimmedTitle.length < 3) {
 			newErrors.siteTitle = __('Site title must be at least 3 characters', 'wp-ai-blogger');
+		} else if (trimmedTitle.length > 100) {
+			newErrors.siteTitle = __('Site title must be less than 100 characters', 'wp-ai-blogger');
 		}
 
-		if (!formData.siteFor.trim()) {
+		// Validate siteFor
+		const trimmedFor = formData.siteFor?.trim() || '';
+		if (!trimmedFor) {
 			newErrors.siteFor = __('Site purpose is required', 'wp-ai-blogger');
-		} else if (formData.siteFor.length < 10) {
+		} else if (trimmedFor.length < 10) {
 			newErrors.siteFor = __('Please provide a more detailed description (at least 10 characters)', 'wp-ai-blogger');
+		} else if (trimmedFor.length > 200) {
+			newErrors.siteFor = __('Site purpose must be less than 200 characters', 'wp-ai-blogger');
 		}
 
-		if (!formData.siteDescription.trim()) {
+		// Validate siteDescription
+		const trimmedDescription = formData.siteDescription?.trim() || '';
+		if (!trimmedDescription) {
 			newErrors.siteDescription = __('Site description is required', 'wp-ai-blogger');
-		} else if (formData.siteDescription.length < 20) {
+		} else if (trimmedDescription.length < 20) {
 			newErrors.siteDescription = __('Please provide a more detailed description (at least 20 characters)', 'wp-ai-blogger');
+		} else if (trimmedDescription.length > 1000) {
+			newErrors.siteDescription = __('Site description must be less than 1000 characters', 'wp-ai-blogger');
 		}
 
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
 	}, [formData]);
 
-	// Form field handlers
+	// Form field handlers with enhanced validation
 	const handleFieldChange = useCallback((field) => (value) => {
-		setFormData(prev => ({ ...prev, [field]: value }));
-		// Clear error when user starts typing
+		// Sanitize input value
+		const sanitizedValue = typeof value === 'string' ? value : String(value || '');
+
+		setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+
+		// Clear error when user starts typing and provide real-time validation
 		if (errors[field]) {
 			setErrors(prev => ({ ...prev, [field]: '' }));
+		}
+
+		// Real-time validation for better UX
+		if (field === 'siteTitle' && sanitizedValue.trim() && sanitizedValue.length >= 3) {
+			setErrors(prev => ({ ...prev, siteTitle: '' }));
+		}
+		if (field === 'siteFor' && sanitizedValue.trim() && sanitizedValue.length >= 10) {
+			setErrors(prev => ({ ...prev, siteFor: '' }));
+		}
+		if (field === 'siteDescription' && sanitizedValue.trim() && sanitizedValue.length >= 20) {
+			setErrors(prev => ({ ...prev, siteDescription: '' }));
 		}
 	}, [errors]);
 
@@ -232,17 +281,52 @@ const PersonaFormStep = memo(() => {
 		setIsSubmitting(true);
 
 		try {
-			// Update Redux state
-			dispatch({ type: 'UPDATE_SITE_TITLE', payload: formData.siteTitle });
-			dispatch({ type: 'UPDATE_SITE_FOR', payload: formData.siteFor });
-			dispatch({ type: 'UPDATE_SITE_DESCRIPTION', payload: formData.siteDescription });
+			// Update Redux state with validation
+			if (formData.siteTitle?.trim()) {
+				dispatch({ type: 'UPDATE_SITE_TITLE', payload: formData.siteTitle.trim() });
+			}
+			if (formData.siteFor?.trim()) {
+				dispatch({ type: 'UPDATE_SITE_FOR', payload: formData.siteFor.trim() });
+			}
+			if (formData.siteDescription?.trim()) {
+				dispatch({ type: 'UPDATE_SITE_DESCRIPTION', payload: formData.siteDescription.trim() });
+			}
 
-			// Update API data
-			await Promise.all([
-				updateApiData('siteTitle', formData.siteTitle, dispatch, abortControllerRef),
-				updateApiData('siteFor', formData.siteFor, dispatch, abortControllerRef),
-				updateApiData('siteDescription', formData.siteDescription, dispatch, abortControllerRef),
-			]);
+			// Update API data with error handling for each field
+			const apiPromises = [];
+
+			if (formData.siteTitle?.trim()) {
+				apiPromises.push(
+					updateApiData('siteTitle', formData.siteTitle.trim(), dispatch, abortControllerRef)
+						.catch(error => {
+							console.error('Failed to save siteTitle:', error);
+							throw new Error(__('Failed to save site title', 'wp-ai-blogger'));
+						})
+				);
+			}
+
+			if (formData.siteFor?.trim()) {
+				apiPromises.push(
+					updateApiData('siteFor', formData.siteFor.trim(), dispatch, abortControllerRef)
+						.catch(error => {
+							console.error('Failed to save siteFor:', error);
+							throw new Error(__('Failed to save site purpose', 'wp-ai-blogger'));
+						})
+				);
+			}
+
+			if (formData.siteDescription?.trim()) {
+				apiPromises.push(
+					updateApiData('siteDescription', formData.siteDescription.trim(), dispatch, abortControllerRef)
+						.catch(error => {
+							console.error('Failed to save siteDescription:', error);
+							throw new Error(__('Failed to save site description', 'wp-ai-blogger'));
+						})
+				);
+			}
+
+			// Wait for all API calls to complete
+			await Promise.all(apiPromises);
 
 			// Navigate to next step
 			navigate(`${wpaib_localized_data.admin_app_url}&step=license`);

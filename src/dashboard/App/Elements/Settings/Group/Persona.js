@@ -166,15 +166,15 @@ const Persona = memo(() => {
 	const dispatch = useDispatch();
 	const [errors, setErrors] = useState({});
 
-	// Redux selectors with fallbacks
-	const siteTitle = useSelector((state) => state.siteTitle) || '';
-	const siteFor = useSelector((state) => state.siteFor) || '';
-	const siteDescription = useSelector((state) => state.siteDescription) || '';
-	const temperature = parseFloat(useSelector((state) => state.temperature) || 0.7);
-	const harassment = parseInt(useSelector((state) => state.harassment) || 2);
-	const hate = parseInt(useSelector((state) => state.hate) || 2);
-	const sexuallyExplicit = parseInt(useSelector((state) => state.sexuallyExplicit) || 2);
-	const dangerousContent = parseInt(useSelector((state) => state.dangerousContent) || 2);
+	// Redux selectors with proper fallbacks that allow 0 values
+	const siteTitle = useSelector((state) => state?.siteTitle || '');
+	const siteFor = useSelector((state) => state?.siteFor || '');
+	const siteDescription = useSelector((state) => state?.siteDescription || '');
+	const temperature = parseFloat(useSelector((state) => state?.temperature ?? 1.0));
+	const harassment = parseInt(useSelector((state) => state?.harassment ?? 2));
+	const hate = parseInt(useSelector((state) => state?.hate ?? 2));
+	const sexuallyExplicit = parseInt(useSelector((state) => state?.sexuallyExplicit ?? 2));
+	const dangerousContent = parseInt(useSelector((state) => state?.dangerousContent ?? 2));
 
 	// Enhanced validation with better UX
 	const validateSiteTitle = useCallback((value) => {
@@ -205,19 +205,19 @@ const Persona = memo(() => {
 		return true;
 	}, []);
 
-	// Optimized handlers with better performance
+	// Optimized handlers - only update Redux state, let ContentHeader handle persistence
 	const handleSiteTitleChange = useCallback((e) => {
 		const value = e.target.value;
 		dispatch({ type: 'UPDATE_SITE_TITLE', payload: value });
-		// Debounced validation to avoid excessive calls
-		setTimeout(() => validateSiteTitle(value), 300);
+		// Immediate validation for better UX
+		validateSiteTitle(value);
 	}, [dispatch, validateSiteTitle]);
 
 	const handleSiteForChange = useCallback((e) => {
 		const value = e.target.value;
 		dispatch({ type: 'UPDATE_SITE_FOR', payload: value });
-		// Debounced validation to avoid excessive calls
-		setTimeout(() => validateSiteFor(value), 300);
+		// Immediate validation for better UX
+		validateSiteFor(value);
 	}, [dispatch, validateSiteFor]);
 
 	const handleSiteDescriptionChange = useCallback((e) => {
@@ -227,27 +227,27 @@ const Persona = memo(() => {
 
 	const handleTemperatureChange = useCallback((value) => {
 		// Ensure value is within valid range and properly formatted
-		const clampedValue = Math.max(0, Math.min(2, parseFloat(value) || 0.7));
+		const clampedValue = Math.max(0, Math.min(2, parseFloat(value) || 1.0));
 		dispatch({ type: 'UPDATE_TEMPERATURE', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleHarassmentChange = useCallback((value) => {
-		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) ?? 2));
 		dispatch({ type: 'UPDATE_HARASSMENT', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleHateChange = useCallback((value) => {
-		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) ?? 2));
 		dispatch({ type: 'UPDATE_HATE', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleSexuallyExplicitChange = useCallback((value) => {
-		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) ?? 2));
 		dispatch({ type: 'UPDATE_SEXUALLY_EXPLICIT', payload: clampedValue });
 	}, [dispatch]);
 
 	const handleDangerousContentChange = useCallback((value) => {
-		const clampedValue = Math.max(0, Math.min(4, parseInt(value) || 2));
+		const clampedValue = Math.max(0, Math.min(4, parseInt(value) ?? 2));
 		dispatch({ type: 'UPDATE_DANGEROUS_CONTENT', payload: clampedValue });
 	}, [dispatch]);
 

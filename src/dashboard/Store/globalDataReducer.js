@@ -15,11 +15,11 @@ const initialState = {
 	userName: '',
 	userEmail: '',
 	pluginSettings: {},
-	temperature: 0.7,
-	harassment: false,
-	hate: false,
-	sexuallyExplicit: false,
-	dangerousContent: false,
+	temperature: 1.0,
+	harassment: 2,
+	hate: 2,
+	sexuallyExplicit: 2,
+	dangerousContent: 2,
 	postIdeas: '',
 	tokenTotal: 0,
 	tokenRemaining: 0,
@@ -118,26 +118,26 @@ const globalDataReducer = ( state = initialState, action ) => {
 		},
 		UPDATE_TEMPERATURE: () => {
 			const temp = Number( action.payload );
-			const validTemp = isNaN( temp ) ? 0.7 : Math.max( 0, Math.min( 2, temp ) ); // Clamp between 0 and 2
+			const validTemp = isNaN( temp ) ? 1.0 : Math.max( 0, Math.min( 2, temp ) ); // Clamp between 0 and 2
 			return { ...state, temperature: validTemp };
 		},
 		UPDATE_HARASSMENT: () => {
-			const value = Number( action.payload );
+			const value = action.payload !== undefined ? Number( action.payload ) : 2;
 			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
 			return { ...state, harassment: validValue };
 		},
 		UPDATE_HATE: () => {
-			const value = Number( action.payload );
+			const value = action.payload !== undefined ? Number( action.payload ) : 2;
 			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
 			return { ...state, hate: validValue };
 		},
 		UPDATE_SEXUALLY_EXPLICIT: () => {
-			const value = Number( action.payload );
+			const value = action.payload !== undefined ? Number( action.payload ) : 2;
 			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
 			return { ...state, sexuallyExplicit: validValue };
 		},
 		UPDATE_DANGEROUS_CONTENT: () => {
-			const value = Number( action.payload );
+			const value = action.payload !== undefined ? Number( action.payload ) : 2;
 			const validValue = isNaN( value ) ? 2 : Math.max( 0, Math.min( 4, Math.floor( value ) ) ); // Clamp between 0 and 4
 			return { ...state, dangerousContent: validValue };
 		},
