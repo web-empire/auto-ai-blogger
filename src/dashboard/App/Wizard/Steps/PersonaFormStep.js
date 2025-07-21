@@ -354,25 +354,22 @@ const PersonaFormStep = memo(() => {
 			<div className="w-full max-w-6xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
 					{/* Header */}
-					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
+					<div className="p-6 text-center border-b border-gray-200">
 						<div className="mb-3">
-							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
+							<span className="inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full tracking-wide uppercase">
 								<User className="w-4 h-4 mr-2" aria-hidden="true" />
 								{__('Step 2 of 5', 'wp-ai-blogger')}
 							</span>
 						</div>
-						<h1 id="persona-heading" className="text-2xl md:text-3xl font-bold text-white mb-2">
+						<h1 id="persona-heading" className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
 							{__('Tell Us About Your Site', 'wp-ai-blogger')}
 						</h1>
-						<p className="text-indigo-100 text-base md:text-lg">
-							{__('Help us understand your site so we can generate the perfect content for your audience.', 'wp-ai-blogger')}
-						</p>
 
 						{/* Progress bar */}
 						<div className="mt-4">
-							<div className="bg-white bg-opacity-20 rounded-full h-2 overflow-hidden">
+							<div className="bg-gray-200 rounded-full h-2 overflow-hidden">
 								<div
-									className="bg-white h-full transition-all duration-500 ease-out"
+									className="bg-gradient-to-r from-indigo-600 to-purple-600 h-full transition-all duration-500 ease-out"
 									style={{ width: `${completionPercentage}%` }}
 									role="progressbar"
 									aria-valuenow={completionPercentage}
@@ -381,7 +378,7 @@ const PersonaFormStep = memo(() => {
 									aria-label={__(`Form completion: ${completionPercentage}%`, 'wp-ai-blogger')}
 								/>
 							</div>
-							<p className="text-indigo-100 text-sm mt-1">
+							<p className="text-gray-600 text-sm mt-1">
 								{__(`${completionPercentage}% complete`, 'wp-ai-blogger')}
 							</p>
 						</div>
