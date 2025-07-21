@@ -149,12 +149,12 @@ const WelcomeStep = memo(() => {
 					</h1>
 
 					{/* Enhanced description with better typography */}
-					<span className="text-lg text-gray-700 mx-auto mb-8 leading-relaxed font-medium">
+					<h3 className="text-lg text-gray-700 mx-auto mb-8 leading-relaxed font-medium">
 						{__(
 							"Set once and forget - automatically publish high-quality blog posts on schedule.",
 							'wp-ai-blogger'
 						)}
-					</span>
+					</h3>
 
 					{/* Enhanced CTA section */}
 					<div className="mb-8">
