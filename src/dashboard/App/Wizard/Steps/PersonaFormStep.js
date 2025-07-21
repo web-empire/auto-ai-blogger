@@ -347,12 +347,12 @@ const PersonaFormStep = memo(() => {
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6"
+			className="min-h-screen bg-gray-50 flex items-center justify-center p-6"
 			role="main"
 			aria-labelledby="persona-heading"
 		>
 			<div className="w-full max-w-6xl">
-				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+				<div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
 					{/* Header */}
 					<div className="p-6 text-center border-b border-gray-200">
 						<div className="mb-3">
