@@ -128,7 +128,7 @@ const WelcomeStep = memo(() => {
 				{/* Enhanced hero section */}
 				<div className="text-center mb-20">
 					{/* Step indicator with enhanced styling */}
-					<div className="mb-10">
+					<div className="mb-8">
 						<span className="inline-flex items-center px-8 py-4 bg-white/90 backdrop-blur-xl border border-indigo-200/50 text-indigo-700 text-sm font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
 							<Sparkles className="w-5 h-5 mr-3 animate-pulse text-indigo-500" aria-hidden="true" />
 							{__('Step 1 of 5', 'wp-ai-blogger')}
@@ -149,15 +149,15 @@ const WelcomeStep = memo(() => {
 					</h1>
 
 					{/* Enhanced description with better typography */}
-					<p className="text-lg text-gray-700 mx-auto mb-12 leading-relaxed font-medium">
+					<span className="text-lg text-gray-700 mx-auto mb-8 leading-relaxed font-medium">
 						{__(
 							"Set once and forget - automatically publish high-quality blog posts on schedule.",
 							'wp-ai-blogger'
 						)}
-					</p>
+					</span>
 
 					{/* Enhanced CTA section */}
-					<div className="mb-12">
+					<div className="mb-8">
 						<ActionButton
 							onClick={handleStepRedirection}
 							icon={ArrowRight}
