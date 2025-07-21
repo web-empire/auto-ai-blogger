@@ -155,6 +155,7 @@ const LicenseStep = memo(() => {
 	// Redux state
 	const reduxLicense = useSelector((state) => state.license);
 	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
+	const licensingNonce = useSelector((state) => state.licensingNonce);
 
 	// Component state
 	const [license, setLicense] = useState(() => {
@@ -172,14 +173,30 @@ const LicenseStep = memo(() => {
 		const licenseValue = typeof license === 'string' ? license.trim() : '';
 		if (!licenseValue || processing) return false;
 
+		// Validate nonce is available
+		if (!licensingNonce) {
+			console.error('LicenseStep: No licensing nonce available', { licensingNonce, wpaib_localized_data: wpaib_localized_data?.licensing_nonce });
+			setError(__('Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger'));
+			return false;
+		}
+
 		setProcessing(true);
 		setError('');
+
+		// Debug logging
+		if (process.env.NODE_ENV === 'development') {
+			console.log('LicenseStep: Activating license', {
+				licenseValue: licenseValue.substring(0, 8) + '...',
+				licensingNonce: licensingNonce.substring(0, 8) + '...',
+				ajaxUrl
+			});
+		}
 
 		try {
 			const formData = new FormData();
 			formData.append('action', 'wp_ai_blogger_activate_license');
 			formData.append('license_key', licenseValue);
-			formData.append('nonce', wpaib_localized_data.licensing_nonce);
+			formData.append('wp_ai_blogger_licensing_nonce', licensingNonce);
 
 			const response = await apiFetch({
 				url: ajaxUrl,
@@ -203,7 +220,17 @@ const LicenseStep = memo(() => {
 
 				return true;
 			} else {
-				setError(response.data?.message || __('License activation failed. Please check your license key.', 'wp-ai-blogger'));
+				// Handle specific error types
+				const errorMessage = response.data?.message || response.message || '';
+				console.error('License activation failed:', response);
+
+				if (errorMessage.includes('nonce') || errorMessage.includes('security')) {
+					setError(__('Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger'));
+				} else if (errorMessage.includes('license') || errorMessage.includes('key')) {
+					setError(__('Invalid license key. Please check your license key and try again.', 'wp-ai-blogger'));
+				} else {
+					setError(errorMessage || __('License activation failed. Please check your license key.', 'wp-ai-blogger'));
+				}
 				return false;
 			}
 		} catch (error) {
@@ -213,7 +240,7 @@ const LicenseStep = memo(() => {
 		} finally {
 			setProcessing(false);
 		}
-	}, [license, processing, dispatch, navigate]);
+	}, [license, processing, licensingNonce, dispatch, ajaxUrl]);
 
 	// Enhanced form submission
 	const handleSubmit = useCallback(async () => {

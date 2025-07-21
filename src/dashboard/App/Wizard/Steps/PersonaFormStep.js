@@ -311,41 +311,45 @@ const PersonaFormStep = memo(() => {
 				dispatch({ type: 'UPDATE_SITE_DESCRIPTION', payload: formData.siteDescription.trim() });
 			}
 
-			// Update API data with error handling for each field
-			const apiPromises = [];
+			// Save settings sequentially to avoid race conditions and database conflicts
+			const settingsToSave = [];
 
 			if (formData.siteTitle?.trim()) {
-				apiPromises.push(
-					updateApiData('siteTitle', formData.siteTitle.trim(), dispatch, abortControllerRef)
-						.catch(error => {
-							console.error('Failed to save siteTitle:', error);
-							throw new Error(__('Failed to save site title', 'wp-ai-blogger'));
-						})
-				);
+				settingsToSave.push({ key: 'siteTitle', value: formData.siteTitle.trim(), label: 'site title' });
 			}
-
 			if (formData.siteFor?.trim()) {
-				apiPromises.push(
-					updateApiData('siteFor', formData.siteFor.trim(), dispatch, abortControllerRef)
-						.catch(error => {
-							console.error('Failed to save siteFor:', error);
-							throw new Error(__('Failed to save site purpose', 'wp-ai-blogger'));
-						})
-				);
+				settingsToSave.push({ key: 'siteFor', value: formData.siteFor.trim(), label: 'site purpose' });
 			}
-
 			if (formData.siteDescription?.trim()) {
-				apiPromises.push(
-					updateApiData('siteDescription', formData.siteDescription.trim(), dispatch, abortControllerRef)
-						.catch(error => {
-							console.error('Failed to save siteDescription:', error);
-							throw new Error(__('Failed to save site description', 'wp-ai-blogger'));
-						})
-				);
+				settingsToSave.push({ key: 'siteDescription', value: formData.siteDescription.trim(), label: 'site description' });
 			}
 
-			// Wait for all API calls to complete
-			await Promise.all(apiPromises);
+			const saveResults = [];
+			const totalSettings = settingsToSave.length;
+			let currentIndex = 0;
+
+			for (const { key, value, label } of settingsToSave) {
+				currentIndex++;
+
+				try {
+					// Optional: Show progress feedback (you can remove this if not needed)
+					console.log(`Saving ${label} (${currentIndex} of ${totalSettings})...`);
+
+					const result = await updateApiData(key, value, dispatch, abortControllerRef);
+					saveResults.push({ key, success: true, result });
+				} catch (error) {
+					console.error(`Failed to save ${label}:`, error);
+					saveResults.push({ key, success: false, error });
+					throw new Error(__(`Failed to save ${label}`, 'wp-ai-blogger'));
+				}
+			}
+
+			// Check if any settings failed to save
+			const failedSettings = saveResults.filter(result => !result.success);
+			if (failedSettings.length > 0) {
+				const failedKeys = failedSettings.map(result => result.key).join(', ');
+				throw new Error(`Failed to save some settings: ${failedKeys}`);
+			}
 
 			// Navigate to next step
 			navigate(`${adminAppUrl}&step=license`);
