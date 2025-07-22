@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
 import { Thermometer, Shield, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import DynamicCard from '@Components/DynamicCard';
+import InfoCard from '@Components/InfoCard';
 
 // Enhanced safety filter component
 const SafetyFilterControl = memo(({
@@ -290,12 +291,12 @@ const AdvancedSettings = memo(() => {
 							</div>
 
 							{/* Safety info box */}
-							<DynamicCard
+							<InfoCard
 								icon={Shield}
-								heading={__('Safety Filter Guidelines', 'wp-ai-blogger')}
-								subHeading={__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
+								title={__('Safety Filter Guidelines', 'wp-ai-blogger')}
+								description={__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
 								colorScheme="green"
-								size="small"
+								ariaLabel={__('Safety filter configuration guidelines', 'wp-ai-blogger')}
 							/>
 						</div>
 					</div>

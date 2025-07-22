@@ -8,6 +8,7 @@ import SettingDescription from '@Components/SettingDescription';
 import SettingInput from '@Components/SettingInput';
 import SettingsContainer from '@Components/SettingsContainer';
 import DynamicCard from '@Components/DynamicCard';
+import InfoCard from '@Components/InfoCard';
 
 // Enhanced notification type component
 const NotificationCard = memo(({
@@ -285,22 +286,19 @@ const Notifications = memo(() => {
 						/>
 
 						{/* Information box */}
-						<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-							<div className="flex items-start gap-3">
-								<Bell className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-								<div>
-									<h4 className="text-sm font-medium text-blue-900 mb-1">
-										{__('Notification Types', 'wp-ai-blogger')}
-									</h4>
-									<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-										<li>{__('New content generated and ready for review', 'wp-ai-blogger')}</li>
-										<li>{__('Auto-scheduled posts about to be published', 'wp-ai-blogger')}</li>
-										<li>{__('Content generation errors or issues', 'wp-ai-blogger')}</li>
-										<li>{__('Campaign completion and performance summaries', 'wp-ai-blogger')}</li>
-									</ul>
-								</div>
-							</div>
-						</div>
+						<InfoCard
+							icon={Bell}
+							title={__('Notification Types', 'wp-ai-blogger')}
+							items={[
+								__('New content generated and ready for review', 'wp-ai-blogger'),
+								__('Auto-scheduled posts about to be published', 'wp-ai-blogger'),
+								__('Content generation errors or issues', 'wp-ai-blogger'),
+								__('Campaign completion and performance summaries', 'wp-ai-blogger')
+							]}
+							colorScheme="blue"
+							className="mt-6"
+							ariaLabel={__('Types of notifications you can receive', 'wp-ai-blogger')}
+						/>
 					</div>
 				}
 				className="bg-white shadow-sm rounded-lg border border-gray-200"

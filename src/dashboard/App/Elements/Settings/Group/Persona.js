@@ -5,6 +5,7 @@ import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
+import InfoCard from '@Components/InfoCard';
 import AdvancedSettings from './AdvancedSettings';
 
 // Enhanced main component
@@ -302,16 +303,18 @@ const Persona = memo(() => {
 				</SettingField>
 
 				{/* Pro Tips section */}
-				<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-					<h3 className="text-sm font-medium text-blue-900 mb-2">
-						{__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
-					</h3>
-					<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-						<li>{__('Be specific about your target audience and industry', 'wp-ai-blogger')}</li>
-						<li>{__('Include your brand voice and tone preferences', 'wp-ai-blogger')}</li>
-						<li>{__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')}</li>
-					</ul>
-				</div>
+				<InfoCard
+					icon={Info}
+					title={__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
+					items={[
+						__('Be specific about your target audience and industry', 'wp-ai-blogger'),
+						__('Include your brand voice and tone preferences', 'wp-ai-blogger'),
+						__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')
+					]}
+					colorScheme="blue"
+					className="mt-6"
+					ariaLabel={__('Pro tips for better content generation results', 'wp-ai-blogger')}
+				/>
 			</div>
 
 			{/* Advanced AI Settings Component */}
