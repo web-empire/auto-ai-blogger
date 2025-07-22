@@ -18,7 +18,7 @@ export default function ConfigureDrawer( props ) {
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
 	const postTypes = wpaib_localized_data?.post_types || {};
-	const authors = wpaib_localized_data?.authors || {};
+	const authors = wpaib_localized_data?.authors || [];
 	const postStatuses = wpaib_localized_data?.post_statuses || {};
 	const categories = wpaib_localized_data?.categories || {};
 	const tags = wpaib_localized_data?.tags || {};
@@ -315,9 +315,9 @@ export default function ConfigureDrawer( props ) {
 																	disabled={ isViewMode }
 																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( authors ).map( ( [ key, label ] ) => (
-																		<option key={ key } value={ key }>
-																			{ label }
+																	{ authors.map( ( author ) => (
+																		<option key={ author.id } value={ author.id }>
+																			{ author.name }
 																		</option>
 																	) ) }
 																</select>
