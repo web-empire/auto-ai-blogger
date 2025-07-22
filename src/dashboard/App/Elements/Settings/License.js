@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
-import DynamicCard from '@Components/GetLicenseCard';
+import DynamicCard from '@Components/DynamicCard';
 import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import { updateApiData } from '@Utils/ApiData';
