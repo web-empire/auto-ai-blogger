@@ -85,12 +85,16 @@ const LicenseForm = memo(({
 						disabled={processing}
 						className={`
 							inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium
-							bg-white border-2 border-red-500 rounded-lg
+							bg-white !border-2 !border-red-500 rounded-lg
 							text-red-700 hover:text-red-900 hover:bg-red-50
 							focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
 							transition-all duration-200
 							${processing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
 						`}
+						style={{
+							border: '2px solid #ef4444',
+							borderColor: '#ef4444 !important'
+						}}
 						aria-label={__('Deactivate license', 'wp-ai-blogger')}
 					>
 						{processing && <Loader2 className="w-4 h-4 animate-spin" />}
