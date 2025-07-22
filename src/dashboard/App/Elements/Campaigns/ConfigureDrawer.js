@@ -17,7 +17,11 @@ export default function ConfigureDrawer( props ) {
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
-	const postTypes = wpaib_localized_data.post_types || {};
+	const postTypes = wpaib_localized_data?.post_types || {};
+	const authors = wpaib_localized_data?.authors || {};
+	const postStatuses = wpaib_localized_data?.post_statuses || {};
+	const categories = wpaib_localized_data?.categories || {};
+	const tags = wpaib_localized_data?.tags || {};
 	const isViewMode = mode === 'view';
 
 	useEffect( () => {
@@ -284,7 +288,7 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-type"
-																	value={ drawerData.postType }
+																	value={ drawerData.postType || '' }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postType: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
@@ -306,12 +310,12 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-author"
-																	value={ drawerData.author }
+																	value={ drawerData.author || '' }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, author: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( wpaib_localized_data.authors ).map( ( [ key, label ] ) => (
+																	{ Object.entries( authors ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -328,12 +332,12 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-status"
-																	value={ drawerData.postStatus }
+																	value={ drawerData.postStatus || '' }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postStatus: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( wpaib_localized_data.post_statuses ).map( ( [ key, label ] ) => (
+																	{ Object.entries( postStatuses ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -353,12 +357,12 @@ export default function ConfigureDrawer( props ) {
 																			<select
 																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																				id="post-category"
-																				value={ drawerData.category }
+																				value={ drawerData.category || '' }
 																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, category: e.target.value } ) }
 																				disabled={ isViewMode }
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( wpaib_localized_data.categories ).map( ( [ key, label ] ) => (
+																				{ Object.entries( categories ).map( ( [ key, label ] ) => (
 																					<option key={ key } value={ key }>
 																						{ label }
 																					</option>
@@ -375,12 +379,12 @@ export default function ConfigureDrawer( props ) {
 																			<select
 																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																				id="post-tag"
-																				value={ drawerData.tag }
+																				value={ drawerData.tag || '' }
 																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, tag: e.target.value } ) }
 																				disabled={ isViewMode }
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( wpaib_localized_data.tags ).map( ( [ key, label ] ) => (
+																				{ Object.entries( tags ).map( ( [ key, label ] ) => (
 																					<option key={ key } value={ key }>
 																						{ label }
 																					</option>
