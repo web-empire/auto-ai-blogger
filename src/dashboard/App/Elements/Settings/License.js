@@ -78,7 +78,7 @@ const LicenseForm = memo(({
 					</div>
 				</div>
 
-				{activated && !processing && !tokenLoading ? (
+				{activated && !tokenLoading ? (
 					<button
 						type="button"
 						onClick={onDeactivate}
