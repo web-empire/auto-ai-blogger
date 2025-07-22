@@ -29,23 +29,7 @@ const General = memo(() => {
 				<SettingsContainer
 					title={__('Site Persona', 'wp-ai-blogger')}
 					description={__('Help AI understand your site\'s personality and target audience to generate more relevant and engaging content.', 'wp-ai-blogger')}
-					element={
-						<div className="space-y-4">
-							<Persona />
-
-							{/* Additional help text */}
-							<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-								<h3 className="text-sm font-medium text-blue-900 mb-2">
-									{__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
-								</h3>
-								<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-									<li>{__('Be specific about your target audience and industry', 'wp-ai-blogger')}</li>
-									<li>{__('Include your brand voice and tone preferences', 'wp-ai-blogger')}</li>
-									<li>{__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')}</li>
-								</ul>
-							</div>
-						</div>
-					}
+					element={<Persona />}
 					className="bg-white shadow-sm rounded-lg border border-gray-200"
 				/>
 			</section>

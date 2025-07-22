@@ -486,6 +486,18 @@ const Persona = memo(() => {
 						{__('This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger')}
 					</p>
 				</SettingField>
+
+				{/* Pro Tips section */}
+				<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+					<h3 className="text-sm font-medium text-blue-900 mb-2">
+						{__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
+					</h3>
+					<ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+						<li>{__('Be specific about your target audience and industry', 'wp-ai-blogger')}</li>
+						<li>{__('Include your brand voice and tone preferences', 'wp-ai-blogger')}</li>
+						<li>{__('Mention any specific topics or keywords you focus on', 'wp-ai-blogger')}</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Advanced AI Settings - Accordion Style */}
