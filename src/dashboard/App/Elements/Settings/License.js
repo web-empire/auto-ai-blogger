@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
-import GetLicenseCard from '@Components/GetLicenseCard';
+import DynamicCard from '@Components/GetLicenseCard';
 import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import { updateApiData } from '@Utils/ApiData';
@@ -122,7 +122,15 @@ const LicenseForm = memo(({
 				)}
 			</div>
 
-			{!activated && <GetLicenseCard upgradeLink={upgradeLink} />}
+			{!activated && <DynamicCard
+				heading={__('No License Key?', 'wp-ai-blogger')}
+				subHeading={__('Get started with free credits today', 'wp-ai-blogger')}
+				linkText={__('Get Free Credits', 'wp-ai-blogger')}
+				linkUrl={upgradeLink}
+				colorScheme="blue"
+				size="medium"
+				ariaLabel={__('Get free credits - opens in new tab', 'wp-ai-blogger')}
+			/>}
 
 			{/* Token loading indicator */}
 			{tokenLoading && (
@@ -376,17 +384,15 @@ const License = memo(() => {
 
 	return (
 		<div className="space-y-6 min-h-full">
-			{/* Enhanced header */}
-			<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-				<div className="p-2 bg-indigo-100 rounded-lg">
-					<Zap className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-				</div>
-				<div>
-					<h2 className="text-xl font-bold text-gray-900">
-						{__('License Management', 'wp-ai-blogger')}
-					</h2>
-				</div>
-			</div>
+			{/* Enhanced header using DynamicCard */}
+			<DynamicCard
+				icon={Zap}
+				heading={__('License Management', 'wp-ai-blogger')}
+				subHeading={__('Manage your premium license and unlock AI features', 'wp-ai-blogger')}
+				colorScheme="indigo"
+				size="medium"
+				className="mt-0 border-b border-gray-200 rounded-none rounded-t-lg bg-gradient-to-r from-indigo-50 to-purple-50"
+			/>
 
 			{/* Settings container */}
 			<SettingsContainer
