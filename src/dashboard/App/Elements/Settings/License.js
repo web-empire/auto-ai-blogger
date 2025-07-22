@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
+import GetLicenseCard from '@Components/GetLicenseCard';
 import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import { updateApiData } from '@Utils/ApiData';
@@ -70,7 +71,7 @@ const LicenseForm = memo(({
 					/>
 				</div>
 
-				{activated ? (
+				{activated && !processing && !tokenLoading ? (
 					<button
 						type="button"
 						onClick={onDeactivate}
@@ -110,19 +111,7 @@ const LicenseForm = memo(({
 				)}
 			</div>
 
-			{!activated && (
-				<p id="license-help" className="text-xs text-gray-500">
-					{__('Don\'t have a license? ', 'wp-ai-blogger')}
-					<a
-						href={upgradeLink}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-indigo-600 hover:text-indigo-800 underline"
-					>
-						{__('Get one here', 'wp-ai-blogger')}
-					</a>
-				</p>
-			)}
+			{!activated && <GetLicenseCard upgradeLink={upgradeLink} />}
 
 			{/* Token loading indicator */}
 			{tokenLoading && (
@@ -363,14 +352,17 @@ const License = memo(() => {
 
 	// Reset button states when activation status changes
 	useEffect(() => {
-		if (activated) {
+		if (activated && !processing && !tokenLoading) {
+			// Only show "Activated" and "Deactivate" when completely done
 			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
-		} else {
+		} else if (!activated) {
+			// Reset to initial state when not activated
 			setActivationText(__('Activate', 'wp-ai-blogger'));
 			setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
 		}
-	}, [activated]);
+		// Don't change text during processing or token loading
+	}, [activated, processing, tokenLoading]);
 
 	return (
 		<div className="space-y-6">
@@ -383,9 +375,6 @@ const License = memo(() => {
 					<h2 className="text-xl font-bold text-gray-900">
 						{__('License Management', 'wp-ai-blogger')}
 					</h2>
-					<p className="text-gray-600 text-sm">
-						{__('Activate your license to unlock premium AI features', 'wp-ai-blogger')}
-					</p>
 				</div>
 			</div>
 
