@@ -221,8 +221,8 @@ const Persona = memo(() => {
 			setErrors(prev => ({ ...prev, siteDescription: __('Please provide more detailed information (at least 20 characters)', 'wp-ai-blogger') }));
 			return false;
 		}
-		if (trimmedValue.length > 1000) {
-			setErrors(prev => ({ ...prev, siteDescription: __('Description must be 1000 characters or less', 'wp-ai-blogger') }));
+		if (trimmedValue.length > 500) {
+			setErrors(prev => ({ ...prev, siteDescription: __('Description must be 500 characters or less', 'wp-ai-blogger') }));
 			return false;
 		}
 		setErrors(prev => ({ ...prev, siteDescription: null }));
@@ -288,7 +288,7 @@ const Persona = memo(() => {
 
 	// Optimized character count with bounds checking
 	const descriptionCount = siteDescription.length;
-	const maxDescriptionLength = 1000;
+	const maxDescriptionLength = 500;
 	const descriptionProgress = Math.min(100, (descriptionCount / maxDescriptionLength) * 100);
 	const isDescriptionNearLimit = descriptionProgress > 90;
 
