@@ -290,19 +290,13 @@ const AdvancedSettings = memo(() => {
 							</div>
 
 							{/* Safety info box */}
-							<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-								<div className="flex items-start gap-3">
-									<Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-									<div>
-										<h4 className="text-sm font-medium text-green-900 mb-1">
-											{__('Safety Filter Guidelines', 'wp-ai-blogger')}
-										</h4>
-										<p className="text-sm text-green-700">
-											{__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
-										</p>
-									</div>
-								</div>
-							</div>
+							<DynamicCard
+								icon={Shield}
+								heading={__('Safety Filter Guidelines', 'wp-ai-blogger')}
+								subHeading={__('Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger')}
+								colorScheme="green"
+								size="small"
+							/>
 						</div>
 					</div>
 				)}
