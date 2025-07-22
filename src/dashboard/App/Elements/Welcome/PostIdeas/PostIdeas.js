@@ -28,6 +28,8 @@ export default function PostIdeas() {
 	const dangerousContent = useSelector( ( state ) => state.dangerousContent );
 	const license = useSelector( ( state ) => state.license );
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
+	const tokenTotal = useSelector( ( state ) => state.tokenTotal );
+	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
@@ -106,6 +108,24 @@ export default function PostIdeas() {
 				} );
 				await updateApiData( 'postIdeas', postIdeasString, dispatch, abortControllerRef );
 				setPostIdeas( postIdeasString );
+
+				// Handle token data if present
+				if ( data.token_data ) {
+					// Update Redux store with token data
+					dispatch({
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: data.token_data.total,
+					});
+					dispatch({
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: data.token_data.remaining,
+					});
+
+					// Update API data in database
+					await updateApiData( 'tokenTotal', data.token_data.total, dispatch, abortControllerRef );
+					await updateApiData( 'tokenRemaining', data.token_data.remaining, dispatch, abortControllerRef );
+				}
+
 				setLoading( false );
 			} else {
 				console.error( 'API Error: Invalid response from API' );
