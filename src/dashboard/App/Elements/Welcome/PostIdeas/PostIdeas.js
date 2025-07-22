@@ -31,6 +31,7 @@ export default function PostIdeas() {
 	const tokenTotal = useSelector( ( state ) => state.tokenTotal );
 	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
+	const proAvailable = useSelector( ( state ) => state.proAvailable );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
@@ -341,13 +342,25 @@ export default function PostIdeas() {
 
 	return (
 		<div className="px-4 sm:px-6 lg:px-8 py-8">
-			<div className="sm:flex sm:items-center">
+			<div className="sm:flex sm:items-center sm:justify-between">
 				<div className="sm:flex-auto">
 					<h1 className="text-base font-semibold text-gray-900"> { __( 'Blog Post Suggestions', 'wp-ai-blogger' ) } </h1>
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
 					</p>
 				</div>
+				{ ! proAvailable && (
+					<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+						<ProButton
+							variant="primary"
+							size="default"
+							icon={<MoveRight className="w-4 h-4" />}
+							className="shadow-sm"
+						>
+							{ __( 'Upgrade to Pro', 'wp-ai-blogger' ) }
+						</ProButton>
+					</div>
+				) }
 			</div>
 
 			<div className="mt-6 flow-root">
