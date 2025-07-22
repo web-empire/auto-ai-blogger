@@ -388,10 +388,9 @@ const License = memo(() => {
 			<DynamicCard
 				icon={Zap}
 				heading={__('License Management', 'wp-ai-blogger')}
-				subHeading={__('Manage your premium license and unlock AI features', 'wp-ai-blogger')}
 				colorScheme="indigo"
-				size="medium"
-				className="mt-0 border-b border-gray-200 rounded-none rounded-t-lg bg-gradient-to-r from-indigo-50 to-purple-50"
+				size="large"
+				className="border-b border-gray-200 pb-4"
 			/>
 
 			{/* Settings container */}
