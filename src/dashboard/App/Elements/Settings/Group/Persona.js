@@ -196,7 +196,7 @@ const Persona = memo(() => {
 	const validateSiteFor = useCallback((value) => {
 		const trimmedValue = value.trim();
 		if (!trimmedValue) {
-			setErrors(prev => ({ ...prev, siteFor: __('Site description is required', 'wp-ai-blogger') }));
+			setErrors(prev => ({ ...prev, siteFor: __('Site for is required', 'wp-ai-blogger') }));
 			return false;
 		}
 		if (trimmedValue.length < 10) {
@@ -366,7 +366,7 @@ const Persona = memo(() => {
 							forId="blog-for"
 							title={
 								<div className="flex items-center gap-2">
-									{__('Site Description', 'wp-ai-blogger')}
+									{__('Site For', 'wp-ai-blogger')}
 									<div className="relative">
 										<button
 											type="button"
@@ -424,33 +424,33 @@ const Persona = memo(() => {
 
 			{/* Detailed site description - moved before temperature */}
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-					{__('Detailed Site Information', 'wp-ai-blogger')}
-					<div className="relative">
-						<button
-							type="button"
-							onMouseEnter={() => handleTooltipShow('siteDescription')}
-							onMouseLeave={() => handleTooltipHide('siteDescription')}
-							onFocus={() => handleTooltipShow('siteDescription')}
-							onBlur={() => handleTooltipHide('siteDescription')}
-							className="text-gray-400 hover:text-gray-600 focus:outline-none"
-							aria-label={__('Show field description', 'wp-ai-blogger')}
-						>
-							<Info className="w-4 h-4" />
-						</button>
-						{showTooltips.siteDescription && (
-							<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
-								{__('Tell us more', 'wp-ai-blogger')}
-								<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-							</div>
-						)}
-					</div>
-				</h3>
-
 				<SettingField>
 					<SettingLabel
 						forId="more-about-blog"
-						title={__('Tell us more about your site', 'wp-ai-blogger')}
+						title={
+							<div className="flex items-center gap-2">
+								{__('Detailed Site Information', 'wp-ai-blogger')}
+								<div className="relative">
+									<button
+										type="button"
+										onMouseEnter={() => handleTooltipShow('siteDescription')}
+										onMouseLeave={() => handleTooltipHide('siteDescription')}
+										onFocus={() => handleTooltipShow('siteDescription')}
+										onBlur={() => handleTooltipHide('siteDescription')}
+										className="text-gray-400 hover:text-gray-600 focus:outline-none"
+										aria-label={__('Show field description', 'wp-ai-blogger')}
+									>
+										<Info className="w-4 h-4" />
+									</button>
+									{showTooltips.siteDescription && (
+										<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
+											{__('Tell us more about your site', 'wp-ai-blogger')}
+											<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+										</div>
+									)}
+								</div>
+							</div>
+						}
 						required={true}
 					/>
 					<div className="relative">
