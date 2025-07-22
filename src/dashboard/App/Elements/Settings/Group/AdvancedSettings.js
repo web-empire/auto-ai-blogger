@@ -208,17 +208,19 @@ const AdvancedSettings = memo(() => {
 					aria-expanded={isAdvancedOpen}
 					aria-controls="advanced-settings-content"
 				>
-					<DynamicCard
-						icon={Thermometer}
-						heading={__('Advanced AI Settings', 'wp-ai-blogger')}
-						subHeading={__('Configure creativity temperature and content safety filters', 'wp-ai-blogger')}
-						colorScheme="orange"
-						size="medium"
-						className="!cursor-pointer !bg-transparent [&>*:first-child]:!mb-1"
-						onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-						aria-expanded={isAdvancedOpen}
-						aria-controls="advanced-settings-content"
-					/>
+					<div className="flex items-center gap-3">
+						<div className="p-2 bg-orange-100 rounded-lg">
+							<Thermometer className="w-5 h-5 text-orange-600" aria-hidden="true" />
+						</div>
+						<div>
+							<h3 className="text-lg font-semibold text-gray-900 mb-2">
+								{__('Advanced AI Settings', 'wp-ai-blogger')}
+							</h3>
+							<p className="text-sm text-gray-600">
+								{__('Configure creativity temperature and content safety filters', 'wp-ai-blogger')}
+							</p>
+						</div>
+					</div>
 					<div className="flex-shrink-0">
 						{isAdvancedOpen ? (
 							<ChevronUp className="w-5 h-5 text-gray-500" />
