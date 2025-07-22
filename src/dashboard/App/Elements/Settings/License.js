@@ -58,7 +58,7 @@ const LicenseForm = memo(({
 								: __('Enter your license key...', 'wp-ai-blogger')
 						}
 						className={`
-							block w-full !pl-12 pr-3 py-2.5 text-sm
+							block w-full !pl-12 !pr-12 py-2.5 text-sm
 							border border-gray-300 rounded-lg
 							bg-white text-gray-900
 							placeholder:text-gray-400
@@ -69,6 +69,13 @@ const LicenseForm = memo(({
 						`}
 						aria-describedby={activated ? "license-status" : "license-help"}
 					/>
+
+					{/* Status indicator */}
+					<div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+						{activated && (
+							<CheckCircle2 className="h-4 w-4 text-green-500" aria-hidden="true" />
+						)}
+					</div>
 				</div>
 
 				{activated && !processing && !tokenLoading ? (
