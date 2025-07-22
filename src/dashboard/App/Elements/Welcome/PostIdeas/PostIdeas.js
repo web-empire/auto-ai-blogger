@@ -347,6 +347,11 @@ export default function PostIdeas() {
 					<h1 className="text-base font-semibold text-gray-900"> { __( 'Blog Post Suggestions', 'wp-ai-blogger' ) } </h1>
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
+						{ ! proAvailable && (
+							<span className="block mt-1 text-amber-600 font-medium">
+								{ __( '⚡ Free users are limited to 5 post suggestions. Upgrade for unlimited ideas!', 'wp-ai-blogger' ) }
+							</span>
+						) }
 					</p>
 				</div>
 				{ ! proAvailable && (
@@ -355,9 +360,9 @@ export default function PostIdeas() {
 							variant="primary"
 							size="default"
 							icon={<MoveRight className="w-4 h-4" />}
-							className="shadow-sm"
+							className="shadow-lg border-2 border-amber-400 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
 						>
-							{ __( 'Upgrade to Pro', 'wp-ai-blogger' ) }
+							{ __( 'Get Unlimited Post Suggestions', 'wp-ai-blogger' ) }
 						</ProButton>
 					</div>
 				) }
@@ -373,8 +378,30 @@ export default function PostIdeas() {
 										<th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
 											{ __( 'Title', 'wp-ai-blogger' ) }
 										</th>
-										<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-											{ __( 'Write Post', 'wp-ai-blogger' ) }
+										<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 flex items-center justify-between">
+											<span>{ __( 'Write Post', 'wp-ai-blogger' ) }</span>
+											{ proAvailable ? (
+												<button
+													onClick={ handleRefresh }
+													disabled={ loading }
+													className="flex items-center gap-1 px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
+													title={ __( 'Refresh post ideas', 'wp-ai-blogger' ) }
+												>
+													<RotateCw className={ `h-3 w-3 ${ loading ? 'animate-spin' : '' }` } />
+													{ __( 'Refresh', 'wp-ai-blogger' ) }
+												</button>
+											) : (
+												<div className="relative group">
+													<button
+														disabled
+														className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-200 text-gray-400 rounded cursor-not-allowed opacity-60"
+														title={ __( 'Upgrade to Pro to refresh post ideas', 'wp-ai-blogger' ) }
+													>
+														<RotateCw className="h-3 w-3" />
+														{ __( 'Refresh', 'wp-ai-blogger' ) }
+													</button>
+												</div>
+											) }
 										</th>
 									</tr>
 								</thead>
@@ -392,30 +419,53 @@ export default function PostIdeas() {
 											<Skeleton />
 										</Suspense>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
-										postIdeasArr.map( ( postTitle, index ) => (
-											<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
-												<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-													<div className="font-medium">
-														<TrimWordsContent
-															content={ postTitle || '' }
-															count={ 120 }
-														/>
-													</div>
-												</td>
-												<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-													<a
-														target="_blank"
-														href="#"
-														onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-														className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-														data-type="create"
-													>
-														<Plus className="w-5 h-5" />
-														{ __( 'Create', 'wp-ai-blogger' ) }
-													</a>
-												</td>
-											</tr>
-										) )
+										<>
+											{/* Limit to 5 ideas for free users, unlimited for pro users */}
+											{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : 5 ).map( ( postTitle, index ) => (
+												<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
+													<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
+														<div className="font-medium">
+															<TrimWordsContent
+																content={ postTitle || '' }
+																count={ 120 }
+															/>
+														</div>
+													</td>
+													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
+														<a
+															target="_blank"
+															href="#"
+															onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+															className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
+															data-type="create"
+														>
+															<Plus className="w-5 h-5" />
+															{ __( 'Create', 'wp-ai-blogger' ) }
+														</a>
+													</td>
+												</tr>
+											) ) }
+											{/* Show upgrade prompt for free users when there are more than 5 ideas */}
+											{ ! proAvailable && postIdeasArr.length > 5 && (
+												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
+													<td colSpan="2" className="px-6 py-6 text-center">
+														<div className="flex flex-col items-center space-y-3">
+															<div className="text-amber-700 font-semibold text-sm">
+																🔒 { __( `${ postIdeasArr.length - 5 } more post ideas available with Pro!`, 'wp-ai-blogger' ) }
+															</div>
+															<ProButton
+																variant="primary"
+																size="small"
+																icon={<MoveRight className="w-4 h-4" />}
+																className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
+															>
+																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
+															</ProButton>
+														</div>
+													</td>
+												</tr>
+											) }
+										</>
 									) : (
 										<tr>
 											<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
@@ -428,14 +478,30 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold">
-											<ProButton
-												variant="ghost"
-												size="default"
-												icon={<MoveRight className="w-5 h-5" />}
-												className="text-indigo-600 hover:text-indigo-900"
-											>
-												{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
-											</ProButton>
+											{ ! proAvailable ? (
+												<div className="flex flex-col items-center space-y-2">
+													<div className="text-amber-600 font-medium text-sm">
+														{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions!', 'wp-ai-blogger' ) }
+													</div>
+													<ProButton
+														variant="primary"
+														size="default"
+														icon={<MoveRight className="w-5 h-5" />}
+														className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
+													>
+														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
+													</ProButton>
+												</div>
+											) : (
+												<ProButton
+													variant="ghost"
+													size="default"
+													icon={<MoveRight className="w-5 h-5" />}
+													className="text-indigo-600 hover:text-indigo-900"
+												>
+													{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
+												</ProButton>
+											) }
 										</td>
 									</tr>
 								</tfoot>
