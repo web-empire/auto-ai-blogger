@@ -4,7 +4,7 @@ import { ArrowRight, Key, CheckCircle2, AlertCircle, Shield, Loader2 } from 'luc
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateApiData } from '@Utils/ApiData';
-import GetLicenseCard from '@Components/GetLicenseCard';
+import DynamicCard from '@Components/DynamicCard';
 import apiFetch from '@wordpress/api-fetch';
 
 // Enhanced license input component
@@ -359,7 +359,15 @@ const LicenseStep = memo(() => {
 								processing={processing}
 							/>
 
-							<GetLicenseCard upgradeLink={upgradeLink} />
+							<DynamicCard
+								heading={__('No License Key?', 'wp-ai-blogger')}
+								subHeading={__('Get started with free credits today', 'wp-ai-blogger')}
+								linkText={__('Get Free Credits', 'wp-ai-blogger')}
+								linkUrl={upgradeLink}
+								colorScheme="blue"
+								size="medium"
+								ariaLabel={__('Get free credits - opens in new tab', 'wp-ai-blogger')}
+							/>
 
 							{/* Success message */}
 							{licenseStatus === 'licensed' && !error && (
