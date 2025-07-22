@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Settings } from 'lucide-react';
 import SettingsContainer from '@Components/SettingsContainer';
+import DynamicCard from '@Components/DynamicCard';
 
 // Import the Persona component directly to avoid double lazy loading
 import { Persona } from '@Elements/Settings/Group';
@@ -14,22 +15,14 @@ const General = memo(() => {
 			role="main"
 			aria-labelledby="general-settings-heading"
 		>
-			{/* Enhanced header section */}
-			<header className="border-b border-gray-200 pb-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-indigo-100 rounded-lg">
-						<Settings className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-					</div>
-					<div>
-						<h1 id="general-settings-heading" className="text-2xl font-bold text-gray-900">
-							{__('General Settings', 'wp-ai-blogger')}
-						</h1>
-						<p className="text-gray-600 mt-1">
-							{__('Configure your site persona and AI content preferences.', 'wp-ai-blogger')}
-						</p>
-					</div>
-				</div>
-			</header>
+			{/* Enhanced header using DynamicCard */}
+			<DynamicCard
+				icon={Settings}
+				heading={__('General Settings', 'wp-ai-blogger')}
+				colorScheme="indigo"
+				size="large"
+				className="border-b border-gray-200 pb-4"
+			/>
 
 			{/* Settings content */}
 			<section aria-labelledby="persona-section-heading">

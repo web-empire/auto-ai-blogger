@@ -41,7 +41,7 @@ const DynamicCard = memo(({
 			linkIconSize: 'w-3 h-3',
 			gap: 'gap-2',
 			marginBottom: 'mb-2',
-			headingMarginBottom: 'mb-1'
+			headingMarginBottom: '!mb-1'
 		},
 		medium: {
 			container: 'p-4',
@@ -54,7 +54,7 @@ const DynamicCard = memo(({
 			linkIconSize: 'w-3 h-3',
 			gap: 'gap-3',
 			marginBottom: 'mb-3',
-			headingMarginBottom: 'mb-6'
+			headingMarginBottom: '!mb-6'
 		},
 		large: {
 			container: 'p-6',
@@ -67,7 +67,7 @@ const DynamicCard = memo(({
 			linkIconSize: 'w-4 h-4',
 			gap: 'gap-4',
 			marginBottom: 'mb-4',
-			headingMarginBottom: 'mb-9'
+			headingMarginBottom: '!mb-9'
 		}
 	};
 
@@ -146,7 +146,7 @@ const DynamicCard = memo(({
 					{(heading || subHeading) && (
 						<div>
 							{heading && (
-								<h3 className={`${currentSize.heading} !mt-0 ${subHeading ? `!${currentSize.headingMarginBottom}` : '!mb-0'}`}>
+								<h3 className={`${currentSize.heading} !mt-0 ${subHeading ? currentSize.headingMarginBottom : '!mb-0'}`}>
 									{heading}
 								</h3>
 							)}

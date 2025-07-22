@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
-import { Thermometer, Shield, AlertTriangle, Info, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Thermometer, Shield, AlertTriangle, Info, Settings2, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
@@ -166,6 +166,7 @@ const Persona = memo(() => {
 	const dispatch = useDispatch();
 	const [errors, setErrors] = useState({});
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+	const [showTooltips, setShowTooltips] = useState({});
 
 	// Redux selectors - values are already initialized from menu.php through Redux store
 	const siteTitle = useSelector((state) => state.siteTitle);
@@ -196,6 +197,10 @@ const Persona = memo(() => {
 		const trimmedValue = value.trim();
 		if (!trimmedValue) {
 			setErrors(prev => ({ ...prev, siteFor: __('Site description is required', 'wp-ai-blogger') }));
+			return false;
+		}
+		if (trimmedValue.length < 10) {
+			setErrors(prev => ({ ...prev, siteFor: __('Please provide a more detailed description (at least 10 characters)', 'wp-ai-blogger') }));
 			return false;
 		}
 		if (trimmedValue.length > 200) {
@@ -252,6 +257,15 @@ const Persona = memo(() => {
 		dispatch({ type: 'UPDATE_DANGEROUS_CONTENT', payload: clampedValue });
 	}, [dispatch]);
 
+	// Tooltip handlers
+	const handleTooltipShow = useCallback((field) => {
+		setShowTooltips(prev => ({ ...prev, [field]: true }));
+	}, []);
+
+	const handleTooltipHide = useCallback((field) => {
+		setShowTooltips(prev => ({ ...prev, [field]: false }));
+	}, []);
+
 	// Optimized character count with bounds checking
 	const descriptionCount = siteDescription.length;
 	const maxDescriptionLength = 1000;
@@ -260,21 +274,6 @@ const Persona = memo(() => {
 
 	return (
 		<div className="space-y-8">
-			{/* Enhanced header */}
-			<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-				<div className="p-2 bg-purple-100 rounded-lg">
-					<Settings2 className="w-5 h-5 text-purple-600" aria-hidden="true" />
-				</div>
-				<div>
-					<h2 className="text-xl font-bold text-gray-900">
-						{__('Content Persona Settings', 'wp-ai-blogger')}
-					</h2>
-					<p className="text-gray-600 text-sm">
-						{__('Configure your site profile and AI content generation parameters', 'wp-ai-blogger')}
-					</p>
-				</div>
-			</div>
-
 			{/* Site information section */}
 			<div className="space-y-4">
 				<h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -286,18 +285,51 @@ const Persona = memo(() => {
 					<SettingField>
 						<SettingLabel
 							forId="name-of-the-blog"
-							title={__('Site Title', 'wp-ai-blogger')}
+							title={
+								<div className="flex items-center gap-2">
+									{__('Site Title', 'wp-ai-blogger')}
+									<div className="relative">
+										<button
+											type="button"
+											onMouseEnter={() => handleTooltipShow('siteTitle')}
+											onMouseLeave={() => handleTooltipHide('siteTitle')}
+											onFocus={() => handleTooltipShow('siteTitle')}
+											onBlur={() => handleTooltipHide('siteTitle')}
+											className="text-gray-400 hover:text-gray-600 focus:outline-none"
+											aria-label={__('Show field description', 'wp-ai-blogger')}
+										>
+											<Info className="w-4 h-4" />
+										</button>
+										{showTooltips.siteTitle && (
+											<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
+												{__('The main title of your website or blog', 'wp-ai-blogger')}
+												<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+											</div>
+										)}
+									</div>
+								</div>
+							}
 							required={true}
 						/>
-						<SettingInput
-							id="name-of-the-blog"
-							value={siteTitle}
-							onChange={handleSiteTitleChange}
-							placeholder={__('Enter your site title', 'wp-ai-blogger')}
-							maxLength={100}
-							aria-describedby="site-title-error"
-							className={errors.siteTitle ? 'border-red-300 focus:ring-red-500' : ''}
-						/>
+						<div className="relative">
+							<SettingInput
+								id="name-of-the-blog"
+								value={siteTitle}
+								onChange={handleSiteTitleChange}
+								placeholder={__('Enter your site title', 'wp-ai-blogger')}
+								maxLength={100}
+								aria-describedby="site-title-error"
+								className={`${errors.siteTitle ? 'border-red-300 focus:ring-red-500' : ''} !pr-10`}
+							/>
+							{/* Check mark indicator */}
+							<div className="absolute right-3 top-3">
+								{errors.siteTitle ? (
+									<AlertTriangle className="w-4 h-4 text-red-500" aria-hidden="true" />
+								) : siteTitle?.trim() && siteTitle.length >= 3 ? (
+									<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+								) : null}
+							</div>
+						</div>
 						{errors.siteTitle && (
 							<p id="site-title-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
 								<AlertTriangle className="w-3 h-3" />
@@ -312,18 +344,51 @@ const Persona = memo(() => {
 					<SettingField>
 						<SettingLabel
 							forId="blog-for"
-							title={__('Site Description', 'wp-ai-blogger')}
+							title={
+								<div className="flex items-center gap-2">
+									{__('Site Description', 'wp-ai-blogger')}
+									<div className="relative">
+										<button
+											type="button"
+											onMouseEnter={() => handleTooltipShow('siteFor')}
+											onMouseLeave={() => handleTooltipHide('siteFor')}
+											onFocus={() => handleTooltipShow('siteFor')}
+											onBlur={() => handleTooltipHide('siteFor')}
+											className="text-gray-400 hover:text-gray-600 focus:outline-none"
+											aria-label={__('Show field description', 'wp-ai-blogger')}
+										>
+											<Info className="w-4 h-4" />
+										</button>
+										{showTooltips.siteFor && (
+											<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
+												{__('Who is your target audience?', 'wp-ai-blogger')}
+												<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+											</div>
+										)}
+									</div>
+								</div>
+							}
 							required={true}
 						/>
-						<SettingInput
-							id="blog-for"
-							value={siteFor}
-							onChange={handleSiteForChange}
-							placeholder={__('Brief description of your site', 'wp-ai-blogger')}
-							maxLength={200}
-							aria-describedby="site-for-error"
-							className={errors.siteFor ? 'border-red-300 focus:ring-red-500' : ''}
-						/>
+						<div className="relative">
+							<SettingInput
+								id="blog-for"
+								value={siteFor}
+								onChange={handleSiteForChange}
+								placeholder={__('Brief description of your site', 'wp-ai-blogger')}
+								maxLength={200}
+								aria-describedby="site-for-error"
+								className={`${errors.siteFor ? 'border-red-300 focus:ring-red-500' : ''} !pr-10`}
+							/>
+							{/* Check mark indicator */}
+							<div className="absolute right-3 top-3">
+								{errors.siteFor ? (
+									<AlertTriangle className="w-4 h-4 text-red-500" aria-hidden="true" />
+								) : siteFor?.trim() && siteFor.length >= 10 ? (
+									<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+								) : null}
+							</div>
+						</div>
 						{errors.siteFor && (
 							<p id="site-for-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
 								<AlertTriangle className="w-3 h-3" />
@@ -346,19 +411,48 @@ const Persona = memo(() => {
 				<SettingField>
 					<SettingLabel
 						forId="more-about-blog"
-						title={__('Tell us more about your site', 'wp-ai-blogger')}
+						title={
+							<div className="flex items-center gap-2">
+								{__('Tell us more about your site', 'wp-ai-blogger')}
+								<div className="relative">
+									<button
+										type="button"
+										onMouseEnter={() => handleTooltipShow('siteDescription')}
+										onMouseLeave={() => handleTooltipHide('siteDescription')}
+										onFocus={() => handleTooltipShow('siteDescription')}
+										onBlur={() => handleTooltipHide('siteDescription')}
+										className="text-gray-400 hover:text-gray-600 focus:outline-none"
+										aria-label={__('Show field description', 'wp-ai-blogger')}
+									>
+										<Info className="w-4 h-4" />
+									</button>
+									{showTooltips.siteDescription && (
+										<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
+											{__('Help AI understand your content needs', 'wp-ai-blogger')}
+											<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+										</div>
+									)}
+								</div>
+							</div>
+						}
 					/>
 					<div className="relative">
 						<textarea
 							id="more-about-blog"
 							value={siteDescription}
 							onChange={handleSiteDescriptionChange}
-							className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm resize-vertical"
+							className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm resize-vertical !pr-10"
 							rows={6}
 							maxLength={maxDescriptionLength}
 							placeholder={__('Provide detailed information about your site, target audience, content style, and any specific requirements...', 'wp-ai-blogger')}
 							aria-describedby="description-count"
 						/>
+						{/* Check mark indicator */}
+						<div className="absolute top-3 right-3">
+							{siteDescription?.trim() && siteDescription.length >= 20 ? (
+								<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+							) : null}
+						</div>
 						<div className={`absolute bottom-2 right-3 text-xs px-1 bg-white rounded ${isDescriptionNearLimit ? 'text-orange-600 font-medium' : 'text-gray-400'}`}>
 							{descriptionCount}/{maxDescriptionLength}
 						</div>
