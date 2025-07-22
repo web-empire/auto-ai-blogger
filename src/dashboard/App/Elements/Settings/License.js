@@ -78,8 +78,8 @@ const LicenseForm = memo(({
 						disabled={processing}
 						className={`
 							inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium
-							bg-white border border-gray-300 rounded-lg
-							text-gray-700 hover:text-gray-900 hover:bg-gray-50
+							bg-white border-2 border-red-500 rounded-lg
+							text-red-700 hover:text-red-900 hover:bg-red-50
 							focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
 							transition-all duration-200
 							${processing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
@@ -211,7 +211,6 @@ const License = memo(() => {
 
 			// Show token loading state
 			setTokenLoading(true);
-			setActivationText(__('Fetching token data...', 'wp-ai-blogger'));
 
 			// Fetch token data immediately after successful activation
 			try {
@@ -356,8 +355,8 @@ const License = memo(() => {
 			// Only show "Activated" and "Deactivate" when completely done
 			setActivationText(__('Activated', 'wp-ai-blogger'));
 			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
-		} else if (!activated) {
-			// Reset to initial state when not activated
+		} else if (!activated && !processing) {
+			// Reset to initial state when not activated and not processing
 			setActivationText(__('Activate', 'wp-ai-blogger'));
 			setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
 		}
