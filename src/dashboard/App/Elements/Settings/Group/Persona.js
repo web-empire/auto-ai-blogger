@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
-import { AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Info, CheckCircle2, Lightbulb } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
@@ -304,8 +304,8 @@ const Persona = memo(() => {
 
 				{/* Pro Tips section */}
 				<InfoCard
-					icon={Info}
-					title={__('💡 Pro Tips for Better Results', 'wp-ai-blogger')}
+					icon={Lightbulb}
+					title={__('Pro Tips for Better Results', 'wp-ai-blogger')}
 					items={[
 						__('Be specific about your target audience and industry', 'wp-ai-blogger'),
 						__('Include your brand voice and tone preferences', 'wp-ai-blogger'),
