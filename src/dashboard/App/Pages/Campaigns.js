@@ -346,7 +346,7 @@ export default function Campaigns() {
 				campaignData={ analyticsModal.campaignData }
 			/>
 
-			<DeleteCampaignModal
+			<CampaignDeleteModal
 				isOpen={ deleteModal.isOpen }
 				onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
 				campaignId={ deleteModal.campaignId }
