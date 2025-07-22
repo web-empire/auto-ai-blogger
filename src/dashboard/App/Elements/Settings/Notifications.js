@@ -7,6 +7,7 @@ import SwitchControl from '@Components/SwitchControl';
 import SettingDescription from '@Components/SettingDescription';
 import SettingInput from '@Components/SettingInput';
 import SettingsContainer from '@Components/SettingsContainer';
+import DynamicCard from '@Components/DynamicCard';
 
 // Enhanced notification type component
 const NotificationCard = memo(({
@@ -223,20 +224,14 @@ const Notifications = memo(() => {
 
 	return (
 		<div className="space-y-6">
-			{/* Enhanced header */}
-			<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-				<div className="p-2 bg-blue-100 rounded-lg">
-					<Bell className="w-5 h-5 text-blue-600" aria-hidden="true" />
-				</div>
-				<div>
-					<h2 className="text-xl font-bold text-gray-900">
-						{__('Notification Settings', 'wp-ai-blogger')}
-					</h2>
-					<p className="text-gray-600 text-sm">
-						{__('Configure how you want to be notified about content generation and publishing', 'wp-ai-blogger')}
-					</p>
-				</div>
-			</div>
+			{/* Enhanced header using DynamicCard */}
+			<DynamicCard
+				icon={Bell}
+				heading={__('Notification Settings', 'wp-ai-blogger')}
+				colorScheme="blue"
+				size="large"
+				className="border-b border-gray-200 pb-4"
+			/>
 
 			{/* Settings container */}
 			<SettingsContainer
