@@ -364,7 +364,7 @@ const License = memo(() => {
 	}, [activated, processing, tokenLoading]);
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6 min-h-full">
 			{/* Enhanced header */}
 			<div className="flex items-center gap-3 pb-4 border-b border-gray-200">
 				<div className="p-2 bg-indigo-100 rounded-lg">
@@ -395,7 +395,7 @@ const License = memo(() => {
 						upgradeLink={upgradeLink}
 					/>
 				}
-				className="bg-white shadow-sm rounded-lg border border-gray-200"
+				className="bg-white shadow-sm rounded-lg border border-gray-200 p-6"
 			/>
 
 			{/* Screen reader status */}
