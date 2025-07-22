@@ -146,7 +146,7 @@ const DynamicCard = memo(({
 					{(heading || subHeading) && (
 						<div>
 							{heading && (
-								<h3 className={`${currentSize.heading} !mt-0 !${currentSize.headingMarginBottom}`}>
+								<h3 className={`${currentSize.heading} !mt-0 ${subHeading ? `!${currentSize.headingMarginBottom}` : '!mb-0'}`}>
 									{heading}
 								</h3>
 							)}

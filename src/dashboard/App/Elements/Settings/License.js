@@ -128,7 +128,7 @@ const LicenseForm = memo(({
 				linkText={__('Get Free Credits', 'wp-ai-blogger')}
 				linkUrl={upgradeLink}
 				colorScheme="blue"
-				size="medium"
+				size="small"
 				ariaLabel={__('Get free credits - opens in new tab', 'wp-ai-blogger')}
 			/>}
 
