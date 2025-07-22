@@ -214,7 +214,7 @@ const AdvancedSettings = memo(() => {
 						subHeading={__('Configure creativity temperature and content safety filters', 'wp-ai-blogger')}
 						colorScheme="orange"
 						size="medium"
-						className="!cursor-pointer"
+						className="!cursor-pointer !bg-transparent [&>*:first-child]:!mb-1"
 						onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
 						aria-expanded={isAdvancedOpen}
 						aria-controls="advanced-settings-content"
