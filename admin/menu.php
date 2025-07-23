@@ -540,13 +540,29 @@ class Menu {
 	 */
 	private function sanitize_metadata_defaults( array $defaults ): array {
 		$sanitized = [];
-		$allowed_keys = [ 'title', 'content', 'excerpt', 'status', 'categories', 'tags', 'author' ];
+		$allowed_keys = [ 
+			'type', 'title', 'content', 'excerpt', 'status', 'keywords', 'postsTarget', 
+			'frequency', 'repeatInterval', 'repeatUnit', 'postType', 'postStatus', 
+			'summaryAsExcerpt', 'author', 'category', 'tag', 'categories', 'tags', 
+			'lastRun', 'lastPostID', 'postsCreated', 'maxWords', 'maxTitleWords', 
+			'postsVisit', 'overrideSitePersona', 'overrideSiteTitle', 
+			'overrideSiteDescription', 'overrideSiteFor'
+		];
 
 		foreach ( $allowed_keys as $key ) {
 			if ( isset( $defaults[ $key ] ) ) {
 				switch ( $key ) {
+					case 'type':
 					case 'title':
 					case 'excerpt':
+					case 'keywords':
+					case 'repeatUnit':
+					case 'postType':
+					case 'postStatus':
+					case 'lastRun':
+					case 'overrideSiteTitle':
+					case 'overrideSiteDescription':
+					case 'overrideSiteFor':
 						$sanitized[ $key ] = sanitize_text_field( $defaults[ $key ] );
 						break;
 					case 'content':
@@ -555,14 +571,32 @@ class Menu {
 					case 'status':
 						$sanitized[ $key ] = sanitize_key( $defaults[ $key ] );
 						break;
+					case 'postsTarget':
+					case 'frequency':
+					case 'repeatInterval':
+					case 'lastPostID':
+					case 'postsCreated':
+					case 'maxWords':
+					case 'maxTitleWords':
+					case 'postsVisit':
+					case 'author':
+						$sanitized[ $key ] = absint( $defaults[ $key ] );
+						break;
+					case 'summaryAsExcerpt':
+					case 'overrideSitePersona':
+						$sanitized[ $key ] = (bool) $defaults[ $key ];
+						break;
+					case 'category':
+					case 'tag':
+						$sanitized[ $key ] = sanitize_text_field( $defaults[ $key ] );
+						break;
 					case 'categories':
 					case 'tags':
 						if ( is_array( $defaults[ $key ] ) ) {
 							$sanitized[ $key ] = array_map( 'absint', $defaults[ $key ] );
+						} else {
+							$sanitized[ $key ] = sanitize_text_field( $defaults[ $key ] );
 						}
-						break;
-					case 'author':
-						$sanitized[ $key ] = absint( $defaults[ $key ] );
 						break;
 				}
 			}

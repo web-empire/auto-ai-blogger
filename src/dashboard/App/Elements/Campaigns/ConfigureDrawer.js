@@ -38,8 +38,7 @@ export default function ConfigureDrawer( props ) {
 	const handleCampaign = ( e ) => {
 		e.preventDefault();
 		setHandlingCampaign( true );
-		const isNewCampaign = configureData?.type === 'new' || drawerData?.type === 'new';
-		updateCampaign( drawerData, isNewCampaign, abortControllerRef );
+		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef );
 	};
 
 	return (
@@ -61,7 +60,7 @@ export default function ConfigureDrawer( props ) {
 												{
 													isViewMode
 														? __( 'Campaign Configuration', 'wp-ai-blogger' )
-														: ( configureData?.type === 'new' || drawerData?.type === 'new' )
+														: ( drawerData.type === 'new' )
 															? __( 'New Campaign', 'wp-ai-blogger' )
 															: __( 'Edit Campaign', 'wp-ai-blogger' )
 												}
@@ -529,7 +528,7 @@ export default function ConfigureDrawer( props ) {
 											disabled={ handlingCampaign }
 											className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
 										>
-											{ ( configureData?.type === 'new' || drawerData?.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+											{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
 										</button>
 									) }
 								</div>

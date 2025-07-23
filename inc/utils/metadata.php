@@ -59,6 +59,14 @@ class Metadata {
 					'default' => '',
 					'type'    => 'number',
 				],
+				'repeatInterval'          => [
+					'default' => 1,
+					'type'    => 'number',
+				],
+				'repeatUnit'              => [
+					'default' => 'day',
+					'type'    => 'string',
+				],
 				'postType'                => [
 					'default' => 'post',
 					'type'    => 'string',
