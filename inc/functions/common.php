@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WPAIBlogger\Inc\Utils\Metadata;
 use WPAIBlogger\Inc\Utils\Settings;
+use WPAIBlogger\Inc\Utils\Helper;
 
 /**
  * Get user details.
@@ -466,6 +467,7 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
 /**
  * Get API response in order to create blog post.
  *
+ * @param string $campaign_title Campaign title.
  * @param string $keywords         Keywords.
  * @param int    $max_title_words  Max title words.
  * @param int    $max_content_words Max content words.
@@ -473,13 +475,24 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @since x.x.x
  * @return array|WP_Error
  */
-function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details ) {
+function wpaib_get_post_creation_api_response( $campaign_title, $keywords, $max_title_words, $max_content_words, $site_persona_details ) {
+	if ( is_string( $keywords ) ) {
+		$keywords = explode( ',', $keywords );
+		$keywords = array_map( 'trim', $keywords );
+	}
+
+	$license_key = Helper::get_option( 'license', '' );
+	if ( empty( $license_key ) ) {
+		return new \WP_Error( 'license_key_missing', __( 'License key is missing. Please activate the plugin.', 'wp-ai-blogger' ) );
+	}
+
 	$core_details = [
 		'keywords'      => $keywords,
 		'maxTitleWords' => $max_title_words,
 		'maxWords'      => $max_content_words,
-		'license'       => WP_AI_BLOGGER_PUBLIC_TOKEN,
+		'license'       => $license_key,
 		'site_url'      => get_site_url(),
+		'name'          => $campaign_title,
 	];
 
 	$api_response = wp_safe_remote_post(
@@ -515,13 +528,15 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 	// Decode the response.
 	$api_response = json_decode( wp_remote_retrieve_body( $api_response ), true );
 
+	// @TODO: Update tokens data in DB.
+
 	// Check for errors in the response.
 	if ( isset( $api_response['error'] ) ) {
 		return new \WP_Error( 'api_error', $api_response['error'] );
 	}
 
 	// Check for a valid response.
-	if ( empty( $api_response['title'] ) || empty( $api_response['content'] ) ) {
+	if ( empty( $api_response['post_title'] ) || empty( $api_response['post_content'] ) ) {
 		return new \WP_Error( 'invalid_response', __( 'Empty response from API for title or content.', 'wp-ai-blogger' ) );
 	}
 
@@ -574,6 +589,12 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  * @since x.x.x
  */
 function wpaib_create_blog_post( $campaign_id ) {
+	// Campaign title.
+	$campaign_title = get_the_title( $campaign_id );
+	if ( empty( $campaign_title ) ) {
+		return new \WP_Error( 'invalid_campaign_title', __( 'Campaign title is empty.', 'wp-ai-blogger' ) );
+	}
+
 	// Site persona settings.
 	$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
@@ -593,7 +614,7 @@ function wpaib_create_blog_post( $campaign_id ) {
 	$max_content_words = Metadata::get_campaign_meta( $campaign_id, 'maxWords' );
 
 	// Perform the API call to get the content.
-	$api_response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details );
+	$api_response = wpaib_get_post_creation_api_response( $campaign_title, $keywords, $max_title_words, $max_content_words, $site_persona_details );
 
 	if ( is_wp_error( $api_response ) ) {
 		return $api_response;
