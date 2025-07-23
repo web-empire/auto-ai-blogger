@@ -362,11 +362,11 @@ export default function ConfigureDrawer( props ) {
 																				disabled={ isViewMode }
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( categories ).map( ( [ key, label ] ) => (
-																					<option key={ key } value={ key }>
-																						{ label }
-																					</option>
-																				) ) }
+																				{ categories.map( ( category ) => (
+                                                                                    <option key={ category.id } value={ category.id }>
+                                                                                        { category.name }
+                                                                                    </option>
+                                                                                ) ) }
 																			</select>
 																		</div>
 																	</div>
@@ -384,11 +384,11 @@ export default function ConfigureDrawer( props ) {
 																				disabled={ isViewMode }
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( tags ).map( ( [ key, label ] ) => (
-																					<option key={ key } value={ key }>
-																						{ label }
-																					</option>
-																				) ) }
+																				{ tags.map( ( tag ) => (
+                                                                                    <option key={ tag.id } value={ tag.id }>
+                                                                                        { tag.name }
+                                                                                    </option>
+                                                                                ) ) }
 																			</select>
 																		</div>
 																	</div>
