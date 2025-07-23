@@ -293,11 +293,11 @@ export default function ConfigureDrawer( props ) {
 																	disabled={ isViewMode }
 																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => ( // eslint-disable-line no-unused-vars
-																		<option key={ label } value={ label }>
-																			{ label.charAt( 0 ).toUpperCase() + label.slice( 1 ) } { /* Capitalize first letter */ }
-																		</option>
-																	) ) }
+																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => (
+                                                                        <option key={ type } value={ type }>
+                                                                            { label }
+                                                                        </option>
+                                                                    ) ) }
 																</select>
 															</div>
 														</div>
