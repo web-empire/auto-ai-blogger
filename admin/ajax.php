@@ -344,7 +344,7 @@ class Ajax {
 		$published_posts = get_posts(
 			[
 				'post_type'              => 'any',
-				'post_status'            => 'publish',
+				'post_status'            => 'any',
 				'meta_query'             => [
 					[
 						'key'     => 'wp_aib_campaign_id',
@@ -383,8 +383,8 @@ class Ajax {
 
 		// Get campaign metadata.
 		$campaign_meta = Metadata::get_campaign_data( $campaign_id );
-		$posts_target  = absint( $campaign_meta['postsTarget'] ?? 0 );
-		$posts_created = count( $published_posts );
+		$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
+		$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 
 		// Calculate success rate.
 		$success_rate = $posts_target > 0 ? round( $posts_created / $posts_target * 100 ) : 100;
@@ -444,7 +444,7 @@ class Ajax {
 		}
 
 		$analytics_data = [
-			'publishedPosts' => $posts_created,
+			'publishedPosts' => $posts_created . '/' . $posts_target,
 			'totalViews'     => $total_views,
 			'totalComments'  => $total_comments,
 			'successRate'    => $success_rate,

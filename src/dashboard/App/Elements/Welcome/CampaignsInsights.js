@@ -186,13 +186,13 @@ export default function CampaignsInsights() {
 					>
 						<div className="campaigns-insight-wrap">
 							<div className="insight-inner-wrap">
-								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Total Posts', 'wp-ai-blogger' ) }</div>
+								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Posts Created', 'wp-ai-blogger' ) }</div>
 								<div className="text-base font-semibold text-gray-900 m-0 p-0">{ campaign.postsCreated }</div>
 							</div>
 
 							<div className="insight-inner-wrap">
-								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Total Visits', 'wp-ai-blogger' ) }</div>
-								<div className="text-base font-semibold text-gray-900 m-0 p-0">{ campaign.postsVisit }</div>
+								<div className="m-0 p-0 truncate text-sm font-medium text-gray-500">{ __( 'Posts Target', 'wp-ai-blogger' ) }</div>
+								<div className="text-base font-semibold text-gray-900 m-0 p-0">{ campaign.postsTarget }</div>
 							</div>
 
 							<div className="insight-inner-wrap">
