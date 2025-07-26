@@ -2,6 +2,7 @@
 // Import components directly to avoid double lazy loading
 import CampaignsInsights from './CampaignsInsights';
 import PostIdeas from './PostIdeas/PostIdeas';
+import TokenNotification from './TokenNotification';
 
 // Component metadata for better organization
 export const welcomeComponents = {
@@ -23,6 +24,7 @@ export const welcomeComponents = {
 export {
 	CampaignsInsights,
 	PostIdeas,
+	TokenNotification,
 };
 
 // Export component list for dynamic rendering
