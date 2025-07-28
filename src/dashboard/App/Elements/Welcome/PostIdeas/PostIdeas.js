@@ -374,8 +374,8 @@ export default function PostIdeas() {
 				}
 
 				// Validate that we have the required data
-				if ( ! response.data || ! response.data.post_id ) {
-					console.error( __( 'Post created but no post ID received.', 'wp-ai-blogger' ) );
+				if ( ! response.data || ! response.data.post_id || ! response.data.edit_link ) {
+					console.error( __( 'Post created but no post ID or edit link received.', 'wp-ai-blogger' ) );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
@@ -386,8 +386,8 @@ export default function PostIdeas() {
 					return;
 				}
 
-				// Build the edit link
-				const editUrl = editPostLink.replace( '{{POST_ID}}', response.data.post_id );
+				// Use the edit link provided by the backend
+				const editUrl = response.data.edit_link;
 
 				// Update button to "Open Post"
 				e.target.dataset.type = 'open-post';
