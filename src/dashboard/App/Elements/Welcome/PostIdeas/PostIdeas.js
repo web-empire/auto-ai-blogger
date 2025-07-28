@@ -42,6 +42,7 @@ export default function PostIdeas() {
 	const [ loading, setLoading ] = useState( true ); // Always start with loading true
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
+	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -301,6 +302,19 @@ export default function PostIdeas() {
 			return;
 		}
 
+		// Prevent multiple clicks for the same post
+		if ( creatingPosts.has( title ) ) {
+			return;
+		}
+
+		// Add this post to the creating set
+		setCreatingPosts( prev => new Set( prev ).add( title ) );
+
+		// Update button to show loading state
+		const originalContent = e.target.innerHTML;
+		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating...', 'wp-ai-blogger' ) }`;
+		e.target.style.pointerEvents = 'none';
+
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
 		formData.append( 'security', adminNonce );
@@ -332,14 +346,51 @@ export default function PostIdeas() {
 			body: formData,
 		} )
 			.then( ( response ) => {
-				if ( ! response.success ) {
-					console.error( __( 'Failed to create post.', 'wp-ai-blogger' ) );
+				// Check if response exists and has the expected structure
+				if ( ! response || typeof response !== 'object' ) {
+					console.error( __( 'Invalid response received from server.', 'wp-ai-blogger' ) );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
+				// Check if the request was successful
+				if ( ! response.success ) {
+					const errorMessage = response.data?.message || __( 'Failed to create post.', 'wp-ai-blogger' );
+					console.error( __( 'Failed to create post:', 'wp-ai-blogger' ), errorMessage );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
+					return;
+				}
+
+				// Validate that we have the required data
+				if ( ! response.data || ! response.data.post_id ) {
+					console.error( __( 'Post created but no post ID received.', 'wp-ai-blogger' ) );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
+					return;
+				}
+
+				// Success - update the UI and show success notification
 				e.target.dataset.type = 'edit';
 				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
 				e.target.href = editPostLink.replace( '{{POST_ID}}', response.data.post_id );
+				e.target.style.pointerEvents = 'auto';
 				window.open( e.target.href, '_blank' );
 
 				dispatch( {
@@ -347,7 +398,26 @@ export default function PostIdeas() {
 					payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
 				} );
 			} )
-			.catch( () => {} );
+			.catch( ( error ) => {
+				// Handle network errors or other exceptions
+				const errorMessage = error?.message || __( 'Network error occurred while creating post.', 'wp-ai-blogger' );
+				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), error );
+				dispatch( {
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+				} );
+				// Reset button state
+				e.target.innerHTML = originalContent;
+				e.target.style.pointerEvents = 'auto';
+			} )
+			.finally( () => {
+				// Remove this post from the creating set
+				setCreatingPosts( prev => {
+					const newSet = new Set( prev );
+					newSet.delete( title );
+					return newSet;
+				} );
+			} );
 	};
 
 	return (

@@ -868,8 +868,8 @@ class Ajax {
 			if ( empty( $post_content ) && ! empty( $post_title ) ) {
 				$generated_content = $this->generate_content_from_title_api( $post_title, $post_data );
 				if ( is_wp_error( $generated_content ) ) {
-					wp_send_json_error( [ 
-						'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $generated_content->get_error_message() 
+					wp_send_json_error( [
+						'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $generated_content->get_error_message()
 					] );
 					return;
 				}
@@ -923,8 +923,12 @@ class Ajax {
 			);
 
 			if ( is_wp_error( $post_id ) || ! $post_id ) {
+				$error_message = is_wp_error( $post_id )
+					? $post_id->get_error_message()
+					: __( 'Failed to create post - unknown error occurred.', 'wp-ai-blogger' );
+
 				wp_send_json_error( [
-					'message' => $this->get_error_msg( 'default' ),
+					'message' => $error_message,
 					'details' => is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Failed to create post'
 				] );
 				return;
@@ -939,7 +943,10 @@ class Ajax {
 			] );
 
 		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+			error_log( 'WP AI Blogger: Exception in wpaib_create_post - ' . $e->getMessage() );
+			wp_send_json_error( [
+				'message' => __( 'An unexpected error occurred while creating the post. Please try again.', 'wp-ai-blogger' )
+			] );
 		}
 	}
 
@@ -1077,13 +1084,13 @@ class Ajax {
 			$api_data['temperature'] = isset( $post_data['temperature'] ) ? floatval( $post_data['temperature'] ) : 0.7;
 
 			// Safety settings with fallback values
-			$safety_settings = [ 
-				'harassment' => 1, 
-				'hate' => 1, 
-				'sexually_explicit' => 2, 
-				'dangerous_content' => 1 
+			$safety_settings = [
+				'harassment' => 1,
+				'hate' => 1,
+				'sexually_explicit' => 2,
+				'dangerous_content' => 1
 			];
-			
+
 			foreach ( $safety_settings as $setting => $default_value ) {
 				if ( isset( $post_data[ $setting ] ) ) {
 					$api_data[ $setting ] = absint( $post_data[ $setting ] );
@@ -1094,7 +1101,7 @@ class Ajax {
 
 			// Make API request
 			$api_url = 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title';
-			
+
 			$response = wp_remote_post( $api_url, [
 				'timeout' => 90,
 				'headers' => [
@@ -1138,14 +1145,14 @@ class Ajax {
 			}
 
 			// Extract generated content
-			if ( ! isset( $decoded_response['data']['post_content'] ) ) {
+			if ( ! isset( $decoded_response['post_content'] ) ) {
 				return new \WP_Error(
 					'api_no_content',
 					__( 'API did not return generated content', 'wp-ai-blogger' )
 				);
 			}
 
-			$generated_content = $decoded_response['data']['post_content'];
+			$generated_content = $decoded_response['post_content'];
 
 			// Validate content length
 			if ( empty( $generated_content ) || strlen( $generated_content ) < 50 ) {
