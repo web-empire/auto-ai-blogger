@@ -297,7 +297,7 @@ export default function PostIdeas() {
 	const wpaib_create_post = ( e, title ) => {
 		e.preventDefault();
 
-		if ( e.target.dataset.type === 'edit' ) {
+		if ( e.target.dataset.type === 'edit' || e.target.dataset.type === 'open-post' ) {
 			window.open( e.target.href, '_blank' );
 			return;
 		}
@@ -305,18 +305,6 @@ export default function PostIdeas() {
 		// Prevent multiple clicks for the same post
 		if ( creatingPosts.has( title ) ) {
 			return;
-		}
-
-		// Open a new window immediately to avoid popup blockers
-		// We'll navigate it to the correct URL once we get the post ID
-		let newWindow = null;
-		try {
-			newWindow = window.open( 'about:blank', '_blank' );
-			if ( ! newWindow ) {
-				console.warn( 'Popup blocked by browser' );
-			}
-		} catch ( error ) {
-			console.warn( 'Failed to open window:', error );
 		}
 
 		// Add this post to the creating set
@@ -365,12 +353,9 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
 					} );
-					// Reset button state and close window
+					// Reset button state
 					e.target.innerHTML = originalContent;
 					e.target.style.pointerEvents = 'auto';
-					if ( newWindow && ! newWindow.closed ) {
-						newWindow.close();
-					}
 					return;
 				}
 
@@ -382,12 +367,9 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 					} );
-					// Reset button state and close window
+					// Reset button state
 					e.target.innerHTML = originalContent;
 					e.target.style.pointerEvents = 'auto';
-					if ( newWindow && ! newWindow.closed ) {
-						newWindow.close();
-					}
 					return;
 				}
 
@@ -398,57 +380,51 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
 					} );
-					// Reset button state and close window
+					// Reset button state
 					e.target.innerHTML = originalContent;
 					e.target.style.pointerEvents = 'auto';
-					if ( newWindow && ! newWindow.closed ) {
-						newWindow.close();
-					}
 					return;
 				}
 
-				// Success - update the UI and show success notification
-				e.target.dataset.type = 'edit';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
-				e.target.style.pointerEvents = 'auto';
-
 				// Build the edit link
 				const editUrl = editPostLink.replace( '{{POST_ID}}', response.data.post_id );
-				e.target.href = editUrl;
 
-				// Navigate the opened window to the edit URL
-				if ( newWindow && ! newWindow.closed ) {
-					try {
-						newWindow.location.href = editUrl;
-						dispatch( {
-							type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-							payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
-						} );
-					} catch ( navigationError ) {
-						console.warn( 'Failed to navigate window:', navigationError );
-						newWindow.close();
-						// Fallback: try to open a new window
-						window.open( editUrl, '_blank' );
-						dispatch( {
-							type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-							payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
-						} );
+				// Try to open the post in a new tab
+				let popupOpened = false;
+				try {
+					const newWindow = window.open( editUrl, '_blank' );
+					if ( newWindow && newWindow.focus ) {
+						newWindow.focus();
+						popupOpened = true;
 					}
+				} catch ( error ) {
+					console.warn( 'Failed to open popup:', error );
+				}
+
+				// Update button based on whether popup was successful
+				if ( popupOpened ) {
+					// Success - popup opened
+					e.target.dataset.type = 'edit';
+					e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a .5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
+					e.target.href = editUrl;
+					e.target.style.pointerEvents = 'auto';
+
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
+					} );
 				} else {
-					// Window was blocked or closed, try opening a new one
-					try {
-						window.open( editUrl, '_blank' );
-						dispatch( {
-							type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-							payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
-						} );
-					} catch ( popupError ) {
-						console.warn( 'Popup blocked:', popupError );
-						dispatch( {
-							type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-							payload: __( 'Post created! Click the Edit button to open it (popup blocked).', 'wp-ai-blogger' ),
-						} );
-					}
+					// Popup was blocked - show "Open Post" button
+					e.target.dataset.type = 'open-post';
+					e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
+					e.target.href = editUrl;
+					e.target.style.pointerEvents = 'auto';
+					e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
+
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: __( 'Post created! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
+					} );
 				}
 			} )
 			.catch( ( error ) => {
@@ -459,12 +435,9 @@ export default function PostIdeas() {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 				} );
-				// Reset button state and close window
+				// Reset button state
 				e.target.innerHTML = originalContent;
 				e.target.style.pointerEvents = 'auto';
-				if ( newWindow && ! newWindow.closed ) {
-					newWindow.close();
-				}
 			} )
 			.finally( () => {
 				// Remove this post from the creating set
