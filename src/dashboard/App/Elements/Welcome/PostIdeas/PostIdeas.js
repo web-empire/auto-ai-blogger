@@ -312,6 +312,16 @@ export default function PostIdeas() {
 			post_content: '',
 			excerpt: '',
 			metadata: JSON.stringify( { wp_aib_reference: 1 } ),
+			// Include license and site information for content generation
+			license: license,
+			site_title: siteTitle,
+			site_purpose: siteFor,
+			site_description: siteDescription,
+			temperature: temperature,
+			harassment: harassment,
+			hate: hate,
+			sexually_explicit: sexuallyExplicit,
+			dangerous_content: dangerousContent,
 		};
 
 		formData.append( 'post_data', JSON.stringify( postData ) );

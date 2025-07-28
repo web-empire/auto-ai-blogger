@@ -861,8 +861,23 @@ class Ajax {
 				return;
 			}
 
+
+
+			// If no content provided, generate content from title via API
+			$post_content = $post_data['post_content'] ?? '';
+			if ( empty( $post_content ) && ! empty( $post_title ) ) {
+				$generated_content = $this->generate_content_from_title_api( $post_title, $post_data );
+				if ( is_wp_error( $generated_content ) ) {
+					wp_send_json_error( [ 
+						'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $generated_content->get_error_message() 
+					] );
+					return;
+				}
+				$post_content = $generated_content;
+			}
+
 			// Validate and sanitize content
-			$post_content = wp_kses_post( $post_data['post_content'] ?? '' );
+			$post_content = wp_kses_post( $post_content );
 			if ( strlen( $post_content ) > 100000 ) { // 100KB limit
 				wp_send_json_error( [ 'message' => __( 'Post content is too long.', 'wp-ai-blogger' ) ] );
 				return;
@@ -1023,6 +1038,130 @@ class Ajax {
 				'message' => $this->get_error_msg( 'default' ),
 				'error' => 'Exception occurred during campaign execution'
 			] );
+		}
+	}
+
+	/**
+	 * Generate content from title using the API.
+	 *
+	 * @param string $title The post title.
+	 * @param array  $post_data Additional post data.
+	 * @return string|\WP_Error Generated content or error.
+	 * @since 2.0.0
+	 */
+	private function generate_content_from_title_api( $title, $post_data = [] ) {
+		try {
+			// Prepare API request data
+			$api_data = [
+				'title' => $title,
+			];
+
+			// Add optional parameters if they exist in post_data with fallback values
+			if ( ! empty( $post_data['license'] ) ) {
+				$api_data['license'] = sanitize_text_field( $post_data['license'] );
+			}
+
+			if ( ! empty( $post_data['site_title'] ) ) {
+				$api_data['site_title'] = sanitize_text_field( $post_data['site_title'] );
+			}
+
+			if ( ! empty( $post_data['site_purpose'] ) ) {
+				$api_data['site_purpose'] = sanitize_text_field( $post_data['site_purpose'] );
+			}
+
+			if ( ! empty( $post_data['site_description'] ) ) {
+				$api_data['site_description'] = sanitize_text_field( $post_data['site_description'] );
+			}
+
+			// Temperature with fallback to 0.7
+			$api_data['temperature'] = isset( $post_data['temperature'] ) ? floatval( $post_data['temperature'] ) : 0.7;
+
+			// Safety settings with fallback values
+			$safety_settings = [ 
+				'harassment' => 1, 
+				'hate' => 1, 
+				'sexually_explicit' => 2, 
+				'dangerous_content' => 1 
+			];
+			
+			foreach ( $safety_settings as $setting => $default_value ) {
+				if ( isset( $post_data[ $setting ] ) ) {
+					$api_data[ $setting ] = absint( $post_data[ $setting ] );
+				} else {
+					$api_data[ $setting ] = $default_value;
+				}
+			}
+
+			// Make API request
+			$api_url = 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title';
+			
+			$response = wp_remote_post( $api_url, [
+				'timeout' => 90,
+				'headers' => [
+					'Content-Type' => 'application/json',
+					'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+				],
+				'body' => wp_json_encode( $api_data ),
+			] );
+
+			// Check for HTTP errors
+			if ( is_wp_error( $response ) ) {
+				return new \WP_Error(
+					'api_request_failed',
+					__( 'Failed to connect to content generation API: ', 'wp-ai-blogger' ) . $response->get_error_message()
+				);
+			}
+
+			$http_code = wp_remote_retrieve_response_code( $response );
+			if ( $http_code !== 200 ) {
+				return new \WP_Error(
+					'api_http_error',
+					sprintf( __( 'API returned HTTP error %d', 'wp-ai-blogger' ), $http_code )
+				);
+			}
+
+			// Parse response
+			$body = wp_remote_retrieve_body( $response );
+			$decoded_response = json_decode( $body, true );
+
+			if ( json_last_error() !== JSON_ERROR_NONE ) {
+				return new \WP_Error(
+					'api_json_error',
+					__( 'Invalid JSON response from API', 'wp-ai-blogger' )
+				);
+			}
+
+			// Check API response status
+			if ( isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
+				$error_message = $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' );
+				return new \WP_Error( 'api_error', $error_message );
+			}
+
+			// Extract generated content
+			if ( ! isset( $decoded_response['data']['post_content'] ) ) {
+				return new \WP_Error(
+					'api_no_content',
+					__( 'API did not return generated content', 'wp-ai-blogger' )
+				);
+			}
+
+			$generated_content = $decoded_response['data']['post_content'];
+
+			// Validate content length
+			if ( empty( $generated_content ) || strlen( $generated_content ) < 50 ) {
+				return new \WP_Error(
+					'api_content_too_short',
+					__( 'Generated content is too short or empty', 'wp-ai-blogger' )
+				);
+			}
+
+			return $generated_content;
+
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'api_exception',
+				__( 'Exception occurred during content generation: ', 'wp-ai-blogger' ) . $e->getMessage()
+			);
 		}
 	}
 }
