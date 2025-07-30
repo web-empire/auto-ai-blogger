@@ -316,11 +316,6 @@ export default function PostIdeas() {
 	const wpaib_create_post = ( e, title ) => {
 		e.preventDefault();
 
-		if ( e.target.dataset.type === 'open-post' ) {
-			window.open( e.target.href, '_blank' );
-			return;
-		}
-
 		// Prevent multiple clicks for the same post
 		if ( creatingPosts.has( title ) ) {
 			return;
@@ -418,12 +413,9 @@ export default function PostIdeas() {
 					},
 				} );
 
-				// Update button to "Open Post"
-				e.target.dataset.type = 'open-post';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
-				e.target.href = editUrl;
+				// Reset button state - React will handle the button update via state
+				e.target.innerHTML = originalContent;
 				e.target.style.pointerEvents = 'auto';
-				e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
@@ -569,11 +561,9 @@ export default function PostIdeas() {
 																	) : (
 																		// Show "Create" button for uncreated posts
 																		<a
-																			target="_blank"
 																			href="#"
 																			onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
 																			className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-																			data-type="create"
 																		>
 																			<Plus className="w-5 h-5" />
 																			{ __( 'Create', 'wp-ai-blogger' ) }
