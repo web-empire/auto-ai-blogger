@@ -434,7 +434,7 @@ export default function PostIdeas() {
 						variant="primary"
 						size="default"
 						icon={<Crown className="w-4 h-4" />}
-						className="bg-indigo-600 hover:bg-indigo-500 text-white"
+						className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
 						onClick={ proAvailable ? handleRefresh : undefined }
 						disabled={ ! proAvailable }
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions', 'wp-ai-blogger' ) }
