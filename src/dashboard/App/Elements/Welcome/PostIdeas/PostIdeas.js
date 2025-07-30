@@ -307,11 +307,6 @@ export default function PostIdeas() {
 		// Add this post to the creating set
 		setCreatingPosts( prev => new Set( prev ).add( title ) );
 
-		// Update button to show loading state
-		const originalContent = e.target.innerHTML;
-		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating...', 'wp-ai-blogger' ) }`;
-		e.target.style.pointerEvents = 'none';
-
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
 		formData.append( 'security', adminNonce );
@@ -350,9 +345,6 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -364,9 +356,6 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -377,25 +366,18 @@ export default function PostIdeas() {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
 
-				// Update button to "Open Post"
-				e.target.dataset.type = 'open-post';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
-				e.target.href = editUrl;
-				e.target.style.pointerEvents = 'auto';
-				e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
+				// Open the post in a new tab
+				window.open( editUrl, '_blank' );
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Post created successfully! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
+					payload: __( 'Post created successfully! Opening in new tab.', 'wp-ai-blogger' ),
 				} );
 			} )
 			.catch( ( error ) => {
@@ -406,9 +388,6 @@ export default function PostIdeas() {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 				} );
-				// Reset button state
-				e.target.innerHTML = originalContent;
-				e.target.style.pointerEvents = 'auto';
 			} )
 			.finally( () => {
 				// Remove this post from the creating set
@@ -502,16 +481,22 @@ export default function PostIdeas() {
 														</div>
 													</td>
 													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-														<a
-															target="_blank"
-															href="#"
-															onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-															className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-															data-type="create"
-														>
-															<Plus className="w-5 h-5" />
-															{ __( 'Create', 'wp-ai-blogger' ) }
-														</a>
+														{ creatingPosts.has( postTitle ) ? (
+															<div className="flex items-center gap-2">
+																<div className="w-5 h-5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+																<span className="text-gray-600">{ __( 'Creating...', 'wp-ai-blogger' ) }</span>
+															</div>
+														) : (
+															<a
+																href="#"
+																onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+																className="text-indigo-600 hover:text-indigo-900 inline-flex items-center gap-x-1 cursor-pointer"
+																data-type="create"
+															>
+																<Plus className="w-5 h-5" />
+																{ __( 'Create', 'wp-ai-blogger' ) }
+															</a>
+														) }
 													</td>
 												</tr>
 											) ) }
