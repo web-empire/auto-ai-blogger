@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -40,6 +40,7 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
+	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -427,25 +428,40 @@ export default function PostIdeas() {
 					<h1 className="text-base font-semibold text-gray-900"> { __( 'Blog Post Suggestions', 'wp-ai-blogger' ) } </h1>
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
-						{ ! proAvailable && (
-							<span className="block mt-1 text-amber-600 font-medium">
-								{ __( '⚡ Free users are limited to 5 post suggestions. Upgrade for unlimited ideas!', 'wp-ai-blogger' ) }
-							</span>
-						) }
 					</p>
 				</div>
-				{ ! proAvailable && (
-					<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-						<ProButton
-							variant="primary"
-							size="default"
-							icon={<MoveRight className="w-4 h-4" />}
-							className="shadow-lg border-2 border-amber-400 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
+				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
+					<span
+						className="inline-flex items-center text-xs font-medium text-indigo-700 relative"
+						onMouseEnter={ () => setShowTooltip( true ) }
+						onMouseLeave={ () => setShowTooltip( false ) }
+					>
+						{ showTooltip && (
+							<div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mt-2 whitespace-nowrap">
+								{ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Free users are limited to 5 post suggestions.', 'wp-ai-blogger' ) }
+							</div>
+						) }
+						<button
+							type="button"
+							className={`rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none flex items-center gap-x-1 ${
+								proAvailable
+									? 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600 cursor-pointer'
+									: 'bg-gray-400 text-gray-200 cursor-not-allowed'
+							}`}
+							onClick={ proAvailable ? handleRefresh : undefined }
+							disabled={ ! proAvailable }
 						>
-							{ __( 'Get Unlimited Post Suggestions', 'wp-ai-blogger' ) }
-						</ProButton>
-					</div>
-				) }
+							{
+								proAvailable ? (
+									<RotateCw className="w-4 h-4" />
+								) : (
+									<Crown className="w-4 h-4" />
+								)
+							}
+							{ __( 'Refresh', 'wp-ai-blogger' ) }
+						</button>
+					</span>
+				</div>
 			</div>
 
 			<div className="mt-6 flow-root">
