@@ -109,6 +109,27 @@ const globalDataReducer = ( state = {}, action ) => {
 
 			return { ...state, postIdeas: stringValue };
 		},
+		UPDATE_CREATED_POST_SESSION: () => {
+			// Update session tracking for created posts
+			// Payload should be an object with { title, postId, editUrl }
+			if ( ! action.payload || ! action.payload.title ) {
+				console.warn( 'UPDATE_CREATED_POST_SESSION: Invalid payload', action.payload );
+				return state;
+			}
+
+			const { title, postId, editUrl } = action.payload;
+			return {
+				...state,
+				createdPostsSession: {
+					...state.createdPostsSession,
+					[ title ]: {
+						postId: Number( postId ) || 0,
+						editUrl: String( editUrl || '' ),
+						createdAt: Date.now()
+					}
+				}
+			};
+		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
 		UPDATE_LICENSE_STATUS: () => ( { ...state, license_status: String( action.payload || 'inactive' ) } ),

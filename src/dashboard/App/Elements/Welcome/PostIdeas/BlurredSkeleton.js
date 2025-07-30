@@ -9,7 +9,16 @@ const BlurredSkeletonRow = memo(({ index, showLockIcon }) => (
 		role="row"
 		aria-label={__(`Created post idea ${index + 1}`, 'wp-ai-blogger')}
 	>
-		{/* Overlay for additional blur effect */}
+		{/* Lock icon overlay - positioned to center across entire row */}
+		{showLockIcon && (
+			<div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+				<div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-gray-200">
+					<Lock className="h-6 w-6 text-gray-600" />
+				</div>
+			</div>
+		)}
+
+		{/* First column */}
 		<td className="py-4 pl-4 pr-3 text-sm sm:pl-6 relative">
 			<div className="flex items-start gap-3">
 				{/* Blurred content placeholder */}
@@ -24,17 +33,9 @@ const BlurredSkeletonRow = memo(({ index, showLockIcon }) => (
 					/>
 				</div>
 			</div>
-
-			{/* Lock icon overlay - only show on first blurred row */}
-			{showLockIcon && (
-				<div className="absolute inset-0 flex items-center justify-center">
-					<div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200">
-						<Lock className="h-5 w-5 text-gray-600" />
-					</div>
-				</div>
-			)}
 		</td>
 
+		{/* Second column */}
 		<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6 relative">
 			<div className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 bg-gray-200">
 				<div className="w-4 h-4 bg-gray-400 rounded" />

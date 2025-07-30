@@ -37,6 +37,7 @@ export default function PostIdeas() {
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
 	const editPostLink = useSelector( ( state ) => state.editPostLink );
+	const createdPostsSession = useSelector( ( state ) => state.createdPostsSession || {} );
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
@@ -53,6 +54,16 @@ export default function PostIdeas() {
 	// Calculate available and created counts
 	const availableIdeasCount = postIdeasArr.length;
 	const createdIdeasCount = Math.max( 0, TOTAL_ROWS - availableIdeasCount );
+
+	// Helper function to check if a post has been created for this title
+	const getCreatedPostInfo = ( title ) => {
+		return createdPostsSession[ title ] || null;
+	};
+
+	// Helper function to check if a post title has been created
+	const isPostCreated = ( title ) => {
+		return !! createdPostsSession[ title ];
+	};
 
 	const fetchPostIdeas = useCallback( async () => {
 		setLoading( true );
@@ -397,6 +408,16 @@ export default function PostIdeas() {
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
 
+				// Store the created post info in Redux session state
+				dispatch( {
+					type: 'UPDATE_CREATED_POST_SESSION',
+					payload: {
+						title: title,
+						postId: response.data.post_id,
+						editUrl: editUrl,
+					},
+				} );
+
 				// Update button to "Open Post"
 				e.target.dataset.type = 'open-post';
 				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
@@ -515,30 +536,53 @@ export default function PostIdeas() {
 											{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 												<>
 													{/* Show available ideas - for free users, limit to what fits with created ideas */}
-													{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : Math.min( postIdeasArr.length, TOTAL_ROWS ) ).map( ( postTitle, index ) => (
-														<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
-															<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-																<div className="font-medium">
-																	<TrimWordsContent
-																		content={ postTitle || '' }
-																		count={ 120 }
-																	/>
-																</div>
-															</td>
-															<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-																<a
-																	target="_blank"
-																	href="#"
-																	onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-																	className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-																	data-type="create"
-																>
-																	<Plus className="w-5 h-5" />
-																	{ __( 'Create', 'wp-ai-blogger' ) }
-																</a>
-															</td>
-														</tr>
-													) ) }
+													{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : Math.min( postIdeasArr.length, TOTAL_ROWS ) ).map( ( postTitle, index ) => {
+														const createdPostInfo = getCreatedPostInfo( postTitle );
+														const isCreated = isPostCreated( postTitle );
+
+														return (
+															<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
+																<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
+																	<div className="font-medium">
+																		<TrimWordsContent
+																			content={ postTitle || '' }
+																			count={ 120 }
+																		/>
+																	</div>
+																</td>
+																<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
+																	{ isCreated ? (
+																		// Show "Open Post" button for created posts
+																		<a
+																			target="_blank"
+																			href={ createdPostInfo.editUrl }
+																			className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold"
+																			rel="noopener noreferrer"
+																		>
+																			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link w-5 h-5">
+																				<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+																				<polyline points="15,3 21,3 21,9"/>
+																				<line x1="10" y1="14" x2="21" y2="3"/>
+																			</svg>
+																			{ __( 'Open Post', 'wp-ai-blogger' ) }
+																		</a>
+																	) : (
+																		// Show "Create" button for uncreated posts
+																		<a
+																			target="_blank"
+																			href="#"
+																			onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+																			className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
+																			data-type="create"
+																		>
+																			<Plus className="w-5 h-5" />
+																			{ __( 'Create', 'wp-ai-blogger' ) }
+																		</a>
+																	) }
+																</td>
+															</tr>
+														);
+													} ) }
 
 													{/* Show blurred skeleton rows for created posts */}
 													{ createdIdeasCount > 0 && (
