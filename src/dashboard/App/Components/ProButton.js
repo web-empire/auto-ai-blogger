@@ -16,6 +16,7 @@ const ProButton = forwardRef( ( {
 	loading = false,
 	icon = null,
 	tooltip = null,
+	tooltipPosition = 'top',
 	children = __( 'Upgrade to Pro', 'wp-ai-blogger' ),
 	onClick,
 	'aria-label': ariaLabel,
@@ -138,7 +139,7 @@ const ProButton = forwardRef( ( {
 		return (
 			<>
 				{ icon && (
-					<span className="mr-2" aria-hidden="true">
+					<span className="mr-2 flex items-center" aria-hidden="true">
 						{ icon }
 					</span>
 				) }
@@ -147,10 +148,20 @@ const ProButton = forwardRef( ( {
 		);
 	}, [ loading, icon, children ] );
 
+	// Tooltip position styles
+	const tooltipPositions = {
+		top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
+		bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
+		left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
+		right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
+	};
+
+	const tooltipClasses = `absolute ${tooltipPositions[tooltipPosition] || tooltipPositions.top} bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
+
 	return (
 		<div className="relative inline-block">
 			{ tooltip && showTooltip && (
-				<div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mb-2 max-w-xs text-center whitespace-nowrap z-50">
+				<div className={tooltipClasses}>
 					{ tooltip }
 				</div>
 			) }
