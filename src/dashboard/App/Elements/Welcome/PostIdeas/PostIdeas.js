@@ -40,7 +40,6 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
-	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -431,36 +430,17 @@ export default function PostIdeas() {
 					</p>
 				</div>
 				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
-					<span
-						className="inline-flex items-center text-xs font-medium text-indigo-700 relative"
-						onMouseEnter={ () => setShowTooltip( true ) }
-						onMouseLeave={ () => setShowTooltip( false ) }
+					<ProButton
+						variant="primary"
+						size="default"
+						icon={<Crown className="w-4 h-4" />}
+						className="bg-indigo-600 hover:bg-indigo-500 text-white"
+						onClick={ proAvailable ? handleRefresh : undefined }
+						disabled={ ! proAvailable }
+						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions', 'wp-ai-blogger' ) }
 					>
-						{ showTooltip && (
-							<div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mt-2 whitespace-nowrap">
-								{ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Free users are limited to 5 post suggestions.', 'wp-ai-blogger' ) }
-							</div>
-						) }
-						<button
-							type="button"
-							className={`rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none flex items-center gap-x-1 ${
-								proAvailable
-									? 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600 cursor-pointer'
-									: 'bg-gray-400 text-gray-200 cursor-not-allowed'
-							}`}
-							onClick={ proAvailable ? handleRefresh : undefined }
-							disabled={ ! proAvailable }
-						>
-							{
-								proAvailable ? (
-									<RotateCw className="w-4 h-4" />
-								) : (
-									<Crown className="w-4 h-4" />
-								)
-							}
-							{ __( 'Refresh', 'wp-ai-blogger' ) }
-						</button>
-					</span>
+						{ __( 'Refresh', 'wp-ai-blogger' ) }
+					</ProButton>
 				</div>
 			</div>
 
