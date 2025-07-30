@@ -476,6 +476,13 @@ export default function PostIdeas() {
 										}>
 											<Skeleton />
 										</Suspense>
+									) : postIdeasFromRedux === '-1' ? (
+										// Special case for when postIdeasFromRedux is "-1"
+										<tr>
+											<td colSpan="2" className="px-6 py-4 text-center text-amber-600 font-medium">
+												{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'wp-ai-blogger' ) }
+											</td>
+										</tr>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										<>
 											{/* Limit to 5 ideas for free users, unlimited for pro users */}
@@ -536,22 +543,7 @@ export default function PostIdeas() {
 								<tfoot className="bg-gray-50">
 									<tr>
 										<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
-											{ postIdeasFromRedux === '-1' ? (
-												// Special footer for when postIdeasFromRedux is "-1"
-												<div className="flex flex-col items-center space-y-2">
-													<div className="text-amber-600 font-medium text-base">
-														{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'wp-ai-blogger' ) }
-													</div>
-													<ProButton
-														variant="primary"
-														size="default"
-														icon={<MoveRight className="w-5 h-5" />}
-														className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-lg"
-													>
-														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
-													</ProButton>
-												</div>
-											) : ! proAvailable ? (
+											{ ! proAvailable ? (
 												<div className="flex flex-col items-center space-y-2">
 													<ProButton
 														variant="primary"
