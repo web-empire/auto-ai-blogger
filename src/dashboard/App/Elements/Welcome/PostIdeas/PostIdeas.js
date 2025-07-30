@@ -28,14 +28,11 @@ export default function PostIdeas() {
 	const dangerousContent = useSelector( ( state ) => state.dangerousContent );
 	const license = useSelector( ( state ) => state.license );
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
-	const tokenTotal = useSelector( ( state ) => state.tokenTotal );
-	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
 	const proAvailable = useSelector( ( state ) => state.proAvailable );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
-	const editPostLink = useSelector( ( state ) => state.editPostLink );
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
@@ -182,7 +179,7 @@ export default function PostIdeas() {
 
 	useEffect( () => {
 		// Convert string to array for display when postIdeas changes
-		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' ) {
+		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' && postIdeas !== '-1' ) {
 			// Convert string to array by splitting on newlines
 			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
@@ -501,6 +498,13 @@ export default function PostIdeas() {
 										}>
 											<Skeleton />
 										</Suspense>
+									) : postIdeasFromRedux === '-1' ? (
+										// Special case for when postIdeasFromRedux is "-1"
+										<tr>
+											<td colSpan="2" className="px-6 py-4 text-center text-amber-600 font-medium">
+												{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'wp-ai-blogger' ) }
+											</td>
+										</tr>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										<>
 											{/* Limit to 5 ideas for free users, unlimited for pro users */}
@@ -563,9 +567,6 @@ export default function PostIdeas() {
 										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold">
 											{ ! proAvailable ? (
 												<div className="flex flex-col items-center space-y-2">
-													<div className="text-amber-600 font-medium text-sm">
-														{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions!', 'wp-ai-blogger' ) }
-													</div>
 													<ProButton
 														variant="primary"
 														size="default"

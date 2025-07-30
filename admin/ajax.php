@@ -994,9 +994,14 @@ class Ajax {
 
 			// Only update if we actually removed something
 			if ( $found_and_removed ) {
-				// Update post ideas in database (but not in Redux - that stays for UI)
-				$updated_post_ideas_string = implode( "\n", $updated_ideas );
-				\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+				// Check if this was the last post idea
+				if ( empty( $updated_ideas ) ) {
+					// Set to "-1" to indicate post ideas are exhausted
+					\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+				} else {
+					$updated_post_ideas_string = implode( "\n", $updated_ideas );
+					\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+				}
 			}
 
 		} catch ( \Exception $e ) {
