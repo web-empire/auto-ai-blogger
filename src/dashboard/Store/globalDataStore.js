@@ -77,7 +77,6 @@ const getInitialState = () => {
 		dangerousContent: safeParseLocalizedData( wpaib_localized_data.dangerous_content, 'number', 2 ),
 		license: safeParseLocalizedData( wpaib_localized_data.license, 'string', '' ),
 		postIdeas: safeParseLocalizedData( wpaib_localized_data.postIdeas, 'string', '' ),
-		createdPostsSession: {}, // Track created posts in current session
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
