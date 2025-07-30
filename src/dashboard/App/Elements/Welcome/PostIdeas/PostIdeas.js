@@ -440,7 +440,15 @@ export default function PostIdeas() {
 						tooltipPosition="left"
 						iconPosition="left"
 					>
-						{ __( 'Refresh', 'wp-ai-blogger' ) }
+						{ proAvailable ? __( 'Refresh', 'wp-ai-blogger' ) :
+							( postIdeasFromRedux === '-1' ?
+								__( 'Refresh (0/5)', 'wp-ai-blogger' ) :
+								( !postIdeasFromRedux || postIdeasFromRedux.trim() === '' ?
+									__( 'Refresh', 'wp-ai-blogger' ) :
+									__( `Refresh (${Math.min(postIdeasArr.length, 5)}/5)`, 'wp-ai-blogger' )
+								)
+							)
+						}
 					</ProButton>
 				</div>
 			</div>
