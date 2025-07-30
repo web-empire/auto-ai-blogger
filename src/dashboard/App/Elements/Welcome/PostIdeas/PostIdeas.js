@@ -309,7 +309,7 @@ export default function PostIdeas() {
 
 		// Update button to show loading state
 		const originalContent = e.target.innerHTML;
-		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating...', 'wp-ai-blogger' ) }`;
+		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating...', 'wp-ai-blogger' ) }`;
 		e.target.style.pointerEvents = 'none';
 
 		const formData = new window.FormData();
