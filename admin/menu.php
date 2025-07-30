@@ -277,12 +277,6 @@ class Menu {
 			]
 		);
 
-		// Debug logging in development
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'WP AI Blogger License Debug: ' . print_r( $license, true ) );
-			error_log( 'WP AI Blogger Localized Data: ' . print_r( $localized_data, true ) );
-		}
-
 		$handle = 'wp_ai_auto_blogger_admin_scripts';
 		$build_path = WP_AI_BLOGGER_BASE_URL . 'assets/build/';
 		$script_asset_path = WP_AI_BLOGGER_DIR . 'assets/build/blog-app.asset.php';
@@ -540,12 +534,12 @@ class Menu {
 	 */
 	private function sanitize_metadata_defaults( array $defaults ): array {
 		$sanitized = [];
-		$allowed_keys = [ 
-			'type', 'title', 'content', 'excerpt', 'status', 'keywords', 'postsTarget', 
-			'frequency', 'repeatInterval', 'repeatUnit', 'postType', 'postStatus', 
-			'summaryAsExcerpt', 'author', 'category', 'tag', 'categories', 'tags', 
-			'lastRun', 'lastPostID', 'postsCreated', 'maxWords', 'maxTitleWords', 
-			'postsVisit', 'overrideSitePersona', 'overrideSiteTitle', 
+		$allowed_keys = [
+			'type', 'title', 'content', 'excerpt', 'status', 'keywords', 'postsTarget',
+			'frequency', 'repeatInterval', 'repeatUnit', 'postType', 'postStatus',
+			'summaryAsExcerpt', 'author', 'category', 'tag', 'categories', 'tags',
+			'lastRun', 'lastPostID', 'postsCreated', 'maxWords', 'maxTitleWords',
+			'postsVisit', 'overrideSitePersona', 'overrideSiteTitle',
 			'overrideSiteDescription', 'overrideSiteFor'
 		];
 

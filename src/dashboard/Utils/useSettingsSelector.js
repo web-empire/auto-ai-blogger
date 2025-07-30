@@ -3,6 +3,9 @@ import { useMemo } from 'react';
 
 /**
  * Memoized selector for settings to prevent unnecessary re-renders
+ *
+ * @param {Object} state Redux state
+ * @return {Object} Settings object with current values
  */
 const selectSettings = ( state ) => ( {
 	siteTitle: state.siteTitle || '',

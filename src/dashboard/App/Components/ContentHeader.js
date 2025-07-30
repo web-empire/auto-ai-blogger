@@ -2,9 +2,26 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
+import { Save } from 'lucide-react';
 
 /**
  * Enhanced ContentHeader component with improved error handling and UX
+ *
+ * @param {Object}   props                      Component properties
+ * @param {string}   [props.title='']           Header title
+ * @param {string}   [props.tab='']             Current active tab
+ * @param {string}   [props.siteTitle='']       Site title setting
+ * @param {string}   [props.siteFor='']         Site for setting
+ * @param {string}   [props.siteDescription=''] Site description setting
+ * @param {number}   [props.temperature=0.7]    Temperature setting for AI responses
+ * @param {number}   [props.harassment=2]       Harassment content filter setting
+ * @param {number}   [props.hate=2]             Hate content filter setting
+ * @param {number}   [props.sexuallyExplicit=2] Sexually explicit content filter
+ * @param {number}   [props.dangerousContent=2] Dangerous content filter setting
+ * @param {string}   [props.className='']       Additional CSS classes
+ * @param {Function} [props.onSaveStart]        Callback when save starts
+ * @param {Function} [props.onSaveComplete]     Callback when save completes successfully
+ * @param {Function} [props.onSaveError]        Callback when save fails
  */
 const ContentHeader = ( {
 	title = '',
@@ -12,6 +29,7 @@ const ContentHeader = ( {
 	siteTitle = '',
 	siteFor = '',
 	siteDescription = '',
+	icon: Icon = Gift,
 	temperature = 0.7,
 	harassment = 2,
 	hate = 2,
@@ -20,20 +38,14 @@ const ContentHeader = ( {
 	className = '',
 	onSaveStart,
 	onSaveComplete,
-	onSaveError,
-	...otherProps
+	onSaveError
 } ) => {
-	// Don't render for license tab - check this FIRST before any other processing
-	if ( tab === 'license' ) {
-		return null;
-	}
-
 	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
 	const [ processing, setProcessing ] = useState( false );
 	const [ lastSaveTime, setLastSaveTime ] = useState( null );
 
-	// Memoize settings object to prevent unnecessary re-renders
+	// Memoize settings object to prevent unnecessary re-renders.
 	const settingsToSave = useMemo( () => {
 		const settings = {
 			siteTitle,
@@ -46,7 +58,7 @@ const ContentHeader = ( {
 			dangerousContent,
 		};
 
-		// Filter out undefined and null values
+		// Filter out undefined and null values.
 		return Object.entries( settings )
 			.filter( ( [ , value ] ) => value !== undefined && value !== null )
 			.reduce( ( acc, [ key, value ] ) => ( { ...acc, [ key ]: value } ), {} );
@@ -58,7 +70,7 @@ const ContentHeader = ( {
 		harassment,
 		hate,
 		sexuallyExplicit,
-		dangerousContent
+		dangerousContent,
 	] );
 
 	// Enhanced save function with better error handling
@@ -85,11 +97,11 @@ const ContentHeader = ( {
 			for ( const [ key, value ] of Object.entries( settingsToSave ) ) {
 				currentIndex++;
 
-				// Update processing state to show progress
+				// Update processing state to show progress.
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: {
-						message: __( `Saving setting ${ currentIndex } of ${ totalSettings }...`, 'wp-ai-blogger' ),
+						message: __( 'Saving setting', 'wp-ai-blogger' ) + ` ${ currentIndex } ` + __( 'of', 'wp-ai-blogger' ) + ` ${ totalSettings }...`,
 						type: 'info',
 						duration: 0, // Don't auto-hide while saving
 					},
@@ -106,13 +118,13 @@ const ContentHeader = ( {
 			}
 
 			// Check if any settings failed to save
-			const failedSettings = saveResults.filter( result => ! result.success );
+			const failedSettings = saveResults.filter( ( result ) => ! result.success );
 			if ( failedSettings.length > 0 ) {
-				const failedKeys = failedSettings.map( result => result.key ).join( ', ' );
+				const failedKeys = failedSettings.map( ( result ) => result.key ).join( ', ' );
 				throw new Error( `Failed to save some settings: ${ failedKeys }` );
 			}
 
-			// Success feedback
+			// Success feedback.
 			const successMessage = __( 'Settings saved successfully', 'wp-ai-blogger' );
 
 			dispatch( {
@@ -126,7 +138,6 @@ const ContentHeader = ( {
 
 			setLastSaveTime( new Date() );
 			onSaveComplete?.( settingsToSave );
-
 		} catch ( error ) {
 			console.error( 'Failed to save settings:', error );
 
@@ -149,92 +160,75 @@ const ContentHeader = ( {
 
 	// Memoize header title
 	const headerTitle = useMemo( () => {
-		if ( ! title ) return __( 'Settings', 'wp-ai-blogger' );
+		if ( ! title ) {
+			return __( 'Settings', 'wp-ai-blogger' );
+		}
 		return `${ title } ${ __( 'Settings', 'wp-ai-blogger' ) }`;
 	}, [ title ] );
 
-	// Format last save time
-	const formatLastSave = useCallback( () => {
-		if ( ! lastSaveTime ) return null;
-
-		const now = new Date();
-		const diffMinutes = Math.floor( ( now - lastSaveTime ) / ( 1000 * 60 ) );
-
-		if ( diffMinutes < 1 ) {
-			return __( 'Saved just now', 'wp-ai-blogger' );
-		} else if ( diffMinutes < 60 ) {
-			return __( `Saved ${ diffMinutes } minute${ diffMinutes === 1 ? '' : 's' } ago`, 'wp-ai-blogger' );
-		} else {
-			return lastSaveTime.toLocaleTimeString();
-		}
-	}, [ lastSaveTime ] );
-
 	return (
-		<div className={ `flex items-center justify-between pb-4 mb-8 wpaib-content-header ${ className }` }>
-			<div className="flex-1">
-				<h1 className="text-lg font-semibold text-gray-900 p-0 m-0">
-					{ headerTitle }
-				</h1>
-				{ lastSaveTime && (
-					<p className="text-sm text-slate-500 mt-1">
-						{ formatLastSave() }
-					</p>
+		<div className={ `flex items-center w-full justify-between mb-8 wpaib-content-header bg-gradient-to-r from-blue-50 to-indigo-50 border rounded-xl border-b border-gray-200 p-6` }>
+			<div className={ `flex items-center w-full gap-4` }>
+				{ Icon && (
+					<div className={ `p-3 bg-blue-100 rounded-lg flex` }>
+						<Icon className={ `w-6 h-6 text-blue-600` } aria-hidden="true" />
+					</div>
 				) }
-			</div>
 
-			<button
-				type="button"
-				disabled={ processing || Object.keys( settingsToSave ).length === 0 }
-				onClick={ saveSettings }
-				className="cursor-pointer inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-				aria-label={ processing ? __( 'Saving settings...', 'wp-ai-blogger' ) : __( 'Save settings', 'wp-ai-blogger' ) }
-				aria-describedby={ lastSaveTime ? 'last-save-time' : undefined }
-			>
-				{ processing ? (
-					<>
-						<svg
-							className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							aria-hidden="true"
-						>
-							<circle
-								className="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								strokeWidth="4"
-							/>
-							<path
-								className="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							/>
-						</svg>
-						<span>{ __( 'Saving…', 'wp-ai-blogger' ) }</span>
-					</>
-				) : (
-					<>
-						<svg
-							className="w-4 h-4 mr-2"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							aria-hidden="true"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={ 2 }
-								d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-							/>
-						</svg>
-						<span>{ __( 'Save Settings', 'wp-ai-blogger' ) }</span>
-					</>
-				) }
-			</button>
+				<div className="flex justify-between items-center gap-2 w-full">
+					{ headerTitle && (
+						<h1 className={ `text-2xl font-bold text-gray-900 m-0 p-0` }>
+							{ headerTitle }
+						</h1>
+					) }
+
+					{
+						tab !== 'license' && (
+							<button
+								type="button"
+								disabled={ processing || Object.keys( settingsToSave ).length === 0 }
+								onClick={ saveSettings }
+								className="cursor-pointer inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+								aria-label={ processing ? __( 'Saving settings…', 'wp-ai-blogger' ) : __( 'Save settings', 'wp-ai-blogger' ) }
+								aria-describedby={ lastSaveTime ? 'last-save-time' : undefined }
+							>
+								{ processing ? (
+									<>
+										<svg
+											className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
+										>
+											<circle
+												className="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="4"
+											/>
+											<path
+												className="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+											/>
+										</svg>
+										<span>{ __( 'Saving…', 'wp-ai-blogger' ) }</span>
+									</>
+								) : (
+									<>
+										<Save className="w-4 h-4 mr-2" aria-hidden="true" />
+										<span>{ __( 'Save', 'wp-ai-blogger' ) }</span>
+									</>
+								) }
+							</button>
+						)
+					}
+
+				</div>
+			</div>
 		</div>
 	);
 };

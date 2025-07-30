@@ -54,7 +54,7 @@ const SettingField = forwardRef( ( {
 		evenly: 'justify-evenly',
 	};
 
-	// Memoize classes for performance
+	// Memoize classes for performance.
 	const fieldClasses = useMemo( () => {
 		return aiClassNames(
 			// Base classes

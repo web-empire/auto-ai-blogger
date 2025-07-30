@@ -24,7 +24,6 @@ const SettingInput = forwardRef( ( {
 	size = 'default',
 	variant = 'default',
 	autoComplete,
-	autoFocus = false,
 	maxLength,
 	minLength,
 	pattern,
@@ -124,7 +123,6 @@ const SettingInput = forwardRef( ( {
 				required={ required }
 				readOnly={ readOnly }
 				autoComplete={ autoComplete }
-				autoFocus={ autoFocus }
 				maxLength={ maxLength }
 				minLength={ minLength }
 				pattern={ pattern }

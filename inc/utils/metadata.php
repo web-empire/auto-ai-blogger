@@ -104,11 +104,11 @@ class Metadata {
 					'type'    => 'number',
 				],
 				'maxWords'                => [
-					'default' => 400,
+					'default' => 1200,
 					'type'    => 'number',
 				],
 				'maxTitleWords'           => [
-					'default' => 8,
+					'default' => 10,
 					'type'    => 'number',
 				],
 				'postsVisit'              => [

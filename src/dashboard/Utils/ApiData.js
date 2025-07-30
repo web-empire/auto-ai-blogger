@@ -35,7 +35,7 @@ const createSecureFormData = ( action, key, value, config = {} ) => {
 	const formData = new window.FormData();
 
 	formData.append( 'action', action );
-	formData.append( 'security', config.nonce || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce) || '' );
+	formData.append( 'security', config.nonce || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce ) || '' );
 	formData.append( 'key', key );
 
 	// Properly serialize complex values
@@ -54,6 +54,7 @@ const createSecureFormData = ( action, key, value, config = {} ) => {
  * @param {string}   key      - Settings key.
  * @param {*}        value    - The data to send.
  * @param {Function} dispatch - Redux dispatch function.
+ * @param {Object}   config   - Configuration object with nonce and ajaxUrl.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
@@ -72,7 +73,7 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
 		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value, config );
 
 		const response = await apiFetch( {
-			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			timeout: 30000, // 30 second timeout
@@ -81,13 +82,12 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
 		// Handle successful response
 		if ( response?.success ) {
 			return response;
-		} else {
-			// Log the full response for debugging
-			console.error('Full API response:', response);
-			throw new Error( response?.data?.message || 'API request failed' );
 		}
+		// Log the full response for debugging
+		console.error( 'Full API response:', response );
+		throw new Error( response?.data?.message || 'API request failed' );
 	} catch ( error ) {
-		console.error( `API Error for key "${key}":`, error.message );
+		console.error( `API Error for key "${ key }":`, error.message );
 
 		// Dispatch error state if provided
 		if ( dispatch ) {
@@ -112,11 +112,12 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
  * @param {Object}  value              - The campaign data to send.
  * @param {boolean} isNew              - Is new campaign or not.
  * @param {Object}  abortControllerRef - The ref object to hold abort controller.
+ * @param {Object}  config             - Configuration object with nonce and ajaxUrl.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
 const updateCampaign = async ( value, isNew, abortControllerRef = null, config = {} ) => {
-	// Validate campaign data
+	// Validate campaign data.
 	if ( ! value || typeof value !== 'object' ) {
 		const error = new Error( 'Invalid campaign data provided' );
 		console.error( error.message );
@@ -139,7 +140,7 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null, config =
 		const formData = createSecureFormData( action, 'campaign_details', value, config );
 
 		const response = await apiFetch( {
-			url: config.ajaxUrl || (typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
 			method: 'POST',
 			body: formData,
 			signal: abortController.signal,
@@ -160,9 +161,8 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null, config =
 			}, 1000 );
 
 			return response;
-		} else {
-			throw new Error( response?.data?.message || `Failed to ${ isNew ? 'create' : 'update' } campaign` );
 		}
+		throw new Error( response?.data?.message || `Failed to ${ isNew ? 'create' : 'update' } campaign` );
 	} catch ( error ) {
 		// Handle different types of errors
 		if ( error.name === 'AbortError' ) {

@@ -91,7 +91,7 @@ const SettingLabel = forwardRef( ( {
 
 					{ required && (
 						<span
-							className="ml-1 text-red-500"
+							className="ml-[2px] text-red-500"
 							aria-label={ __( 'Required field', 'wp-ai-blogger' ) }
 							title={ __( 'This field is required', 'wp-ai-blogger' ) }
 						>
@@ -115,7 +115,7 @@ const SettingLabel = forwardRef( ( {
 							aria-label={ tooltip }
 						>
 							<svg
-								className="w-3 h-3"
+								className="w-3 h-3 flex"
 								fill="currentColor"
 								viewBox="0 0 20 20"
 								aria-hidden="true"

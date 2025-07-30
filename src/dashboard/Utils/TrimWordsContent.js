@@ -33,13 +33,13 @@ const trimTextByWords = ( text, wordLimit = 40, suffix = '...' ) => {
 /**
  * Enhanced TrimWordsContent component with better performance and accessibility
  *
- * @param {Object} props               - Component props
- * @param {string} props.content       - The content to trim
- * @param {number} props.count         - Number of words to display (default: 40)
- * @param {string} props.suffix        - Suffix when trimmed (default: '...')
- * @param {string} props.className     - CSS class name
- * @param {string} props.title         - Title attribute for accessibility
- * @param {string} props.ariaLabel     - ARIA label for screen readers
+ * @param {Object} props           - Component props
+ * @param {string} props.content   - The content to trim
+ * @param {number} props.count     - Number of words to display (default: 40)
+ * @param {string} props.suffix    - Suffix when trimmed (default: '...')
+ * @param {string} props.className - CSS class name
+ * @param {string} props.title     - Title attribute for accessibility
+ * @param {string} props.ariaLabel - ARIA label for screen readers
  * @return {JSX.Element} Trimmed content component
  */
 const TrimWordsContent = ( {

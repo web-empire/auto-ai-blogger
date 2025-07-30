@@ -3,15 +3,13 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
-import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import DynamicCard from '@Components/DynamicCard';
-import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { Tooltip } from '@wordpress/components';
+import { Key, Shield, Zap, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
 
 // Enhanced license activation form
-const LicenseForm = memo(({
+const LicenseForm = memo( ( {
 	licenseKey,
 	setLicenseKey,
 	activated,
@@ -21,21 +19,21 @@ const LicenseForm = memo(({
 	deactivationText,
 	onActivate,
 	onDeactivate,
-	upgradeLink
-}) => {
-	const handleKeyPress = useCallback((e) => {
-		if (e.key === 'Enter' && !activated && licenseKey.trim() && !processing) {
+	upgradeLink,
+} ) => {
+	const handleKeyPress = useCallback( ( e ) => {
+		if ( e.key === 'Enter' && ! activated && licenseKey.trim() && ! processing ) {
 			e.preventDefault();
 			onActivate();
 		}
-	}, [activated, licenseKey, processing, onActivate]);
+	}, [ activated, licenseKey, processing, onActivate ] );
 
 	return (
 		<div className="space-y-4">
 			<SettingLabel
 				forId="license-key"
-				title={__('License Key', 'wp-ai-blogger')}
-				description={!activated ? __('Enter your license key to unlock premium features', 'wp-ai-blogger') : undefined}
+				title={ __( 'License Key', 'wp-ai-blogger' ) }
+				description={ ! activated ? __( 'Enter your license key to unlock premium features', 'wp-ai-blogger' ) : undefined }
 			/>
 
 			<div className="flex gap-3">
@@ -48,382 +46,380 @@ const LicenseForm = memo(({
 						id="license-key"
 						name="license-key"
 						type="text"
-						value={licenseKey}
-						disabled={activated}
-						onChange={(e) => setLicenseKey(e.target.value.trim())}
-						onKeyPress={handleKeyPress}
+						value={ licenseKey }
+						disabled={ activated }
+						onChange={ ( e ) => setLicenseKey( e.target.value.trim() ) }
+						onKeyPress={ handleKeyPress }
 						placeholder={
 							activated
-								? __('License is active', 'wp-ai-blogger')
-								: __('Enter your license key...', 'wp-ai-blogger')
+								? __( 'License is active', 'wp-ai-blogger' )
+								: __( 'Enter your license key…', 'wp-ai-blogger' )
 						}
-						className={`
+						className={ `
 							block w-full !pl-12 !pr-12 py-2.5 text-sm
 							border border-gray-300 rounded-lg
 							bg-white text-gray-900
 							placeholder:text-gray-400
 							focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
 							transition-colors duration-200
-							${activated ? 'bg-gray-50 text-gray-500' : ''}
-							${processing ? 'opacity-70' : ''}
-						`}
-						aria-describedby={activated ? "license-status" : "license-help"}
+							${ activated ? 'bg-gray-50 text-gray-500' : '' }
+							${ processing ? 'opacity-70' : '' }
+						` }
+						aria-describedby={ activated ? 'license-status' : 'license-help' }
 					/>
 
-					{/* Status indicator */}
+					{ /* Status indicator */ }
 					<div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-						{activated && (
+						{ activated && (
 							<CheckCircle2 className="h-4 w-4 text-green-500" aria-hidden="true" />
-						)}
+						) }
 					</div>
 				</div>
 
-				{activated && !tokenLoading ? (
+				{ activated && ! tokenLoading ? (
 					<button
 						type="button"
-						onClick={onDeactivate}
-						disabled={processing}
-						className={`
+						onClick={ onDeactivate }
+						disabled={ processing }
+						className={ `
 							inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium
 							bg-white !border-2 !border-red-500 rounded-lg
 							text-red-700 hover:text-red-900 hover:bg-red-50
 							focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
 							transition-all duration-200
-							${processing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
-						`}
-						style={{
+							${ processing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer' }
+						` }
+						style={ {
 							border: '2px solid #ef4444',
-							borderColor: '#ef4444 !important'
-						}}
-						aria-label={__('Deactivate license', 'wp-ai-blogger')}
+							borderColor: '#ef4444 !important',
+						} }
+						aria-label={ __( 'Deactivate license', 'wp-ai-blogger' ) }
 					>
-						{processing && <Loader2 className="w-4 h-4 animate-spin" />}
-						{deactivationText}
+						{ processing && <Loader2 className="w-4 h-4 animate-spin" /> }
+						{ deactivationText }
 					</button>
 				) : (
 					<button
 						type="button"
-						onClick={onActivate}
-						disabled={!licenseKey.trim() || processing || tokenLoading}
-						className={`
+						onClick={ onActivate }
+						disabled={ ! licenseKey.trim() || processing || tokenLoading }
+						className={ `
 							inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium
 							bg-indigo-600 text-white rounded-lg
 							hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
 							transition-all duration-200 transform hover:scale-105
-							${(!licenseKey.trim() || processing || tokenLoading) ? 'opacity-70 cursor-not-allowed hover:scale-100' : 'cursor-pointer shadow-sm'}
-							${tokenLoading ? 'bg-green-600 hover:bg-green-700' : ''}
-						`}
-						aria-label={__('Activate license', 'wp-ai-blogger')}
+							${ ( ! licenseKey.trim() || processing || tokenLoading ) ? 'opacity-70 cursor-not-allowed hover:scale-100' : 'cursor-pointer shadow-sm' }
+							${ tokenLoading ? 'bg-green-600 hover:bg-green-700' : '' }
+						` }
+						aria-label={ __( 'Activate license', 'wp-ai-blogger' ) }
 					>
-						{(processing || tokenLoading) && <Loader2 className="w-4 h-4 animate-spin" />}
-						{!processing && !tokenLoading && <Shield className="w-4 h-4" />}
-						{activationText}
+						{ ( processing || tokenLoading ) && <Loader2 className="w-4 h-4 animate-spin" /> }
+						{ ! processing && ! tokenLoading && <Shield className="w-4 h-4" /> }
+						{ activationText }
 					</button>
-				)}
+				) }
 			</div>
 
-			{!activated && <DynamicCard
-				heading={__('No License Key?', 'wp-ai-blogger')}
-				subHeading={__('Get started with free credits today', 'wp-ai-blogger')}
-				linkText={__('Get Free Credits', 'wp-ai-blogger')}
-				linkUrl={upgradeLink}
-				colorScheme="blue"
-				size="small"
-				ariaLabel={__('Get free credits - opens in new tab', 'wp-ai-blogger')}
-			/>}
+			{ ! activated &&
+				<DynamicCard
+					heading={ __( 'No License Key?', 'wp-ai-blogger' ) }
+					subHeading={ __( 'Get started with free credits today', 'wp-ai-blogger' ) }
+					linkText={ __( 'Get Free Credits', 'wp-ai-blogger' ) }
+					linkUrl={ upgradeLink }
+					colorScheme="blue"
+					size="medium"
+					ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
+				/>
+			}
 
-			{/* Token loading indicator */}
-			{tokenLoading && (
+			{ /* Token loading indicator */ }
+			{ tokenLoading && (
 				<div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
 					<Loader2 className="w-5 h-5 animate-spin text-green-600" />
-					<div>
+					<div className="flex flex-col gap-1">
 						<p className="text-sm font-medium text-green-800">
-							{__('Fetching your token data...', 'wp-ai-blogger')}
+							{ __( 'Fetching your token data…', 'wp-ai-blogger' ) }
 						</p>
 						<p className="text-xs text-green-600">
-							{__('This may take a few seconds', 'wp-ai-blogger')}
+							{ __( 'This may take a few seconds', 'wp-ai-blogger' ) }
 						</p>
 					</div>
 				</div>
-			)}
+			) }
 		</div>
 	);
-});
+} );
 
 LicenseForm.displayName = 'LicenseForm';
 
-// Main License component
-const License = memo(() => {
+// Main License component.
+const License = memo( () => {
 	const dispatch = useDispatch();
-	const abortControllerRef = useRef({});
+	const abortControllerRef = useRef( {} );
 
-	// Redux selectors with fallbacks
-	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
-	const license = useSelector((state) => state.license) || '';
-	const upgradeLink = useSelector((state) => state.upgradeLink) || '#';
-	const licensingNonce = useSelector((state) => state.licensingNonce) || '';
-	const ajaxUrl = useSelector((state) => state.ajaxUrl) || '/wp-admin/admin-ajax.php';
+	// Redux selectors with fallbacks.
+	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
+	const upgradeLink = useSelector( ( state ) => state.upgradeLink ) || '#';
+	const licensingNonce = useSelector( ( state ) => state.licensingNonce ) || '';
+	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 
 	// Local state
-	const [processing, setProcessing] = useState(false);
-	const [tokenLoading, setTokenLoading] = useState(false);
-	const [licenseKey, setLicenseKey] = useState('');
-	const [activationText, setActivationText] = useState(__('Activate', 'wp-ai-blogger'));
-	const [deactivationText, setDeactivationText] = useState(__('Deactivate', 'wp-ai-blogger'));
+	const [ processing, setProcessing ] = useState( false );
+	const [ tokenLoading, setTokenLoading ] = useState( false );
+	const [ licenseKey, setLicenseKey ] = useState( '' );
+	const [ activationText, setActivationText ] = useState( __( 'Activate', 'wp-ai-blogger' ) );
+	const [ deactivationText, setDeactivationText ] = useState( __( 'Deactivate', 'wp-ai-blogger' ) );
 
 	// Computed values
-	const activated = useMemo(() => licenseStatus === 'licensed', [licenseStatus]);
+	const activated = useMemo( () => licenseStatus === 'licensed', [ licenseStatus ] );
 
 	// Cleanup effect
-	useEffect(() => {
+	useEffect( () => {
 		return () => {
 			// Cancel any ongoing requests
-			Object.values(abortControllerRef.current).forEach(controller => {
-				if (controller && typeof controller.abort === 'function') {
+			Object.values( abortControllerRef.current ).forEach( ( controller ) => {
+				if ( controller && typeof controller.abort === 'function' ) {
 					controller.abort();
 				}
-			});
+			} );
 		};
-	}, []);
+	}, [] );
 
 	// Enhanced license activation with better error handling
-	const activateLicense = useCallback(async () => {
-		if (!licenseKey.trim() || processing) return;
+	const activateLicense = useCallback( async () => {
+		if ( ! licenseKey.trim() || processing ) {
+			return;
+		}
 
-		setActivationText(__('Activating...', 'wp-ai-blogger'));
-		setProcessing(true);
+		setActivationText( __( 'Activating…', 'wp-ai-blogger' ) );
+		setProcessing( true );
 
 		// Create abort controller for this request
 		const abortController = new AbortController();
-		abortControllerRef.current['activation'] = abortController;
+		abortControllerRef.current.activation = abortController;
 
 		try {
 			const formData = new FormData();
-			formData.append('action', 'wp_ai_blogger_activate_license');
-			formData.append('license_key', licenseKey);
-			formData.append('wp_ai_blogger_licensing_nonce', licensingNonce);
+			formData.append( 'action', 'wp_ai_blogger_activate_license' );
+			formData.append( 'license_key', licenseKey );
+			formData.append( 'wp_ai_blogger_licensing_nonce', licensingNonce );
 
-			const response = await apiFetch({
+			const response = await apiFetch( {
 				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
-				signal: abortController.signal
-			});
+				signal: abortController.signal,
+			} );
 
-			if (!response.success) {
-				throw new Error(response?.data?.message || __('License activation failed', 'wp-ai-blogger'));
+			if ( ! response.success ) {
+				throw new Error( response?.data?.message || __( 'License activation failed', 'wp-ai-blogger' ) );
 			}
 
 			// Update license status
-			dispatch({
+			dispatch( {
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'licensed',
-			});
+			} );
 
 			// Also update the license key in Redux for token fetching
-			dispatch({
+			dispatch( {
 				type: 'UPDATE_LICENSE',
 				payload: licenseKey,
-			});
+			} );
 
-			console.log('License key set in Redux:', licenseKey);
+			console.log( 'License key set in Redux:', licenseKey );
 
 			// Show token loading state
-			setTokenLoading(true);
+			setTokenLoading( true );
 
 			// Fetch token data immediately after successful activation
 			try {
-				const tokenResponse = await fetch(`https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${licenseKey}`, {
+				const tokenResponse = await fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ licenseKey }`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					signal: abortController.signal
-				});
+					signal: abortController.signal,
+				} );
 
-				if (tokenResponse.ok) {
+				if ( tokenResponse.ok ) {
 					const tokenData = await tokenResponse.json();
 
-					if (tokenData && tokenData.success && tokenData.data) {
+					if ( tokenData && tokenData.success && tokenData.data ) {
 						// Update Redux store with token data
-						dispatch({
+						dispatch( {
 							type: 'UPDATE_TOKEN_TOTAL',
 							payload: tokenData.data.total,
-						});
-						dispatch({
+						} );
+						dispatch( {
 							type: 'UPDATE_TOKEN_REMAINING',
 							payload: tokenData.data.remaining,
-						});
+						} );
 
 						// Update API data in database
-						await updateApiData('tokenTotal', tokenData.data.total, dispatch, abortControllerRef);
-						await updateApiData('tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef);
+						await updateApiData( 'tokenTotal', tokenData.data.total, dispatch, abortControllerRef );
+						await updateApiData( 'tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef );
 
-						console.log('Token data fetched and updated:', tokenData.data);
-						setActivationText(__('License Activated & Tokens Updated!', 'wp-ai-blogger'));
+						console.log( 'Token data fetched and updated:', tokenData.data );
+						setActivationText( __( 'License Activated & Tokens Updated!', 'wp-ai-blogger' ) );
 					}
 				} else {
-					console.warn('Failed to fetch token data after license activation');
-					setActivationText(__('License Activated (Token fetch failed)', 'wp-ai-blogger'));
+					console.warn( 'Failed to fetch token data after license activation' );
+					setActivationText( __( 'License Activated (Token fetch failed)', 'wp-ai-blogger' ) );
 				}
-			} catch (tokenError) {
+			} catch ( tokenError ) {
 				// Don't fail the license activation if token fetch fails
-				console.warn('Token data fetch error after license activation:', tokenError);
-				setActivationText(__('License Activated (Token fetch failed)', 'wp-ai-blogger'));
+				console.warn( 'Token data fetch error after license activation:', tokenError );
+				setActivationText( __( 'License Activated (Token fetch failed)', 'wp-ai-blogger' ) );
 			} finally {
-				setTokenLoading(false);
+				setTokenLoading( false );
 			}
 
-			setLicenseKey('');
+			setLicenseKey( '' );
 
 			const notificationPayload = {
-				message: __('License activated successfully!', 'wp-ai-blogger'),
+				message: __( 'License activated successfully!', 'wp-ai-blogger' ),
 				type: 'success',
-				duration: 4000
+				duration: 4000,
 			};
 
-			console.log('Dispatching notification:', notificationPayload);
-			dispatch({
+			console.log( 'Dispatching notification:', notificationPayload );
+			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: notificationPayload,
-			});
-		} catch (error) {
-			if (error.name === 'AbortError') return;
+			} );
+		} catch ( error ) {
+			if ( error.name === 'AbortError' ) {
+				return;
+			}
 
-			console.error('License activation error:', error);
+			console.error( 'License activation error:', error );
 
-			setActivationText(__('Activate', 'wp-ai-blogger'));
-			dispatch({
+			setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
+			dispatch( {
 				type: 'UPDATE_LICENSE_STATUS',
 				payload: 'unlicensed',
-			});
-			dispatch({
+			} );
+			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: {
-					message: error.message || __('Failed to activate license', 'wp-ai-blogger'),
+					message: error.message || __( 'Failed to activate license', 'wp-ai-blogger' ),
 					type: 'error',
-					duration: 5000
+					duration: 5000,
 				},
-			});
+			} );
 		} finally {
-			setProcessing(false);
-			delete abortControllerRef.current['activation'];
+			setProcessing( false );
+			delete abortControllerRef.current.activation;
 		}
-	}, [licenseKey, processing, dispatch]);
+	}, [ licenseKey, processing, dispatch ] );
 
 	// Enhanced license deactivation
-	const deactivateLicense = useCallback(async () => {
-		if (processing) return;
+	const deactivateLicense = useCallback( async () => {
+		if ( processing ) {
+			return;
+		}
 
-		setDeactivationText(__('Deactivating...', 'wp-ai-blogger'));
-		setProcessing(true);
+		setDeactivationText( __( 'Deactivating…', 'wp-ai-blogger' ) );
+		setProcessing( true );
 
 		// Create abort controller for this request
 		const abortController = new AbortController();
-		abortControllerRef.current['deactivation'] = abortController;
+		abortControllerRef.current.deactivation = abortController;
 
 		try {
 			const formData = new FormData();
-			formData.append('action', 'wp_ai_blogger_deactivate_license');
-			formData.append('wp_ai_blogger_licensing_nonce', licensingNonce);
+			formData.append( 'action', 'wp_ai_blogger_deactivate_license' );
+			formData.append( 'wp_ai_blogger_licensing_nonce', licensingNonce );
 
-			const response = await apiFetch({
+			const response = await apiFetch( {
 				url: ajaxUrl,
 				method: 'POST',
 				body: formData,
-				signal: abortController.signal
-			});
+				signal: abortController.signal,
+			} );
 
-			if (response.success) {
-				setLicenseKey('');
-				dispatch({
+			if ( response.success ) {
+				setLicenseKey( '' );
+				dispatch( {
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'unlicensed',
-				});
-				dispatch({
+				} );
+				dispatch( {
 					type: 'UPDATE_LICENSE',
 					payload: '',
-				});
+				} );
 
-				setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
-				setActivationText(__('Activate', 'wp-ai-blogger'));
+				setDeactivationText( __( 'Deactivated', 'wp-ai-blogger' ) );
+				setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
 			}
 
-			dispatch({
+			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: {
-					message: response?.data?.message || __('License deactivated', 'wp-ai-blogger'),
+					message: response?.data?.message || __( 'License deactivated', 'wp-ai-blogger' ),
 					type: 'success',
-					duration: 3000
+					duration: 3000,
 				},
-			});
-		} catch (error) {
-			if (error.name === 'AbortError') return;
+			} );
+		} catch ( error ) {
+			if ( error.name === 'AbortError' ) {
+				return;
+			}
 
-			console.error('Deactivation error:', error);
-			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
+			console.error( 'Deactivation error:', error );
+			setDeactivationText( __( 'Deactivate', 'wp-ai-blogger' ) );
 		} finally {
-			setProcessing(false);
-			delete abortControllerRef.current['deactivation'];
+			setProcessing( false );
+			delete abortControllerRef.current.deactivation;
 		}
-	}, [processing, dispatch]);
+	}, [ processing, dispatch ] );
 
 	// Reset button states when activation status changes
-	useEffect(() => {
-		if (activated && !processing && !tokenLoading) {
+	useEffect( () => {
+		if ( activated && ! processing && ! tokenLoading ) {
 			// Only show "Activated" and "Deactivate" when completely done
-			setActivationText(__('Activated', 'wp-ai-blogger'));
-			setDeactivationText(__('Deactivate', 'wp-ai-blogger'));
-		} else if (!activated && !processing) {
+			setActivationText( __( 'Activated', 'wp-ai-blogger' ) );
+			setDeactivationText( __( 'Deactivate', 'wp-ai-blogger' ) );
+		} else if ( ! activated && ! processing ) {
 			// Reset to initial state when not activated and not processing
-			setActivationText(__('Activate', 'wp-ai-blogger'));
-			setDeactivationText(__('Deactivated', 'wp-ai-blogger'));
+			setActivationText( __( 'Activate', 'wp-ai-blogger' ) );
+			setDeactivationText( __( 'Deactivated', 'wp-ai-blogger' ) );
 		}
 		// Don't change text during processing or token loading
-	}, [activated, processing, tokenLoading]);
+	}, [ activated, processing, tokenLoading ] );
 
 	return (
 		<div className="space-y-6 min-h-full">
-			{/* Enhanced header using DynamicCard */}
-			<DynamicCard
-				icon={Zap}
-				heading={__('License Management', 'wp-ai-blogger')}
-				colorScheme="indigo"
-				size="large"
-				className="border-b border-gray-200 pb-4"
-			/>
-
-			{/* Settings container */}
+			{ /* Settings container */ }
 			<SettingsContainer
-				title={__('License Configuration', 'wp-ai-blogger')}
-				description={__('Activate your license to unlock premium AI features and token access.', 'wp-ai-blogger')}
 				element={
 					<LicenseForm
-						licenseKey={licenseKey}
-						setLicenseKey={setLicenseKey}
-						activated={activated}
-						processing={processing}
-						tokenLoading={tokenLoading}
-						activationText={activationText}
-						deactivationText={deactivationText}
-						onActivate={activateLicense}
-						onDeactivate={deactivateLicense}
-						upgradeLink={upgradeLink}
+						licenseKey={ licenseKey }
+						setLicenseKey={ setLicenseKey }
+						activated={ activated }
+						processing={ processing }
+						tokenLoading={ tokenLoading }
+						activationText={ activationText }
+						deactivationText={ deactivationText }
+						onActivate={ activateLicense }
+						onDeactivate={ deactivateLicense }
+						upgradeLink={ upgradeLink }
 					/>
 				}
-				className="bg-white shadow-sm rounded-lg border border-gray-200 p-6"
+				className="bg-white shadow-sm rounded-lg border border-gray-200"
 			/>
 
-			{/* Screen reader status */}
+			{ /* Screen reader status */ }
 			<div className="sr-only" aria-live="polite">
-				{activated
-					? __('License is active', 'wp-ai-blogger')
-					: __('No active license', 'wp-ai-blogger')
+				{ activated
+					? __( 'License is active', 'wp-ai-blogger' )
+					: __( 'No active license', 'wp-ai-blogger' )
 				}
 			</div>
 		</div>
 	);
-});
+} );
 
 License.displayName = 'LicenseSettings';
 

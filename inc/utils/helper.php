@@ -157,23 +157,17 @@ class Helper {
 			$settings[ $key ] = $sanitized_value;
 		}
 
-		// Validate final settings array
+		// Validate final settings array.
 		$validated_settings = self::validate_settings_array( $settings );
 
-		$update_result = update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
+		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
 
-		// Debug logging for troubleshooting
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $original_key === 'postIdeas' ) {
-			$existing_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
-			$key_exists_before = isset( $existing_option[ $key ] );
-			$key_exists_after = isset( $validated_settings[ $key ] );
-			error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $original_key . ', Original Value: ' . json_encode( $value ) . ', Sanitized Value: ' . json_encode( $sanitized_value ) . ', Is Default: ' . ( $is_default ? 'true' : 'false' ) . ', Key Exists Before: ' . ( $key_exists_before ? 'true' : 'false' ) . ', Key Exists After: ' . ( $key_exists_after ? 'true' : 'false' ) . ', Existing DB: ' . json_encode( $existing_option ) . ', Validated Settings: ' . json_encode( $validated_settings ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
-		}
-
-		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error
-		// We return the sanitized value regardless, as the operation was successful
+		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error.
+		// We return the sanitized value regardless, as the operation was successful.
 		return $sanitized_value;
-	}	/**
+	}
+
+	/**
 	 * Delete option from the database for the admin settings.
 	 *
 	 * @param  string $key The option key.

@@ -9,15 +9,15 @@ import { updateApiData } from '@Utils/ApiData';
  * Core version display component with enhanced accessibility
  */
 export const CoreVersion = () => {
-	const version = useSelector((state) => state.version) || '1.0.0';
-	const proVersion = useSelector((state) => state.proVersion) || '';
-	const proAvailable = useSelector((state) => state.proAvailable) || false;
+	const version = useSelector( ( state ) => state.version ) || '1.0.0';
+	const proVersion = useSelector( ( state ) => state.proVersion ) || '';
+	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
 	return (
 		<>
 			<div className="flex items-center">
 				<Tooltip
-					text={ __( 'CORE Version', 'wp-ai-blogger' ) }
+					text={ __( 'CORE', 'wp-ai-blogger' ) }
 					delay={ 100 }
 					className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 				>
@@ -31,20 +31,21 @@ export const CoreVersion = () => {
 			</div>
 
 			{ proAvailable && proVersion && (
-				<div className="flex items-center">
-					<span
-						className="mr-1 sm:mr-2"
-						aria-label={ `Pro version ${ proVersion }` }
+				<>
+					<span>-</span>
+					<Tooltip
+						text={ __( 'PRO', 'wp-ai-blogger' ) }
+						delay={ 100 }
+						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 					>
-						{ proVersion }
-					</span>
-					<span
-						className="ml-1 sm:ml-2 text-[0.625rem] leading-[1rem] font-medium text-white border border-slate-800 bg-slate-800 rounded-[0.1875rem] relative inline-flex flex-shrink-0 py-[0rem] px-1.5"
-						aria-label="Pro version indicator"
-					>
-						{ __( 'PRO', 'wp-ai-blogger' ) }
-					</span>
-				</div>
+						<span
+							className="select-none cursor-help"
+							aria-label={ `Pro version ${ proVersion }` }
+						>
+							V-{ proVersion }
+						</span>
+					</Tooltip>
+				</>
 			) }
 
 			{ wp?.hooks?.applyFilters?.(
@@ -137,24 +138,24 @@ export const TokenDisplayAndRefresh = () => {
 	const formattedTotalTokens = totalTokens.toLocaleString();
 
 	// Calculate progress percentage and status
-	const progressPercentage = totalTokens > 0 ? ((totalTokens - tokenRemaining) / totalTokens) * 100 : 0;
+	const progressPercentage = totalTokens > 0 ? ( ( totalTokens - tokenRemaining ) / totalTokens ) * 100 : 0;
 	const getTokenStatus = () => {
 		const remaining = tokenRemaining;
-		if (remaining >= 1000) {
+		if ( remaining >= 1000 ) {
 			return {
-				text: __('Plenty of tokens', 'wp-ai-blogger'),
-				color: 'bg-green-500'
+				text: __( 'Plenty of tokens', 'wp-ai-blogger' ),
+				color: 'bg-green-500',
 			};
 		}
-		if (remaining >= 100) {
+		if ( remaining >= 100 ) {
 			return {
-				text: __('Moderate', 'wp-ai-blogger'),
-				color: 'bg-amber-500'
+				text: __( 'Moderate', 'wp-ai-blogger' ),
+				color: 'bg-amber-500',
 			};
 		}
 		return {
-			text: __('Low', 'wp-ai-blogger'),
-			color: 'bg-red-500'
+			text: __( 'Low', 'wp-ai-blogger' ),
+			color: 'bg-red-500',
 		};
 	};
 	const tokenStatus = getTokenStatus();
@@ -172,7 +173,7 @@ export const TokenDisplayAndRefresh = () => {
 					{ __( 'Tokens', 'wp-ai-blogger' ) }
 				</p>
 
-				{/* Progress bar */}
+				{ /* Progress bar */ }
 				<Tooltip
 					text={ tokenStatus.text }
 					delay={ 100 }
@@ -180,8 +181,8 @@ export const TokenDisplayAndRefresh = () => {
 				>
 					<div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-help">
 						<div
-							className={ `h-full transition-all duration-500 ease-in-out ${tokenStatus.color}` }
-							style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+							className={ `h-full transition-all duration-500 ease-in-out ${ tokenStatus.color }` }
+							style={ { width: `${ Math.min( progressPercentage, 100 ) }%` } }
 						/>
 					</div>
 				</Tooltip>
@@ -198,8 +199,8 @@ export const TokenDisplayAndRefresh = () => {
 					font-medium
 					focus:outline-none focus:ring-0
 					${ licenseStatus !== 'licensed' || processing || ! license
-						? 'opacity-50 cursor-not-allowed'
-						: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
+			? 'opacity-50 cursor-not-allowed'
+			: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
 					${ processing ? 'pointer-events-none' : '' }
 				` }
 				onClick={ refreshTokens }

@@ -28,8 +28,6 @@ export default function PostIdeas() {
 	const dangerousContent = useSelector( ( state ) => state.dangerousContent );
 	const license = useSelector( ( state ) => state.license );
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
-	const tokenTotal = useSelector( ( state ) => state.tokenTotal );
-	const tokenRemaining = useSelector( ( state ) => state.tokenRemaining );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
 	const proAvailable = useSelector( ( state ) => state.proAvailable );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
@@ -100,7 +98,7 @@ export default function PostIdeas() {
 
 			if ( data && data.post_ideas && Array.isArray( data.post_ideas ) ) {
 				// Convert array to string for consistent storage
-				const postIdeasString = data.post_ideas.filter( idea => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
+				const postIdeasString = data.post_ideas.filter( ( idea ) => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
 
 				// Store as string in Redux and DB
 				dispatch( {
@@ -113,14 +111,14 @@ export default function PostIdeas() {
 				// Handle token data if present
 				if ( data.token_data ) {
 					// Update Redux store with token data
-					dispatch({
+					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: data.token_data.total,
-					});
-					dispatch({
+					} );
+					dispatch( {
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: data.token_data.remaining,
-					});
+					} );
 
 					// Update API data in database
 					await updateApiData( 'tokenTotal', data.token_data.total, dispatch, abortControllerRef );
@@ -150,7 +148,7 @@ export default function PostIdeas() {
 		sexuallyExplicit,
 		dangerousContent,
 		license,
-		dispatch
+		dispatch,
 	] );
 
 	useEffect( () => {
@@ -183,7 +181,7 @@ export default function PostIdeas() {
 		// Convert string to array for display when postIdeas changes
 		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' ) {
 			// Convert string to array by splitting on newlines
-			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
+			const ideasArray = postIdeas.split( '\n' ).filter( ( idea ) => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
 		} else {
 			// Clear the array if no post ideas
@@ -225,7 +223,7 @@ export default function PostIdeas() {
 						url="https://wpaiblogger.com/pricing/"
 						variant="primary"
 						size="default"
-						icon={<MoveRight className="h-5 w-5" />}
+						icon={ <MoveRight className="h-5 w-5" /> }
 						className="mt-5"
 					>
 						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
@@ -359,7 +357,7 @@ export default function PostIdeas() {
 						<ProButton
 							variant="primary"
 							size="default"
-							icon={<MoveRight className="w-4 h-4" />}
+							icon={ <MoveRight className="w-4 h-4" /> }
 							className="shadow-lg border-2 border-amber-400 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
 						>
 							{ __( 'Get Unlimited Post Suggestions', 'wp-ai-blogger' ) }
@@ -412,7 +410,7 @@ export default function PostIdeas() {
 										<Suspense fallback={
 											<tr>
 												<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
-													{ __( 'Loading...', 'wp-ai-blogger' ) }
+													{ __( 'Loading…', 'wp-ai-blogger' ) }
 												</td>
 											</tr>
 										}>
@@ -420,7 +418,7 @@ export default function PostIdeas() {
 										</Suspense>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										<>
-											{/* Limit to 5 ideas for free users, unlimited for pro users */}
+											{ /* Limit to 5 ideas for free users, unlimited for pro users */ }
 											{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : 5 ).map( ( postTitle, index ) => (
 												<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
 													<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
@@ -445,18 +443,19 @@ export default function PostIdeas() {
 													</td>
 												</tr>
 											) ) }
-											{/* Show upgrade prompt for free users when there are more than 5 ideas */}
+
+											{ /* Show upgrade prompt for free users when there are more than 5 ideas */ }
 											{ ! proAvailable && postIdeasArr.length > 5 && (
 												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
 													<td colSpan="2" className="px-6 py-6 text-center">
 														<div className="flex flex-col items-center space-y-3">
 															<div className="text-amber-700 font-semibold text-sm">
-																🔒 { __( `${ postIdeasArr.length - 5 } more post ideas available with Pro!`, 'wp-ai-blogger' ) }
+																🔒 { `${ postIdeasArr.length - 5 } ` + __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }
 															</div>
 															<ProButton
 																variant="primary"
 																size="small"
-																icon={<MoveRight className="w-4 h-4" />}
+																icon={ <MoveRight className="w-4 h-4" /> }
 																className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
 															>
 																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
@@ -486,7 +485,7 @@ export default function PostIdeas() {
 													<ProButton
 														variant="primary"
 														size="default"
-														icon={<MoveRight className="w-5 h-5" />}
+														icon={ <MoveRight className="w-5 h-5" /> }
 														className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 													>
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
@@ -496,7 +495,7 @@ export default function PostIdeas() {
 												<ProButton
 													variant="ghost"
 													size="default"
-													icon={<MoveRight className="w-5 h-5" />}
+													icon={ <MoveRight className="w-5 h-5" /> }
 													className="text-indigo-600 hover:text-indigo-900"
 												>
 													{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }

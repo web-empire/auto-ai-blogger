@@ -1,8 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 
 // Lazy load components for better performance
-const NavigationBar = lazy(() => import('./NavigationBar'));
-const FooterNavigationBar = lazy(() => import('./FooterNavigationBar'));
+const NavigationBar = lazy( () => import( './NavigationBar' ) );
+const FooterNavigationBar = lazy( () => import( './FooterNavigationBar' ) );
 
 // Loading fallback component
 const FieldLoader = () => (
@@ -14,14 +14,14 @@ const FieldLoader = () => (
 
 // Enhanced exports with Suspense wrappers
 export const NavigationBarWithSuspense = () => (
-	<Suspense fallback={<FieldLoader />}>
+	<Suspense fallback={ <FieldLoader /> }>
 		<NavigationBar />
 	</Suspense>
 );
 
-export const FooterNavigationBarWithSuspense = (props) => (
-	<Suspense fallback={<FieldLoader />}>
-		<FooterNavigationBar {...props} />
+export const FooterNavigationBarWithSuspense = ( props ) => (
+	<Suspense fallback={ <FieldLoader /> }>
+		<FooterNavigationBar { ...props } />
 	</Suspense>
 );
 

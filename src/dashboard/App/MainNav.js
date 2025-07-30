@@ -12,10 +12,10 @@ export default function MainNav() {
 	const location = useLocation();
 
 	// Redux selectors for dynamic data
-	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
-	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
-	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
-	const proAvailable = useSelector((state) => state.proAvailable) || false;
+	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
+	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
+	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
 	// Memoize license status to prevent unnecessary recalculations
 	const licenseEnabled = useMemo( () => {
@@ -53,7 +53,7 @@ export default function MainNav() {
 		];
 
 		// Filter out license-required menus if license is not enabled
-		const filteredMenus = baseMenus.filter( menu => {
+		const filteredMenus = baseMenus.filter( ( menu ) => {
 			return ! menu.requiresLicense || licenseEnabled;
 		} );
 
@@ -103,7 +103,7 @@ export default function MainNav() {
 							className="h-full ml-4 sm:ml-8 sm:flex gap-y-4 gap-x-8"
 							aria-label="Primary navigation"
 						>
-							{ navMenus.map( ( menu, index ) => {
+							{ navMenus.map( ( menu ) => {
 								const isActive = activePage === menu.slug && activePath === menu.path;
 								const linkClasses = isActive
 									? 'mb-4 sm:mb-0 border-blogapp text-blogapp active:text-blogapp focus:text-blogapp focus-visible:text-blogapp-hover hover:text-blogapp-hover inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
@@ -180,7 +180,6 @@ export default function MainNav() {
 					</div>
 				</div>
 			</div>
-			<TokenNotification />
 		</section>
 	);
 }

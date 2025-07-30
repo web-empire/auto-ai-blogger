@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react';
 
 // Lazy load wizard step components for better performance
-const WelcomeStep = lazy(() => import('./WelcomeStep'));
-const PersonaFormStep = lazy(() => import('./PersonaFormStep'));
-const LicenseStep = lazy(() => import('./LicenseStep'));
-const OptinStep = lazy(() => import('./OptinStep'));
-const ReadyStep = lazy(() => import('./ReadyStep'));
+const WelcomeStep = lazy( () => import( './WelcomeStep' ) );
+const PersonaFormStep = lazy( () => import( './PersonaFormStep' ) );
+const LicenseStep = lazy( () => import( './LicenseStep' ) );
+const OptinStep = lazy( () => import( './OptinStep' ) );
+const ReadyStep = lazy( () => import( './ReadyStep' ) );
 
 // Enhanced loading component for step transitions
 const StepLoadingFallback = () => (
@@ -18,18 +18,18 @@ const StepLoadingFallback = () => (
 );
 
 // Higher-order component to wrap steps with Suspense
-const withSuspense = (Component) => (props) => (
-	<Suspense fallback={<StepLoadingFallback />}>
-		<Component {...props} />
+const withSuspense = ( Component ) => ( props ) => (
+	<Suspense fallback={ <StepLoadingFallback /> }>
+		<Component { ...props } />
 	</Suspense>
 );
 
 // Create wrapped components
-const WrappedWelcomeStep = withSuspense(WelcomeStep);
-const WrappedPersonaFormStep = withSuspense(PersonaFormStep);
-const WrappedLicenseStep = withSuspense(LicenseStep);
-const WrappedOptinStep = withSuspense(OptinStep);
-const WrappedReadyStep = withSuspense(ReadyStep);
+const WrappedWelcomeStep = withSuspense( WelcomeStep );
+const WrappedPersonaFormStep = withSuspense( PersonaFormStep );
+const WrappedLicenseStep = withSuspense( LicenseStep );
+const WrappedOptinStep = withSuspense( OptinStep );
+const WrappedReadyStep = withSuspense( ReadyStep );
 
 // Export wrapped components
 export {
