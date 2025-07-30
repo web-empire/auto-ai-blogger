@@ -104,7 +104,7 @@ class Metadata {
 					'type'    => 'number',
 				],
 				'maxWords'                => [
-					'default' => 1200,
+					'default' => 1000,
 					'type'    => 'number',
 				],
 				'maxTitleWords'           => [
