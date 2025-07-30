@@ -934,6 +934,11 @@ class Ajax {
 				return;
 			}
 
+			// Remove this title from the postIdeas DB option (but keep Redux unchanged)
+			if ( ! empty( $post_data['title'] ) ) {
+				$this->remove_post_idea_from_db( $post_data['title'] );
+			}
+
 			wp_send_json_success( [
 				'message' => $this->get_error_msg( 'success' ),
 				'post_id' => $post_id,
@@ -947,6 +952,56 @@ class Ajax {
 			wp_send_json_error( [
 				'message' => __( 'An unexpected error occurred while creating the post. Please try again.', 'wp-ai-blogger' )
 			] );
+		}
+	}
+
+	/**
+	 * Remove a post idea from the database when a post is created from it.
+	 * This keeps Redux unchanged so UI can show "Open Post" button until page refresh.
+	 *
+	 * @param string $post_title The title of the post that was created.
+	 * @since 2.0.0
+	 */
+	private function remove_post_idea_from_db( $post_title ) {
+		try {
+			// Sanitize the title
+			$post_title = sanitize_text_field( trim( $post_title ) );
+			if ( empty( $post_title ) ) {
+				return;
+			}
+
+			// Get current post ideas from database
+			$current_post_ideas = \WPAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
+
+			if ( empty( $current_post_ideas ) || ! is_string( $current_post_ideas ) ) {
+				return;
+			}
+
+			// Convert post ideas string to array
+			$ideas_array = array_filter( array_map( 'trim', explode( "\n", $current_post_ideas ) ) );
+
+			// Find and remove the exact matching idea
+			$updated_ideas = [];
+			$found_and_removed = false;
+
+			foreach ( $ideas_array as $idea ) {
+				if ( ! $found_and_removed && trim( $idea ) === $post_title ) {
+					$found_and_removed = true;
+					continue; // Skip this idea (remove it)
+				}
+				$updated_ideas[] = $idea;
+			}
+
+			// Only update if we actually removed something
+			if ( $found_and_removed ) {
+				// Update post ideas in database (but not in Redux - that stays for UI)
+				$updated_post_ideas_string = implode( "\n", $updated_ideas );
+				\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+			}
+
+		} catch ( \Exception $e ) {
+			// Log error but don't fail the post creation
+			error_log( 'WP AI Blogger: Error removing post idea from DB - ' . $e->getMessage() );
 		}
 	}
 
