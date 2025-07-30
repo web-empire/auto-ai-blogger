@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from './Skeleton';
+import BlurredSkeleton from './BlurredSkeleton';
 import apiFetch from '@wordpress/api-fetch';
 import ProButton from '@Components/ProButton';
 
@@ -45,6 +46,13 @@ export default function PostIdeas() {
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
 
 	const licenseEnabled = licenseStatus === 'licensed';
+
+	// Constants
+	const TOTAL_ROWS = 5;
+
+	// Calculate available and created counts
+	const availableIdeasCount = postIdeasArr.length;
+	const createdIdeasCount = Math.max( 0, TOTAL_ROWS - availableIdeasCount );
 
 	const fetchPostIdeas = useCallback( async () => {
 		setLoading( true );
@@ -499,62 +507,80 @@ export default function PostIdeas() {
 												</td>
 											</tr>
 										}>
-											<Skeleton />
+											<Skeleton rows={ TOTAL_ROWS } />
 										</Suspense>
-									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
+									) : (
 										<>
-											{/* Limit to 5 ideas for free users, unlimited for pro users */}
-											{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : 5 ).map( ( postTitle, index ) => (
-												<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
-													<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-														<div className="font-medium">
-															<TrimWordsContent
-																content={ postTitle || '' }
-																count={ 120 }
-															/>
-														</div>
-													</td>
-													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-														<a
-															target="_blank"
-															href="#"
-															onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-															className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-															data-type="create"
-														>
-															<Plus className="w-5 h-5" />
-															{ __( 'Create', 'wp-ai-blogger' ) }
-														</a>
-													</td>
-												</tr>
-											) ) }
-											{/* Show upgrade prompt for free users when there are more than 5 ideas */}
-											{ ! proAvailable && postIdeasArr.length > 5 && (
-												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
-													<td colSpan="2" className="px-6 py-6 text-center">
-														<div className="flex flex-col items-center space-y-3">
-															<div className="text-amber-700 font-semibold text-sm">
-																🔒 { __( `${ postIdeasArr.length - 5 } more post ideas available with Pro!`, 'wp-ai-blogger' ) }
-															</div>
-															<ProButton
-																variant="primary"
-																size="small"
-																icon={<MoveRight className="w-4 h-4" />}
-																className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
-															>
-																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
-															</ProButton>
-														</div>
-													</td>
-												</tr>
+											{/* Available post ideas */}
+											{ postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
+												<>
+													{/* Show available ideas - for free users, limit to what fits with created ideas */}
+													{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : Math.min( postIdeasArr.length, TOTAL_ROWS ) ).map( ( postTitle, index ) => (
+														<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
+															<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
+																<div className="font-medium">
+																	<TrimWordsContent
+																		content={ postTitle || '' }
+																		count={ 120 }
+																	/>
+																</div>
+															</td>
+															<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
+																<a
+																	target="_blank"
+																	href="#"
+																	onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+																	className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
+																	data-type="create"
+																>
+																	<Plus className="w-5 h-5" />
+																	{ __( 'Create', 'wp-ai-blogger' ) }
+																</a>
+															</td>
+														</tr>
+													) ) }
+
+													{/* Show blurred skeleton rows for created posts */}
+													{ createdIdeasCount > 0 && (
+														<BlurredSkeleton rows={ createdIdeasCount } />
+													) }
+
+													{/* Show upgrade prompt for free users when there are more than available slots */}
+													{ ! proAvailable && postIdeasArr.length > TOTAL_ROWS && (
+														<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
+															<td colSpan="2" className="px-6 py-6 text-center">
+																<div className="flex flex-col items-center space-y-3">
+																	<div className="text-amber-700 font-semibold text-sm">
+																		🔒 { __( `${ postIdeasArr.length - TOTAL_ROWS } more post ideas available with Pro!`, 'wp-ai-blogger' ) }
+																	</div>
+																	<ProButton
+																		variant="primary"
+																		size="small"
+																		icon={<MoveRight className="w-4 h-4" />}
+																		className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
+																	>
+																		{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
+																	</ProButton>
+																</div>
+															</td>
+														</tr>
+													) }
+												</>
+											) : (
+												<>
+													{/* No available ideas - show blurred rows for created posts if any, else show no ideas message */}
+													{ createdIdeasCount > 0 ? (
+														<BlurredSkeleton rows={ createdIdeasCount } />
+													) : (
+														<tr>
+															<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
+																{ __( 'No post ideas available.', 'wp-ai-blogger' ) }
+															</td>
+														</tr>
+													) }
+												</>
 											) }
 										</>
-									) : (
-										<tr>
-											<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
-												{ __( 'No post ideas available.', 'wp-ai-blogger' ) }
-											</td>
-										</tr>
 									) }
 								</tbody>
 
