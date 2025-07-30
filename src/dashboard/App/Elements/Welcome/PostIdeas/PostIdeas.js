@@ -438,6 +438,7 @@ export default function PostIdeas() {
 						onClick={ proAvailable ? handleRefresh : undefined }
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
+						iconPosition="left"
 					>
 						{ __( 'Refresh', 'wp-ai-blogger' ) }
 					</ProButton>

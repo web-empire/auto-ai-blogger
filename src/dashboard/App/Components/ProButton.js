@@ -15,6 +15,7 @@ const ProButton = forwardRef( ( {
 	disabled = false,
 	loading = false,
 	icon = null,
+	iconPosition = 'right',
 	tooltip = null,
 	tooltipPosition = 'top',
 	children = __( 'Upgrade to Pro', 'wp-ai-blogger' ),
@@ -136,17 +137,20 @@ const ProButton = forwardRef( ( {
 			);
 		}
 
+		const iconElement = icon && (
+			<span className={`flex items-center ${iconPosition === 'left' ? 'mr-2' : 'ml-2'}`} aria-hidden="true">
+				{ icon }
+			</span>
+		);
+
 		return (
 			<>
-				{ icon && (
-					<span className="mr-2 flex items-center" aria-hidden="true">
-						{ icon }
-					</span>
-				) }
+				{ iconPosition === 'left' && iconElement }
 				{ children }
+				{ iconPosition === 'right' && iconElement }
 			</>
 		);
-	}, [ loading, icon, children ] );
+	}, [ loading, icon, iconPosition, children ] );
 
 	// Tooltip position styles
 	const tooltipPositions = {
