@@ -434,7 +434,7 @@ export default function PostIdeas() {
 						variant="primary"
 						size="default"
 						icon={<Crown className="w-4 h-4" />}
-						className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
+						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 						onClick={ proAvailable ? handleRefresh : undefined }
 						disabled={ ! proAvailable }
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions', 'wp-ai-blogger' ) }
@@ -550,16 +550,7 @@ export default function PostIdeas() {
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
 													</ProButton>
 												</div>
-											) : (
-												<ProButton
-													variant="ghost"
-													size="default"
-													icon={<MoveRight className="w-5 h-5" />}
-													className="text-indigo-600 hover:text-indigo-900"
-												>
-													{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
-												</ProButton>
-											) }
+											) : null }
 										</td>
 									</tr>
 								</tfoot>
