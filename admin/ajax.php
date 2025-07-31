@@ -863,20 +863,32 @@ class Ajax {
 
 
 
-			// If no content provided, generate content from title via API
-			$post_content = $post_data['post_content'] ?? '';
-			if ( empty( $post_content ) && ! empty( $post_title ) ) {
-				$generated_content = $this->generate_content_from_title_api( $post_title, $post_data );
-				if ( is_wp_error( $generated_content ) ) {
-					wp_send_json_error( [
-						'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $generated_content->get_error_message()
-					] );
-					return;
-				}
-				$post_content = $generated_content;
+		// If no content provided, generate content from title via API
+		$post_content = $post_data['post_content'] ?? '';
+		if ( empty( $post_content ) && ! empty( $post_title ) ) {
+			$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
+			if ( is_wp_error( $api_result ) ) {
+				wp_send_json_error( [
+					'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $api_result->get_error_message()
+				] );
+				return;
 			}
 
-			// Validate and sanitize content
+			$post_content = $api_result['post_content'];
+
+			// Process images if they exist in the API response
+			if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
+				$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
+				if ( is_wp_error( $processed_result ) ) {
+					// Log error but continue with original content (without images)
+					error_log( 'WP AI Blogger: Image processing failed - ' . $processed_result->get_error_message() );
+				} else {
+					$post_content = $processed_result;
+				}
+			}
+		}
+
+		// Validate and sanitize content
 			$post_content = wp_kses_post( $post_content );
 			if ( strlen( $post_content ) > 100000 ) { // 100KB limit
 				wp_send_json_error( [ 'message' => __( 'Post content is too long.', 'wp-ai-blogger' ) ] );
@@ -1126,6 +1138,9 @@ class Ajax {
 			// Add optional parameters if they exist in post_data with fallback values
 			if ( ! empty( $post_data['license'] ) ) {
 				$api_data['license'] = sanitize_text_field( $post_data['license'] );
+			} else {
+				// Get license from plugin settings if not provided
+				$api_data['license'] = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 			}
 
 			if ( ! empty( $post_data['site_title'] ) ) {
@@ -1142,6 +1157,9 @@ class Ajax {
 
 			// Temperature with fallback to 0.7
 			$api_data['temperature'] = isset( $post_data['temperature'] ) ? floatval( $post_data['temperature'] ) : 0.7;
+
+			// Add image count parameter (default to 3 if not specified)
+			$api_data['image_count'] = isset( $post_data['image_count'] ) ? absint( $post_data['image_count'] ) : 3;
 
 			// Safety settings with fallback values
 			$safety_settings = [
@@ -1204,7 +1222,7 @@ class Ajax {
 				return new \WP_Error( 'api_error', $error_message );
 			}
 
-			// Extract generated content
+			// Extract generated content and images
 			if ( ! isset( $decoded_response['post_content'] ) ) {
 				return new \WP_Error(
 					'api_no_content',
@@ -1222,12 +1240,194 @@ class Ajax {
 				);
 			}
 
-			return $generated_content;
+			// Extract images array if present
+			$images = $decoded_response['images'] ?? [];
+
+			return [
+				'post_content' => $generated_content,
+				'images'       => $images,
+			];
 
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'api_exception',
 				__( 'Exception occurred during content generation: ', 'wp-ai-blogger' ) . $e->getMessage()
+			);
+		}
+	}
+
+	/**
+	 * Process images from API response and replace placeholders in content.
+	 *
+	 * @param string $content The post content with placeholders.
+	 * @param array  $images Array of image data from API.
+	 * @return string|\WP_Error Processed content with images or error.
+	 * @since 2.0.0
+	 */
+	private function process_images_and_replace_placeholders( $content, $images ) {
+		try {
+			if ( empty( $images ) || ! is_array( $images ) ) {
+				return $content;
+			}
+
+			$processed_content = $content;
+			$image_html_blocks = [];
+
+			// Process each image
+			foreach ( $images as $image_data ) {
+				if ( empty( $image_data['url'] ) ) {
+					// Skip images without URLs
+					continue;
+				}
+
+				// Upload image to media library
+				$attachment_id = $this->upload_image_to_media_library(
+					$image_data['url'],
+					$image_data['alt_text'] ?? 'Generated image'
+				);
+
+				if ( is_wp_error( $attachment_id ) ) {
+					// Log error but continue processing other images
+					error_log( 'WP AI Blogger: Failed to upload image - ' . $attachment_id->get_error_message() );
+					continue;
+				}
+
+				// Get the uploaded image details
+				$image_url = wp_get_attachment_url( $attachment_id );
+				$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+
+				if ( empty( $image_alt ) ) {
+					$image_alt = $image_data['alt_text'] ?? 'Generated image';
+				}
+
+				// Create Gutenberg image block
+				$image_block = sprintf(
+					'<!-- wp:image {"id":%d,"sizeSlug":"large","linkDestination":"none"} -->' . "\n" .
+					'<figure class="wp-block-image size-large"><img src="%s" alt="%s" class="wp-image-%d"/></figure>' . "\n" .
+					'<!-- /wp:image -->',
+					$attachment_id,
+					esc_url( $image_url ),
+					esc_attr( $image_alt ),
+					$attachment_id
+				);
+
+				$image_html_blocks[] = $image_block;
+			}
+
+			// Replace placeholders with actual images
+			$placeholder_count = substr_count( $processed_content, '{{WP_AIB_IMAGE}}' );
+			$available_images = count( $image_html_blocks );
+
+			// Replace each placeholder with an image (cycle through available images if needed)
+			for ( $i = 0; $i < $placeholder_count; $i++ ) {
+				$image_index = $i % max( 1, $available_images );
+				$image_block = $image_html_blocks[ $image_index ] ?? '';
+
+				// Replace first occurrence of the placeholder
+				$processed_content = preg_replace( '/\{\{WP_AIB_IMAGE\}\}/', $image_block, $processed_content, 1 );
+			}
+
+			return $processed_content;
+
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'image_processing_error',
+				__( 'Exception occurred during image processing: ', 'wp-ai-blogger' ) . $e->getMessage()
+			);
+		}
+	}
+
+	/**
+	 * Upload an image from URL to WordPress media library.
+	 *
+	 * @param string $image_url The image URL to upload.
+	 * @param string $alt_text The alt text for the image.
+	 * @return int|\WP_Error The attachment ID or error.
+	 * @since 2.0.0
+	 */
+	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
+		try {
+			// Download the image
+			$response = wp_remote_get( $image_url, [
+				'timeout' => 30,
+				'headers' => [
+					'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+				],
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				return new \WP_Error(
+					'image_download_failed',
+					__( 'Failed to download image: ', 'wp-ai-blogger' ) . $response->get_error_message()
+				);
+			}
+
+			$http_code = wp_remote_retrieve_response_code( $response );
+			if ( $http_code !== 200 ) {
+				return new \WP_Error(
+					'image_download_http_error',
+					sprintf( __( 'Image download returned HTTP error %d', 'wp-ai-blogger' ), $http_code )
+				);
+			}
+
+			$image_data = wp_remote_retrieve_body( $response );
+			if ( empty( $image_data ) ) {
+				return new \WP_Error(
+					'image_download_empty',
+					__( 'Downloaded image data is empty', 'wp-ai-blogger' )
+				);
+			}
+
+			// Get image info from the URL
+			$image_info = pathinfo( parse_url( $image_url, PHP_URL_PATH ) );
+			$filename = sanitize_file_name( $image_info['filename'] ?? 'generated-image' );
+			$extension = $image_info['extension'] ?? 'jpg';
+
+			// Ensure we have a valid filename
+			if ( empty( $filename ) ) {
+				$filename = 'generated-image-' . time();
+			}
+
+			$filename = $filename . '.' . $extension;
+
+			// Upload to WordPress
+			$upload = wp_upload_bits( $filename, null, $image_data );
+			if ( $upload['error'] ) {
+				return new \WP_Error(
+					'image_upload_failed',
+					__( 'Failed to upload image: ', 'wp-ai-blogger' ) . $upload['error']
+				);
+			}
+
+			// Create attachment
+			$attachment = [
+				'post_mime_type' => wp_check_filetype( $upload['file'] )['type'],
+				'post_title'     => sanitize_text_field( $alt_text ),
+				'post_content'   => '',
+				'post_status'    => 'inherit',
+			];
+
+			$attachment_id = wp_insert_attachment( $attachment, $upload['file'] );
+			if ( is_wp_error( $attachment_id ) ) {
+				return $attachment_id;
+			}
+
+			// Set alt text
+			if ( ! empty( $alt_text ) ) {
+				update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $alt_text ) );
+			}
+
+			// Generate attachment metadata
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+			wp_update_attachment_metadata( $attachment_id, $attachment_data );
+
+			return $attachment_id;
+
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'image_upload_exception',
+				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}
