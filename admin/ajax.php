@@ -1158,8 +1158,8 @@ class Ajax {
 			// Temperature with fallback to 0.7
 			$api_data['temperature'] = isset( $post_data['temperature'] ) ? floatval( $post_data['temperature'] ) : 0.7;
 
-			// Add image count parameter (default to 3 if not specified)
-			$api_data['image_count'] = isset( $post_data['image_count'] ) ? absint( $post_data['image_count'] ) : 3;
+			// Add image count parameter (default to 0 if not specified)
+			$api_data['image_count'] = isset( $post_data['image_count'] ) ? absint( $post_data['image_count'] ) : 0;
 
 			// Safety settings with fallback values
 			$safety_settings = [

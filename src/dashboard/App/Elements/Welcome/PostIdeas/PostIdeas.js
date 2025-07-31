@@ -333,6 +333,7 @@ export default function PostIdeas() {
 			hate: hate,
 			sexually_explicit: sexuallyExplicit,
 			dangerous_content: dangerousContent,
+			image_count: 1,
 		};
 
 		formData.append( 'post_data', JSON.stringify( postData ) );
