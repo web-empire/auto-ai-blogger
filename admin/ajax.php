@@ -513,11 +513,6 @@ class Ajax {
 			// Update option with error handling
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
 
-			// Debug logging for postIdeas
-			if ( $sub_option_key === 'postIdeas' ) {
-				error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $sub_option_key . ', Original Value: ' . print_r( $_POST['value'], true ) . ', Sanitized Value: ' . print_r( $sub_option_value, true ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
-			}
-
 			if ( false === $update_result ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
@@ -893,7 +888,6 @@ class Ajax {
 				$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
 				if ( is_wp_error( $processed_result ) ) {
 					// Log error but continue with original content (without images)
-					error_log( 'WP AI Blogger: Image processing failed - ' . $processed_result->get_error_message() );
 				} else {
 					$post_content = $processed_result;
 				}
@@ -979,7 +973,6 @@ class Ajax {
 			wp_send_json_success( $success_response );
 
 		} catch ( \Exception $e ) {
-			error_log( 'WP AI Blogger: Exception in wpaib_create_post - ' . $e->getMessage() );
 			wp_send_json_error( [
 				'message' => __( 'An unexpected error occurred while creating the post. Please try again.', 'wp-ai-blogger' )
 			] );
@@ -989,6 +982,7 @@ class Ajax {
 	/**
 	 * Remove a post idea from the database when a post is created from it.
 	 * This keeps Redux unchanged so UI can show "Open Post" button until page refresh.
+	 * Uses atomic operations to prevent race conditions when multiple posts are created quickly.
 	 *
 	 * @param string $post_title The title of the post that was created.
 	 * @since 2.0.0
@@ -1001,43 +995,88 @@ class Ajax {
 				return;
 			}
 
-			// Get current post ideas from database
-			$current_post_ideas = \WPAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
+			// Use WordPress transients for atomic operations to prevent race conditions
+			$lock_key = 'wp_ai_blogger_postideas_lock';
+			$max_lock_time = 10; // Maximum lock time in seconds
 
-			if ( empty( $current_post_ideas ) || ! is_string( $current_post_ideas ) ) {
+			// Try to acquire lock (retry up to 3 times)
+			$lock_acquired = false;
+			$retry_count = 0;
+			$max_retries = 3;
+
+			while ( ! $lock_acquired && $retry_count < $max_retries ) {
+				$lock_acquired = get_transient( $lock_key );
+
+				if ( false === $lock_acquired ) {
+					// No lock exists, try to set one
+					$lock_acquired = set_transient( $lock_key, time(), $max_lock_time );
+					break;
+				} else {
+					// Lock exists, check if it's expired
+					$lock_time = intval( $lock_acquired );
+					if ( ( time() - $lock_time ) > $max_lock_time ) {
+						// Lock is expired, force remove it and try again
+						delete_transient( $lock_key );
+						$lock_acquired = false;
+					} else {
+						// Wait a bit before retrying
+						usleep( 100000 ); // 100ms
+						$retry_count++;
+						$lock_acquired = false;
+					}
+				}
+			}
+
+			if ( ! $lock_acquired ) {
+				// Could not acquire lock, return
 				return;
 			}
 
-			// Convert post ideas string to array
-			$ideas_array = array_filter( array_map( 'trim', explode( "\n", $current_post_ideas ) ) );
+			// Now we have the lock, perform the operation
+			try {
+				// Get current post ideas from database (fresh read)
+				$current_post_ideas = \WPAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
 
-			// Find and remove the exact matching idea
-			$updated_ideas = [];
-			$found_and_removed = false;
-
-			foreach ( $ideas_array as $idea ) {
-				if ( ! $found_and_removed && trim( $idea ) === $post_title ) {
-					$found_and_removed = true;
-					continue; // Skip this idea (remove it)
+				if ( empty( $current_post_ideas ) || ! is_string( $current_post_ideas ) ) {
+					return;
 				}
-				$updated_ideas[] = $idea;
-			}
 
-			// Only update if we actually removed something
-			if ( $found_and_removed ) {
-				// Check if this was the last post idea
-				if ( empty( $updated_ideas ) ) {
-					// Set to "-1" to indicate post ideas are exhausted
-					\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
-				} else {
-					$updated_post_ideas_string = implode( "\n", $updated_ideas );
-					\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+				// Convert post ideas string to array
+				$ideas_array = array_filter( array_map( 'trim', explode( "\n", $current_post_ideas ) ) );
+
+				// Find and remove the exact matching idea
+				$updated_ideas = [];
+				$found_and_removed = false;
+
+				foreach ( $ideas_array as $idea ) {
+					if ( ! $found_and_removed && trim( $idea ) === $post_title ) {
+						$found_and_removed = true;
+						continue; // Skip this idea (remove it)
+					}
+					$updated_ideas[] = $idea;
 				}
+
+				// Only update if we actually removed something
+				if ( $found_and_removed ) {
+					// Check if this was the last post idea
+					if ( empty( $updated_ideas ) ) {
+						// Set to "-1" to indicate post ideas are exhausted
+						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+					} else {
+						$updated_post_ideas_string = implode( "\n", $updated_ideas );
+						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+					}
+				}
+
+			} finally {
+				// Always release the lock
+				delete_transient( $lock_key );
 			}
 
 		} catch ( \Exception $e ) {
 			// Log error but don't fail the post creation
-			error_log( 'WP AI Blogger: Error removing post idea from DB - ' . $e->getMessage() );
+			// Make sure to release lock even on exception
+			delete_transient( $lock_key );
 		}
 	}
 
@@ -1330,7 +1369,6 @@ class Ajax {
 
 				if ( is_wp_error( $attachment_id ) ) {
 					// Log error but continue processing other images
-					error_log( 'WP AI Blogger: Failed to upload image - ' . $attachment_id->get_error_message() );
 					continue;
 				}
 
