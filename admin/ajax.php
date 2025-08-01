@@ -999,32 +999,32 @@ class Ajax {
 			$lock_key = 'wp_ai_blogger_postideas_lock';
 			$max_lock_time = 10; // Maximum lock time in seconds
 
-			// Try to acquire lock (retry up to 3 times)
+			// Try to acquire lock (retry up to 5 times)
 			$lock_acquired = false;
 			$retry_count = 0;
 			$max_retries = 5;
 
 			while ( ! $lock_acquired && $retry_count < $max_retries ) {
-				$lock_acquired = get_transient( $lock_key );
+				$existing_lock = get_transient( $lock_key );
 
-				if ( false === $lock_acquired ) {
+				if ( false === $existing_lock ) {
 					// No lock exists, try to set one
 					$lock_acquired = set_transient( $lock_key, time(), $max_lock_time );
-					break;
+					if ( $lock_acquired ) {
+						break; // Successfully acquired lock
+					}
 				} else {
 					// Lock exists, check if it's expired
-					$lock_time = intval( $lock_acquired );
+					$lock_time = intval( $existing_lock );
 					if ( ( time() - $lock_time ) > $max_lock_time ) {
 						// Lock is expired, force remove it and try again
 						delete_transient( $lock_key );
-						$lock_acquired = false;
 					} else {
 						// Wait a bit before retrying
-						usleep( 100000 ); // 100ms
-						$retry_count++;
-						$lock_acquired = false;
+						usleep( 50000 ); // 50ms
 					}
 				}
+				$retry_count++;
 			}
 
 			if ( ! $lock_acquired ) {
