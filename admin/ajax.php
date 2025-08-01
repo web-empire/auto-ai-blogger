@@ -869,7 +869,8 @@ class Ajax {
 			$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
 			if ( is_wp_error( $api_result ) ) {
 				wp_send_json_error( [
-					'message' => __( 'Failed to generate content: ', 'wp-ai-blogger' ) . $api_result->get_error_message()
+					'message' => $api_result->get_error_message(),
+					'code' => $api_result->get_error_code()
 				] );
 				return;
 			}
@@ -1219,7 +1220,9 @@ class Ajax {
 			// Check API response status
 			if ( isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
 				$error_message = $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' );
-				return new \WP_Error( 'api_error', $error_message );
+				$error_code = $decoded_response['code'] ?? 'api_error';
+
+				return new \WP_Error( $error_code, $error_message );
 			}
 
 			// Extract generated content and images

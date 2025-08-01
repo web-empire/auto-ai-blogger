@@ -349,7 +349,11 @@ export default function PostIdeas() {
 					console.error( __( 'Invalid response received from server.', 'wp-ai-blogger' ) );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-						payload: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
+						payload: {
+							message: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
+							type: 'error',
+							duration: 5000
+						}
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -363,7 +367,11 @@ export default function PostIdeas() {
 					console.error( __( 'Failed to create post:', 'wp-ai-blogger' ), errorMessage );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-						payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+						payload: {
+							message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+							type: 'error',
+							duration: 5000
+						}
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -376,7 +384,11 @@ export default function PostIdeas() {
 					console.error( __( 'Post created but no post ID or edit link received.', 'wp-ai-blogger' ) );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-						payload: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
+						payload: {
+							message: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
+							type: 'error',
+							duration: 5000
+						}
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -405,7 +417,11 @@ export default function PostIdeas() {
 				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), error );
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+					payload: {
+						message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+						type: 'error',
+						duration: 5000
+					}
 				} );
 				// Reset button state
 				e.target.innerHTML = originalContent;
