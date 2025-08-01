@@ -868,10 +868,18 @@ class Ajax {
 		if ( empty( $post_content ) && ! empty( $post_title ) ) {
 			$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
 			if ( is_wp_error( $api_result ) ) {
-				wp_send_json_error( [
+				$error_response = [
 					'message' => $api_result->get_error_message(),
 					'code' => $api_result->get_error_code()
-				] );
+				];
+
+				// Include HTTP status code if available
+				$error_data = $api_result->get_error_data();
+				if ( $error_data && isset( $error_data['status'] ) ) {
+					$error_response['status'] = $error_data['status'];
+				}
+
+				wp_send_json_error( $error_response );
 				return;
 			}
 
@@ -1199,12 +1207,6 @@ class Ajax {
 			}
 
 			$http_code = wp_remote_retrieve_response_code( $response );
-			if ( $http_code !== 200 ) {
-				return new \WP_Error(
-					'api_http_error',
-					sprintf( __( 'API returned HTTP error %d', 'wp-ai-blogger' ), $http_code )
-				);
-			}
 
 			// Parse response
 			$body = wp_remote_retrieve_body( $response );
@@ -1217,12 +1219,35 @@ class Ajax {
 				);
 			}
 
+			// Handle non-200 HTTP status codes with API error response
+			if ( $http_code !== 200 ) {
+				// Try to extract error details from API response first
+				if ( isset( $decoded_response['code'] ) && isset( $decoded_response['message'] ) ) {
+					$error_code = $decoded_response['code'];
+					$error_message = $decoded_response['message'];
+					$error_data = isset( $decoded_response['data']['status'] ) ? [ 'status' => $decoded_response['data']['status'] ] : [ 'status' => $http_code ];
+
+					return new \WP_Error( $error_code, $error_message, $error_data );
+				} else {
+					// Fallback to generic HTTP error
+					return new \WP_Error(
+						'api_http_error',
+						sprintf( __( 'API returned HTTP error %d', 'wp-ai-blogger' ), $http_code ),
+						[ 'status' => $http_code ]
+					);
+				}
+			}
+
 			// Check API response status
 			if ( isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
 				$error_message = $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' );
 				$error_code = $decoded_response['code'] ?? 'api_error';
 
-				return new \WP_Error( $error_code, $error_message );
+				// Include HTTP status code if available
+				$http_status = $decoded_response['data']['status'] ?? null;
+				$error_data = $http_status ? [ 'status' => $http_status ] : null;
+
+				return new \WP_Error( $error_code, $error_message, $error_data );
 			}
 
 			// Extract generated content and images
