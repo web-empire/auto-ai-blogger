@@ -343,7 +343,7 @@ export default function PostIdeas() {
 			method: 'POST',
 			body: formData,
 		} )
-			.then( ( response ) => {
+			.then( async ( response ) => {
 				// Check if response exists and has the expected structure
 				if ( ! response || typeof response !== 'object' ) {
 					console.error( __( 'Invalid response received from server.', 'wp-ai-blogger' ) );
@@ -412,6 +412,10 @@ export default function PostIdeas() {
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: response.data.token_data.remaining,
 					});
+
+					// Update API data in database
+					await updateApiData( 'tokenTotal', response.data.token_data.total, dispatch, abortControllerRef );
+					await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
 				}
 
 				// Update button to "Open Post"

@@ -1283,11 +1283,6 @@ class Ajax {
 
 			// Extract and update token data if present
 			$token_data = $decoded_response['token_data'] ?? null;
-			if ( $token_data && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
-				// Update the WP AI Blogger settings with the new token data
-				\WPAIBlogger\Inc\Utils\Helper::update_option( 'totalTokens', absint( $token_data['total'] ) );
-				\WPAIBlogger\Inc\Utils\Helper::update_option( 'remainingTokens', absint( $token_data['remaining'] ) );
-			}
 
 			return [
 				'post_content' => $generated_content,
