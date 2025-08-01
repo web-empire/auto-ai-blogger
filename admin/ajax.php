@@ -1002,7 +1002,7 @@ class Ajax {
 			// Try to acquire lock (retry up to 3 times)
 			$lock_acquired = false;
 			$retry_count = 0;
-			$max_retries = 3;
+			$max_retries = 5;
 
 			while ( ! $lock_acquired && $retry_count < $max_retries ) {
 				$lock_acquired = get_transient( $lock_key );
