@@ -399,6 +399,21 @@ export default function PostIdeas() {
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
 
+				// Handle token data if present (update Redux state only, database already updated)
+				if ( response.data.token_data &&
+					 typeof response.data.token_data === 'object' &&
+					 response.data.token_data.total !== undefined &&
+					 response.data.token_data.remaining !== undefined ) {
+					dispatch({
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: response.data.token_data.total,
+					});
+					dispatch({
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: response.data.token_data.remaining,
+					});
+				}
+
 				// Update button to "Open Post"
 				e.target.dataset.type = 'open-post';
 				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;

@@ -865,6 +865,7 @@ class Ajax {
 
 		// If no content provided, generate content from title via API
 		$post_content = $post_data['post_content'] ?? '';
+		$token_data = null; // Initialize token data variable
 		if ( empty( $post_content ) && ! empty( $post_title ) ) {
 			$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
 			if ( is_wp_error( $api_result ) ) {
@@ -884,6 +885,8 @@ class Ajax {
 			}
 
 			$post_content = $api_result['post_content'];
+			// Store token data from API response
+			$token_data = $api_result['token_data'] ?? null;
 
 			// Process images if they exist in the API response
 			if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
@@ -960,13 +963,20 @@ class Ajax {
 				$this->remove_post_idea_from_db( $post_data['title'] );
 			}
 
-			wp_send_json_success( [
+			$success_response = [
 				'message' => $this->get_error_msg( 'success' ),
 				'post_id' => $post_id,
 				'title' => $post_title,
 				'status' => $post_status,
 				'edit_link' => get_edit_post_link( $post_id, 'raw' ),
-			] );
+			];
+
+			// Include token data in response if available (for Redux state updates)
+			if ( $token_data && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
+				$success_response['token_data'] = $token_data;
+			}
+
+			wp_send_json_success( $success_response );
 
 		} catch ( \Exception $e ) {
 			error_log( 'WP AI Blogger: Exception in wpaib_create_post - ' . $e->getMessage() );
@@ -1271,9 +1281,18 @@ class Ajax {
 			// Extract images array if present
 			$images = $decoded_response['images'] ?? [];
 
+			// Extract and update token data if present
+			$token_data = $decoded_response['token_data'] ?? null;
+			if ( $token_data && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
+				// Update the WP AI Blogger settings with the new token data
+				\WPAIBlogger\Inc\Utils\Helper::update_option( 'totalTokens', absint( $token_data['total'] ) );
+				\WPAIBlogger\Inc\Utils\Helper::update_option( 'remainingTokens', absint( $token_data['remaining'] ) );
+			}
+
 			return [
 				'post_content' => $generated_content,
 				'images'       => $images,
+				'token_data'       => $token_data,
 			];
 
 		} catch ( \Exception $e ) {
