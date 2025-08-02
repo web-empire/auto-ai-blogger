@@ -39,6 +39,11 @@ const ProButton = forwardRef( ( {
 		// Call custom onClick if provided
 		if ( onClick ) {
 			onClick( event );
+
+			// If the custom onClick prevented the default, don't open URL
+			if ( event.defaultPrevented ) {
+				return;
+			}
 		}
 
 		// For links, let the browser handle the navigation

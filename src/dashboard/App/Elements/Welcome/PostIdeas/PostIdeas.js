@@ -191,13 +191,13 @@ export default function PostIdeas() {
 	}, [ postIdeas, licenseEnabled ] );
 
 	const handleRefresh = ( e ) => {
-		e.preventDefault();
-		e.stopPropagation();
-
 		// If pro is not available, don't handle the refresh - let ProButton handle the URL opening
 		if ( ! proAvailable ) {
 			return;
 		}
+
+		e.preventDefault();
+		e.stopPropagation();
 
 		dispatch( {
 			type: UPDATE_POST_IDEAS,
