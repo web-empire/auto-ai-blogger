@@ -229,8 +229,8 @@ class Settings {
 				$output = ! empty( $value ) ? wpaib_clean_data( $value ) : '';
 				break;
 
-			case 'array':
-				$output = ! empty( $value ) && is_array( $value ) ? array_map( 'sanitize_textarea_field', $value ) : [];
+			case 'textarea':
+				$output = ! empty( $value ) ? sanitize_textarea_field( wp_unslash( $value ) ) : '';
 				break;
 
 			case 'html':

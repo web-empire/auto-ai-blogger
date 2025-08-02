@@ -74,21 +74,6 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 		return num?.toString() || '0';
 	};
 
-	const getHealthColor = ( health ) => {
-		switch ( health ) {
-			case 'excellent':
-				return 'text-green-600 bg-green-100';
-			case 'good':
-				return 'text-blue-600 bg-blue-100';
-			case 'warning':
-				return 'text-yellow-600 bg-yellow-100';
-			case 'poor':
-				return 'text-red-600 bg-red-100';
-			default:
-				return 'text-gray-600 bg-gray-100';
-		}
-	};
-
 	const onUpgradePro = ( e ) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -144,7 +129,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 										<div className="text-red-500 mb-2">{ error }</div>
 										<button
 											onClick={ fetchAnalyticsData }
-											className="text-indigo-600 hover:text-indigo-500 text-sm"
+											className="text-indigo-600 hover:text-indigo-500 text-sm p-2 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
 										>
 											{ __( 'Try again', 'wp-ai-blogger' ) }
 										</button>
@@ -157,9 +142,8 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 											<div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
 												<div className="flex items-center justify-between">
 													<div className="flex flex-col gap-2">
-														<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Published Posts', 'wp-ai-blogger' ) }</p>
+														<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Created Posts', 'wp-ai-blogger' ) }</p>
 														<p className="text-2xl font-bold text-blue-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
-														<p className="text-sm text-blue-600 m-0">{ __( 'Total Views', 'wp-ai-blogger' ) }</p>
 													</div>
 													<TrendingUp className="w-6 h-6 text-blue-500" />
 												</div>
@@ -171,7 +155,6 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 													<div className="flex flex-col gap-2">
 														<p className="text-sm font-medium text-green-600 m-0">{ __( 'Success Rate', 'wp-ai-blogger' ) }</p>
 														<p className="text-2xl font-bold text-green-900 m-0">{ analyticsData?.successRate || '95' }%</p>
-														<p className="text-sm text-green-600 m-0">{ __( 'Generation success', 'wp-ai-blogger' ) }</p>
 													</div>
 													<CheckCircle className="w-6 h-6 text-green-500" />
 												</div>
@@ -183,7 +166,6 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 													<div className="flex flex-col gap-2">
 														<p className="text-sm font-medium text-purple-600 m-0">{ __( 'Total Comments', 'wp-ai-blogger' ) }</p>
 														<p className="text-2xl font-bold text-purple-900 m-0">{ formatNumber( analyticsData?.totalComments || 0 ) }</p>
-														<p className="text-sm text-purple-600 m-0">{ __( 'Engagement', 'wp-ai-blogger' ) }</p>
 													</div>
 													<MessageSquare className="w-6 h-6 text-purple-500" />
 												</div>
@@ -197,14 +179,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 												<h4 className="text-base font-semibold text-gray-900 m-0">{ __( 'Campaign Health', 'wp-ai-blogger' ) }</h4>
 											</div>
 
-											<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-												<div className="text-center p-3 bg-gray-50 rounded-lg">
-													<div className={ `inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${ getHealthColor( analyticsData?.health || 'good' ) }` }>
-														{ analyticsData?.health || 'Good' }
-													</div>
-													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Status', 'wp-ai-blogger' ) }</p>
-												</div>
-
+											<div className="grid grid-cols-3 lg:grid-cols-3 gap-3">
 												<div className="text-center p-3 bg-gray-50 rounded-lg">
 													<div className="flex items-center justify-center">
 														<CalendarCheck className="w-4 h-4 text-gray-500 mr-1" />

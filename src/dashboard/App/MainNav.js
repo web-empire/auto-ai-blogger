@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import BrandIcon from '@AppImages/crown.svg';
 import { CoreVersion, TokenDisplayAndRefresh } from '@Components/NavigationComponents';
 import { useSelector } from 'react-redux';
+import { Crown } from 'lucide-react';
 
 /**
  * Enhanced MainNav component with better performance and accessibility
@@ -138,27 +139,11 @@ export default function MainNav() {
 							<div className="text-sm font-medium text-slate-600 hover:text-[#1E293B] hover:svg-hover-color pr-4">
 								<button
 									onClick={ handleProPurchase }
-									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded px-2 py-1 transition-colors duration-200"
+									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded px-3 py-2 transition-colors duration-200 gap-2"
 									aria-label={ __( 'Unlock Pro Features - Opens in new tab', 'wp-ai-blogger' ) }
 									type="button"
 								>
-									<svg
-										width="16"
-										height="12"
-										viewBox="0 0 16 12"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-										className="mr-2 svg-focusable"
-										aria-hidden="true"
-									>
-										<path
-											d="M3.3335 11.3337H12.6668M1.3335 0.666992L3.3335 8.66699H12.6668L14.6668 0.666992L10.6668 5.33366L8.00016 0.666992L5.3335 5.33366L1.3335 0.666992Z"
-											stroke="currentColor"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="svg-path"
-										/>
-									</svg>
+									<Crown className="w-4 h-4" />
 									{ __( 'Unlock Pro Features', 'wp-ai-blogger' ) }
 								</button>
 							</div>

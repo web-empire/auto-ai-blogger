@@ -82,10 +82,6 @@ class Helper {
 			return $default;
 		}
 
-		// Get the original camelCase key for further processing.
-		$original_key_index = array_search( $key, $sanitized_allowed_keys );
-		$original_key       = self::$allowed_keys[ $original_key_index ];
-
 		$settings = Settings::get_ai_blogger_settings();
 
 		if ( empty( $settings ) || ! is_array( $settings ) ) {
@@ -104,8 +100,7 @@ class Helper {
 			return $default;
 		}
 
-		// Sanitize output based on key type (use original camelCase key).
-		return self::sanitize_output( $original_key, $value );
+		return $value;
 	}
 
 	/**
@@ -419,66 +414,6 @@ class Helper {
 					return is_float( $value ) ? (float) $value : absint( $value );
 				}
 				return false;
-		}
-	}
-
-	/**
-	 * Sanitizes output values based on key type.
-	 *
-	 * @since 1.0.0
-	 * @param string $key The option key.
-	 * @param mixed  $value The value to sanitize.
-	 * @return mixed Sanitized value.
-	 */
-	private static function sanitize_output( string $key, $value ) {
-		switch ( $key ) {
-			case 'userOnboarded':
-			case 'enableLogging':
-				return (bool) $value;
-
-			case 'onboardingTab':
-			case 'license_status':
-				return sanitize_key( $value );
-
-			case 'userName':
-			case 'siteTitle':
-			case 'siteFor':
-			case 'license':
-			case 'apiKey':
-			case 'blogName':
-				return sanitize_text_field( $value );
-
-			case 'userEmail':
-			case 'adminEmail':
-				return sanitize_email( $value );
-
-			case 'siteDescription':
-				return sanitize_textarea_field( $value );
-
-			case 'temperature':
-				return (float) $value;
-
-			case 'harassment':
-			case 'hate':
-			case 'sexuallyExplicit':
-			case 'dangerousContent':
-			case 'tokenTotal':
-			case 'tokenRemaining':
-				return absint( $value );
-
-			case 'postIdeas':
-				// Return string format directly for frontend.
-				if ( is_string( $value ) ) {
-					return sanitize_textarea_field( $value );
-				}
-				return '';
-
-			default:
-				// Default sanitization for unknown keys.
-				if ( is_string( $value ) ) {
-					return sanitize_text_field( $value );
-				}
-				return $value;
 		}
 	}
 

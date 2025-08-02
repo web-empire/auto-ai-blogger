@@ -169,3 +169,7 @@ urlencode
 usleep
 wpfooter
 XSS
+numberposts
+strtotime
+typenow
+userdata

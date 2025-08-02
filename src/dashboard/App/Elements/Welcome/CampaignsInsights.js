@@ -1,30 +1,36 @@
 import React, { useMemo, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MoveRight, Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink } from 'lucide-react';
+import { MoveRight, Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, CalendarCheck, ChartPie } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-// Enhanced metric card component with animations and accessibility
-const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, className = '' } ) => (
-	<div className={ `bg-white rounded-lg p-4 border border-gray-200 hover:border-indigo-300 transition-all duration-200 hover:shadow-md ${ className }` }>
-		<div className="flex items-center justify-between mb-2">
+// Enhanced metric card component with animations and accessibility.
+const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, className = '', getOnlyDetails = false } ) => (
+	<div className={ `${ getOnlyDetails ? '' : 'bg-white rounded-lg p-4 border border-solid border-gray-200 hover:border-indigo-300 transition-all duration-200 shadow-sm hover:shadow-lg' } ${ className }` }>
+		<div className="flex items-center justify-between">
 			<div className="flex items-center gap-2">
-				<div className="p-2 bg-indigo-50 rounded-lg">
-					<Icon className="w-4 h-4 text-indigo-600" aria-hidden="true" />
-				</div>
+				{
+					! getOnlyDetails && (
+						<div className={ `${ getOnlyDetails ? '' : 'p-2 bg-indigo-50 rounded-lg' }` }>
+							<Icon className="w-4 h-4 text-indigo-600 flex" aria-hidden="true" />
+						</div>
+					)
+				}
 				<span className="text-sm font-medium text-gray-600">{ metric }</span>
 			</div>
-			{ trend && (
-				<div className={ `flex items-center gap-1 text-xs ${ trend > 0 ? 'text-green-600' : 'text-red-600' }` }>
-					<TrendingUp className="w-3 h-3" aria-hidden="true" />
-					<span>{ Math.abs( trend ) }%</span>
-				</div>
-			) }
-		</div>
-		<div className="space-y-1">
-			<div className="text-2xl font-bold text-gray-900" aria-label={ `${ metric }: ${ value }` }>
+
+			<div className={ `${ getOnlyDetails ? 'text-base' : 'text-xl' } font-bold text-gray-900` } aria-label={ `${ metric }: ${ value }` }>
 				{ value }
+				{ trend && (
+					<div className={ `flex items-center gap-1 text-xs ${ trend > 0 ? 'text-green-600' : 'text-red-600' }` }>
+						<TrendingUp className="w-3 h-3" aria-hidden="true" />
+						<span>{ Math.abs( trend ) }%</span>
+					</div>
+				) }
 			</div>
+		</div>
+
+		<div className="space-y-1">
 			{ description && (
 				<p className="text-xs text-gray-500">{ description }</p>
 			) }
@@ -34,7 +40,7 @@ const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, clas
 
 MetricCard.displayName = 'CampaignMetricCard';
 
-// Enhanced campaign card component with better UX
+// Enhanced campaign card component with better UX.
 const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 	const handleKeyDown = useCallback( ( e ) => {
 		if ( e.key === 'Enter' || e.key === ' ' ) {
@@ -43,11 +49,10 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 		}
 	}, [ campaign, onViewDetails ] );
 
-	const statusColor = campaign?.status === 'active' ? 'text-green-600' : 'text-gray-500';
 	const isPerformant = ( campaign?.postsVisit || 0 ) > 100;
 
 	return (
-		<div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 group">
+		<div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-solid border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 group">
 			{ /* Performance indicator */ }
 			{ isPerformant && (
 				<div className="absolute top-3 right-3 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
@@ -58,34 +63,31 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 			<div className="p-6">
 				{ /* Campaign header */ }
 				<div className="mb-4">
-					<h4 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
-						{ campaign?.name || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
+					<h4 className="text-base font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors p-0 m-0">
+						{ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
 					</h4>
-					<span className={ `text-sm font-medium ${ statusColor }` }>
-						{ campaign?.status === 'active' ? __( 'Active', 'wp-ai-blogger' ) : __( 'Inactive', 'wp-ai-blogger' ) }
-					</span>
 				</div>
 
 				{ /* Metrics grid */ }
-				<div className="grid grid-cols-3 gap-4 mb-6">
+				<div className="flex flex-col gap-2">
 					<MetricCard
 						metric={ __( 'Posts', 'wp-ai-blogger' ) }
 						value={ campaign?.postsCreated || '0' }
 						icon={ BarChart3 }
-						className="bg-blue-50 border-blue-200"
+						getOnlyDetails={ true }
 					/>
 					<MetricCard
 						metric={ __( 'Visits', 'wp-ai-blogger' ) }
 						value={ campaign?.postsVisit || '0' }
 						icon={ Eye }
 						trend={ campaign?.visitTrend }
-						className="bg-green-50 border-green-200"
+						getOnlyDetails={ true }
 					/>
 					<MetricCard
 						metric={ __( 'Last Run', 'wp-ai-blogger' ) }
 						value={ campaign?.lastRun || __( 'Never', 'wp-ai-blogger' ) }
 						icon={ Calendar }
-						className="bg-purple-50 border-purple-200"
+						getOnlyDetails={ true }
 					/>
 				</div>
 			</div>
@@ -96,7 +98,7 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 					type="button"
 					onClick={ () => onViewDetails( campaign ) }
 					onKeyDown={ handleKeyDown }
-					className="w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-2 hover:bg-indigo-50 transition-all duration-200"
+					className="w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-0 bg-transparent transition-all duration-200"
 					aria-label={ __( 'View details for campaign', 'wp-ai-blogger' ) }
 				>
 					<span>{ __( 'View Campaign Details', 'wp-ai-blogger' ) }</span>
@@ -214,11 +216,11 @@ function CampaignsInsights( { onError } ) {
 	if ( ! campaignsData.campaigns || campaignsData.campaigns.length === 0 ) {
 		return (
 			<section
-				className="px-4 sm:px-6 lg:px-8 py-8"
+				className="px-4 sm:px-6 lg:px-8 pb-8 pt-0"
 				aria-labelledby="campaigns-insights-heading"
 			>
 				<div className="mb-6">
-					<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900">
+					<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
 						{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
 					</h2>
 					<p className="text-gray-600 mt-1">
@@ -239,13 +241,11 @@ function CampaignsInsights( { onError } ) {
 			<div className="mb-8">
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900">
-							{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
+						<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
+							{ __( 'Overall Metrics', 'wp-ai-blogger' ) }
 						</h2>
-						<p className="text-gray-600 mt-1">
-							{ __( 'Overview of your', 'wp-ai-blogger' ) + ` ${ campaignsData.totalCampaigns } ` + __( 'campaigns', 'wp-ai-blogger' ) }
-						</p>
 					</div>
+
 					{ campaignsData.activeCampaigns > 0 && (
 						<div className="flex items-center gap-1 text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm font-medium">
 							<TrendingUp className="w-4 h-4" aria-hidden="true" />
@@ -255,34 +255,40 @@ function CampaignsInsights( { onError } ) {
 				</div>
 
 				{ /* Summary metrics */ }
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+				<div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
 					<MetricCard
-						metric={ __( 'Total Posts Created', 'wp-ai-blogger' ) }
+						metric={ __( 'Total Posts', 'wp-ai-blogger' ) }
 						value={ campaignsData.totalPosts.toLocaleString() }
-						description={ __( 'Across all campaigns', 'wp-ai-blogger' ) }
 						icon={ BarChart3 }
 						className="bg-blue-50 border-blue-200"
 					/>
 					<MetricCard
 						metric={ __( 'Total Visits', 'wp-ai-blogger' ) }
 						value={ campaignsData.totalVisits.toLocaleString() }
-						description={ __( 'Combined traffic', 'wp-ai-blogger' ) }
 						icon={ Eye }
 						className="bg-green-50 border-green-200"
 					/>
 					<MetricCard
 						metric={ __( 'Active Campaigns', 'wp-ai-blogger' ) }
 						value={ `${ campaignsData.activeCampaigns }/${ campaignsData.totalCampaigns }` }
-						description={ __( 'Currently running', 'wp-ai-blogger' ) }
-						icon={ TrendingUp }
+						icon={ CalendarCheck }
+						className="bg-purple-50 border-purple-200"
+					/>
+					<MetricCard
+						metric={ __( 'Analytics', 'wp-ai-blogger' ) }
+						value={ `${ campaignsData.activeCampaigns }/${ campaignsData.totalCampaigns }` }
+						icon={ ChartPie }
 						className="bg-purple-50 border-purple-200"
 					/>
 				</div>
 			</div>
 
 			{ /* Enhanced campaigns grid */ }
+			<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
+				{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
+			</h2>
 			<div
-				className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+				className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6"
 				role="region"
 				aria-label={ __( 'Campaigns list', 'wp-ai-blogger' ) }
 			>

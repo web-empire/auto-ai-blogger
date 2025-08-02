@@ -74,7 +74,6 @@ function Welcome() {
 				{ /* Campaigns insights section */ }
 				<section
 					aria-labelledby="campaigns-heading"
-					className="mb-8"
 				>
 					<h2 id="campaigns-heading" className="sr-only">
 						{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }

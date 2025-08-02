@@ -190,7 +190,15 @@ export default function PostIdeas() {
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
-	const handleRefresh = () => {
+	const handleRefresh = ( e ) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if ( ! proAvailable ) {
+			window.open( wpaib_localized_data.pro_purchase_url, '_blank' );
+			return;
+		}
+
 		dispatch( {
 			type: UPDATE_POST_IDEAS,
 			payload: '', // Use empty string instead of empty array
@@ -391,9 +399,9 @@ export default function PostIdeas() {
 
 				// Handle token data if present (update Redux state only, database already updated)
 				if ( response.data.token_data &&
-					 typeof response.data.token_data === 'object' &&
-					 response.data.token_data.total !== undefined &&
-					 response.data.token_data.remaining !== undefined ) {
+					typeof response.data.token_data === 'object' &&
+					response.data.token_data.total !== undefined &&
+					response.data.token_data.remaining !== undefined ) {
 					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: response.data.token_data.total,
@@ -410,7 +418,7 @@ export default function PostIdeas() {
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Post created successfully! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
+					payload: __( 'Post created successfully! Click "Edit" to edit it.', 'wp-ai-blogger' ),
 				} );
 			} )
 			.catch( ( newError ) => {
@@ -438,17 +446,20 @@ export default function PostIdeas() {
 	};
 
 	return (
-		<div className="px-4 sm:px-6 lg:px-8 py-8">
+		<div className="px-4 sm:px-6 lg:px-8 pt-2 pb-8">
 			<div className="sm:flex sm:items-center sm:justify-between">
-				<div className="sm:flex-auto">
-					<h1 className="text-base font-semibold text-gray-900"> { __( 'Blog Post Suggestions', 'wp-ai-blogger' ) } </h1>
-					<p className="mt-2 text-sm text-gray-700">
-						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
+				<div className="flex flex-col gap-2">
+					<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-4 p-0 m-0">
+						{ __( 'Blog Post Suggestions', 'wp-ai-blogger' ) }
 						{ ! proAvailable && (
-							<span className="block mt-1 text-amber-600 font-medium">
-								{ __( '⚡ Free users are limited to 5 post suggestions. Upgrade for unlimited ideas!', 'wp-ai-blogger' ) }
+							<span className="block text-sm text-amber-600 font-normal">
+								{ `⚡ ${ __( 'Upgrade for Unlimited Ideas!', 'wp-ai-blogger' ) }` }
 							</span>
 						) }
+					</h2>
+
+					<p className="mt-4 text-sm text-gray-700">
+						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
 					</p>
 				</div>
 
@@ -458,7 +469,7 @@ export default function PostIdeas() {
 						size="default"
 						icon={ <Crown className="w-4 h-4" /> }
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
-						onClick={ proAvailable ? handleRefresh : undefined }
+						onClick={ handleRefresh }
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
@@ -486,7 +497,7 @@ export default function PostIdeas() {
 										<th scope="col" className="w-3/5 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
 											{ __( 'Title', 'wp-ai-blogger' ) }
 										</th>
-										<th scope="col" className="w-2/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+										<th scope="col" className="w-2/5 px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
 											{ __( 'Write Post', 'wp-ai-blogger' ) }
 										</th>
 									</tr>
@@ -517,7 +528,7 @@ export default function PostIdeas() {
 											{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : 5 ).map( ( postTitle, index ) => (
 												<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
 													<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-														<div className="font-medium">
+														<div className="font-normal">
 															<TrimWordsContent
 																content={ postTitle || '' }
 																count={ 120 }
@@ -545,16 +556,16 @@ export default function PostIdeas() {
 																target="_blank"
 																href="#"
 																onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-																className={ `flex items-center gap-x-1 cursor-pointer ${ 
-																	creatingPosts.size > 0 
-																		? ( creatingPosts.has( postTitle ) 
-																			? 'text-green-600 hover:text-green-900' 
+																className={ `flex items-center gap-x-1 cursor-pointer ${
+																	creatingPosts.size > 0
+																		? ( creatingPosts.has( postTitle )
+																			? 'text-green-600 hover:text-green-900'
 																			: 'text-gray-400 cursor-not-allowed' )
 																		: 'text-indigo-600 hover:text-indigo-900'
 																}` }
 																data-type="create"
-																style={ { 
-																	pointerEvents: creatingPosts.size > 0 && ! creatingPosts.has( postTitle ) ? 'none' : 'auto' 
+																style={ {
+																	pointerEvents: creatingPosts.size > 0 && ! creatingPosts.has( postTitle ) ? 'none' : 'auto'
 																} }
 															>
 																{ creatingPosts.has( postTitle ) ? (
@@ -578,6 +589,7 @@ export default function PostIdeas() {
 													</td>
 												</tr>
 											) ) }
+
 											{ /* Show upgrade prompt for free users when there are more than 5 ideas */ }
 											{ ! proAvailable && postIdeasArr.length > 5 && (
 												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
@@ -608,10 +620,10 @@ export default function PostIdeas() {
 									) }
 								</tbody>
 
-								<tfoot className="bg-gray-50">
-									<tr>
-										<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
-											{ ! proAvailable ? (
+								{ ! proAvailable ? (
+									<tfoot className="bg-gray-50">
+										<tr>
+											<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
 												<div className="flex flex-col items-center space-y-2">
 													<ProButton
 														variant="primary"
@@ -622,10 +634,10 @@ export default function PostIdeas() {
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
 													</ProButton>
 												</div>
-											) : null }
-										</td>
-									</tr>
-								</tfoot>
+											</td>
+										</tr>
+									</tfoot>
+								) : null }
 							</table>
 						</div>
 					</div>

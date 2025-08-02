@@ -82,7 +82,7 @@ class ErrorBoundary extends React.Component {
 							</div>
 						) }
 
-						<div className="space-y-3">
+						<div className="space-y-3 mt-4">
 							<button
 								onClick={ this.handleRetry }
 								className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"

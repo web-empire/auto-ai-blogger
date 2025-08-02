@@ -33,7 +33,7 @@ export default function Campaigns() {
 		} )
 			.then( ( data ) => {
 				if ( data.success ) {
-					return data.data;
+					return data.data.data;
 				}
 			} )
 			.catch( ( error ) => {
@@ -178,11 +178,11 @@ export default function Campaigns() {
 			<div className="sm:px-6 lg:px-8 py-8 px-4">
 				<div className="sm:flex sm:items-center">
 					<div className="sm:flex-auto">
-						<h1 className="text-base font-semibold text-gray-900">{ __( 'Campaigns', 'wp-ai-blogger' ) }</h1>
-						<p className="mt-2 text-sm text-gray-700">
-							{ __( 'Create and manage your blog campaigns.', 'wp-ai-blogger' ) }
-						</p>
+						<h2 id="free-vs-pro-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
+							{ __( 'Manage Campaigns', 'wp-ai-blogger' ) }
+						</h2>
 					</div>
+
 					<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
 						<button
 							type="button"
@@ -252,7 +252,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<span> { TrimWordsContent( campaign.last_post_title ) } </span>
+																	<TrimWordsContent content={ campaign.last_post_title } count={ 5 } />
 																</Tooltip>
 															) : (
 																<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>

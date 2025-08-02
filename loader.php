@@ -10,10 +10,12 @@ namespace WPAIBlogger;
 
 use WPAIBlogger\Admin\Ajax;
 use WPAIBlogger\Admin\API;
+use WPAIBlogger\Admin\Filters;
 use WPAIBlogger\Admin\Licensing;
 use WPAIBlogger\Admin\Menu;
 use WPAIBlogger\Core\CPT;
 use WPAIBlogger\Core\Editor;
+use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Core\Scheduler;
 
@@ -81,11 +83,17 @@ class Loader {
 			/* Ajax init */
 			Ajax::get_instance();
 
+			/* Filters init */
+			Filters::get_instance();
+
 			/* Licensing */
 			Licensing::get_instance();
 
 			/* Admin Menu init */
 			Menu::get_instance();
+		} else {
+			// Load Frontend Support.
+			Frontend::get_instance();
 		}
 	}
 
