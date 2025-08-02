@@ -93,8 +93,8 @@ const ProButton = forwardRef( ( {
 	// Determine element tag
 	const Tag = isLink ? 'a' : 'button';
 
-	// Props for link
-	const linkProps = isLink ? {
+	// Props for link or button
+	const elementProps = isLink ? {
 		href: proUrl,
 		target: '_blank',
 		rel: 'noopener noreferrer',
@@ -165,7 +165,7 @@ const ProButton = forwardRef( ( {
 			onClick={ handleUpgrade }
 			aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
 			aria-disabled={ disabled || loading }
-			{ ...linkProps }
+			{ ...elementProps }
 			{ ...props }
 		>
 			{ buttonContent }
