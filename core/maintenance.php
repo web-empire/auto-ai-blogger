@@ -3,7 +3,7 @@
  * Maintenance.
  *
  * @package WP_AI_Blogger
- * @since x.x.x
+ * @since 1.0.0
  */
 
 namespace WPAIBlogger\Core;
@@ -19,7 +19,7 @@ use WPAIBlogger\Inc\Traits\Get_Instance;
 /**
  * Update initial setup
  *
- * @since x.x.x
+ * @since 1.0.0
  */
 class Maintenance {
 	use Get_Instance;
@@ -38,7 +38,7 @@ class Maintenance {
 	/**
 	 * Init
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public static function init(): void {
@@ -63,3 +63,4 @@ class Maintenance {
 		do_action( 'wp_ai_blogger_update_after' );
 	}
 }
+

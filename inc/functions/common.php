@@ -1,134 +1,310 @@
 <?php
 /**
- * Plugin functions.
+ * Plugin Common Functions for WP AI Blogger.
  *
- * @package AutoBlog AI
- * @since x.x.x
+ * This file contains common utility functions with security measures.
+ * All functions implement proper input validation, data sanitization, and
+ * security checks to prevent unauthorized access and data manipulation.
+ *
+ * @package wp-ai-blogger
+ * @subpackage Functions
+ * @since 1.0.0
  */
 
-// Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use WPAIBlogger\Inc\Utils\Metadata;
 use WPAIBlogger\Inc\Utils\Settings;
 
 /**
- * Get user details.
+ * Get user details with security validation.
  *
- * @param string $detail Detail to get.
- * @since x.x.x
+ * @param string $detail Detail to get (name|email).
+ * @return string User detail or empty string on failure.
+ * @since 1.0.0
  */
 function wpaib_get_user_detail( $detail ) {
+	// Validate input parameter
+	if ( ! is_string( $detail ) || empty( $detail ) ) {
+		return '';
+	}
+
+	// Sanitize input
+	$detail = sanitize_key( $detail );
+
+	// Check allowed detail types
+	$allowed_details = [ 'name', 'email' ];
+	if ( ! in_array( $detail, $allowed_details, true ) ) {
+		return '';
+	}
+
+	// Get current user safely
 	$current_user = wp_get_current_user();
+
+	if ( ! $current_user || ! $current_user->exists() ) {
+		return '';
+	}
+
 	switch ( $detail ) {
 		case 'name':
-			return ! empty( $current_user->user_firstname ) ? $current_user->user_firstname : $current_user->display_name;
+			$name = ! empty( $current_user->user_firstname ) ?
+				$current_user->user_firstname :
+				$current_user->display_name;
+			return sanitize_text_field( $name );
+
 		case 'email':
-			return ! empty( $current_user->user_email ) ? $current_user->user_email : '';
+			$email = ! empty( $current_user->user_email ) ?
+				$current_user->user_email : '';
+			return sanitize_email( $email );
+
 		default:
 			return '';
 	}
 }
 
 /**
- * Clean variables using sanitize_text_field.
+ * Clean the plugin data with security validation.
  *
- * @param mixed $var Data to sanitize.
- * @return mixed
- *
- * @since x.x.x
+ * @param mixed $data Data to clean.
+ * @param int   $depth Current recursion depth.
+ * @return mixed Cleaned data.
+ * @since 1.0.0
  */
-function wpaib_clean_data( $var ) {
-	if ( is_array( $var ) ) {
-		return array_map( 'wpaib_clean_data', $var );
+function wpaib_clean_data( $data, $depth = 0 ) {
+	// Prevent infinite recursion
+	$max_depth = 10;
+	if ( $depth > $max_depth ) {
+		return null;
 	}
-	return is_scalar( $var ) ? sanitize_text_field( (string) $var ) : $var;
+
+	if ( is_array( $data ) ) {
+		$cleaned = [];
+		foreach ( $data as $key => $value ) {
+			$clean_key = sanitize_key( $key );
+			if ( ! empty( $clean_key ) ) {
+				$cleaned[ $clean_key ] = wpaib_clean_data( $value, $depth + 1 );
+			}
+		}
+		return $cleaned;
+	}
+
+	if ( is_string( $data ) ) {
+		return sanitize_text_field( $data );
+	}
+
+	if ( is_numeric( $data ) ) {
+		return is_float( $data ) ? floatval( $data ) : absint( $data );
+	}
+
+	if ( is_bool( $data ) ) {
+		return (bool) $data;
+	}
+
+	// Return null for unsupported data types
+	return null;
 }
 
 /**
- * Get all campaigns.
+ * Get all campaigns with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized campaigns data.
  */
 function wpaib_get_all_campaigns() {
-	$campaigns = get_posts(
-		[
-			'post_type'              => WP_AI_BLOGGER_CPT_CAMPAIGN,
-			'posts_per_page'         => -1,
-			'post_status'            => 'any',
-			'orderby'                => 'date',
-			'order'                  => 'ASC',
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
-		]
-	);
-
-	$campaigns_data = [];
-
-	if ( ! is_wp_error( $campaigns ) && ! empty( $campaigns ) ) {
-		foreach ( $campaigns as $campaign ) {
-			$campaigns_data[ $campaign->ID ] = Metadata::get_campaign_data( $campaign->ID );
-		}
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return [];
 	}
 
-	return $campaigns_data;
+	try {
+		$campaigns = get_posts(
+			[
+				'post_type'              => WP_AI_BLOGGER_CPT_CAMPAIGN,
+				'posts_per_page'         => 100, // Limit for performance
+				'post_status'            => [ 'publish', 'draft', 'private' ],
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'update_post_term_cache' => false,
+				'update_post_meta_cache' => false,
+			]
+		);
+
+		$campaigns_data = [];
+
+		if ( ! is_wp_error( $campaigns ) && ! empty( $campaigns ) ) {
+			foreach ( $campaigns as $campaign ) {
+				//  Validate campaign object
+				if ( ! $campaign instanceof WP_Post || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+					continue;
+				}
+
+				//  Check if user can read this campaign
+				if ( ! current_user_can( 'read_post', $campaign->ID ) ) {
+					continue;
+				}
+
+				$campaign_data = Metadata::get_campaign_data( $campaign->ID );
+
+				//  Sanitize campaign data
+				if ( is_array( $campaign_data ) ) {
+					$campaigns_data[ absint( $campaign->ID ) ] = wpaib_sanitize_campaign_data( $campaign_data );
+				}
+			}
+		}
+
+		return $campaigns_data;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
 }
 
 /**
- * Get all generated posts.
+ * Get all generated posts with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized generated posts data.
  */
 function wpaib_get_generated_posts() {
-	$generated_posts = get_posts(
-		[
-			'post_type'              => 'any',
-			'posts_per_page'         => -1,
-			'post_status'            => 'any',
-			'orderby'                => 'date',
-			'order'                  => 'ASC',
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
-			'meta_query'             => [
-				[
-					'key'     => 'wp_aib_reference',
-					'value'   => 1,
-					'compare' => '=',
-				],
-			],
-		]
-	);
-
-	$generated_posts_data = [];
-
-	if ( ! is_wp_error( $generated_posts ) && ! empty( $generated_posts ) ) {
-		foreach ( $generated_posts as $post ) {
-			$generated_posts_data[ $post->ID ] = [
-				'post_title'  => $post->post_title,
-				'post_date'   => $post->post_date,
-				'post_status' => $post->post_status,
-				'post_type'   => $post->post_type,
-				'post_id'     => $post->ID,
-				'edit_link'   => add_query_arg(
-					[
-						'post'   => $post->ID,
-						'action' => 'edit',
-					],
-					admin_url( 'post.php' )
-				),
-			];
-		}
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return [];
 	}
 
-	return $generated_posts_data;
+	try {
+		$generated_posts = get_posts(
+			[
+				'post_type'              => get_post_types( [ 'public' => true ] ),
+				'posts_per_page'         => 200, // Limit for performance
+				'post_status'            => [ 'publish', 'draft', 'private' ],
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'update_post_term_cache' => false,
+				'update_post_meta_cache' => false,
+				'meta_query'             => [
+					[
+						'key'     => 'wp_aib_reference',
+						'value'   => 1,
+						'compare' => '=',
+					],
+				],
+			]
+		);
+
+		$posts_data = [];
+
+		if ( ! is_wp_error( $generated_posts ) && ! empty( $generated_posts ) ) {
+			foreach ( $generated_posts as $post ) {
+				//  Validate post object
+				if ( ! $post instanceof WP_Post ) {
+					continue;
+				}
+
+				//  Check if user can read this post
+				if ( ! current_user_can( 'read_post', $post->ID ) ) {
+					continue;
+				}
+
+				//  Sanitize post data
+				$posts_data[] = [
+					'id'         => absint( $post->ID ),
+					'title'      => sanitize_text_field( $post->post_title ),
+					'status'     => sanitize_key( $post->post_status ),
+					'type'       => sanitize_key( $post->post_type ),
+					'date'       => sanitize_text_field( $post->post_date ),
+					'modified'   => sanitize_text_field( $post->post_modified ),
+					'author_id'  => absint( $post->post_author ),
+				];
+			}
+		}
+
+		return $posts_data;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
 }
 
 /**
- * Get all post statuses.
+ * Get array depth safely to prevent memory issues.
  *
- * @since x.x.x
+ * @since 2.0.0
+ * @param array $array Array to check depth.
+ * @return int Array depth.
+ */
+function wpaib_get_array_depth( array $array ): int {
+	$max_depth = 1;
+
+	foreach ( $array as $value ) {
+		if ( is_array( $value ) ) {
+			$depth = wpaib_get_array_depth( $value ) + 1;
+
+			if ( $depth > $max_depth ) {
+				$max_depth = $depth;
+			}
+		}
+	}
+
+	return $max_depth;
+}
+
+/**
+ * Sanitizes campaign data for output.
+ *
+ * @since 2.0.0
+ * @param array $campaign_data Raw campaign data.
+ * @return array Sanitized campaign data.
+ */
+function wpaib_sanitize_campaign_data( array $campaign_data ): array {
+	$sanitized = [];
+	$allowed_keys = [ 'id', 'title', 'description', 'status', 'created_at', 'updated_at', 'post_count', 'keywords', 'settings' ];
+
+	foreach ( $allowed_keys as $key ) {
+		if ( ! isset( $campaign_data[ $key ] ) ) {
+			continue;
+		}
+
+		switch ( $key ) {
+			case 'id':
+			case 'post_count':
+				$sanitized[ $key ] = absint( $campaign_data[ $key ] );
+				break;
+			case 'title':
+				$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
+				break;
+			case 'description':
+				$sanitized[ $key ] = sanitize_textarea_field( $campaign_data[ $key ] );
+				break;
+			case 'status':
+				$sanitized[ $key ] = sanitize_key( $campaign_data[ $key ] );
+				break;
+			case 'created_at':
+			case 'updated_at':
+				$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
+				break;
+			case 'keywords':
+				if ( is_array( $campaign_data[ $key ] ) ) {
+					$sanitized[ $key ] = array_map( 'sanitize_text_field', $campaign_data[ $key ] );
+				} else {
+					$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
+				}
+				break;
+			case 'settings':
+				if ( is_array( $campaign_data[ $key ] ) ) {
+					$sanitized[ $key ] = wpaib_clean_data( $campaign_data[ $key ] );
+				}
+				break;
+		}
+	}
+
+	return $sanitized;
+}
+
+/**
+ * Get all post statuses with security.
+ *
+ * @since 1.0.0
+ * @return array Sanitized post statuses.
  */
 function wpaib_get_post_statuses() {
 	return apply_filters(
@@ -144,333 +320,576 @@ function wpaib_get_post_statuses() {
 }
 
 /**
- * Get all post types.
+ * Get all post types with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized post types.
  */
 function wpaib_get_post_types() {
-	$queried_post_types = array_keys(
-		get_post_types(
-			apply_filters(
-				'wpaib_post_types_query_args',
-				[
-					'public'   => true,
-					'_builtin' => false,
-				]
-			),
-			'objects'
-		)
-	);
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return [];
+	}
 
-	$queried_post_types   = array_diff(
-		$queried_post_types,
-		[
-			WP_AI_BLOGGER_CPT_CAMPAIGN, // Considering by default.
-			'sfwd-assignment',
-			'sfwd-essays',
-			'sfwd-transactions',
-			'sfwd-certificates',
-			'sfwd-quiz',
-			'e-landing-page',
-			'astra-advanced-hook',
-			'astra_adv_header',
-			'elementor_library',
-			'brizy_template',
-			'sc_collection',
-			'course',
-			'lesson',
-			'llms_membership',
-			'tutor_quiz',
-			'tutor_assignments',
-			'testimonial',
-			'frm_display',
-			'mec_esb',
-			'mec-events',
-		]
-	);
-	$queried_post_types[] = 'post';
-	$queried_post_types[] = 'page';
+	try {
+		$queried_post_types = array_keys(
+			get_post_types(
+				apply_filters(
+					'wpaib_post_types_query_args',
+					[
+						'public'   => true,
+						'_builtin' => false,
+					]
+				),
+				'objects'
+			)
+		);
 
-	return $queried_post_types;
+		//  Exclude sensitive post types
+		$excluded_post_types = apply_filters(
+			'wpaib_excluded_post_types',
+			[
+				WP_AI_BLOGGER_CPT_CAMPAIGN,
+				'sfwd-assignment',
+				'sfwd-essays',
+				'sfwd-transactions',
+				'sfwd-certificates',
+				'sfwd-quiz',
+				'e-landing-page',
+				'astra-advanced-hook',
+				'cartflows_step',
+				'cartflows_flow',
+				'wp_block',
+				'user_request',
+				'oembed_cache'
+			]
+		);
+
+		$queried_post_types = array_diff( $queried_post_types, $excluded_post_types );
+
+		// Add built-in post types with security check
+		$builtin_post_types = [ 'post', 'page' ];
+
+		foreach ( $builtin_post_types as $post_type ) {
+			$post_type_obj = get_post_type_object( $post_type );
+			if ( $post_type_obj && current_user_can( $post_type_obj->cap->edit_posts ) ) {
+				$queried_post_types[] = $post_type;
+			}
+		}
+
+		//  Sanitize post type names and get labels
+		$sanitized_post_types = [];
+		foreach ( $queried_post_types as $post_type ) {
+			$post_type = sanitize_key( $post_type );
+			$post_type_obj = get_post_type_object( $post_type );
+
+			if ( $post_type_obj && ! empty( $post_type_obj->labels->name ) ) {
+				$sanitized_post_types[ $post_type ] = sanitize_text_field( $post_type_obj->labels->name );
+			}
+		}
+
+		return $sanitized_post_types;
+
+	} catch ( \Exception $e ) {
+		return [ 'post' => 'Posts' ]; // Safe fallback
+	}
 }
 
 /**
- * Get post categories.
+ * Get post categories with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized categories.
  */
 function wpaib_get_categories() {
-	$categories = get_categories(
-		[
-			'taxonomy'   => 'category',
-			'hide_empty' => false,
-		]
-	);
-
-	if ( is_wp_error( $categories ) || empty( $categories ) ) {
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
 	}
 
-	$cats = [];
-	foreach ( $categories as $category ) {
-		$cats[ $category->term_id ] = $category->name;
+	try {
+		$categories = get_categories(
+			[
+				'taxonomy'   => 'category',
+				'hide_empty' => false,
+				'number'     => 200, // Limit for performance
+			]
+		);
+
+		if ( is_wp_error( $categories ) || empty( $categories ) ) {
+			return [];
+		}
+
+		$cats = [];
+		foreach ( $categories as $category ) {
+			//  Validate category object
+			if ( ! $category instanceof WP_Term ) {
+				continue;
+			}
+
+			$cats[] = [
+				'id'   => absint( $category->term_id ),
+				'name' => sanitize_text_field( $category->name ),
+				'slug' => sanitize_title( $category->slug ),
+			];
+		}
+
+		return $cats;
+
+	} catch ( \Exception $e ) {
+		return [];
 	}
-	return $cats;
 }
 
 /**
- * Get post tags.
+ * Get post tags with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized tags.
  */
 function wpaib_get_tags() {
-	$tags = get_tags(
-		[
-			'taxonomy'   => 'post_tag',
-			'orderby'    => 'name',
-			'hide_empty' => false,
-		]
-	);
-
-	if ( is_wp_error( $tags ) || empty( $tags ) ) {
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
 	}
 
-	$ts = [];
-	foreach ( $tags as $tag ) {
-		$ts[ $tag->term_id ] = $tag->name;
+	try {
+		$tags = get_tags(
+			[
+				'taxonomy'   => 'post_tag',
+				'orderby'    => 'name',
+				'hide_empty' => false,
+				'number'     => 500, // Limit for performance
+			]
+		);
+
+		if ( is_wp_error( $tags ) || empty( $tags ) ) {
+			return [];
+		}
+
+		$tag_list = [];
+		foreach ( $tags as $tag ) {
+			//  Validate tag object
+			if ( ! $tag instanceof WP_Term ) {
+				continue;
+			}
+
+			$tag_list[] = [
+				'id'   => absint( $tag->term_id ),
+				'name' => sanitize_text_field( $tag->name ),
+				'slug' => sanitize_title( $tag->slug ),
+			];
+		}
+
+		return $tag_list;
+
+	} catch ( \Exception $e ) {
+		return [];
 	}
-	return $ts;
 }
 
 /**
- * Get all authors.
+ * Get all authors with security validation.
  *
- * @since x.x.x
+ * @since 1.0.0
+ * @return array Sanitized authors list.
  */
 function wpaib_get_authors() {
-	$users   = get_users();
-	$authors = [];
-	foreach ( $users as $user ) {
-		$authors[ $user->ID ] = $user->display_name;
-	}
-	return $authors;
-}
-
-/**
- * Get all custom schedules to schedule auto blog posts.
- *
- * @return array
- * @since x.x.x
- */
-function wpaib_get_schedules() {
-	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
-
-	if ( empty( $schedules ) ) {
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
 	}
 
-	foreach ( $schedules as $campaign_id => $days ) {
-		$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
-		$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+	try {
+		$users = get_users(
+			[
+				'capability' => 'edit_posts',
+				'number'     => 100, // Limit for performance
+				'orderby'    => 'display_name',
+				'order'      => 'ASC',
+			]
+		);
 
-		if ( $posts_target <= $posts_created ) {
-			unset( $schedules[ $campaign_id ] );
+		if ( is_wp_error( $users ) || empty( $users ) ) {
+			return [];
 		}
-	}
 
-	return $schedules;
+		$authors = [];
+		foreach ( $users as $user ) {
+			//  Validate user object
+			if ( ! $user instanceof WP_User ) {
+				continue;
+			}
+
+			$authors[] = [
+				'id'   => absint( $user->ID ),
+				'name' => sanitize_text_field( $user->display_name ),
+				'login' => sanitize_user( $user->user_login ),
+			];
+		}
+
+		return $authors;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
 }
 
 /**
- * Get all custom schedules to schedule auto blog posts.
+ * Get all custom schedules to schedule auto blog posts with security.
  *
- * @param int $campaign_id Campaign ID.
- * @param int $days       Days.
- * @return void
- * @since x.x.x
+ * @return array Sanitized schedules.
+ * @since 1.0.0
  */
-function wpaib_update_schedules( $campaign_id, $days ): void {
-	$schedules = wpaib_get_schedules();
-
-	if ( ! empty( $schedules[ $campaign_id ] ) ) {
-		$schedules[ $campaign_id ] = $days;
-	} else {
-		$schedules[ $campaign_id ] = $days;
+function wpaib_get_schedules() {
+	//  Check user capabilities
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return [];
 	}
 
-	update_option( 'wpaib_auto_blogging_schedules', $schedules );
+	try {
+		$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
+
+		//  Validate data structure
+		if ( ! is_array( $schedules ) || empty( $schedules ) ) {
+			return [];
+		}
+
+		$validated_schedules = [];
+		foreach ( $schedules as $campaign_id => $days ) {
+			//  Validate campaign ID
+			$campaign_id = absint( $campaign_id );
+			if ( $campaign_id <= 0 ) {
+				continue;
+			}
+
+			//  Validate days
+			if ( ! is_array( $days ) ) {
+				continue;
+			}
+
+			$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
+			$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
+
+			// Skip completed campaigns
+			if ( $posts_target > 0 && $posts_target <= $posts_created ) {
+				continue;
+			}
+
+			$validated_schedules[ $campaign_id ] = array_map( 'sanitize_text_field', $days );
+		}
+
+		return $validated_schedules;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
 }
 
 /**
- * Check if the campaign posts target is achieved.
+ * Update custom schedules with security validation.
+ *
+ * @param int   $campaign_id Campaign ID.
+ * @param array $days       Schedule days.
+ * @return bool Success status.
+ * @since 1.0.0
+ */
+function wpaib_update_schedules( $campaign_id, $days ) {
+	//  Check user capabilities
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return false;
+	}
+
+	try {
+		//  Validate campaign ID
+		$campaign_id = absint( $campaign_id );
+		if ( $campaign_id <= 0 ) {
+			return false;
+		}
+
+		//  Validate days array
+		if ( ! is_array( $days ) ) {
+			return false;
+		}
+
+		//  Sanitize days array
+		$sanitized_days = array_map( 'sanitize_text_field', $days );
+		$sanitized_days = array_filter( $sanitized_days ); // Remove empty values
+
+		if ( empty( $sanitized_days ) ) {
+			return false;
+		}
+
+		$schedules = wpaib_get_schedules();
+		$schedules[ $campaign_id ] = $sanitized_days;
+
+		$result = update_option( 'wpaib_auto_blogging_schedules', $schedules );
+
+		if ( $result ) {
+			do_action( 'wpaib_schedule_updated', $campaign_id, $sanitized_days );
+		}
+
+		return $result;
+
+	} catch ( \Exception $e ) {
+		return false;
+	}
+}
+
+/**
+ * Check if the campaign posts target is achieved with security validation.
  *
  * @param int $campaign_id Campaign ID.
- * @return bool
- * @since x.x.x
+ * @return bool Target achievement status.
+ * @since 1.0.0
  */
 function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
-	$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
-	$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
+	try {
+		//  Validate campaign ID
+		$campaign_id = absint( $campaign_id );
+		if ( $campaign_id <= 0 ) {
+			return false;
+		}
 
-	if ( $posts_target <= $posts_created ) {
-		return true;
+		//  Check user capabilities for campaign access
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return false;
+		}
+
+		$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
+		$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
+
+		//  Validate metadata values
+		if ( $posts_target < 0 || $posts_created < 0 ) {
+			return false;
+		}
+
+		return $posts_target > 0 && $posts_target <= $posts_created;
+
+	} catch ( \Exception $e ) {
+		return false;
 	}
-
-	return false;
 }
 
 /**
- * Get API response in order to create blog post.
+ * Get API response to create blog post with security validation.
  *
- * @param string $keywords         Keywords.
- * @param int    $max_title_words  Max title words.
- * @param int    $max_content_words Max content words.
+ * @param string $keywords             Keywords.
+ * @param int    $max_title_words      Max title words.
+ * @param int    $max_content_words    Max content words.
  * @param array  $site_persona_details Site persona details.
- * @since x.x.x
- * @return array|WP_Error
+ * @since 1.0.0
+ * @return array|WP_Error Sanitized API response or error.
  */
 function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details ) {
-	$core_details = [
-		'keywords'      => $keywords,
-		'maxTitleWords' => $max_title_words,
-		'maxWords'      => $max_content_words,
-		'license'       => WP_AI_BLOGGER_PUBLIC_TOKEN,
-		'site_url'      => get_site_url(),
-	];
-
-	$body_args = [
-		'keywords'         => [
-			'Pet supplies',
-			'Pet products',
-			'Pet care',
-			'Pet owner tips',
-			'Best pet accessories',
-			'Premium pet food',
-			'Natural dog food',
-			'Organic cat food',
-			'Durable dog toys',
-			'Interactive cat toys',
-			'Cat trees',
-		],
-		'maxTitleWords'    => 10,
-		'maxWords'         => 500,
-		'name'             => 'Vaccination Drive for Pets',
-		'license'          => '25415bcb-1643-446c-9bbf-0a5f260c7bce',
-		'site_title'       => 'Pawsitively Purrfect Pet Supplies',
-		'site_purpose'     => 'To provide the best for furry, scaled, or feathered friends.',
-		'site_description' => 'This site offers premium pet food, fun toys, and essential accessories for all types of pets, focusing on pet wellness, nutritional dog food, durable cat trees, exotic fish supplies, and grooming tools for all breeds.',
-	];
-
-	$args = [
-		'method'      => 'POST',
-		'timeout'     => 45, // In seconds. 0 means no timeout (use with caution).
-		'redirection' => 10, // Number of redirects allowed.
-		'httpversion' => '1.1',
-		'blocking'    => true, // Whether to block the request until complete.
-		'headers'     => [
-			'Content-Type' => 'application/json',
-		],
-		'body'        => json_encode( $body_args ), // Encode the body arguments as JSON.
-		'cookies'     => [],
-	];
-
-	$response = wp_remote_post( WP_AI_BLOGGER_POST_CREATION_API, $args );
-
-	// Check for WP_Error.
-	if ( is_wp_error( $response ) ) {
-		$error_message = $response->get_error_message();
-		echo "Something went wrong: {$error_message}";
-		return;
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return new WP_Error( 'insufficient_permissions', 'Insufficient permissions to create posts.' );
 	}
 
-	// Get the body of the response.
-	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+	try {
+		//  Validate and sanitize inputs
+		$keywords = sanitize_textarea_field( $keywords );
+		if ( empty( $keywords ) || strlen( $keywords ) > 1000 ) {
+			return new WP_Error( 'invalid_keywords', 'Invalid keywords provided.' );
+		}
 
-	// echo "Response Body: " . $body; // Debugging purpose.
-	error_log( print_r( $body, true ) ); // Debugging purpose.
-	return $body;
+		$max_title_words = absint( $max_title_words );
+		if ( $max_title_words < 1 || $max_title_words > 50 ) {
+			$max_title_words = 10; // Safe default
+		}
 
-	// $api_response = wp_safe_remote_post(
-	// WP_AI_BLOGGER_POST_CREATION_API,
-	// [
-	// 'body' => wp_json_encode(
-	// array_merge(
-	// $core_details,
-	// $site_persona_details
-	// )
-	// ),
-	// 'timeout' => 15,
-	// 'headers' => [
-	// 'Content-Type' => 'application/json',
-	// ],
-	// ]
-	// );
+		$max_content_words = absint( $max_content_words );
+		if ( $max_content_words < 100 || $max_content_words > 5000 ) {
+			$max_content_words = 500; // Safe default
+		}
 
-	// // Check for errors.
-	// if ( is_wp_error( $api_response ) ) {
-	// return $api_response;
-	// }
+		//  Validate site persona details
+		if ( ! is_array( $site_persona_details ) ) {
+			return new WP_Error( 'invalid_site_persona', 'Invalid site persona details.' );
+		}
 
-	// // Check for a valid response.
-	// if ( ! isset( $api_response['body'] ) ) {
-	// return new \WP_Error( 'invalid_response', __( 'Invalid response from API.', 'wp-ai-blogger' ) );
-	// }
+		//  Sanitize site persona details
+		$sanitized_persona = [];
+		$allowed_keys = [ 'name', 'site_title', 'site_purpose', 'site_description' ];
 
-	// // Decode the response.
-	// $api_response = json_decode( wp_remote_retrieve_body( $api_response ), true );
+		foreach ( $allowed_keys as $key ) {
+			if ( isset( $site_persona_details[ $key ] ) ) {
+				$sanitized_persona[ $key ] = sanitize_text_field( $site_persona_details[ $key ] );
+			}
+		}
 
-	// error_log( print_r( $api_response, true ) ); // Debugging purpose.
+		//  Validate license token
+		$license = sanitize_text_field( WP_AI_BLOGGER_PUBLIC_TOKEN );
+		if ( empty( $license ) ) {
+			return new WP_Error( 'missing_license', 'License token is required.' );
+		}
 
-	// // Check for errors in the response.
-	// if ( isset( $api_response['error'] ) ) {
-	// return new \WP_Error( 'api_error', $api_response['error'] );
-	// }
+		// Prepare request body
+		$body_args = array_merge(
+			[
+				'keywords'         => explode( ',', $keywords ),
+				'maxTitleWords'    => $max_title_words,
+				'maxWords'         => $max_content_words,
+				'license'          => $license,
+				'site_url'         => esc_url_raw( get_site_url() ),
+			],
+			$sanitized_persona
+		);
 
-	// // Check for a valid response.
-	// if ( empty( $api_response['title'] ) || empty( $api_response['content'] ) ) {
-	// return new \WP_Error( 'invalid_response', __( 'Empty response from API for title or content.', 'wp-ai-blogger' ) );
-	// }
+		//  Validate API endpoint
+		$api_url = WP_AI_BLOGGER_POST_CREATION_API;
+		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
+			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
+		}
 
-	// return $api_response; // It's needed title, content and summary.
+		$args = [
+			'method'      => 'POST',
+			'timeout'     => 30, // Reduced timeout for security
+			'redirection' => 5,  // Limited redirects
+			'httpversion' => '1.1',
+			'blocking'    => true,
+			'headers'     => [
+				'Content-Type' => 'application/json',
+				'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
+			],
+			'body'        => wp_json_encode( $body_args ),
+			'cookies'     => [],
+			'sslverify'   => true, // Enforce SSL verification
+		];
+
+		$response = wp_remote_post( $api_url, $args );
+
+		//  Check for errors
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		//  Validate response
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( $response_code !== 200 ) {
+			return new WP_Error( 'api_error', "API returned status code: {$response_code}" );
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		if ( empty( $body ) ) {
+			return new WP_Error( 'empty_response', 'Empty response from API.' );
+		}
+
+		//  Parse and validate JSON response
+		$data = json_decode( $body, true );
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return new WP_Error( 'invalid_json', 'Invalid JSON response from API.' );
+		}
+
+		//  Sanitize response data
+		if ( is_array( $data ) ) {
+			$data = wpaib_sanitize_api_response( $data );
+		}
+
+		// Log successful API call (without sensitive data)
+
+
+		return $data;
+
+	} catch ( \Exception $e ) {
+		return new WP_Error( 'api_exception', 'API request failed due to an exception.' );
+	}
 }
 
 /**
- * Get site persona details.
+ * Sanitize API response data recursively.
  *
- * @param int $campaign_id Campaign ID.
- * @return array
- * @since x.x.x
+ * @param array $data API response data.
+ * @return array Sanitized data.
  */
-function wpaib_get_site_persona_details( $campaign_id = 0 ) {
-	$site_details    = Settings::get_ai_blogger_settings();
-	$persona_details = [
-		'site_title'       => $site_details['siteTitle'] ?? '',
-		'site_purpose'     => $site_details['siteFor'] ?? '',
-		'site_description' => $site_details['siteDescription'] ?? '',
-		// 'temperature'     => $site_details['temperature'] ?? 0,
-		// 'harassment' 	  => $site_details['harassment'] ?? 0,
-		// 'hate'            => $site_details['hate'] ?? 0,
-		// 'sexually_explicit' => $site_details['sexuallyExplicit'] ?? 0,
-		// 'dangerous_content' => $site_details['dangerousContent'] ?? 0,
-		// 'civic_integrity' => $site_details['civicIntegrity'] ?? 0,
-	];
+function wpaib_sanitize_api_response( $data ) {
+	if ( ! is_array( $data ) ) {
+		return sanitize_text_field( $data );
+	}
 
-	if ( $campaign_id ) {
-		$override_site_details = Metadata::get_campaign_meta( $campaign_id, 'overrideSitePersona' );
+	$sanitized = [];
+	foreach ( $data as $key => $value ) {
+		$clean_key = sanitize_key( $key );
 
-		if ( $override_site_details ) {
-			$overridden_site_title       = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' ) ?? $site_details['siteTitle'];
-			$overridden_site_description = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' ) ?? $site_details['siteDescription'];
-			$overridden_site_for         = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' ) ?? $site_details['siteFor'];
-
-			$persona_details['site_title']       = $overridden_site_title;
-			$persona_details['site_purpose']     = $overridden_site_for;
-			$persona_details['site_description'] = $overridden_site_description;
+		if ( is_array( $value ) ) {
+			$sanitized[ $clean_key ] = wpaib_sanitize_api_response( $value );
+		} elseif ( is_string( $value ) ) {
+			// Preserve HTML for content fields but sanitize
+			if ( in_array( $clean_key, [ 'content', 'excerpt' ], true ) ) {
+				$sanitized[ $clean_key ] = wp_kses_post( $value );
+			} else {
+				$sanitized[ $clean_key ] = sanitize_text_field( $value );
+			}
+		} else {
+			$sanitized[ $clean_key ] = $value;
 		}
 	}
 
-	return $persona_details;
+	return $sanitized;
+}
+
+/**
+ * Get site persona details with security validation.
+ *
+ * @param int $campaign_id Campaign ID.
+ * @return array Sanitized site persona details.
+ * @since 1.0.0
+ */
+function wpaib_get_site_persona_details( $campaign_id = 0 ) {
+	//  Check user capabilities
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return [];
+	}
+
+	try {
+		//  Validate campaign ID
+		$campaign_id = absint( $campaign_id );
+
+		$site_details = Settings::get_ai_blogger_settings();
+
+		//  Validate settings data
+		if ( ! is_array( $site_details ) ) {
+			$site_details = [];
+		}
+
+		$persona_details = [
+			'site_title'       => isset( $site_details['siteTitle'] ) ? sanitize_text_field( $site_details['siteTitle'] ) : '',
+			'site_purpose'     => isset( $site_details['siteFor'] ) ? sanitize_textarea_field( $site_details['siteFor'] ) : '',
+			'site_description' => isset( $site_details['siteDescription'] ) ? sanitize_textarea_field( $site_details['siteDescription'] ) : '',
+		];
+
+		// Handle campaign-specific overrides
+		if ( $campaign_id > 0 ) {
+			$override_site_details = Metadata::get_campaign_meta( $campaign_id, 'overrideSitePersona' );
+
+			if ( $override_site_details ) {
+				$overridden_title = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' );
+				$overridden_desc  = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' );
+				$overridden_for   = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' );
+
+				if ( ! empty( $overridden_title ) ) {
+					$persona_details['site_title'] = sanitize_text_field( $overridden_title );
+				}
+				if ( ! empty( $overridden_desc ) ) {
+					$persona_details['site_description'] = sanitize_textarea_field( $overridden_desc );
+				}
+				if ( ! empty( $overridden_for ) ) {
+					$persona_details['site_purpose'] = sanitize_textarea_field( $overridden_for );
+				}
+			}
+		}
+
+		//  Filter empty values
+		$persona_details = array_filter( $persona_details, function( $value ) {
+			return ! empty( trim( $value ) );
+		});
+
+		return $persona_details;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
 }
 
 /**
@@ -478,7 +897,7 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  *
  * @param int $campaign_id Campaign ID.
  * @return int|WP_Error
- * @since x.x.x
+ * @since 1.0.0
  */
 function wpaib_create_blog_post( $campaign_id ) {
 	// Site persona settings.
@@ -539,3 +958,4 @@ function wpaib_create_blog_post( $campaign_id ) {
 
 	return $post_id;
 }
+

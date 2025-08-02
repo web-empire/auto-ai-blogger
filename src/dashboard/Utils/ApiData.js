@@ -2,85 +2,183 @@
 import apiFetch from '@wordpress/api-fetch';
 
 /**
- * A function to send form data via API fetch.
+ * Validates API input parameters.
  *
- * @function
- *
- * @param {string}   key                - Settings key.
- * @param {string}   value              - The data to send.
- * @param {Function} dispatch
- * @param {Object}   abortControllerRef - The ref object with to hold abort controller.
- *
- * @return {Promise} Returns a promise representing the processed request.
+ * @param {string} key   - Settings key.
+ * @param {*}      value - The value to validate.
+ * @return {boolean} True if valid, false otherwise.
  */
-const updateApiData = async ( key, value, dispatch, abortControllerRef = null ) => {
-	// Abort any previous request.
-	if ( abortControllerRef.current[ key ] ) {
-		abortControllerRef.current[ key ]?.abort();
+const validateApiInput = ( key, value ) => {
+	if ( typeof key !== 'string' || key.length === 0 ) {
+		console.error( 'Invalid API key provided' );
+		return false;
 	}
 
-	// Create a new AbortController.
-	const abortController = new AbortController();
-	abortControllerRef.current[ key ] = abortController;
+	if ( value === undefined || value === null ) {
+		console.error( 'Invalid API value provided' );
+		return false;
+	}
 
-	const formData = new window.FormData();
-
-	formData.append( 'action', 'wpaib_update_admin_setting' );
-	formData.append( 'security', wpaib_localized_data.admin_nonce );
-	formData.append( 'key', key );
-	formData.append( 'value', value );
-
-	return apiFetch( {
-		url: wpaib_localized_data.ajax_url,
-		method: 'POST',
-		body: formData,
-		signal: abortControllerRef.current[ key ]?.signal, // Pass the signal to the fetch request.
-	} );
+	return true;
 };
 
 /**
- * A function to create a new campaign.
+ * Creates a secure FormData object with authentication data.
+ *
+ * @param {string} action - WordPress action name.
+ * @param {string} key    - Setting key.
+ * @param {*}      value  - The data to send.
+ * @param {Object} config - Configuration object with nonce and ajaxUrl.
+ * @return {FormData} Configured FormData object.
+ */
+const createSecureFormData = ( action, key, value, config = {} ) => {
+	const formData = new window.FormData();
+
+	formData.append( 'action', action );
+	formData.append( 'security', config.nonce || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_nonce ) || '' );
+	formData.append( 'key', key );
+
+	// Properly serialize complex values
+	const serializedValue = typeof value === 'object' ? JSON.stringify( value ) : String( value );
+	formData.append( 'value', serializedValue );
+
+	return formData;
+};
+
+/**
+ * A simplified function to send form data via API fetch for admin use.
+ * Focuses on basic security and reliability without complex abort controller management.
  *
  * @function
  *
- * @param {string} value              - The data to send.
- * @param {string} isNew              - Is new campaign or not.
- * @param {Object} abortControllerRef - The ref object with to hold abort controller.
+ * @param {string}   key      - Settings key.
+ * @param {*}        value    - The data to send.
+ * @param            config
+ * @param {Function} dispatch - Redux dispatch function.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
-const updateCampaign = async ( value, isNew, abortControllerRef = null ) => {
-	// Abort any previous request.
-	if ( abortControllerRef.current.campaign_details ) {
-		abortControllerRef.current.campaign_details?.abort();
+const updateApiData = async ( key, value, dispatch, config = {} ) => {
+	// Validate inputs
+	if ( ! validateApiInput( key, value ) ) {
+		return Promise.reject( new Error( 'Invalid input parameters' ) );
 	}
 
-	// Create a new AbortController.
+	if ( typeof dispatch !== 'function' ) {
+		console.error( 'Dispatch function is required' );
+		return Promise.reject( new Error( 'Invalid dispatch function' ) );
+	}
+
+	try {
+		const formData = createSecureFormData( 'wpaib_update_admin_setting', key, value, config );
+
+		const response = await apiFetch( {
+			url: config.ajaxUrl || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
+			method: 'POST',
+			body: formData,
+			timeout: 30000, // 30 second timeout
+		} );
+
+		// Handle successful response
+		if ( response?.success ) {
+			return response;
+		}
+		// Log the full response for debugging
+		console.error( 'Full API response:', response );
+		throw new Error( response?.data?.message || 'API request failed' );
+	} catch ( error ) {
+		console.error( `API Error for key "${ key }":`, error.message );
+
+		// Dispatch error state if provided
+		if ( dispatch ) {
+			dispatch( {
+				type: 'SET_API_ERROR',
+				payload: {
+					key,
+					error: error.message,
+				},
+			} );
+		}
+
+		return Promise.reject( error );
+	}
+};
+
+/**
+ * A function to create or update a campaign with enhanced error handling.
+ *
+ * @function
+ *
+ * @param {Object}  value              - The campaign data to send.
+ * @param {boolean} isNew              - Is new campaign or not.
+ * @param           config
+ * @param {Object}  abortControllerRef - The ref object to hold abort controller.
+ *
+ * @return {Promise} Returns a promise representing the processed request.
+ */
+const updateCampaign = async ( value, isNew, abortControllerRef = null, config = {} ) => {
+	// Validate campaign data
+	if ( ! value || typeof value !== 'object' ) {
+		const error = new Error( 'Invalid campaign data provided' );
+		console.error( error.message );
+		return Promise.reject( error );
+	}
+
+	// Abort any previous request
+	if ( abortControllerRef?.current?.campaign_details ) {
+		abortControllerRef.current.campaign_details.abort();
+	}
+
+	// Create a new AbortController
 	const abortController = new AbortController();
-	abortControllerRef.current.campaign_details = abortController;
+	if ( abortControllerRef?.current ) {
+		abortControllerRef.current.campaign_details = abortController;
+	}
 
-	const formData = new window.FormData();
+	try {
+		const action = isNew ? 'wpaib_create_campaign' : 'wpaib_update_campaign';
+		const formData = createSecureFormData( action, 'campaign_details', value, config );
 
-	formData.append( 'action', isNew ? 'wpaib_create_campaign' : 'wpaib_update_campaign' );
-	formData.append( 'security', wpaib_localized_data.admin_nonce );
-	formData.append( 'key', 'campaign_details' );
-	formData.append( 'value', JSON.stringify( value ) );
+		const response = await apiFetch( {
+			url: config.ajaxUrl || ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
+			method: 'POST',
+			body: formData,
+			signal: abortController.signal,
+			timeout: 30000, // 30 second timeout
+		} );
 
-	return apiFetch( {
-		url: wpaib_localized_data.ajax_url,
-		method: 'POST',
-		body: formData,
-		signal: abortControllerRef.current.campaign_details?.signal, // Pass the signal to the fetch request.
-	} )
-		.then( ( data ) => {
-			if ( data.success ) {
+		// Handle successful response
+		if ( response?.success ) {
+			// Instead of immediate reload, provide feedback first
+			console.log( `Campaign ${ isNew ? 'created' : 'updated' } successfully` );
+
+			// Optional: dispatch success action for UI feedback
+			// dispatch({ type: 'CAMPAIGN_SAVE_SUCCESS', payload: response.data });
+
+			// Delayed reload to allow user to see success message
+			setTimeout( () => {
 				window.location.reload();
-			} else {
-				// Show error message.
-				console.error( data.data.message );
-			}
-		} )
-		.catch( () => {} );
+			}, 1000 );
+
+			return response;
+		}
+		throw new Error( response?.data?.message || `Failed to ${ isNew ? 'create' : 'update' } campaign` );
+	} catch ( error ) {
+		// Handle different types of errors
+		if ( error.name === 'AbortError' ) {
+			console.log( 'Campaign operation was aborted' );
+			return Promise.reject( error );
+		}
+
+		console.error( 'Campaign Error:', error.message );
+
+		// Show user-friendly error message
+		if ( typeof window !== 'undefined' && window.alert ) {
+			window.alert( `Error: ${ error.message }` );
+		}
+
+		return Promise.reject( error );
+	}
 };
 
 export { updateApiData, updateCampaign };

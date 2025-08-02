@@ -11,13 +11,18 @@ import SettingInput from '@Components/SettingInput';
 
 export default function ConfigureDrawer( props ) {
 	const abortControllerRef = useRef( {} );
-	const { configureData, openDrawer, setOpenDrawer } = props;
+	const { configureData, openDrawer, setOpenDrawer, mode = 'edit' } = props;
 
 	const [ activeTab, setActiveTab ] = useState( 'campaign' );
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
-	const postTypes = wpaib_localized_data.post_types || {};
+	const postTypes = wpaib_localized_data?.post_types || {};
+	const authors = wpaib_localized_data?.authors || [];
+	const postStatuses = wpaib_localized_data?.post_statuses || {};
+	const categories = wpaib_localized_data?.categories || {};
+	const tags = wpaib_localized_data?.tags || {};
+	const isViewMode = mode === 'view';
 
 	useEffect( () => {
 		setDrawerData( configureData );
@@ -53,9 +58,11 @@ export default function ConfigureDrawer( props ) {
 										<div className="flex items-center justify-between">
 											<h2 className="text-base font-semibold text-white m-0 p-0">
 												{
-													drawerData.type === 'new'
-														? __( 'New Campaign', 'wp-ai-blogger' )
-														: __( 'Edit Campaign', 'wp-ai-blogger' )
+													isViewMode
+														? __( 'Campaign Configuration', 'wp-ai-blogger' )
+														: ( drawerData.type === 'new' )
+															? __( 'New Campaign', 'wp-ai-blogger' )
+															: __( 'Edit Campaign', 'wp-ai-blogger' )
 												}
 											</h2>
 											<div className="ml-3 flex h-7 items-center">
@@ -109,9 +116,10 @@ export default function ConfigureDrawer( props ) {
 																	id="project-name"
 																	name="project-name"
 																	defaultValue={ drawerData.title }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, title: e.target.value } ) }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, title: e.target.value } ) }
 																	type="text"
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	readOnly={ isViewMode }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
 														</div>
@@ -125,9 +133,10 @@ export default function ConfigureDrawer( props ) {
 																	id="campaign-keywords"
 																	name="campaign-keywords"
 																	rows={ 3 }
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																	defaultValue={ drawerData.keywords }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, keywords: e.target.value } ) }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
+																	readOnly={ isViewMode }
 																/>
 															</div>
 														</div>
@@ -146,32 +155,47 @@ export default function ConfigureDrawer( props ) {
 																	id="campaign-target"
 																	name="campaign-target"
 																	defaultValue={ drawerData.postsTarget }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
 																	type="number"
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	readOnly={ isViewMode }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
 														</div>
 
 														<div className="flex items-center justify-between">
-															<label htmlFor="campaign-frequency" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Frequency', 'wp-ai-blogger' ) }
+															<label htmlFor="campaign-repeat-after" className="flex items-center text-sm/6 font-medium text-gray-900">
+																{ __( 'Repeat After', 'wp-ai-blogger' ) }
 																<QuestionMarkCircleIcon
 																	aria-hidden="true"
-																	title={ __( '(run after every n days)', 'wp-ai-blogger' ) }
+																	title={ __( 'Set how often the campaign should run automatically.', 'wp-ai-blogger' ) }
 																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
 																/>
 															</label>
 
-															<div className="mt-2">
+															<div className="mt-2 flex gap-2">
 																<input
-																	id="campaign-frequency"
-																	name="campaign-frequency"
-																	defaultValue={ drawerData.frequency }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, frequency: e.target.value } ) }
+																	id="campaign-repeat-after"
+																	name="campaign-repeat-after"
+																	defaultValue={ drawerData.repeatInterval || 1 }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, repeatInterval: parseInt( e.target.value ) || 1 } ) }
 																	type="number"
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	min="1"
+																	max="365"
+																	readOnly={ isViewMode }
+																	className={ `block w-20 rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
+																<select
+																	className={ `min-w-[100px] ${ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }` }
+																	value={ drawerData.repeatUnit || 'day' }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, repeatUnit: e.target.value } ) }
+																	disabled={ isViewMode }
+																>
+																	<option value="day">{ __( 'Day(s)', 'wp-ai-blogger' ) }</option>
+																	<option value="week">{ __( 'Week(s)', 'wp-ai-blogger' ) }</option>
+																	<option value="month">{ __( 'Month(s)', 'wp-ai-blogger' ) }</option>
+																	<option value="year">{ __( 'Year(s)', 'wp-ai-blogger' ) }</option>
+																</select>
 															</div>
 														</div>
 
@@ -182,8 +206,9 @@ export default function ConfigureDrawer( props ) {
 															<div className="mt-2">
 																<SwitchControl
 																	checked={ drawerData.summaryAsExcerpt }
-																	onChange={ () => setDrawerData( { ...drawerData, summaryAsExcerpt: ! drawerData.summaryAsExcerpt } ) }
+																	onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, summaryAsExcerpt: ! drawerData.summaryAsExcerpt } ) }
 																	id="use-summary-as-excerpt"
+																	disabled={ isViewMode }
 																/>
 															</div>
 														</div>
@@ -202,7 +227,8 @@ export default function ConfigureDrawer( props ) {
 																			type="radio"
 																			aria-describedby="privacy-public-description"
 																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
-																			onChange={ () => setDrawerData( { ...drawerData, status: 'publish' } ) }
+																			onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'publish' } ) }
+																			disabled={ isViewMode }
 																		/>
 																	</div>
 																	<div className="pl-7 text-sm/6">
@@ -226,7 +252,8 @@ export default function ConfigureDrawer( props ) {
 																				type="radio"
 																				aria-describedby="privacy-private-to-project-description"
 																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
-																				onChange={ () => setDrawerData( { ...drawerData, status: 'draft' } ) }
+																				onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'draft' } ) }
+																				disabled={ isViewMode }
 																			/>
 																		</div>
 																		<div className="pl-7 text-sm/6">
@@ -258,11 +285,17 @@ export default function ConfigureDrawer( props ) {
 																{ __( 'Post Type', 'wp-ai-blogger' ) }
 															</label>
 															<div>
-																<select className="wpaib-select-control" id="post-type" value={ drawerData.postType } onChange={ ( e ) => setDrawerData( { ...drawerData, postType: e.target.value } ) }>
+																<select
+																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	id="post-type"
+																	value={ drawerData.postType || '' }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postType: e.target.value } ) }
+																	disabled={ isViewMode }
+																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => ( // eslint-disable-line no-unused-vars
-																		<option key={ label } value={ label }>
-																			{ label.charAt( 0 ).toUpperCase() + label.slice( 1 ) } { /* Capitalize first letter */ }
+																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => (
+																		<option key={ type } value={ type }>
+																			{ label }
 																		</option>
 																	) ) }
 																</select>
@@ -274,11 +307,17 @@ export default function ConfigureDrawer( props ) {
 																{ __( 'Post Author', 'wp-ai-blogger' ) }
 															</label>
 															<div>
-																<select className="wpaib-select-control" id="post-author" value={ drawerData.author } onChange={ ( e ) => setDrawerData( { ...drawerData, author: e.target.value } ) }>
+																<select
+																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	id="post-author"
+																	value={ drawerData.author || '' }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, author: e.target.value } ) }
+																	disabled={ isViewMode }
+																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( wpaib_localized_data.authors ).map( ( [ key, label ] ) => (
-																		<option key={ key } value={ key }>
-																			{ label }
+																	{ authors.map( ( author ) => (
+																		<option key={ author.id } value={ author.id }>
+																			{ author.name }
 																		</option>
 																	) ) }
 																</select>
@@ -290,9 +329,15 @@ export default function ConfigureDrawer( props ) {
 																{ __( 'Post Status', 'wp-ai-blogger' ) }
 															</label>
 															<div>
-																<select className="wpaib-select-control" id="post-status" value={ drawerData.postStatus } onChange={ ( e ) => setDrawerData( { ...drawerData, postStatus: e.target.value } ) }>
+																<select
+																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	id="post-status"
+																	value={ drawerData.postStatus || '' }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postStatus: e.target.value } ) }
+																	disabled={ isViewMode }
+																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																	{ Object.entries( wpaib_localized_data.post_statuses ).map( ( [ key, label ] ) => (
+																	{ Object.entries( postStatuses ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }
 																		</option>
@@ -309,11 +354,17 @@ export default function ConfigureDrawer( props ) {
 																			{ __( 'Post Category', 'wp-ai-blogger' ) }
 																		</label>
 																		<div>
-																			<select className="wpaib-select-control" id="post-category" value={ drawerData.category } onChange={ ( e ) => setDrawerData( { ...drawerData, category: e.target.value } ) }>
+																			<select
+																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																				id="post-category"
+																				value={ drawerData.category || '' }
+																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, category: e.target.value } ) }
+																				disabled={ isViewMode }
+																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( wpaib_localized_data.categories ).map( ( [ key, label ] ) => (
-																					<option key={ key } value={ key }>
-																						{ label }
+																				{ categories.map( ( category ) => (
+																					<option key={ category.id } value={ category.id }>
+																						{ category.name }
 																					</option>
 																				) ) }
 																			</select>
@@ -325,11 +376,17 @@ export default function ConfigureDrawer( props ) {
 																			{ __( 'Post Tag', 'wp-ai-blogger' ) }
 																		</label>
 																		<div>
-																			<select className="wpaib-select-control" id="post-tag" value={ drawerData.tag } onChange={ ( e ) => setDrawerData( { ...drawerData, tag: e.target.value } ) }>
+																			<select
+																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																				id="post-tag"
+																				value={ drawerData.tag || '' }
+																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, tag: e.target.value } ) }
+																				disabled={ isViewMode }
+																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
-																				{ Object.entries( wpaib_localized_data.tags ).map( ( [ key, label ] ) => (
-																					<option key={ key } value={ key }>
-																						{ label }
+																				{ tags.map( ( tag ) => (
+																					<option key={ tag.id } value={ tag.id }>
+																						{ tag.name }
 																					</option>
 																				) ) }
 																			</select>
@@ -359,9 +416,10 @@ export default function ConfigureDrawer( props ) {
 																	id="maximum-title-words"
 																	name="maximum-title-words"
 																	defaultValue={ drawerData.maxTitleWords }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
 																	type="number"
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	readOnly={ isViewMode }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
 														</div>
@@ -376,9 +434,10 @@ export default function ConfigureDrawer( props ) {
 																	id="maximum-words"
 																	name="maximum-words"
 																	defaultValue={ drawerData.maxWords }
-																	onChange={ ( e ) => setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
 																	type="number"
-																	className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																	readOnly={ isViewMode }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
 														</div>
@@ -390,8 +449,9 @@ export default function ConfigureDrawer( props ) {
 															<div className="mt-2">
 																<SwitchControl
 																	checked={ drawerData.overrideSitePersona }
-																	onChange={ () => setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
+																	onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
 																	id="override-site-persona"
+																	disabled={ isViewMode }
 																/>
 															</div>
 														</div>
@@ -404,7 +464,8 @@ export default function ConfigureDrawer( props ) {
 																		<SettingInput
 																			id="name-of-the-blog"
 																			defaultValue={ drawerData.overrideSiteTitle }
-																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteTitle: e.target.value } ) }
+																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteTitle: e.target.value } ) }
+																			readOnly={ isViewMode }
 																		/>
 																	</SettingField>
 
@@ -413,7 +474,8 @@ export default function ConfigureDrawer( props ) {
 																		<SettingInput
 																			id="blog-for"
 																			defaultValue={ drawerData.overrideSiteFor }
-																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteFor: e.target.value } ) }
+																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteFor: e.target.value } ) }
+																			readOnly={ isViewMode }
 																		/>
 																	</SettingField>
 
@@ -421,9 +483,10 @@ export default function ConfigureDrawer( props ) {
 																		<SettingLabel forId="more-about-blog" title={ __( 'Campaign Description:', 'wp-ai-blogger' ) } />
 																		<textarea
 																			id="more-about-blog"
-																			className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																			value={ drawerData.overrideSiteDescription }
-																			onChange={ ( e ) => setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
+																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
+																			readOnly={ isViewMode }
 																		/>
 																	</SettingField>
 																</>
@@ -456,16 +519,18 @@ export default function ConfigureDrawer( props ) {
 										onClick={ closePopup }
 										className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 									>
-										{ __( 'Cancel', 'wp-ai-blogger' ) }
+										{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
 									</button>
 
-									<button
-										onClick={ handleCampaign }
-										disabled={ handlingCampaign }
-										className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
-									>
-										{ drawerData.type === 'new' ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
-									</button>
+									{ ! isViewMode && (
+										<button
+											onClick={ handleCampaign }
+											disabled={ handlingCampaign }
+											className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
+										>
+											{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+										</button>
+									) }
 								</div>
 							</form>
 						</DialogPanel>

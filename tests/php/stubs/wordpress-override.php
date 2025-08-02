@@ -14,3 +14,4 @@
  * @return bool True if posts are available, false if end of the loop.
  */
 function have_posts() {}
+

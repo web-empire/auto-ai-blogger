@@ -4,14 +4,14 @@ namespace WPAIBlogger {
     /**
      * Plugin_Loader
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     class Loader
     {
         /**
          * Constructor
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function __construct()
         {
@@ -19,7 +19,7 @@ namespace WPAIBlogger {
         /**
          * Enqueue required setup after plugins loaded.
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public function setup() : void
@@ -28,7 +28,7 @@ namespace WPAIBlogger {
         /**
          * Initiator
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return object initialized object of class.
          */
         public static function get_instance()
@@ -46,7 +46,7 @@ namespace WPAIBlogger {
         /**
          * Plugin Activation actions.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function activation_actions() : void
         {
@@ -54,7 +54,7 @@ namespace WPAIBlogger {
         /**
          * Plugin Deactivation actions.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function deactivation_actions() : void
         {
@@ -161,7 +161,7 @@ namespace WPAIBlogger\Inc\Traits {
     /**
      * Trait Get_Instance.
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     trait Get_Instance
     {
@@ -174,7 +174,7 @@ namespace WPAIBlogger\Inc\Traits {
         /**
          * Initiator
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return object initialized object of class.
          */
         public static function get_instance()
@@ -193,7 +193,7 @@ namespace WPAIBlogger\Inc\Utils {
         /**
          * Cache the DB options
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @access public
          * @var array
          */
@@ -202,7 +202,7 @@ namespace WPAIBlogger\Inc\Utils {
          * Returns all default dashboard settings.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_settings_dataset()
         {
@@ -214,7 +214,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param  mixed  $default Option default value if option is not available.
          * @return mixed   Returns the option value
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_default_option($key, $default = false)
         {
@@ -223,7 +223,7 @@ namespace WPAIBlogger\Inc\Utils {
          * As per the settings dataset, return the default settings.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_default_settings()
         {
@@ -232,7 +232,7 @@ namespace WPAIBlogger\Inc\Utils {
          * Returns all portal settings.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_ai_blogger_settings()
         {
@@ -241,7 +241,7 @@ namespace WPAIBlogger\Inc\Utils {
          * Get all the settings type wise.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_all_type_wise_settings()
         {
@@ -249,7 +249,7 @@ namespace WPAIBlogger\Inc\Utils {
         /**
          * Data cleaner
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @access public
          *
          * @param mixed  $value     data from AJAX.
@@ -265,7 +265,7 @@ namespace WPAIBlogger\Inc\Utils {
          *
          * @param string $key The setting key.
          * @return string
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_setting_type($key)
         {
@@ -281,7 +281,7 @@ namespace WPAIBlogger\Inc\Utils {
         /**
          * Cache the DB options
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @access public
          * @var array
          */
@@ -290,7 +290,7 @@ namespace WPAIBlogger\Inc\Utils {
          * Returns all default post settings.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_settings_dataset()
         {
@@ -302,7 +302,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param string $key         The meta key.
          * @return string
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_campaign_meta($campaign_id, $key)
         {
@@ -315,7 +315,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param mixed  $value       The meta value.
          * @return bool
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function update_campaign_meta($campaign_id, $key, $value)
         {
@@ -327,7 +327,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param  mixed  $default Option default value if option is not available.
          * @return mixed   Returns the option value
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_default_option($key, $default = false)
         {
@@ -336,7 +336,7 @@ namespace WPAIBlogger\Inc\Utils {
          * As per the settings dataset, return the default settings.
          *
          * @return array
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_default_settings()
         {
@@ -344,7 +344,7 @@ namespace WPAIBlogger\Inc\Utils {
         /**
          * Data cleaner
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @access public
          *
          * @param mixed  $value     data from AJAX.
@@ -359,7 +359,7 @@ namespace WPAIBlogger\Inc\Utils {
          * Format post metadata in a way that it can be saved in the database via wp_insert_post.
          *
          * @param array $postdata The metadata to format.
-         * @since x.x.x
+         * @since 1.0.0
          * @return array The formatted metadata.
          */
         public static function format_data($postdata)
@@ -370,7 +370,7 @@ namespace WPAIBlogger\Inc\Utils {
          *
          * @param int $post_id The post ID.
          * @return array<mixed> The metadata.
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_metadata($post_id)
         {
@@ -401,7 +401,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param  mixed  $default Option default value if option is not available.
          * @return mixed   Returns the option value
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function get_option($key, $default = false)
         {
@@ -413,7 +413,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param  mixed  $value    Option value to update.
          * @return string           Return the option value
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function update_option($key, $value = true)
         {
@@ -424,7 +424,7 @@ namespace WPAIBlogger\Inc\Utils {
          * @param  string $key The option key.
          * @return void
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public static function delete_option($key) : void
         {
@@ -1040,7 +1040,7 @@ namespace WPAIBlogger\Core {
     /**
      * Update initial setup
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     class Maintenance
     {
@@ -1054,7 +1054,7 @@ namespace WPAIBlogger\Core {
         /**
          * Init
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public static function init() : void
@@ -1120,7 +1120,7 @@ namespace WPAIBlogger\Core {
     /**
      * Create auto blog post scheduler
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     class Scheduler
     {
@@ -1135,7 +1135,7 @@ namespace WPAIBlogger\Core {
          * Custom cron schedules.
          *
          * @param array $schedules Schedules.
-         * @since x.x.x
+         * @since 1.0.0
          * @return array
          */
         public function custom_cron_schedules($schedules)
@@ -1146,7 +1146,7 @@ namespace WPAIBlogger\Core {
          *
          * @param int $campaign_id Campaign ID.
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public function create_blog_post($campaign_id) : void
@@ -1245,7 +1245,7 @@ namespace WPAIBlogger\Admin {
     /**
      * Menu setup
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     class Menu
     {
@@ -1257,7 +1257,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Constructor
          *
-         * @since x.x.x
+         * @since 1.0.0
          *
          * @return void
          */
@@ -1267,7 +1267,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Initialize Admin Setup.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function settings_admin_scripts() : void
         {
@@ -1275,7 +1275,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Renders the hub screen canvas.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function render_settings_page() : void
         {
@@ -1283,7 +1283,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Enqueue the Admin's build files for plugin to work.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function app_build_scripts() : void
         {
@@ -1291,7 +1291,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Function to load the admin area actions.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function initialize_hooks() : void
         {
@@ -1299,7 +1299,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Add submenu to admin menu.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function register_plugin_menus() : void
         {
@@ -1328,7 +1328,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Constructor
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function __construct()
         {
@@ -1336,7 +1336,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Register API routes.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function register_routes() : void
         {
@@ -1347,7 +1347,7 @@ namespace WPAIBlogger\Admin {
          * @param \WP_REST_Request $request Full details about the request.
          * @return array $updated_option defaults + set DB option data.
          *
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function get_admin_settings($request)
         {
@@ -1357,7 +1357,7 @@ namespace WPAIBlogger\Admin {
          *
          * @param  WP_REST_Request $request Full details about the request.
          * @return WP_Error|bool
-         * @since x.x.x
+         * @since 1.0.0
          */
         public function get_permissions_check($request)
         {
@@ -1366,7 +1366,7 @@ namespace WPAIBlogger\Admin {
     /**
      * Licensing handler class.
      *
-     * @since x.x.x
+     * @since 1.0.0
      */
     class Licensing
     {
@@ -1380,7 +1380,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Class constructor
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public function __construct()
@@ -1390,7 +1390,7 @@ namespace WPAIBlogger\Admin {
          * Licensing setup.
          * Creates a client object for SureCart licensing.
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return \SureCart\Licensing\Client
          */
         public static function licensing_setup()
@@ -1400,7 +1400,7 @@ namespace WPAIBlogger\Admin {
          * Licensing setup.
          * Creates a client object for SureCart licensing.
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public static function init_licensing() : void
@@ -1410,7 +1410,7 @@ namespace WPAIBlogger\Admin {
          * Activate license
          *
          * @hooked wp_ajax_wp_ai_blogger_activate_license
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public function activate_license() : void
@@ -1420,7 +1420,7 @@ namespace WPAIBlogger\Admin {
          * Deactivate license.
          *
          * @hooked wp_ajax_wp_ai_blogger_deactivate_license
-         * @since x.x.x
+         * @since 1.0.0
          * @return void
          */
         public function deactivate_license() : void
@@ -1429,7 +1429,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Checks if license is active.
          *
-         * @since x.x.x
+         * @since 1.0.0
          * @return bool
          */
         public static function is_license_active()
@@ -1450,7 +1450,7 @@ namespace {
      * Get user details.
      *
      * @param string $detail Detail to get.
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_get_user_detail($detail)
     {
@@ -1518,7 +1518,7 @@ namespace {
      * Get all custom schedules to schedule auto blog posts.
      *
      * @return array
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_get_schedules()
     {
@@ -1529,7 +1529,7 @@ namespace {
      * @param int $campaign_id Campaign ID.
      * @param int $days       Days.
      * @return void
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_update_schedules($campaign_id, $days) : void
     {
@@ -1539,7 +1539,7 @@ namespace {
      *
      * @param int $campaign_id Campaign ID.
      * @return bool
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_is_campaign_posts_target_achieved($campaign_id)
     {
@@ -1550,7 +1550,7 @@ namespace {
      * @param string $keywords         Keywords.
      * @param int    $max_title_words  Max title words.
      * @param int    $max_content_words Max content words.
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_get_post_creation_api_response($keywords, $max_title_words, $max_content_words)
     {
@@ -1560,7 +1560,7 @@ namespace {
      *
      * @param int $campaign_id Campaign ID.
      * @return int|WP_Error
-     * @since x.x.x
+     * @since 1.0.0
      */
     function wpaib_create_blog_post($campaign_id)
     {
@@ -1585,3 +1585,4 @@ namespace {
     // Define Upgrade Link.
     \define('WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/');
 }
+

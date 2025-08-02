@@ -251,3 +251,4 @@ class Updater {
 		return $version_info;
 	}
 }
+
