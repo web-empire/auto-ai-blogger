@@ -67,7 +67,7 @@ class ErrorBoundary extends React.Component {
 							{ __( 'The application encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.', 'wp-ai-blogger' ) }
 						</p>
 
-						{/* Error details in development mode */}
+						{ /* Error details in development mode */ }
 						{ process.env.NODE_ENV === 'development' && this.state.error && (
 							<div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
 								<h3 className="text-sm font-medium text-red-800 mb-2">

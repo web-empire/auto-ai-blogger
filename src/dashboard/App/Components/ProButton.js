@@ -23,9 +23,9 @@ const ProButton = forwardRef( ( {
 	'aria-label': ariaLabel,
 	...props
 }, ref ) => {
-	const [showTooltip, setShowTooltip] = useState(false);
+	const [ showTooltip, setShowTooltip ] = useState( false );
 	// Get pro purchase URL from Redux store
-	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
 
 	// Determine the URL to use
 	const proUrl = useMemo( () => {
@@ -132,13 +132,13 @@ const ProButton = forwardRef( ( {
 							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 						/>
 					</svg>
-					{ __( 'Loading...', 'wp-ai-blogger' ) }
+					{ __( 'Loading…', 'wp-ai-blogger' ) }
 				</>
 			);
 		}
 
 		const iconElement = icon && (
-			<span className={`flex items-center ${iconPosition === 'left' ? 'mr-2' : 'ml-2'}`} aria-hidden="true">
+			<span className={ `flex items-center ${ iconPosition === 'left' ? 'mr-2' : 'ml-2' }` } aria-hidden="true">
 				{ icon }
 			</span>
 		);
@@ -160,12 +160,12 @@ const ProButton = forwardRef( ( {
 		right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
 	};
 
-	const tooltipClasses = `absolute ${tooltipPositions[tooltipPosition] || tooltipPositions.top} bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
+	const tooltipClasses = `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
 
 	return (
 		<div className="relative inline-block">
 			{ tooltip && showTooltip && (
-				<div className={tooltipClasses}>
+				<div className={ tooltipClasses }>
 					{ tooltip }
 				</div>
 			) }
@@ -180,8 +180,8 @@ const ProButton = forwardRef( ( {
 					className
 				) }
 				onClick={ handleUpgrade }
-				onMouseEnter={ tooltip ? () => setShowTooltip(true) : undefined }
-				onMouseLeave={ tooltip ? () => setShowTooltip(false) : undefined }
+				onMouseEnter={ tooltip ? () => setShowTooltip( true ) : undefined }
+				onMouseLeave={ tooltip ? () => setShowTooltip( false ) : undefined }
 				aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
 				aria-disabled={ disabled || loading }
 				{ ...linkProps }

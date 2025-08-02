@@ -9,13 +9,13 @@ const setInitialState = ( store ) => {
 			const currentState = store.getState();
 
 			// Debug logging for license preservation
-			console.log('setInitialState - License selection:', {
+			console.log( 'setInitialState - License selection:', {
 				currentLicense: currentState.license,
 				currentLicenseStatus: currentState.license_status,
 				apiLicense: wpAiBloggerSettings.license,
 				selectedLicense: currentState.license || wpAiBloggerSettings.license || '',
-				source: currentState.license ? 'current_state' : (wpAiBloggerSettings.license ? 'api' : 'none')
-			});
+				source: currentState.license ? 'current_state' : ( wpAiBloggerSettings.license ? 'api' : 'none' ),
+			} );
 
 			// Only update specific fields that should come from the API, preserve others
 			const selectiveUpdate = {
@@ -23,20 +23,20 @@ const setInitialState = ( store ) => {
 				initialStateSetFlag: true,
 				activeSettingsNavigationTab: 'home',
 				// Only update these specific fields from API, preserve tokens and other critical data
-				...(wpAiBloggerSettings.siteTitle && { siteTitle: wpAiBloggerSettings.siteTitle }),
-				...(wpAiBloggerSettings.siteFor && { siteFor: wpAiBloggerSettings.siteFor }),
-				...(wpAiBloggerSettings.siteDescription && { siteDescription: wpAiBloggerSettings.siteDescription }),
-				...(wpAiBloggerSettings.temperature !== undefined && { temperature: wpAiBloggerSettings.temperature }),
-				...(wpAiBloggerSettings.harassment !== undefined && { harassment: wpAiBloggerSettings.harassment }),
-				...(wpAiBloggerSettings.hate !== undefined && { hate: wpAiBloggerSettings.hate }),
-				...(wpAiBloggerSettings.sexually_explicit !== undefined && { sexuallyExplicit: wpAiBloggerSettings.sexually_explicit }),
-				...(wpAiBloggerSettings.dangerous_content !== undefined && { dangerousContent: wpAiBloggerSettings.dangerous_content }),
-				...(wpAiBloggerSettings.post_ideas && typeof wpAiBloggerSettings.post_ideas === 'string' && { postIdeas: wpAiBloggerSettings.post_ideas }),
+				...( wpAiBloggerSettings.siteTitle && { siteTitle: wpAiBloggerSettings.siteTitle } ),
+				...( wpAiBloggerSettings.siteFor && { siteFor: wpAiBloggerSettings.siteFor } ),
+				...( wpAiBloggerSettings.siteDescription && { siteDescription: wpAiBloggerSettings.siteDescription } ),
+				...( wpAiBloggerSettings.temperature !== undefined && { temperature: wpAiBloggerSettings.temperature } ),
+				...( wpAiBloggerSettings.harassment !== undefined && { harassment: wpAiBloggerSettings.harassment } ),
+				...( wpAiBloggerSettings.hate !== undefined && { hate: wpAiBloggerSettings.hate } ),
+				...( wpAiBloggerSettings.sexually_explicit !== undefined && { sexuallyExplicit: wpAiBloggerSettings.sexually_explicit } ),
+				...( wpAiBloggerSettings.dangerous_content !== undefined && { dangerousContent: wpAiBloggerSettings.dangerous_content } ),
+				...( wpAiBloggerSettings.post_ideas && typeof wpAiBloggerSettings.post_ideas === 'string' && { postIdeas: wpAiBloggerSettings.post_ideas } ),
 				// License handling: Use current state license if it exists, otherwise use API license
 				license: currentState.license || wpAiBloggerSettings.license || '',
 				// Only update tokens if API returns better data than what we already have
-				...(wpAiBloggerSettings.tokenTotal > currentState.tokenTotal && { tokenTotal: wpAiBloggerSettings.tokenTotal }),
-				...(wpAiBloggerSettings.tokenRemaining > currentState.tokenRemaining && { tokenRemaining: wpAiBloggerSettings.tokenRemaining }),
+				...( wpAiBloggerSettings.tokenTotal > currentState.tokenTotal && { tokenTotal: wpAiBloggerSettings.tokenTotal } ),
+				...( wpAiBloggerSettings.tokenRemaining > currentState.tokenRemaining && { tokenRemaining: wpAiBloggerSettings.tokenRemaining } ),
 			};
 
 			store.dispatch( {

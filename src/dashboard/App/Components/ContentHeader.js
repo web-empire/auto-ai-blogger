@@ -5,6 +5,21 @@ import { updateApiData } from '@Utils/ApiData';
 
 /**
  * Enhanced ContentHeader component with improved error handling and UX
+ * @param root0
+ * @param root0.title
+ * @param root0.tab
+ * @param root0.siteTitle
+ * @param root0.siteFor
+ * @param root0.siteDescription
+ * @param root0.temperature
+ * @param root0.harassment
+ * @param root0.hate
+ * @param root0.sexuallyExplicit
+ * @param root0.dangerousContent
+ * @param root0.className
+ * @param root0.onSaveStart
+ * @param root0.onSaveComplete
+ * @param root0.onSaveError
  */
 const ContentHeader = ( {
 	title = '',
@@ -58,7 +73,7 @@ const ContentHeader = ( {
 		harassment,
 		hate,
 		sexuallyExplicit,
-		dangerousContent
+		dangerousContent,
 	] );
 
 	// Enhanced save function with better error handling
@@ -89,7 +104,7 @@ const ContentHeader = ( {
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: {
-						message: __( `Saving setting ${ currentIndex } of ${ totalSettings }...`, 'wp-ai-blogger' ),
+						message: __( `Saving setting ${ currentIndex } of ${ totalSettings …, 'wp-ai-blogger' ),
 						type: 'info',
 						duration: 0, // Don't auto-hide while saving
 					},
@@ -106,9 +121,9 @@ const ContentHeader = ( {
 			}
 
 			// Check if any settings failed to save
-			const failedSettings = saveResults.filter( result => ! result.success );
+			const failedSettings = saveResults.filter( (result) => ! result.success );
 			if ( failedSettings.length > 0 ) {
-				const failedKeys = failedSettings.map( result => result.key ).join( ', ' );
+				const failedKeys = failedSettings.map( (result) => result.key ).join( ', ' );
 				throw new Error( `Failed to save some settings: ${ failedKeys }` );
 			}
 
@@ -126,7 +141,6 @@ const ContentHeader = ( {
 
 			setLastSaveTime( new Date() );
 			onSaveComplete?.( settingsToSave );
-
 		} catch ( error ) {
 			console.error( 'Failed to save settings:', error );
 
@@ -149,7 +163,7 @@ const ContentHeader = ( {
 
 	// Memoize header title
 	const headerTitle = useMemo( () => {
-		if ( ! title ) return __( 'Settings', 'wp-ai-blogger' );
+		if ( ! title ) {return __( 'Settings', 'wp-ai-blogger' );}
 		return `${ title } ${ __( 'Settings', 'wp-ai-blogger' ) }`;
 	}, [ title ] );
 
@@ -164,9 +178,9 @@ const ContentHeader = ( {
 			return __( 'Saved just now', 'wp-ai-blogger' );
 		} else if ( diffMinutes < 60 ) {
 			return __( `Saved ${ diffMinutes } minute${ diffMinutes === 1 ? '' : 's' } ago`, 'wp-ai-blogger' );
-		} else {
+		} 
 			return lastSaveTime.toLocaleTimeString();
-		}
+		
 	}, [ lastSaveTime ] );
 
 	return (
@@ -187,7 +201,7 @@ const ContentHeader = ( {
 				disabled={ processing || Object.keys( settingsToSave ).length === 0 }
 				onClick={ saveSettings }
 				className="cursor-pointer inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-				aria-label={ processing ? __( 'Saving settings...', 'wp-ai-blogger' ) : __( 'Save settings', 'wp-ai-blogger' ) }
+				aria-label={ processing ? __( 'Saving settings…', 'wp-ai-blogger' ) : __( 'Save settings', 'wp-ai-blogger' ) }
 				aria-describedby={ lastSaveTime ? 'last-save-time' : undefined }
 			>
 				{ processing ? (

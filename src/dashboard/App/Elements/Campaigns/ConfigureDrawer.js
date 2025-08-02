@@ -294,10 +294,10 @@ export default function ConfigureDrawer( props ) {
 																>
 																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => (
-                                                                        <option key={ type } value={ type }>
-                                                                            { label }
-                                                                        </option>
-                                                                    ) ) }
+																		<option key={ type } value={ type }>
+																			{ label }
+																		</option>
+																	) ) }
 																</select>
 															</div>
 														</div>
@@ -363,10 +363,10 @@ export default function ConfigureDrawer( props ) {
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																				{ categories.map( ( category ) => (
-                                                                                    <option key={ category.id } value={ category.id }>
-                                                                                        { category.name }
-                                                                                    </option>
-                                                                                ) ) }
+																					<option key={ category.id } value={ category.id }>
+																						{ category.name }
+																					</option>
+																				) ) }
 																			</select>
 																		</div>
 																	</div>
@@ -385,10 +385,10 @@ export default function ConfigureDrawer( props ) {
 																			>
 																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																				{ tags.map( ( tag ) => (
-                                                                                    <option key={ tag.id } value={ tag.id }>
-                                                                                        { tag.name }
-                                                                                    </option>
-                                                                                ) ) }
+																					<option key={ tag.id } value={ tag.id }>
+																						{ tag.name }
+																					</option>
+																				) ) }
 																			</select>
 																		</div>
 																	</div>

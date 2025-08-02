@@ -5,13 +5,17 @@ import { __ } from '@wordpress/i18n';
 
 /**
  * Error component for invalid routes or access denied
+ *
+ * @param  root0
+ * @param  root0.type
+ * @param  root0.message
  */
 const RouteError = ( { type = 'not-found', message } ) => {
 	const errorMessages = {
 		'not-found': __( 'Page not found. Please check the URL and try again.', 'wp-ai-blogger' ),
 		'access-denied': __( 'Access denied. This feature requires a valid license.', 'wp-ai-blogger' ),
 		'invalid-page': __( 'Invalid page parameter. Please navigate from the main menu.', 'wp-ai-blogger' ),
-		'generic': message || __( 'Something went wrong. Please try again.', 'wp-ai-blogger' ),
+		generic: message || __( 'Something went wrong. Please try again.', 'wp-ai-blogger' ),
 	};
 
 	const getErrorTitle = () => {
@@ -124,7 +128,7 @@ const PageLoader = () => (
 		<div className="flex items-center space-x-3 text-slate-600">
 			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
 			<span className="text-lg font-medium">
-				{ __( 'Loading...', 'wp-ai-blogger' ) }
+				{ __( 'Loading…', 'wp-ai-blogger' ) }
 			</span>
 		</div>
 	</div>
@@ -137,8 +141,8 @@ const PagesRoute = () => {
 	const { search } = useLocation();
 
 	// Redux selectors
-	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
-	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
+	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
+	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
 
 	// Memoize URL parsing with safe data access
 	const { page, path, isValidPage } = useMemo( () => {

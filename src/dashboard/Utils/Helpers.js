@@ -14,7 +14,9 @@ export const wpAiClassNames = ( ...classes ) => {
 	const result = [];
 
 	for ( const cls of classes ) {
-		if ( ! cls ) continue;
+		if ( ! cls ) {
+			continue;
+		}
 
 		const type = typeof cls;
 
@@ -22,10 +24,14 @@ export const wpAiClassNames = ( ...classes ) => {
 			result.push( cls );
 		} else if ( Array.isArray( cls ) ) {
 			const nested = wpAiClassNames( ...cls );
-			if ( nested ) result.push( nested );
+			if ( nested ) {
+				result.push( nested );
+			}
 		} else if ( type === 'object' ) {
 			for ( const [ key, value ] of Object.entries( cls ) ) {
-				if ( value ) result.push( key );
+				if ( value ) {
+					result.push( key );
+				}
 			}
 		}
 	}
@@ -103,7 +109,9 @@ export const throttle = ( func, delay = 100 ) => {
 		if ( ! isThrottled ) {
 			func.apply( this, args );
 			isThrottled = true;
-			setTimeout( () => { isThrottled = false; }, delay );
+			setTimeout( () => {
+				isThrottled = false;
+			}, delay );
 		}
 	};
 };

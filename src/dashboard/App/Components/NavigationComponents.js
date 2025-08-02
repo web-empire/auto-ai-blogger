@@ -9,9 +9,9 @@ import { updateApiData } from '@Utils/ApiData';
  * Core version display component with enhanced accessibility
  */
 export const CoreVersion = () => {
-	const version = useSelector((state) => state.version) || '1.0.0';
-	const proVersion = useSelector((state) => state.proVersion) || '';
-	const proAvailable = useSelector((state) => state.proAvailable) || false;
+	const version = useSelector( ( state ) => state.version ) || '1.0.0';
+	const proVersion = useSelector( ( state ) => state.proVersion ) || '';
+	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
 	return (
 		<>
@@ -137,24 +137,24 @@ export const TokenDisplayAndRefresh = () => {
 	const formattedTotalTokens = totalTokens.toLocaleString();
 
 	// Calculate progress percentage and status
-	const progressPercentage = totalTokens > 0 ? ((totalTokens - tokenRemaining) / totalTokens) * 100 : 0;
+	const progressPercentage = totalTokens > 0 ? ( ( totalTokens - tokenRemaining ) / totalTokens ) * 100 : 0;
 	const getTokenStatus = () => {
 		const remaining = tokenRemaining;
-		if (remaining >= 6000) {
+		if ( remaining >= 6000 ) {
 			return {
-				text: __('Plenty of tokens', 'wp-ai-blogger'),
-				color: 'bg-green-500'
+				text: __( 'Plenty of tokens', 'wp-ai-blogger' ),
+				color: 'bg-green-500',
 			};
 		}
-		if (remaining >= 3000) {
+		if ( remaining >= 3000 ) {
 			return {
-				text: __('Moderate', 'wp-ai-blogger'),
-				color: 'bg-amber-500'
+				text: __( 'Moderate', 'wp-ai-blogger' ),
+				color: 'bg-amber-500',
 			};
 		}
 		return {
-			text: __('Low', 'wp-ai-blogger'),
-			color: 'bg-red-500'
+			text: __( 'Low', 'wp-ai-blogger' ),
+			color: 'bg-red-500',
 		};
 	};
 	const tokenStatus = getTokenStatus();
@@ -172,7 +172,7 @@ export const TokenDisplayAndRefresh = () => {
 					{ __( 'Tokens', 'wp-ai-blogger' ) }
 				</p>
 
-				{/* Progress bar */}
+				{ /* Progress bar */ }
 				<Tooltip
 					text={ tokenStatus.text }
 					delay={ 100 }
@@ -180,8 +180,8 @@ export const TokenDisplayAndRefresh = () => {
 				>
 					<div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-help">
 						<div
-							className={ `h-full transition-all duration-500 ease-in-out ${tokenStatus.color}` }
-							style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+							className={ `h-full transition-all duration-500 ease-in-out ${ tokenStatus.color }` }
+							style={ { width: `${ Math.min( progressPercentage, 100 ) }%` } }
 						/>
 					</div>
 				</Tooltip>
@@ -198,8 +198,8 @@ export const TokenDisplayAndRefresh = () => {
 					font-medium
 					focus:outline-none focus:ring-0
 					${ licenseStatus !== 'licensed' || processing || ! license
-						? 'opacity-50 cursor-not-allowed'
-						: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
+			? 'opacity-50 cursor-not-allowed'
+			: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
 					${ processing ? 'pointer-events-none' : '' }
 				` }
 				onClick={ refreshTokens }

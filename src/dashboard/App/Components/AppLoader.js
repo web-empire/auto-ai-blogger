@@ -2,6 +2,12 @@ import { __ } from '@wordpress/i18n';
 
 /**
  * Enhanced App Loader component with better accessibility and animation
+ *
+ * @param  root0
+ * @param  root0.size
+ * @param  root0.message
+ * @param  root0.fullScreen
+ * @param  root0.className
  */
 const AppLoader = ( {
 	size = 'default',
@@ -20,7 +26,7 @@ const AppLoader = ( {
 		? 'min-h-screen flex items-center justify-center bg-slate-50'
 		: 'flex items-center justify-center p-6';
 
-	const loaderMessage = message || __( 'Loading...', 'wp-ai-blogger' );
+	const loaderMessage = message || __( 'Loading…', 'wp-ai-blogger' );
 
 	return (
 		<div
@@ -31,7 +37,7 @@ const AppLoader = ( {
 		>
 			<div className="flex flex-col items-center space-y-4">
 				<div className="relative">
-					{/* Main spinner */}
+					{ /* Main spinner */ }
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="40"
@@ -51,11 +57,11 @@ const AppLoader = ( {
 						<circle cx="12" cy="12" r="10" />
 					</svg>
 
-					{/* Pulse animation overlay */}
+					{ /* Pulse animation overlay */ }
 					<div className={ `absolute inset-0 ${ sizeClasses[ size ] } bg-blue-600 rounded-full opacity-75 animate-ping` }></div>
 				</div>
 
-				{/* Loading text */}
+				{ /* Loading text */ }
 				<div className="text-center">
 					<p className="text-slate-600 font-medium text-sm">
 						{ loaderMessage }
@@ -68,7 +74,7 @@ const AppLoader = ( {
 				</div>
 			</div>
 
-			{/* Screen reader only text */}
+			{ /* Screen reader only text */ }
 			<span className="sr-only">
 				{ loaderMessage }
 			</span>

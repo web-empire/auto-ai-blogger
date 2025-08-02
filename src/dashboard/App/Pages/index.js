@@ -12,29 +12,29 @@ export const pageMetadata = {
 		path: '/welcome',
 		title: 'Welcome',
 		description: 'Dashboard overview and insights',
-		icon: 'home'
+		icon: 'home',
 	},
 	SETTINGS: {
 		component: Settings,
 		path: '/settings',
 		title: 'Settings',
 		description: 'Configure your AI Blogger settings',
-		icon: 'settings'
+		icon: 'settings',
 	},
 	FREE_VS_PRO: {
 		component: FreeVsPro,
 		path: '/free-vs-pro',
 		title: 'Free vs Pro',
 		description: 'Compare features and upgrade options',
-		icon: 'compare'
+		icon: 'compare',
 	},
 	CAMPAIGNS: {
 		component: Campaigns,
 		path: '/campaigns',
 		title: 'Campaigns',
 		description: 'Manage your blog campaigns',
-		icon: 'campaigns'
-	}
+		icon: 'campaigns',
+	},
 };
 
 // Export individual components (maintaining backward compatibility)
@@ -46,7 +46,7 @@ export {
 };
 
 // Export page list for routing and navigation
-export const pages = Object.values(pageMetadata);
+export const pages = Object.values( pageMetadata );
 
 // Export default pages object for easier imports
 export default {
@@ -55,5 +55,5 @@ export default {
 	FreeVsPro,
 	Campaigns,
 	pageMetadata,
-	pages
+	pages,
 };

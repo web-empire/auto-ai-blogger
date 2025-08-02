@@ -14,7 +14,9 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 		switch ( type ) {
 			case 'number':
 				// Handle 0 values properly - don't treat them as falsy
-				if ( value === 0 || value === '0' ) return 0;
+				if ( value === 0 || value === '0' ) {
+					return 0;
+				}
 				const num = parseFloat( value );
 				return isNaN( num ) ? defaultValue : num;
 			case 'boolean':

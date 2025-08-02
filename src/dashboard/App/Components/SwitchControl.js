@@ -125,13 +125,13 @@ const SwitchControl = forwardRef( ( {
 					error ? 'ring-2 ring-red-500 ring-offset-1' : ''
 				) }
 			>
-				{/* Background */}
+				{ /* Background */ }
 				<span
 					aria-hidden="true"
 					className="pointer-events-none absolute h-full w-full rounded-full bg-white opacity-0"
 				/>
 
-				{/* Track */}
+				{ /* Track */ }
 				<span
 					aria-hidden="true"
 					className={ aiClassNames(
@@ -141,7 +141,7 @@ const SwitchControl = forwardRef( ( {
 					) }
 				/>
 
-				{/* Toggle */}
+				{ /* Toggle */ }
 				<span
 					aria-hidden="true"
 					className={ aiClassNames(

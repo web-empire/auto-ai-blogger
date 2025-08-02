@@ -101,7 +101,7 @@ const globalDataReducer = ( state = {}, action ) => {
 
 			if ( Array.isArray( action.payload ) ) {
 				// Convert array to newline-separated string
-				stringValue = action.payload.filter( idea => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
+				stringValue = action.payload.filter( ( idea ) => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
 			} else if ( typeof action.payload === 'string' ) {
 				// Already a string, just sanitize
 				stringValue = action.payload.trim();
@@ -137,7 +137,7 @@ const globalDataReducer = ( state = {}, action ) => {
 		UPDATE_PRO_VERSION: () => ( { ...state, proVersion: String( action.payload || '' ) } ),
 		UPDATE_POST_TYPES: () => {
 			const postTypes = action.payload && typeof action.payload === 'object' ? action.payload : {};
-			return { ...state, postTypes: postTypes };
+			return { ...state, postTypes };
 		},
 
 		CLEAR_ERROR: () => ( { ...state, error: null } ),

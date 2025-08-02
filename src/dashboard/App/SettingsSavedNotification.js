@@ -57,8 +57,8 @@ export default function SettingsSavedNotification() {
 		const settingsNotification = state.settingsSavedNotification;
 
 		// Debug logging
-		if (settingsNotification) {
-			console.log('SettingsSavedNotification received:', settingsNotification);
+		if ( settingsNotification ) {
+			console.log( 'SettingsSavedNotification received:', settingsNotification );
 		}
 
 		// Support both string and object notifications
@@ -102,7 +102,9 @@ export default function SettingsSavedNotification() {
 
 	// Memoized notification styles
 	const notificationStyle = useMemo( () => {
-		if ( ! notification?.type ) return NotificationTypes.success;
+		if ( ! notification?.type ) {
+			return NotificationTypes.success;
+		}
 		return NotificationTypes[ notification.type ] || NotificationTypes.success;
 	}, [ notification?.type ] );
 
@@ -134,44 +136,44 @@ export default function SettingsSavedNotification() {
 				>
 					<div
 						className={ `
-							max-w-sm w-full ${bgGradient}
-							shadow-xl ${shadowColor}
+							max-w-sm w-full ${ bgGradient }
+							shadow-xl ${ shadowColor }
 							rounded-2xl pointer-events-auto
 							ring-1 ring-black/5
 							overflow-hidden
-							border ${borderColor}
+							border ${ borderColor }
 							notification-container notification-card
 							transform transition-all duration-300
 							relative
 						` }
 						role="alert"
 					>
-						{/* Animated progress bar with CSS animation */}
+						{ /* Animated progress bar with CSS animation */ }
 						<div className="absolute top-0 left-0 right-0 h-1 bg-gray-200/30 overflow-hidden">
 							<div
-								className={ `h-full ${accentColor} transform origin-left notification-progress` }
-								style={{ '--duration': `${notification.duration}ms` }}
+								className={ `h-full ${ accentColor } transform origin-left notification-progress` }
+								style={ { '--duration': `${ notification.duration }ms` } }
 							/>
 						</div>
 
-						{/* Main content */}
+						{ /* Main content */ }
 						<div className="p-5 pt-6">
 							<div className="flex items-start gap-4">
-								{/* Enhanced icon with background and subtle animation */}
+								{ /* Enhanced icon with background and subtle animation */ }
 								<div className={ `
-									flex-shrink-0 w-10 h-10 ${iconBg} rounded-full
+									flex-shrink-0 w-10 h-10 ${ iconBg } rounded-full
 									flex items-center justify-center
 									ring-2 ring-white shadow-sm
 									transform transition-all duration-500
 									animate-pulse
 								` }>
 									<IconComponent
-										className={ `h-5 w-5 ${iconColor} drop-shadow-sm` }
+										className={ `h-5 w-5 ${ iconColor } drop-shadow-sm` }
 										aria-hidden="true"
 									/>
 								</div>
 
-								{/* Message content with better typography */}
+								{ /* Message content with better typography */ }
 								<div className="flex-1 pt-1">
 									<p
 										className="text-sm font-semibold text-gray-900 m-0 p-0 leading-6 tracking-wide"
@@ -181,7 +183,7 @@ export default function SettingsSavedNotification() {
 									</p>
 								</div>
 
-								{/* Enhanced close button with better UX */}
+								{ /* Enhanced close button with better UX */ }
 								<div className="flex-shrink-0">
 									<button
 										type="button"
@@ -210,12 +212,12 @@ export default function SettingsSavedNotification() {
 							</div>
 						</div>
 
-						{/* Add CSS for progress bar animation */}
-						<style>{`
+						{ /* Add CSS for progress bar animation */ }
+						<style>{ `
 							.notification-progress {
 								animation: shrinkWidth var(--duration) linear forwards;
 							}
-						`}</style>
+						` }</style>
 					</div>
 				</Transition>
 			</div>

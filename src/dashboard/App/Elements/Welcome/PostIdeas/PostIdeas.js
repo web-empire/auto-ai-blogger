@@ -98,7 +98,7 @@ export default function PostIdeas() {
 
 			if ( data && data.post_ideas && Array.isArray( data.post_ideas ) ) {
 				// Convert array to string for consistent storage
-				const postIdeasString = data.post_ideas.filter( idea => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
+				const postIdeasString = data.post_ideas.filter( ( idea ) => idea && typeof idea === 'string' && idea.trim() ).join( '\n' );
 
 				// Store as string in Redux and DB
 				dispatch( {
@@ -111,14 +111,14 @@ export default function PostIdeas() {
 				// Handle token data if present
 				if ( data.token_data ) {
 					// Update Redux store with token data
-					dispatch({
+					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: data.token_data.total,
-					});
-					dispatch({
+					} );
+					dispatch( {
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: data.token_data.remaining,
-					});
+					} );
 
 					// Update API data in database
 					await updateApiData( 'tokenTotal', data.token_data.total, dispatch, abortControllerRef );
@@ -148,7 +148,7 @@ export default function PostIdeas() {
 		sexuallyExplicit,
 		dangerousContent,
 		license,
-		dispatch
+		dispatch,
 	] );
 
 	useEffect( () => {
@@ -181,7 +181,7 @@ export default function PostIdeas() {
 		// Convert string to array for display when postIdeas changes
 		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' && postIdeas !== '-1' ) {
 			// Convert string to array by splitting on newlines
-			const ideasArray = postIdeas.split( '\n' ).filter( idea => idea.trim() !== '' );
+			const ideasArray = postIdeas.split( '\n' ).filter( ( idea ) => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
 		} else {
 			// Clear the array if no post ideas
@@ -223,7 +223,7 @@ export default function PostIdeas() {
 						url="https://wpaiblogger.com/pricing/"
 						variant="primary"
 						size="default"
-						icon={<MoveRight className="h-5 w-5" />}
+						icon={ <MoveRight className="h-5 w-5" /> }
 						className="mt-5"
 					>
 						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
@@ -305,11 +305,11 @@ export default function PostIdeas() {
 		}
 
 		// Add this post to the creating set
-		setCreatingPosts( prev => new Set( prev ).add( title ) );
+		setCreatingPosts( ( prev ) => new Set( prev ).add( title ) );
 
 		// Update button to show loading state
 		const originalContent = e.target.innerHTML;
-		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating...', 'wp-ai-blogger' ) }`;
+		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating…', 'wp-ai-blogger' ) }`;
 		e.target.style.pointerEvents = 'none';
 
 		const formData = new window.FormData();
@@ -324,13 +324,13 @@ export default function PostIdeas() {
 			excerpt: '',
 			metadata: JSON.stringify( { wp_aib_reference: 1 } ),
 			// Include license and site information for content generation
-			license: license,
+			license,
 			site_title: siteTitle,
 			site_purpose: siteFor,
 			site_description: siteDescription,
-			temperature: temperature,
-			harassment: harassment,
-			hate: hate,
+			temperature,
+			harassment,
+			hate,
 			sexually_explicit: sexuallyExplicit,
 			dangerous_content: dangerousContent,
 			image_count: 1,
@@ -352,8 +352,8 @@ export default function PostIdeas() {
 						payload: {
 							message: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
 							type: 'error',
-							duration: 5000
-						}
+							duration: 5000,
+						},
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -370,8 +370,8 @@ export default function PostIdeas() {
 						payload: {
 							message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 							type: 'error',
-							duration: 5000
-						}
+							duration: 5000,
+						},
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -387,8 +387,8 @@ export default function PostIdeas() {
 						payload: {
 							message: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
 							type: 'error',
-							duration: 5000
-						}
+							duration: 5000,
+						},
 					} );
 					// Reset button state
 					e.target.innerHTML = originalContent;
@@ -404,14 +404,14 @@ export default function PostIdeas() {
 					 typeof response.data.token_data === 'object' &&
 					 response.data.token_data.total !== undefined &&
 					 response.data.token_data.remaining !== undefined ) {
-					dispatch({
+					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: response.data.token_data.total,
-					});
-					dispatch({
+					} );
+					dispatch( {
 						type: 'UPDATE_TOKEN_REMAINING',
 						payload: response.data.token_data.remaining,
-					});
+					} );
 
 					// Update API data in database
 					await updateApiData( 'tokenTotal', response.data.token_data.total, dispatch, abortControllerRef );
@@ -439,8 +439,8 @@ export default function PostIdeas() {
 					payload: {
 						message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
 						type: 'error',
-						duration: 5000
-					}
+						duration: 5000,
+					},
 				} );
 				// Reset button state
 				e.target.innerHTML = originalContent;
@@ -448,7 +448,7 @@ export default function PostIdeas() {
 			} )
 			.finally( () => {
 				// Remove this post from the creating set
-				setCreatingPosts( prev => {
+				setCreatingPosts( ( prev ) => {
 					const newSet = new Set( prev );
 					newSet.delete( title );
 					return newSet;
@@ -469,19 +469,19 @@ export default function PostIdeas() {
 					<ProButton
 						variant="primary"
 						size="default"
-						icon={<Crown className="w-4 h-4" />}
+						icon={ <Crown className="w-4 h-4" /> }
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 						onClick={ proAvailable ? handleRefresh : undefined }
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
 					>
-						{ proAvailable ? __( 'Refresh', 'wp-ai-blogger' ) :
-							( postIdeasFromRedux === '-1' ?
-								__( 'Refresh (0/5)', 'wp-ai-blogger' ) :
-								( !postIdeasFromRedux || postIdeasFromRedux.trim() === '' ?
-									__( 'Refresh', 'wp-ai-blogger' ) :
-									__( `Refresh (${Math.min(postIdeasArr.length, 5)}/5)`, 'wp-ai-blogger' )
+						{ proAvailable ? __( 'Refresh', 'wp-ai-blogger' )
+							: ( postIdeasFromRedux === '-1'
+								? __( 'Refresh (0/5)', 'wp-ai-blogger' )
+								: ( ! postIdeasFromRedux || postIdeasFromRedux.trim() === ''
+									? __( 'Refresh', 'wp-ai-blogger' )
+									: __( `Refresh (${ Math.min( postIdeasArr.length, 5 ) }/5)`, 'wp-ai-blogger' )
 								)
 							)
 						}
@@ -511,7 +511,7 @@ export default function PostIdeas() {
 										<Suspense fallback={
 											<tr>
 												<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
-													{ __( 'Loading...', 'wp-ai-blogger' ) }
+													{ __( 'Loading…', 'wp-ai-blogger' ) }
 												</td>
 											</tr>
 										}>
@@ -526,7 +526,7 @@ export default function PostIdeas() {
 										</tr>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										<>
-											{/* Limit to 5 ideas for free users, unlimited for pro users */}
+											{ /* Limit to 5 ideas for free users, unlimited for pro users */ }
 											{ postIdeasArr.slice( 0, proAvailable ? postIdeasArr.length : 5 ).map( ( postTitle, index ) => (
 												<tr key={ `post-idea-${ index }-${ postTitle?.slice( 0, 20 ) || index }` } className="even:bg-gray-50">
 													<td className="py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
@@ -551,7 +551,7 @@ export default function PostIdeas() {
 													</td>
 												</tr>
 											) ) }
-											{/* Show upgrade prompt for free users when there are more than 5 ideas */}
+											{ /* Show upgrade prompt for free users when there are more than 5 ideas */ }
 											{ ! proAvailable && postIdeasArr.length > 5 && (
 												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
 													<td colSpan="2" className="px-6 py-6 text-center">
@@ -562,7 +562,7 @@ export default function PostIdeas() {
 															<ProButton
 																variant="primary"
 																size="small"
-																icon={<MoveRight className="w-4 h-4" />}
+																icon={ <MoveRight className="w-4 h-4" /> }
 																className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
 															>
 																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
@@ -589,7 +589,7 @@ export default function PostIdeas() {
 													<ProButton
 														variant="primary"
 														size="default"
-														icon={<MoveRight className="w-5 h-5" />}
+														icon={ <MoveRight className="w-5 h-5" /> }
 														className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 													>
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }

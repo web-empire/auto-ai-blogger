@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 
 /**
  * Memoized selector for settings to prevent unnecessary re-renders
+ *
+ * @param  state
  */
 const selectSettings = ( state ) => ( {
 	siteTitle: state.siteTitle || '',

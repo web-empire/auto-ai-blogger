@@ -10,14 +10,14 @@ export const welcomeComponents = {
 		component: CampaignsInsights,
 		name: 'CampaignsInsights',
 		description: 'Dashboard insights showing campaign statistics and performance',
-		category: 'analytics'
+		category: 'analytics',
 	},
 	POST_IDEAS: {
 		component: PostIdeas,
 		name: 'PostIdeas',
 		description: 'AI-generated blog post ideas and suggestions',
-		category: 'content'
-	}
+		category: 'content',
+	},
 };
 
 // Export individual components (maintaining backward compatibility)
@@ -28,12 +28,12 @@ export {
 };
 
 // Export component list for dynamic rendering
-export const components = Object.values(welcomeComponents);
+export const components = Object.values( welcomeComponents );
 
 // Export default for easier imports
 export default {
 	CampaignsInsights,
 	PostIdeas,
 	welcomeComponents,
-	components
+	components,
 };

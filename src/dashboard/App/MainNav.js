@@ -12,10 +12,10 @@ export default function MainNav() {
 	const location = useLocation();
 
 	// Redux selectors for dynamic data
-	const licenseStatus = useSelector((state) => state.license_status) || 'unlicensed';
-	const homeSlug = useSelector((state) => state.homeSlug) || 'wp-ai-blogger';
-	const proPurchaseUrl = useSelector((state) => state.proPurchaseUrl) || 'https://wpaiblogger.com/';
-	const proAvailable = useSelector((state) => state.proAvailable) || false;
+	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
+	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
+	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
 	// Memoize license status to prevent unnecessary recalculations
 	const licenseEnabled = useMemo( () => {
@@ -53,7 +53,7 @@ export default function MainNav() {
 		];
 
 		// Filter out license-required menus if license is not enabled
-		const filteredMenus = baseMenus.filter( menu => {
+		const filteredMenus = baseMenus.filter( ( menu ) => {
 			return ! menu.requiresLicense || licenseEnabled;
 		} );
 
