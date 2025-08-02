@@ -157,10 +157,6 @@ const Notifications = memo( () => {
 			enabled: false,
 			value: '',
 		},
-		sms: {
-			enabled: false,
-			value: '',
-		},
 	} );
 
 	// Email validation pattern (supports multiple emails)
@@ -190,13 +186,6 @@ const Notifications = memo( () => {
 		} ) );
 	}, [] );
 
-	const toggleSMS = useCallback( () => {
-		setNotifications( ( prev ) => ( {
-			...prev,
-			sms: { ...prev.sms, enabled: ! prev.sms.enabled },
-		} ) );
-	}, [] );
-
 	// Input change handlers
 	const updateEmail = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
@@ -209,13 +198,6 @@ const Notifications = memo( () => {
 		setNotifications( ( prev ) => ( {
 			...prev,
 			whatsapp: { ...prev.whatsapp, value },
-		} ) );
-	}, [] );
-
-	const updateSMS = useCallback( ( value ) => {
-		setNotifications( ( prev ) => ( {
-			...prev,
-			sms: { ...prev.sms, value },
 		} ) );
 	}, [] );
 
@@ -255,30 +237,14 @@ const Notifications = memo( () => {
 							validationPattern={ phonePattern }
 						/>
 
-						{ /* SMS notifications */ }
-						<NotificationCard
-							icon={ <Phone /> }
-							title={ __( 'SMS Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive text message alerts.', 'wp-ai-blogger' ) }
-							enabled={ notifications.sms.enabled }
-							onToggle={ toggleSMS }
-							inputValue={ notifications.sms.value }
-							onInputChange={ updateSMS }
-							inputPlaceholder={ __( '+1234567890', 'wp-ai-blogger' ) }
-							inputType="tel"
-							helpText={ __( 'SMS notifications for critical alerts and publishing confirmations.', 'wp-ai-blogger' ) }
-							validationPattern={ phonePattern }
-						/>
-
 						{ /* Information box */ }
 						<InfoCard
 							icon={ Bell }
 							title={ __( 'Notification Types', 'wp-ai-blogger' ) }
 							items={ [
-								__( 'New content generated and ready for review.', 'wp-ai-blogger' ),
-								__( 'Auto-scheduled posts about to be published.', 'wp-ai-blogger' ),
-								__( 'Content generation errors or issues.', 'wp-ai-blogger' ),
-								__( 'Campaign completion and performance summaries.', 'wp-ai-blogger' ),
+								__( 'Campaign started', 'wp-ai-blogger' ),
+								__( 'New post created', 'wp-ai-blogger' ),
+								__( 'Campaign completed', 'wp-ai-blogger' ),
 							] }
 							colorScheme="blue"
 							className="mt-6"
