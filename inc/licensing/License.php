@@ -259,4 +259,3 @@ class License {
 		return false;
 	}
 }
-

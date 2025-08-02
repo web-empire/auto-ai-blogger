@@ -171,4 +171,3 @@ class Loader {
  * Kicking this off by calling 'get_instance()' method
  */
 Loader::get_instance();
-

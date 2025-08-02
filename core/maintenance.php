@@ -63,4 +63,3 @@ class Maintenance {
 		do_action( 'wp_ai_blogger_update_after' );
 	}
 }
-

@@ -123,4 +123,3 @@ class CPT {
 		do_action( 'wp_ai_blogger_after_register_' . $this->post_type . '_post_type' );
 	}
 }
-

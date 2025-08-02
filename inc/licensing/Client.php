@@ -344,4 +344,3 @@ class Client {
 		$this->textdomain = $this->slug;
 	}
 }
-

@@ -268,4 +268,3 @@ class Settings {
 		return $settings_dataset[ $key ]['type'];
 	}
 }
-
