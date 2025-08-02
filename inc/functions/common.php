@@ -494,13 +494,11 @@ function wpaib_get_schedules() {
 		}
 
 		foreach ( $schedules as $campaign_id => $schedule_data ) {
-			$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
-			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
-
-			if ( $posts_target <= $posts_created ) {
+			if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
 				unset( $schedules[ $campaign_id ] );
 				continue;
 			}
+
 			if ( is_array( $schedule_data ) ) {
 				// Ensure new format has all required fields.
 				$schedules[ $campaign_id ] = wp_parse_args(
