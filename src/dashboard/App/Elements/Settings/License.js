@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
 import SettingLabel from '@Components/SettingLabel';
 import DynamicCard from '@Components/DynamicCard';
-import { Key, Shield, Zap, CheckCircle2, Loader2 } from 'lucide-react';
+import { Key, Shield, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
 
 // Enhanced license activation form

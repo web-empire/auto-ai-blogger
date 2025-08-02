@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
-import { AlertTriangle, Info, CheckCircle2, Lightbulb } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
@@ -219,8 +219,8 @@ const Persona = memo( () => {
 						</p>
 					) : (
 						<p id="description-count" className="text-xs text-gray-500 mt-1">
-						{ __( 'This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger' ) }
-					</p> ) }
+							{ __( 'This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger' ) }
+						</p> ) }
 
 				</SettingField>
 			</div>

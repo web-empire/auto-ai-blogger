@@ -112,6 +112,13 @@ const WelcomeStep = memo( () => {
 			role="main"
 			aria-labelledby="welcome-heading"
 		>
+			{ /* Enhanced background decorative elements */ }
+			<div className="absolute inset-0 pointer-events-none">
+				<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/40 to-indigo-200/40 rounded-full blur-3xl animate-pulse" />
+				<div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse" style={ { animationDelay: '1s' } } />
+				<div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-purple-200/25 to-pink-200/25 rounded-full blur-2xl animate-pulse" style={ { animationDelay: '2s' } } />
+			</div>
+
 			<div className="max-w-6xl mx-auto relative z-10">
 				{ /* Enhanced hero section */ }
 				<div className="text-center mb-12">
@@ -131,7 +138,7 @@ const WelcomeStep = memo( () => {
 					>
 						{ __( 'Turn Ideas Into', 'wp-ai-blogger' ) }
 						<br />
-						<span className="mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent drop-shadow-sm">
+						<span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent drop-shadow-sm">
 							{ __( 'AI-Powered Blogs', 'wp-ai-blogger' ) }
 						</span>
 					</h1>
@@ -175,10 +182,12 @@ const WelcomeStep = memo( () => {
 								<div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
 								{ __( '5 min setup', 'wp-ai-blogger' ) }
 							</span>
+							<div className="w-1 h-1 bg-gray-400 rounded-full" />
 							<span className="flex items-center">
 								<div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse" />
 								{ __( 'No coding needed', 'wp-ai-blogger' ) }
 							</span>
+							<div className="w-1 h-1 bg-gray-400 rounded-full" />
 							<span className="flex items-center">
 								<div className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse" />
 								{ __( 'AI-powered', 'wp-ai-blogger' ) }

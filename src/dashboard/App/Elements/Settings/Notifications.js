@@ -71,7 +71,7 @@ const NotificationCard = memo( ( {
 						} ) }
 					</div>
 
-					<div className='flex flex-col gap-1'>
+					<div className="flex flex-col gap-1">
 						<h3 className={ `text-lg font-semibold p-0 m-0 ${ enabled ? 'text-indigo-900' : 'text-gray-900' }` }>
 							{ title }
 						</h3>

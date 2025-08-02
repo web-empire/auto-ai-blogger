@@ -77,7 +77,6 @@ const InfoCard = memo( ( {
 		>
 			<div className="flex items-start gap-3">
 				<Icon className={ `w-5 h-5 ${ colors.iconColor } flex-shrink-0` } aria-hidden="true" />
-
 				<div className="flex-1">
 					<h4 className={ `text-sm font-medium ${ colors.titleColor } mb-1 mt-0` }>
 						{ title }

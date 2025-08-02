@@ -55,7 +55,7 @@ const SettingField = forwardRef( ( {
 	};
 
 	// Memoize classes for performance.
-	const fieldClasses = useMemo( () => {
+	const fieldClasses = useMemo( () => { // eslint-disable-line
 		return aiClassNames(
 			// Base classes
 			'flex w-full setting-field',

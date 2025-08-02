@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -33,13 +33,13 @@ export default function PostIdeas() {
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
-	const editPostLink = useSelector( ( state ) => state.editPostLink );
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
 	const [ loading, setLoading ] = useState( true ); // Always start with loading true
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
+	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -179,7 +179,7 @@ export default function PostIdeas() {
 
 	useEffect( () => {
 		// Convert string to array for display when postIdeas changes
-		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' ) {
+		if ( licenseEnabled && postIdeas && typeof postIdeas === 'string' && postIdeas.trim() !== '' && postIdeas !== '-1' ) {
 			// Convert string to array by splitting on newlines
 			const ideasArray = postIdeas.split( '\n' ).filter( ( idea ) => idea.trim() !== '' );
 			setPostIdeasArr( ideasArray );
@@ -294,10 +294,23 @@ export default function PostIdeas() {
 	const wpaib_create_post = ( e, title ) => {
 		e.preventDefault();
 
-		if ( e.target.dataset.type === 'edit' ) {
+		if ( e.target.dataset.type === 'open-post' ) {
 			window.open( e.target.href, '_blank' );
 			return;
 		}
+
+		// Prevent multiple clicks for the same post
+		if ( creatingPosts.has( title ) ) {
+			return;
+		}
+
+		// Add this post to the creating set
+		setCreatingPosts( ( prev ) => new Set( prev ).add( title ) );
+
+		// Update button to show loading state
+		const originalContent = e.target.innerHTML;
+		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating…', 'wp-ai-blogger' ) }`;
+		e.target.style.pointerEvents = 'none';
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
@@ -310,6 +323,17 @@ export default function PostIdeas() {
 			post_content: '',
 			excerpt: '',
 			metadata: JSON.stringify( { wp_aib_reference: 1 } ),
+			// Include license and site information for content generation
+			license,
+			site_title: siteTitle,
+			site_purpose: siteFor,
+			site_description: siteDescription,
+			temperature,
+			harassment,
+			hate,
+			sexually_explicit: sexuallyExplicit,
+			dangerous_content: dangerousContent,
+			image_count: 1,
 		};
 
 		formData.append( 'post_data', JSON.stringify( postData ) );
@@ -319,23 +343,117 @@ export default function PostIdeas() {
 			method: 'POST',
 			body: formData,
 		} )
-			.then( ( response ) => {
-				if ( ! response.success ) {
-					console.error( __( 'Failed to create post.', 'wp-ai-blogger' ) );
+			.then( async ( response ) => {
+				// Check if response exists and has the expected structure
+				if ( ! response || typeof response !== 'object' ) {
+					console.error( __( 'Invalid response received from server.', 'wp-ai-blogger' ) );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: {
+							message: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
+							type: 'error',
+							duration: 5000,
+						},
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
-				e.target.dataset.type = 'edit';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line-icon lucide-pencil-line w-5 h-5"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
-				e.target.href = editPostLink.replace( '{{POST_ID}}', response.data.post_id );
-				window.open( e.target.href, '_blank' );
+				// Check if the request was successful
+				if ( ! response.success ) {
+					const errorMessage = response.data?.message || __( 'Failed to create post.', 'wp-ai-blogger' );
+					console.error( __( 'Failed to create post:', 'wp-ai-blogger' ), errorMessage );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: {
+							message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+							type: 'error',
+							duration: 5000,
+						},
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
+					return;
+				}
+
+				// Validate that we have the required data
+				if ( ! response.data || ! response.data.post_id || ! response.data.edit_link ) {
+					console.error( __( 'Post created but no post ID or edit link received.', 'wp-ai-blogger' ) );
+					dispatch( {
+						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+						payload: {
+							message: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
+							type: 'error',
+							duration: 5000,
+						},
+					} );
+					// Reset button state
+					e.target.innerHTML = originalContent;
+					e.target.style.pointerEvents = 'auto';
+					return;
+				}
+
+				// Use the edit link provided by the backend
+				const editUrl = response.data.edit_link;
+
+				// Handle token data if present (update Redux state only, database already updated)
+				if ( response.data.token_data &&
+					 typeof response.data.token_data === 'object' &&
+					 response.data.token_data.total !== undefined &&
+					 response.data.token_data.remaining !== undefined ) {
+					dispatch( {
+						type: 'UPDATE_TOKEN_TOTAL',
+						payload: response.data.token_data.total,
+					} );
+					dispatch( {
+						type: 'UPDATE_TOKEN_REMAINING',
+						payload: response.data.token_data.remaining,
+					} );
+
+					// Update API data in database
+					await updateApiData( 'tokenTotal', response.data.token_data.total, dispatch, abortControllerRef );
+					await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
+				}
+
+				// Update button to "Open Post"
+				e.target.dataset.type = 'open-post';
+				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
+				e.target.href = editUrl;
+				e.target.style.pointerEvents = 'auto';
+				e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Post Created Successfully!', 'wp-ai-blogger' ),
+					payload: __( 'Post created successfully! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
 				} );
 			} )
-			.catch( () => {} );
+			.catch( ( newError ) => {
+				// Handle network errors or other exceptions
+				const errorMessage = newError?.message || __( 'Network error occurred while creating post.', 'wp-ai-blogger' );
+				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), newError );
+				dispatch( {
+					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
+					payload: {
+						message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+						type: 'error',
+						duration: 5000,
+					},
+				} );
+				// Reset button state
+				e.target.innerHTML = originalContent;
+				e.target.style.pointerEvents = 'auto';
+			} )
+			.finally( () => {
+				// Remove this post from the creating set
+				setCreatingPosts( ( prev ) => {
+					const newSet = new Set( prev );
+					newSet.delete( title );
+					return newSet;
+				} );
+			} );
 	};
 
 	return (
@@ -352,54 +470,43 @@ export default function PostIdeas() {
 						) }
 					</p>
 				</div>
-				{ ! proAvailable && (
-					<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-						<ProButton
-							variant="primary"
-							size="default"
-							icon={ <MoveRight className="w-4 h-4" /> }
-							className="shadow-lg border-2 border-amber-400 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
-						>
-							{ __( 'Get Unlimited Post Suggestions', 'wp-ai-blogger' ) }
-						</ProButton>
-					</div>
-				) }
+
+				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
+					<ProButton
+						variant="primary"
+						size="default"
+						icon={ <Crown className="w-4 h-4" /> }
+						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
+						onClick={ proAvailable ? handleRefresh : undefined }
+						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
+						tooltipPosition="left"
+						iconPosition="left"
+					>
+						{ proAvailable ? __( 'Refresh', 'wp-ai-blogger' )
+							: ( postIdeasFromRedux === '-1'
+								? __( 'Refresh (0/5)', 'wp-ai-blogger' )
+								: ( ! postIdeasFromRedux || postIdeasFromRedux.trim() === ''
+									? __( 'Refresh', 'wp-ai-blogger' )
+									: `${ __( 'Refresh', 'wp-ai-blogger' ) } (${ Math.min( postIdeasArr.length, 5 ) }/5)`
+								)
+							)
+						}
+					</ProButton>
+				</div>
 			</div>
 
 			<div className="mt-6 flow-root">
 				<div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
 					<div className="block py-2 align-middle sm:px-6 lg:px-8">
 						<div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg">
-							<table className="w-full divide-y divide-gray-300">
+							<table className="w-full divide-y divide-gray-300 table-fixed">
 								<thead className="bg-gray-50 header-nav">
 									<tr>
-										<th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+										<th scope="col" className="w-3/5 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
 											{ __( 'Title', 'wp-ai-blogger' ) }
 										</th>
-										<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 flex items-center justify-between">
-											<span>{ __( 'Write Post', 'wp-ai-blogger' ) }</span>
-											{ proAvailable ? (
-												<button
-													onClick={ handleRefresh }
-													disabled={ loading }
-													className="flex items-center gap-1 px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
-													title={ __( 'Refresh post ideas', 'wp-ai-blogger' ) }
-												>
-													<RotateCw className={ `h-3 w-3 ${ loading ? 'animate-spin' : '' }` } />
-													{ __( 'Refresh', 'wp-ai-blogger' ) }
-												</button>
-											) : (
-												<div className="relative group">
-													<button
-														disabled
-														className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-200 text-gray-400 rounded cursor-not-allowed opacity-60"
-														title={ __( 'Upgrade to Pro to refresh post ideas', 'wp-ai-blogger' ) }
-													>
-														<RotateCw className="h-3 w-3" />
-														{ __( 'Refresh', 'wp-ai-blogger' ) }
-													</button>
-												</div>
-											) }
+										<th scope="col" className="w-2/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+											{ __( 'Write Post', 'wp-ai-blogger' ) }
 										</th>
 									</tr>
 								</thead>
@@ -416,6 +523,13 @@ export default function PostIdeas() {
 										}>
 											<Skeleton />
 										</Suspense>
+									) : postIdeasFromRedux === '-1' ? (
+										// Special case for when postIdeasFromRedux is "-1"
+										<tr>
+											<td colSpan="2" className="px-6 py-4 text-center text-amber-600 font-medium">
+												{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'wp-ai-blogger' ) }
+											</td>
+										</tr>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
 										<>
 											{ /* Limit to 5 ideas for free users, unlimited for pro users */ }
@@ -443,14 +557,13 @@ export default function PostIdeas() {
 													</td>
 												</tr>
 											) ) }
-
 											{ /* Show upgrade prompt for free users when there are more than 5 ideas */ }
 											{ ! proAvailable && postIdeasArr.length > 5 && (
 												<tr className="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
 													<td colSpan="2" className="px-6 py-6 text-center">
 														<div className="flex flex-col items-center space-y-3">
 															<div className="text-amber-700 font-semibold text-sm">
-																🔒 { `${ postIdeasArr.length - 5 } ` + __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }
+																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }` }
 															</div>
 															<ProButton
 																variant="primary"
@@ -476,12 +589,9 @@ export default function PostIdeas() {
 
 								<tfoot className="bg-gray-50">
 									<tr>
-										<td colSpan="5" className="px-3 py-3.5 text-center text-sm font-semibold">
+										<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
 											{ ! proAvailable ? (
 												<div className="flex flex-col items-center space-y-2">
-													<div className="text-amber-600 font-medium text-sm">
-														{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions!', 'wp-ai-blogger' ) }
-													</div>
 													<ProButton
 														variant="primary"
 														size="default"
@@ -491,16 +601,7 @@ export default function PostIdeas() {
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
 													</ProButton>
 												</div>
-											) : (
-												<ProButton
-													variant="ghost"
-													size="default"
-													icon={ <MoveRight className="w-5 h-5" /> }
-													className="text-indigo-600 hover:text-indigo-900"
-												>
-													{ __( 'Upgrade to Pro to Unlock More Features.', 'wp-ai-blogger' ) }
-												</ProButton>
-											) }
+											) : null }
 										</td>
 									</tr>
 								</tfoot>

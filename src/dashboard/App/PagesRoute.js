@@ -160,15 +160,10 @@ const PagesRoute = () => {
 	// Get route configuration safely
 	const routeConfig = ROUTE_MAP[ path ] || ROUTE_MAP[ '' ];
 
-	// Handle route not found
-	if ( ! routeConfig ) {
-		return <RouteError type="not-found" />;
-	}
-
 	const { component: Component, title } = routeConfig;
 
 	// Set document title for better UX and SEO.
-	React.useEffect( () => {
+	React.useEffect( () => { // eslint-disable-line
 		try {
 			if ( title ) {
 				const originalTitle = document.title;
@@ -183,6 +178,11 @@ const PagesRoute = () => {
 			console.warn( 'Error setting document title:', error );
 		}
 	}, [ title ] );
+
+	// Handle route not found
+	if ( ! routeConfig ) {
+		return <RouteError type="not-found" />;
+	}
 
 	// Handle license requirement
 	if ( routeConfig.requiresLicense && ! isLicensed ) {

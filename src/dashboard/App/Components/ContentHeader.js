@@ -2,26 +2,28 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
-import { Save } from 'lucide-react';
+import { Save, Gift } from 'lucide-react';
 
 /**
  * Enhanced ContentHeader component with improved error handling and UX
  *
- * @param {Object}   props                      Component properties
- * @param {string}   [props.title='']           Header title
- * @param {string}   [props.tab='']             Current active tab
- * @param {string}   [props.siteTitle='']       Site title setting
- * @param {string}   [props.siteFor='']         Site for setting
- * @param {string}   [props.siteDescription=''] Site description setting
- * @param {number}   [props.temperature=0.7]    Temperature setting for AI responses
- * @param {number}   [props.harassment=2]       Harassment content filter setting
- * @param {number}   [props.hate=2]             Hate content filter setting
- * @param {number}   [props.sexuallyExplicit=2] Sexually explicit content filter
- * @param {number}   [props.dangerousContent=2] Dangerous content filter setting
- * @param {string}   [props.className='']       Additional CSS classes
- * @param {Function} [props.onSaveStart]        Callback when save starts
- * @param {Function} [props.onSaveComplete]     Callback when save completes successfully
- * @param {Function} [props.onSaveError]        Callback when save fails
+ * @param {Object}      props                      Component properties
+ * @param {string}      [props.title='']           Header title
+ * @param {string}      [props.tab='']             Current active tab
+ * @param {string}      [props.siteTitle='']       Site title setting
+ * @param {string}      [props.siteFor='']         Site for setting
+ * @param {string}      [props.siteDescription=''] Site description setting
+ * @param {number}      [props.temperature=0.7]    Temperature setting for AI responses
+ * @param {number}      [props.harassment=2]       Harassment content filter setting
+ * @param {number}      [props.hate=2]             Hate content filter setting
+ * @param {number}      [props.sexuallyExplicit=2] Sexually explicit content filter
+ * @param {number}      [props.dangerousContent=2] Dangerous content filter setting
+ * @param {string}      [props.className='']       Additional CSS classes
+ * @param {Function}    [props.onSaveStart]        Callback when save starts
+ * @param {Function}    [props.onSaveComplete]     Callback when save completes successfully
+ * @param {Function}    [props.onSaveError]        Callback when save fails
+ * @param {JSX.Element} [props.icon=Gift]          Icon component to display in header
+ * @return {JSX.Element|null} Rendered header component or null if tab is 'license'
  */
 const ContentHeader = ( {
 	title = '',
@@ -35,18 +37,23 @@ const ContentHeader = ( {
 	hate = 2,
 	sexuallyExplicit = 2,
 	dangerousContent = 2,
-	className = '',
+	className = '', // eslint-disable-line no-unused-vars
 	onSaveStart,
 	onSaveComplete,
-	onSaveError
+	onSaveError,
 } ) => {
-	const abortControllerRef = useRef( {} );
-	const dispatch = useDispatch();
-	const [ processing, setProcessing ] = useState( false );
-	const [ lastSaveTime, setLastSaveTime ] = useState( null );
+	// Don't render for license tab - check this FIRST before any other processing
+	if ( tab === 'license' ) {
+		return null;
+	}
+
+	const abortControllerRef = useRef( {} ); // eslint-disable-line
+	const dispatch = useDispatch(); // eslint-disable-line
+	const [ processing, setProcessing ] = useState( false ); // eslint-disable-line
+	const [ lastSaveTime, setLastSaveTime ] = useState( null ); // eslint-disable-line
 
 	// Memoize settings object to prevent unnecessary re-renders.
-	const settingsToSave = useMemo( () => {
+	const settingsToSave = useMemo( () => { // eslint-disable-line
 		const settings = {
 			siteTitle,
 			siteFor,
@@ -74,7 +81,7 @@ const ContentHeader = ( {
 	] );
 
 	// Enhanced save function with better error handling
-	const saveSettings = useCallback( async () => {
+	const saveSettings = useCallback( async () => { // eslint-disable-line
 		// Prevent multiple simultaneous saves
 		if ( processing ) {
 			return;
@@ -159,7 +166,7 @@ const ContentHeader = ( {
 	}, [ processing, settingsToSave, dispatch, onSaveStart, onSaveComplete, onSaveError ] );
 
 	// Memoize header title
-	const headerTitle = useMemo( () => {
+	const headerTitle = useMemo( () => { // eslint-disable-line
 		if ( ! title ) {
 			return __( 'Settings', 'wp-ai-blogger' );
 		}

@@ -99,6 +99,7 @@ export default function MainNav() {
 								decoding="async"
 							/>
 						</span>
+
 						<nav
 							className="h-full ml-4 sm:ml-8 sm:flex gap-y-4 gap-x-8"
 							aria-label="Primary navigation"
