@@ -475,9 +475,16 @@ class Helper {
 		foreach ( $settings as $key => $value ) {
 			// Only include allowed keys (compare with sanitized versions).
 			if ( in_array( $key, $sanitized_allowed_keys, true ) ) {
-				// Skip re-sanitization - the value should already be sanitized from update_option.
-				// Only validate that the key is allowed and the value is not false.
-				if ( $value !== false ) {
+				// Get original camelCase key to check if it's a boolean field
+				$original_key_index = array_search( $key, $sanitized_allowed_keys );
+				$original_key       = self::$allowed_keys[ $original_key_index ];
+				
+				// Boolean fields can have false as a valid value
+				$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+				$is_boolean_field = in_array( $original_key, $boolean_fields, true );
+				
+				// Include the value if it's not false, or if it's false but for a boolean field
+				if ( $value !== false || $is_boolean_field ) {
 					$validated[ $key ] = $value;
 				}
 			}

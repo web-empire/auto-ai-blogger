@@ -195,7 +195,7 @@ class Ajax {
 			}
 
 			$sub_option_value = '';
-			if ( ! empty( $_POST['value'] ) ) {
+			if ( isset( $_POST['value'] ) ) {
 				if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
 					$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
 				} else {
@@ -206,7 +206,12 @@ class Ajax {
 			// Update option with error handling.
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
 
-			if ( $update_result === false ) {
+			// Boolean fields can legitimately return false as their value
+			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+			$is_boolean_field = in_array( $sub_option_key, $boolean_fields, true );
+
+			// Only treat false as an error if it's not a boolean field with a false value
+			if ( $update_result === false && ! $is_boolean_field ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
 			}
