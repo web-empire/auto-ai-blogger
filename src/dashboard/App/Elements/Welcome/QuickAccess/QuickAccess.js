@@ -44,7 +44,7 @@ export default function QuickAccess() {
 										<tr key={ index } className="hover:bg-gray-50 group">
 											<td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
 												<div className="flex items-center space-x-3">
-													<div className="flex-shrink-0 text-gray-600 group-hover:text-indigo-600 transition-colors">
+													<div className="flex-shrink-0 flex items-center text-gray-600 group-hover:text-indigo-600 transition-colors">
 														{ link.icon }
 													</div>
 													<div className="flex-1 min-w-0">
