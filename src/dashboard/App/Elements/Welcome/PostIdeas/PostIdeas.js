@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw, Crown } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown, ExternalLink } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -40,6 +40,7 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
+	const [ createdPosts, setCreatedPosts ] = useState( new Map() ); // Track which posts have been created (title -> editUrl)
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -299,18 +300,13 @@ export default function PostIdeas() {
 			return;
 		}
 
-		// Prevent multiple clicks for the same post
-		if ( creatingPosts.has( title ) ) {
+		// Prevent multiple clicks for the same post OR if any post is being created
+		if ( creatingPosts.has( title ) || creatingPosts.size > 0 ) {
 			return;
 		}
 
 		// Add this post to the creating set
 		setCreatingPosts( ( prev ) => new Set( prev ).add( title ) );
-
-		// Update button to show loading state
-		const originalContent = e.target.innerHTML;
-		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating…', 'wp-ai-blogger' ) }`;
-		e.target.style.pointerEvents = 'none';
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
@@ -355,9 +351,6 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -373,9 +366,6 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -390,14 +380,14 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
+
+				// Store the created post information
+				setCreatedPosts( ( prev ) => new Map( prev ).set( title, editUrl ) );
 
 				// Handle token data if present (update Redux state only, database already updated)
 				if ( response.data.token_data &&
@@ -418,13 +408,6 @@ export default function PostIdeas() {
 					await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
 				}
 
-				// Update button to "Open Post"
-				e.target.dataset.type = 'open-post';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> ${ __( 'Open Post', 'wp-ai-blogger' ) }`;
-				e.target.href = editUrl;
-				e.target.style.pointerEvents = 'auto';
-				e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
-
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: __( 'Post created successfully! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
@@ -443,8 +426,6 @@ export default function PostIdeas() {
 					},
 				} );
 				// Reset button state
-				e.target.innerHTML = originalContent;
-				e.target.style.pointerEvents = 'auto';
 			} )
 			.finally( () => {
 				// Remove this post from the creating set
@@ -544,16 +525,56 @@ export default function PostIdeas() {
 														</div>
 													</td>
 													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
-														<a
-															target="_blank"
-															href="#"
-															onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-															className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer"
-															data-type="create"
-														>
-															<Plus className="w-5 h-5" />
-															{ __( 'Create', 'wp-ai-blogger' ) }
-														</a>
+														{ createdPosts.has( postTitle ) ? (
+															// Show "Open Post" for created posts
+															<a
+																target="_blank"
+																href={ createdPosts.get( postTitle ) }
+																className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold"
+																onClick={ ( e ) => {
+																	// Let the default link behavior handle opening the post
+																	e.stopPropagation();
+																} }
+															>
+																<ExternalLink className="w-5 h-5" />
+																{ __( 'Open Post', 'wp-ai-blogger' ) }
+															</a>
+														) : (
+															// Show "Create" or loading state
+															<a
+																target="_blank"
+																href="#"
+																onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+																className={ `flex items-center gap-x-1 cursor-pointer ${ 
+																	creatingPosts.size > 0 
+																		? ( creatingPosts.has( postTitle ) 
+																			? 'text-green-600 hover:text-green-900' 
+																			: 'text-gray-400 cursor-not-allowed' )
+																		: 'text-indigo-600 hover:text-indigo-900'
+																}` }
+																data-type="create"
+																style={ { 
+																	pointerEvents: creatingPosts.size > 0 && ! creatingPosts.has( postTitle ) ? 'none' : 'auto' 
+																} }
+															>
+																{ creatingPosts.has( postTitle ) ? (
+																	// Show loading state for the current post being created
+																	<>
+																		<svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.5))', backdropFilter: 'blur(4px)' }}>
+																			<circle className="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" strokeWidth="3"></circle>
+																			<path className="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+																		</svg>
+																		{ __( 'Creating…', 'wp-ai-blogger' ) }
+																	</>
+																) : (
+																	// Show normal or disabled state
+																	<>
+																		<Plus className="w-5 h-5" />
+																		{ __( 'Create', 'wp-ai-blogger' ) }
+																	</>
+																) }
+															</a>
+														) }
 													</td>
 												</tr>
 											) ) }
