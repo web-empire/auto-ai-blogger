@@ -7,19 +7,16 @@ export default function QuickAccess() {
 		{
 			icon: <Ticket className="w-5 h-5" />,
 			title: __( 'Open Support Ticket', 'wp-ai-blogger' ),
-			description: __( 'Get help with any issues or questions', 'wp-ai-blogger' ),
 			url: 'https://wpaiblogger.com/support/'
 		},
 		{
 			icon: <FileText className="w-5 h-5" />,
 			title: __( 'Help Center', 'wp-ai-blogger' ),
-			description: __( 'Browse documentation and tutorials', 'wp-ai-blogger' ),
 			url: 'https://wpaiblogger.com/docs/'
 		},
 		{
 			icon: <Users className="w-5 h-5" />,
 			title: __( 'Join our Community on Facebook', 'wp-ai-blogger' ),
-			description: __( 'Connect with other users and share tips', 'wp-ai-blogger' ),
 			url: 'https://www.facebook.com/groups/wpaiblogger'
 		}
 	];
@@ -44,10 +41,10 @@ export default function QuickAccess() {
 							<table className="w-full divide-y divide-gray-300">
 								<tbody className="divide-y divide-gray-200 bg-white">
 									{ quickAccessLinks.map( ( link, index ) => (
-										<tr key={ index } className="hover:bg-gray-50">
+										<tr key={ index } className="hover:bg-gray-50 group">
 											<td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
 												<div className="flex items-center space-x-3">
-													<div className="flex-shrink-0 text-gray-600">
+													<div className="flex-shrink-0 text-gray-600 group-hover:text-indigo-600 transition-colors">
 														{ link.icon }
 													</div>
 													<div className="flex-1 min-w-0">
@@ -55,13 +52,10 @@ export default function QuickAccess() {
 															href={ link.url }
 															target="_blank"
 															rel="noopener noreferrer"
-															className="text-indigo-600 hover:text-indigo-900 font-medium"
+															className="text-gray-600 hover:text-indigo-600 font-medium transition-colors"
 														>
 															{ link.title }
 														</a>
-														<p className="mt-1 text-sm text-gray-500">
-															{ link.description }
-														</p>
 													</div>
 												</div>
 											</td>

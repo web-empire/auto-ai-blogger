@@ -82,12 +82,12 @@ function Welcome() {
 				</section>
 
 				{ /* Post ideas and Quick Access sections - side by side */ }
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-					<section>
+				<div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mb-8">
+					<section className="lg:col-span-7">
 						<PostIdeas onError={ handleComponentError } />
 					</section>
 
-					<section>
+					<section className="lg:col-span-3">
 						<QuickAccess onError={ handleComponentError } />
 					</section>
 				</div>
