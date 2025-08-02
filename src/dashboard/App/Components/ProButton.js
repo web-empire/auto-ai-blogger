@@ -95,7 +95,7 @@ const ProButton = forwardRef( ( {
 	const baseClasses = 'flex items-center gap-2 justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none no-underline';
 
 	// Link-specific style overrides to prevent default link styling and maintain button appearance
-	const linkStyleOverrides = shouldRenderAsLink ? '!text-inherit hover:!text-inherit visited:!text-inherit focus:!text-inherit active:!text-inherit decoration-none hover:no-underline focus:no-underline visited:no-underline' : '';
+	const linkStyleOverrides = shouldRenderAsLink ? '!text-white hover:!text-white visited:!text-white focus:!text-white active:!text-white decoration-none hover:no-underline focus:no-underline visited:no-underline' : '';
 
 	// Disabled classes
 	const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
