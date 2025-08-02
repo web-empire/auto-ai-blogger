@@ -147,7 +147,9 @@ class Helper {
 		// Sanitize value based on key type (use original camelCase key for switch).
 		$sanitized_value = self::sanitize_input( $original_key, $value );
 
-		if ( $sanitized_value === false ) {
+		// Check if sanitization failed (false can be a valid value for boolean fields)
+		$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+		if ( $sanitized_value === false && ! in_array( $original_key, $boolean_fields, true ) ) {
 			return false;
 		}
 
@@ -269,7 +271,11 @@ class Helper {
 
 			$sanitized_value = self::sanitize_input( $original_key, $value );
 
-			if ( $sanitized_value !== false ) {
+			// Check if sanitization failed (false can be a valid value for boolean fields)
+			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+			$is_valid_value = $sanitized_value !== false || in_array( $original_key, $boolean_fields, true );
+
+			if ( $is_valid_value ) {
 				$settings[ $key ] = $sanitized_value;
 				$updated          = true;
 			}
