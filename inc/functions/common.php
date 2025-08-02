@@ -339,10 +339,10 @@ function wpaib_get_post_types() {
 			}
 		}
 
-		//  Sanitize post type names and get labels.
+		// Sanitize post type names and get labels.
 		$sanitized_post_types = [];
 		foreach ( $queried_post_types as $post_type ) {
-			$post_type = sanitize_key( $post_type );
+			$post_type     = sanitize_key( $post_type );
 			$post_type_obj = get_post_type_object( $post_type );
 
 			if ( $post_type_obj && ! empty( $post_type_obj->labels->name ) ) {
@@ -484,8 +484,8 @@ function wpaib_get_authors() {
 			}
 
 			$authors[] = [
-				'id'   => absint( $user->ID ),
-				'name' => sanitize_text_field( $user->display_name ),
+				'id'    => absint( $user->ID ),
+				'name'  => sanitize_text_field( $user->display_name ),
 				'login' => sanitize_user( $user->user_login ),
 			];
 		}
