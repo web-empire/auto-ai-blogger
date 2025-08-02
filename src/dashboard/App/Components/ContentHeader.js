@@ -72,9 +72,9 @@ const ContentHeader = ( {
 			sexuallyExplicit,
 			dangerousContent,
 			emailNotificationEnabled,
-			emailNotificationValue,
+			emailNotificationValue: emailNotificationEnabled ? emailNotificationValue : '',
 			whatsappNotificationEnabled,
-			whatsappNotificationValue,
+			whatsappNotificationValue: whatsappNotificationEnabled ? whatsappNotificationValue : '',
 		};
 
 		// Filter out undefined and null values.

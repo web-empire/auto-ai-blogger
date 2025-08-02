@@ -26,6 +26,20 @@ const NotificationCard = memo( ( {
 
 	// Enhanced validation
 	const validateInput = useCallback( ( value ) => {
+		// If notification is enabled, the field is required
+		if ( enabled && ( ! value || ! value.trim() ) ) {
+			setIsValid( false );
+			if ( inputType === 'email' ) {
+				setValidationMessage( __( 'Email address is required when notifications are enabled', 'wp-ai-blogger' ) );
+			} else if ( inputType === 'tel' ) {
+				setValidationMessage( __( 'Phone number is required when notifications are enabled', 'wp-ai-blogger' ) );
+			} else {
+				setValidationMessage( __( 'This field is required when notifications are enabled', 'wp-ai-blogger' ) );
+			}
+			return false;
+		}
+
+		// If notification is disabled or field is empty, it's valid
 		if ( ! enabled || ! value.trim() ) {
 			setIsValid( true );
 			setValidationMessage( '' );
@@ -60,6 +74,18 @@ const NotificationCard = memo( ( {
 		onInputChange( value );
 		validateInput( value );
 	}, [ onInputChange, validateInput ] );
+
+	// Validate when the enabled state changes
+	useEffect( () => {
+		if ( enabled ) {
+			// When enabling, validate the current input value
+			validateInput( inputValue );
+		} else {
+			// When disabling, clear validation
+			setIsValid( true );
+			setValidationMessage( '' );
+		}
+	}, [ enabled, inputValue, validateInput ] );
 
 	return (
 		<div className={ `border rounded-lg transition-all duration-200 p-4 ${ enabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-gray-50' }` }>
@@ -100,6 +126,7 @@ const NotificationCard = memo( ( {
 							onChange={ handleInputChange }
 							placeholder={ inputPlaceholder }
 							disabled={ disabled }
+							required={ enabled }
 							className={ `
 								block w-full px-3 py-2 text-sm border rounded-lg
 								bg-white text-gray-900 placeholder:text-gray-400
@@ -110,16 +137,17 @@ const NotificationCard = memo( ( {
 							` }
 							aria-describedby={ `${ title.toLowerCase().replace( ' ', '-' ) }-help` }
 							aria-invalid={ ! isValid }
+							aria-required={ enabled }
 						/>
 
 						{ /* Validation indicator */ }
 						<div className="absolute inset-y-0 right-0 flex items-center pr-3">
-							{ inputValue && (
-								isValid ? (
-									<CheckCircle2 className="w-4 h-4 text-green-500" />
-								) : (
+							{ enabled && (
+								! isValid ? (
 									<AlertCircle className="w-4 h-4 text-red-500" />
-								)
+								) : inputValue && inputValue.trim() ? (
+									<CheckCircle2 className="w-4 h-4 text-green-500" />
+								) : null
 							) }
 						</div>
 					</div>

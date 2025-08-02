@@ -420,14 +420,20 @@ class Helper {
 						$valid_emails[] = $sanitized_email;
 					}
 				}
+				// Return empty string if no valid emails (rather than false) to allow saving when disabled
 				return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
 
 			case 'whatsappNotificationValue':
 				// Basic phone number validation (international format)
 				$phone = sanitize_text_field( $value );
+				// Allow empty values (for when notification is disabled)
+				if ( empty( $phone ) ) {
+					return '';
+				}
 				// Allow international format: +[country code][number]
-				if ( ! empty( $phone ) && ! preg_match( '/^\+?[1-9]\d{1,14}$/', $phone ) ) {
-					return false;
+				if ( ! preg_match( '/^\+?[1-9]\d{1,14}$/', $phone ) ) {
+					// Return empty string instead of false to allow saving when invalid/empty
+					return '';
 				}
 				return $phone;
 
