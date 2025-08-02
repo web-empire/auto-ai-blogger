@@ -29,6 +29,9 @@ const ProButton = forwardRef( ( {
 		return url || proPurchaseUrl;
 	}, [ url, proPurchaseUrl ] );
 
+	// Determine element tag - if we have a URL but no custom onClick, render as link
+	const shouldRenderAsLink = isLink || ( proUrl && proUrl.trim() !== '' && ! onClick );
+
 	// Enhanced click handler with error handling
 	const handleUpgrade = useCallback( ( event ) => {
 		if ( disabled || loading ) {
@@ -97,8 +100,6 @@ const ProButton = forwardRef( ( {
 	// Loading classes
 	const loadingClasses = loading ? 'cursor-wait' : '';
 
-	// Determine element tag - if we have a URL but no custom onClick, render as link
-	const shouldRenderAsLink = isLink || ( proUrl && proUrl.trim() !== '' && ! onClick );
 	const Tag = shouldRenderAsLink ? 'a' : 'button';
 
 	// Filter out link-specific props when rendering as button
