@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 // Import components directly to avoid lazy loading issues
-import { PostIdeas, CampaignsInsights } from '@Elements/Welcome';
+import { PostIdeas, QuickAccess, CampaignsInsights } from '@Elements/Welcome';
 
 // Error boundary for component failures
 class WelcomeErrorBoundary extends React.Component {
@@ -81,16 +81,16 @@ function Welcome() {
 					<CampaignsInsights onError={ handleComponentError } />
 				</section>
 
-				{ /* Post ideas section */ }
-				<section
-					aria-labelledby="ideas-heading"
-					className="mb-8"
-				>
-					<h2 id="ideas-heading" className="sr-only">
-						{ __( 'Post Ideas', 'wp-ai-blogger' ) }
-					</h2>
-					<PostIdeas onError={ handleComponentError } />
-				</section>
+				{ /* Post ideas and Quick Access sections - side by side */ }
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+					<section>
+						<PostIdeas onError={ handleComponentError } />
+					</section>
+
+					<section>
+						<QuickAccess onError={ handleComponentError } />
+					</section>
+				</div>
 			</main>
 		</WelcomeErrorBoundary>
 	);
