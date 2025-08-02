@@ -452,11 +452,6 @@ export default function PostIdeas() {
 				<div className="flex flex-col gap-2">
 					<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-4 p-0 m-0">
 						{ __( 'Blog Post Suggestions', 'wp-ai-blogger' ) }
-						{ ! proAvailable && (
-							<span className="block text-sm text-amber-600 font-normal">
-								{ `⚡ ${ __( 'Upgrade for Unlimited Ideas!', 'wp-ai-blogger' ) }` }
-							</span>
-						) }
 					</h2>
 
 					<p className="mt-4 text-sm text-gray-700">

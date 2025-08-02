@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useCallback, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo, useState } from 'react';
 import { aiClassNames } from '@Utils/aiClassNames';
 import { useSelector } from 'react-redux';
 
@@ -15,12 +15,15 @@ const ProButton = forwardRef( ( {
 	disabled = false,
 	loading = false,
 	icon = null,
+	iconPosition = 'right',
+	tooltip = null,
+	tooltipPosition = 'top',
 	children = __( 'Upgrade to Pro', 'wp-ai-blogger' ),
 	onClick,
 	'aria-label': ariaLabel,
-	iconPosition = 'right',
 	...props
 }, ref ) => {
+	const [ showTooltip, setShowTooltip ] = useState( false );
 	// Get pro purchase URL from Redux store
 	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
 
@@ -41,9 +44,9 @@ const ProButton = forwardRef( ( {
 
 		// Call custom onClick if provided
 		if ( onClick ) {
-			onClick( event );
-			// If the custom onClick prevented the default, don't do anything else
-			if ( event.defaultPrevented ) {
+			const result = onClick( event );
+			// If onClick returns false, prevent default behavior
+			if ( result === false ) {
 				return;
 			}
 		}
@@ -92,7 +95,7 @@ const ProButton = forwardRef( ( {
 	};
 
 	// Base classes.
-	const baseClasses = 'flex items-center gap-2 justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none no-underline';
+	const baseClasses = 'inline-flex items-center justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none no-underline';
 
 	// Link-specific style overrides to prevent default link styling and maintain button appearance
 	const linkStyleOverrides = shouldRenderAsLink ? '!text-white hover:!text-white visited:!text-white focus:!text-white active:!text-white decoration-none hover:no-underline focus:no-underline visited:no-underline' : '';
@@ -149,43 +152,60 @@ const ProButton = forwardRef( ( {
 			);
 		}
 
+		const iconElement = icon && (
+			<span className={ `flex items-center ${ iconPosition === 'left' ? 'mr-2' : 'ml-2' }` } aria-hidden="true">
+				{ icon }
+			</span>
+		);
+
 		return (
 			<>
-				{ ( icon && 'left' === iconPosition ) && (
-					<span className="flex" aria-hidden="true">
-						{ icon }
-					</span>
-				) }
+				{ iconPosition === 'left' && iconElement }
 				{ children }
-				{ ( icon && 'right' === iconPosition ) && (
-					<span className="flex" aria-hidden="true">
-						{ icon }
-					</span>
-				) }
+				{ iconPosition === 'right' && iconElement }
 			</>
 		);
-	}, [ loading, icon, children ] );
+	}, [ loading, icon, iconPosition, children ] );
+
+	// Tooltip position styles
+	const tooltipPositions = {
+		top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
+		bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
+		left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
+		right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
+	};
+
+	const tooltipClasses = `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
 
 	return (
-		<Tag
-			ref={ ref }
-			className={ aiClassNames(
-				baseClasses,
-				linkStyleOverrides,
-				variants[ variant ] || variants.primary,
-				sizes[ size ] || sizes.default,
-				disabledClasses,
-				loadingClasses,
-				className
+		<div className="relative inline-block">
+			{ tooltip && showTooltip && (
+				<div className={ tooltipClasses }>
+					{ tooltip }
+				</div>
 			) }
-			onClick={ handleUpgrade }
-			aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
-			aria-disabled={ disabled || loading }
-			{ ...elementProps }
-			{ ...( shouldRenderAsLink ? props : buttonSafeProps ) }
-		>
-			{ buttonContent }
-		</Tag>
+			<Tag
+				ref={ ref }
+				className={ aiClassNames(
+					baseClasses,
+					linkStyleOverrides,
+					variants[ variant ] || variants.primary,
+					sizes[ size ] || sizes.default,
+					disabledClasses,
+					loadingClasses,
+					className
+				) }
+				onClick={ handleUpgrade }
+				onMouseEnter={ tooltip ? () => setShowTooltip( true ) : undefined }
+				onMouseLeave={ tooltip ? () => setShowTooltip( false ) : undefined }
+				aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
+				aria-disabled={ disabled || loading }
+				{ ...elementProps }
+				{ ...( shouldRenderAsLink ? props : buttonSafeProps ) }
+			>
+				{ buttonContent }
+			</Tag>
+		</div>
 	);
 } );
 
