@@ -327,10 +327,30 @@ function wpaib_get_post_types() {
 			]
 		);
 
-		$queried_post_types[] = 'post';
-		$queried_post_types[] = 'page';
+		$queried_post_types = array_diff( $queried_post_types, $excluded_post_types );
 
-		return array_diff( $queried_post_types, $excluded_post_types );
+		// Add built-in post types with security check.
+		$builtin_post_types = [ 'post', 'page' ];
+
+		foreach ( $builtin_post_types as $post_type ) {
+			$post_type_obj = get_post_type_object( $post_type );
+			if ( $post_type_obj && current_user_can( $post_type_obj->cap->edit_posts ) ) {
+				$queried_post_types[] = $post_type;
+			}
+		}
+
+		//  Sanitize post type names and get labels.
+		$sanitized_post_types = [];
+		foreach ( $queried_post_types as $post_type ) {
+			$post_type = sanitize_key( $post_type );
+			$post_type_obj = get_post_type_object( $post_type );
+
+			if ( $post_type_obj && ! empty( $post_type_obj->labels->name ) ) {
+				$sanitized_post_types[ $post_type ] = sanitize_text_field( $post_type_obj->labels->name );
+			}
+		}
+
+		return $sanitized_post_types;
 
 	} catch ( \Exception $e ) {
 		return [ 'post' => 'Posts' ]; // Safe fallback.
@@ -463,7 +483,11 @@ function wpaib_get_authors() {
 				continue;
 			}
 
-			$authors[ $user->ID ] = $user->display_name;
+			$authors[] = [
+				'id'   => absint( $user->ID ),
+				'name' => sanitize_text_field( $user->display_name ),
+				'login' => sanitize_user( $user->user_login ),
+			];
 		}
 
 		return $authors;
