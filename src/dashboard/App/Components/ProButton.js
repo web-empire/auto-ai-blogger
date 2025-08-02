@@ -39,13 +39,19 @@ const ProButton = forwardRef( ( {
 		// Call custom onClick if provided
 		if ( onClick ) {
 			const result = onClick( event );
-			// If onClick returns false, prevent default behavior
+			// If onClick returns false, prevent default behavior and don't open URL
 			if ( result === false ) {
+				event.preventDefault();
 				return;
 			}
 		}
 
-		// Prevent default for custom handling
+		// For links, let the browser handle the navigation
+		if ( isLink ) {
+			return; // Let the default link behavior handle this
+		}
+
+		// For buttons, prevent default and handle navigation via JavaScript
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -62,7 +68,7 @@ const ProButton = forwardRef( ( {
 			// Fallback to direct navigation
 			window.location.href = proUrl;
 		}
-	}, [ disabled, loading, onClick, proUrl ] );
+	}, [ disabled, loading, onClick, proUrl, isLink ] );
 
 	// Variant styles
 	const variants = {

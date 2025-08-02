@@ -194,9 +194,9 @@ export default function PostIdeas() {
 		e.preventDefault();
 		e.stopPropagation();
 
+		// If pro is not available, return false to let ProButton handle the URL opening
 		if ( ! proAvailable ) {
-			window.open( wpaib_localized_data.pro_purchase_url, '_blank' );
-			return;
+			return false;
 		}
 
 		dispatch( {
