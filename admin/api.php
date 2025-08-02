@@ -88,10 +88,10 @@ class API extends \WP_REST_Controller {
 	 * Admin settings dataset
 	 *
 	 * @access private
-	 * @var array $ai_blogger_admin_settings Settings array.
+	 * @var array<string,mixed> $ai_blogger_admin_settings Settings array.
 	 * @since 1.0.0
 	 */
-	private static $ai_blogger_admin_settings = [];
+	private static array $ai_blogger_admin_settings = [];
 
 	/**
 	 * Constructor
@@ -99,7 +99,8 @@ class API extends \WP_REST_Controller {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		self::$ai_blogger_admin_settings = get_option( self::$option_name, [] );
+		$settings                        = get_option( self::$option_name, [] );
+		self::$ai_blogger_admin_settings = is_array( $settings ) ? $settings : [];
 		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
 
 		// Add security headers.
@@ -124,7 +125,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Server             $server  Server instance.
 	 * @return bool
 	 */
-	public function set_security_headers( $served, $result, $request, $server ) {
+	public function set_security_headers( $served, $result, $request, $server ): bool {
 		// Only apply to our API endpoints.
 		if ( strpos( $request->get_route(), $this->namespace ) === false ) {
 			return $served;
@@ -224,7 +225,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @since 1.0.0
 	 */
-	public function get_admin_settings( $request ) {
+	public function get_admin_settings( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Rate limiting check.
 		$rate_limit_check = $this->check_rate_limit( $request );
 		if ( is_wp_error( $rate_limit_check ) ) {
@@ -256,7 +257,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @since 1.0.0
 	 */
-	public function update_admin_settings( $request ) {
+	public function update_admin_settings( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Rate limiting check.
 		$rate_limit_check = $this->check_rate_limit( $request );
 		if ( is_wp_error( $rate_limit_check ) ) {
@@ -286,8 +287,10 @@ class API extends \WP_REST_Controller {
 			return $sanitized_settings;
 		}
 
-		// Update settings.
-		$updated = Settings::update_ai_blogger_settings( $sanitized_settings );
+		// Update settings using update_option directly for settings array.
+		$current_settings = Settings::get_ai_blogger_settings();
+		$merged_settings  = array_merge( $current_settings, $sanitized_settings );
+		$updated          = update_option( WP_AI_BLOGGER_DB_OPTION, $merged_settings );
 
 		if ( ! $updated ) {
 			return new \WP_Error(
@@ -317,7 +320,7 @@ class API extends \WP_REST_Controller {
 	 * @return \WP_Error|bool
 	 * @since 1.0.0
 	 */
-	public function get_permissions_check( $request ) {
+	public function get_permissions_check( \WP_REST_Request $request ): \WP_Error|bool {
 		// Basic capability check.
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			return new \WP_Error(
@@ -343,7 +346,7 @@ class API extends \WP_REST_Controller {
 	 * @return \WP_Error|bool
 	 * @since 1.0.0
 	 */
-	public function update_permissions_check( $request ) {
+	public function update_permissions_check( \WP_REST_Request $request ): \WP_Error|bool {
 		// capability check for updates.
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) || ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error(
@@ -379,7 +382,7 @@ class API extends \WP_REST_Controller {
 	 * @return \WP_Error|bool
 	 * @since 1.0.0
 	 */
-	public function license_permissions_check( $request ) {
+	public function license_permissions_check( \WP_REST_Request $request ): \WP_Error|bool {
 		// Admin-only capability for license management.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new \WP_Error(
@@ -404,7 +407,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_REST_Response|\WP_Error Response or error.
 	 */
-	public function verify_license( $request ) {
+	public function verify_license( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Implementation will be added when integrating with licensing system.
 		return new \WP_Error(
 			'not_implemented',
@@ -419,7 +422,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_REST_Response|\WP_Error Response or error.
 	 */
-	public function activate_license( $request ) {
+	public function activate_license( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Implementation will be added when integrating with licensing system.
 		return new \WP_Error(
 			'not_implemented',
@@ -434,7 +437,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_REST_Response|\WP_Error Response or error.
 	 */
-	public function deactivate_license( $request ) {
+	public function deactivate_license( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Implementation will be added when integrating with licensing system.
 		return new \WP_Error(
 			'not_implemented',
@@ -449,7 +452,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_Error|bool True if secure, WP_Error if blocked.
 	 */
-	private function perform_security_checks( $request ) {
+	private function perform_security_checks( \WP_REST_Request $request ): \WP_Error|bool {
 		// Check for suspicious User-Agent.
 		$user_agent = $request->get_header( 'User-Agent' );
 		if ( $this->is_suspicious_user_agent( $user_agent ) ) {
@@ -491,7 +494,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_Error|bool True if allowed, WP_Error if rate limited.
 	 */
-	private function check_rate_limit( $request ) {
+	private function check_rate_limit( \WP_REST_Request $request ): \WP_Error|bool {
 		$client_ip = $this->get_client_ip();
 		$user_id   = get_current_user_id();
 
@@ -515,8 +518,22 @@ class API extends \WP_REST_Controller {
 			return true;
 		}
 
+		// Ensure cached data is an array with proper structure.
+		if ( ! is_array( $cached_data ) || ! isset( $cached_data['count'] ) ) {
+			// Reset corrupted cache.
+			set_transient(
+				$cache_key,
+				[
+					'count'      => 1,
+					'start_time' => time(),
+				],
+				self::RATE_LIMIT_WINDOW
+			);
+			return true;
+		}
+
 		// Check if limit exceeded.
-		if ( $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
+		if ( (int) $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
 			return new \WP_Error(
 				'rate_limit_exceeded',
 				__( 'Too many requests. Please try again later.', 'wp-ai-blogger' ),
@@ -525,7 +542,7 @@ class API extends \WP_REST_Controller {
 		}
 
 		// Increment counter.
-		$cached_data['count']++;
+		$cached_data['count'] = (int) $cached_data['count'] + 1;
 		set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
 
 		return true;
@@ -536,7 +553,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @return string The client's IP address.
 	 */
-	private function get_client_ip() {
+	private function get_client_ip(): string {
 		$ip_headers = [
 			'HTTP_CF_CONNECTING_IP',     // Cloudflare.
 			'HTTP_X_FORWARDED_FOR',      // Load balancers/proxies.
@@ -563,11 +580,11 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Check for suspicious User-Agent patterns.
 	 *
-	 * @param string $user_agent The User-Agent header.
+	 * @param string|null $user_agent The User-Agent header.
 	 * @return bool True if suspicious, false otherwise.
 	 * @since x.x.x
 	 */
-	private function is_suspicious_user_agent( $user_agent ) {
+	private function is_suspicious_user_agent( ?string $user_agent ): bool {
 		if ( empty( $user_agent ) ) {
 			return true; // Block empty User-Agent.
 		}
@@ -606,7 +623,7 @@ class API extends \WP_REST_Controller {
 	 * @param string $referer The referer URL.
 	 * @return bool True if valid, false otherwise.
 	 */
-	private function is_valid_referer( $referer ) {
+	private function is_valid_referer( string $referer ): bool {
 		$site_url  = get_site_url();
 		$admin_url = admin_url();
 
@@ -619,7 +636,7 @@ class API extends \WP_REST_Controller {
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_Error|bool True if valid, WP_Error if too large.
 	 */
-	private function validate_request_size( $request ) {
+	private function validate_request_size( \WP_REST_Request $request ): \WP_Error|bool {
 		$content_length = $request->get_header( 'Content-Length' );
 
 		if ( ! empty( $content_length ) && (int) $content_length > self::MAX_REQUEST_SIZE ) {
@@ -636,10 +653,10 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Sanitize settings data for database storage.
 	 *
-	 * @param array $settings_data Raw settings data.
-	 * @return array|\WP_Error Sanitized data or error.
+	 * @param array<string,mixed> $settings_data Raw settings data.
+	 * @return array<string,mixed>|\WP_Error Sanitized data or error.
 	 */
-	private function sanitize_settings_data( $settings_data ) {
+	private function sanitize_settings_data( array $settings_data ): array|\WP_Error {
 		$sanitized    = [];
 		$allowed_keys = $this->get_allowed_setting_keys();
 
@@ -693,10 +710,10 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Sanitize settings for API response.
 	 *
-	 * @param array $settings Settings data.
-	 * @return array Sanitized settings.
+	 * @param array<string,mixed> $settings Settings data.
+	 * @return array<string,mixed> Sanitized settings.
 	 */
-	private function sanitize_settings_for_response( $settings ) {
+	private function sanitize_settings_for_response( array $settings ): array {
 		$safe_settings = [];
 
 		// Fields that should not be masked even if they contain sensitive keywords.
@@ -725,9 +742,9 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Get allowed setting keys for validation.
 	 *
-	 * @return array Array of allowed setting keys.
+	 * @return array<string> Array of allowed setting keys.
 	 */
-	private function get_allowed_setting_keys() {
+	private function get_allowed_setting_keys(): array {
 		return [
 			'site_title',
 			'site_purpose',
@@ -751,9 +768,9 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Get arguments for settings endpoint.
 	 *
-	 * @return array Endpoint arguments.
+	 * @return array<string,array<string,mixed>> Endpoint arguments.
 	 */
-	private function get_settings_args() {
+	private function get_settings_args(): array {
 		return [
 			'context' => [
 				'description' => __( 'Scope under which the request is made.', 'wp-ai-blogger' ),
@@ -767,9 +784,9 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Get arguments for update endpoint.
 	 *
-	 * @return array Endpoint arguments.
+	 * @return array<string,array<string,mixed>> Endpoint arguments.
 	 */
-	private function get_update_args() {
+	private function get_update_args(): array {
 		return [
 			'site_title'       => [
 				'description'       => __( 'Site title for persona context.', 'wp-ai-blogger' ),
@@ -808,9 +825,9 @@ class API extends \WP_REST_Controller {
 	/**
 	 * Get arguments for license endpoints.
 	 *
-	 * @return array Endpoint arguments.
+	 * @return array<string,array<string,mixed>> Endpoint arguments.
 	 */
-	private function get_license_args() {
+	private function get_license_args(): array {
 		return [
 			'license_key' => [
 				'description'       => __( 'License key for activation.', 'wp-ai-blogger' ),

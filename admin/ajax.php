@@ -62,7 +62,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @var array
+	 * @var array<string>
 	 */
 	public $ajax_events = [
 		'wpaib_update_admin_setting',
@@ -79,7 +79,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	public static $nonce = [];
 
@@ -87,7 +87,7 @@ class Ajax {
 	 * Errors
 	 *
 	 * @access private
-	 * @var array Errors strings.
+	 * @var array<string, string> Errors strings.
 	 * @since 1.0.0
 	 */
 	private $errors = [];
@@ -269,7 +269,7 @@ class Ajax {
 			$formatted_campaign_data = Metadata::format_data( $campaign_details );
 
 			// Validate required fields.
-			if ( empty( $formatted_campaign_data['title'] ) ) {
+			if ( ! is_array( $formatted_campaign_data ) || empty( $formatted_campaign_data['title'] ) ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'wp-ai-blogger' ) ] );
 				return;
 			}
@@ -359,6 +359,10 @@ class Ajax {
 			}
 
 			// Validate campaign ID.
+			if ( ! is_array( $campaign_details ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
+				return;
+			}
 			$campaign_id = absint( $campaign_details['id'] ?? 0 );
 			if ( ! $campaign_id ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
@@ -389,7 +393,7 @@ class Ajax {
 			$formatted_campaign_data = Metadata::format_data( $campaign_details );
 
 			// Validate required fields.
-			if ( empty( $formatted_campaign_data['title'] ) ) {
+			if ( ! is_array( $formatted_campaign_data ) || empty( $formatted_campaign_data['title'] ) ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'wp-ai-blogger' ) ] );
 				return;
 			}
@@ -464,7 +468,7 @@ class Ajax {
 			}
 
 			// Validate campaign ID.
-			$campaign_id = absint( $_POST['campaign_id'] ?? 0 );
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 			if ( ! $campaign_id ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
 				return;
@@ -547,7 +551,7 @@ class Ajax {
 			}
 
 			// Decode and validate JSON.
-			$post_data = json_decode( $post_data, true );
+			$post_data = json_decode( (string) $post_data, true );
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
@@ -562,7 +566,7 @@ class Ajax {
 			$post_data = Metadata::sanitize_data( $post_data, 'array' );
 
 			// Validate and sanitize title.
-			$post_title = sanitize_text_field( $post_data['title'] );
+			$post_title = sanitize_text_field( (string) $post_data['title'] );
 			if ( strlen( $post_title ) > 200 ) {
 				wp_send_json_error( [ 'message' => __( 'Post title is too long (max 200 characters).', 'wp-ai-blogger' ) ] );
 				return;
@@ -581,29 +585,31 @@ class Ajax {
 
 					// Include HTTP status code if available.
 					$error_data = $api_result->get_error_data();
-					if ( $error_data && isset( $error_data['status'] ) ) {
-						$error_response['status'] = $error_data['status'];
+					if ( is_array( $error_data ) && isset( $error_data['status'] ) ) {
+						$error_response['status'] = (int) $error_data['status'];
 					}
 
 					wp_send_json_error( $error_response );
 					return;
 				}
 
-				$post_content = $api_result['post_content'];
-				// Store token data from API response.
-				$token_data = $api_result['token_data'] ?? null;
+				if ( is_array( $api_result ) ) {
+					$post_content = $api_result['post_content'] ?? '';
+					// Store token data from API response.
+					$token_data = $api_result['token_data'] ?? null;
 
-				// Process images if they exist in the API response.
-				if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
-					$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
-					if ( ! is_wp_error( $processed_result ) ) {
-						$post_content = $processed_result;
+					// Process images if they exist in the API response.
+					if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
+						$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
+						if ( ! is_wp_error( $processed_result ) ) {
+							$post_content = $processed_result;
+						}
 					}
 				}
 			}
 
 			// Validate and sanitize content.
-			$post_content = wp_kses_post( $post_content );
+			$post_content = wp_kses_post( (string) $post_content );
 			if ( strlen( $post_content ) > 100000 ) { // 100KB limit.
 				wp_send_json_error( [ 'message' => __( 'Post content is too long.', 'wp-ai-blogger' ) ] );
 				return;
@@ -611,19 +617,19 @@ class Ajax {
 
 			// Validate post status.
 			$allowed_statuses = [ 'draft', 'publish', 'private', 'pending' ];
-			$post_status      = isset( $post_data['status'] ) && in_array( $post_data['status'], $allowed_statuses, true )
+			$post_status      = isset( $post_data['status'] ) && is_string( $post_data['status'] ) && in_array( $post_data['status'], $allowed_statuses, true )
 				? $post_data['status']
 				: 'draft';
 
 			// Validate post type.
-			$post_type = sanitize_text_field( $post_data['post_type'] ?? 'post' );
+			$post_type = sanitize_text_field( (string) ( $post_data['post_type'] ?? 'post' ) );
 			if ( ! post_type_exists( $post_type ) ) {
 				$post_type = 'post';
 			}
 
 			// Check if user can create this post type.
 			$post_type_object = get_post_type_object( $post_type );
-			if ( ! current_user_can( $post_type_object->cap->create_posts ) ) {
+			if ( ! $post_type_object || ! current_user_can( $post_type_object->cap->create_posts ) ) {
 				wp_send_json_error( [ 'message' => __( 'You do not have permission to create this type of post.', 'wp-ai-blogger' ) ] );
 				return;
 			}
@@ -631,22 +637,25 @@ class Ajax {
 			// Sanitize metadata.
 			$meta_data = [];
 			if ( ! empty( $post_data['metadata'] ) ) {
-				$metadata_raw = json_decode( $post_data['metadata'], true );
+				$metadata_raw = json_decode( (string) $post_data['metadata'], true );
 				if ( json_last_error() === JSON_ERROR_NONE && is_array( $metadata_raw ) ) {
 					$meta_data = Metadata::sanitize_data( $metadata_raw, 'array' );
 				}
 			}
 
 			// Create a new post with error handling.
-			$post_id = \wp_insert_post(
-				[
-					'post_title'   => $post_title,
-					'post_content' => $post_content,
-					'post_status'  => $post_status,
-					'post_type'    => $post_type,
-					'meta_input'   => $meta_data,
-				]
-			);
+			$post_args = [
+				'post_title'   => $post_title,
+				'post_content' => $post_content,
+				'post_status'  => $post_status,
+				'post_type'    => $post_type,
+			];
+
+			if ( ! empty( $meta_data ) && is_array( $meta_data ) ) {
+				$post_args['meta_input'] = $meta_data;
+			}
+
+			$post_id = \wp_insert_post( $post_args );
 
 			if ( is_wp_error( $post_id ) || ! $post_id ) {
 				$error_message = is_wp_error( $post_id )
@@ -663,7 +672,7 @@ class Ajax {
 			}
 
 			// Remove this title from the postIdeas DB option (but keep Redux unchanged).
-			if ( ! empty( $post_data['title'] ) ) {
+			if ( ! empty( $post_data['title'] ) && is_string( $post_data['title'] ) ) {
 				$this->remove_post_idea_from_db( $post_data['title'] );
 			}
 
@@ -676,7 +685,7 @@ class Ajax {
 			];
 
 			// Include token data in response if available (for Redux state updates).
-			if ( $token_data && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
+			if ( is_array( $token_data ) && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
 				$success_response['token_data'] = $token_data;
 			}
 
@@ -873,13 +882,15 @@ class Ajax {
 		}
 
 		// Check if limit exceeded.
-		if ( $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
+		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) && $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
 			return new \WP_Error( 'rate_limit_exceeded', $this->get_error_msg( 'rate_limit' ) );
 		}
 
 		// Increment counter.
-		$cached_data['count']++;
-		set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
+		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) ) {
+			$cached_data['count']++;
+			set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
+		}
 
 		return true;
 	}
@@ -891,7 +902,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function validate_ajax_request_size() {
-		$content_length = absint( $_SERVER['CONTENT_LENGTH'] ?? 0 );
+		$content_length = isset( $_SERVER['CONTENT_LENGTH'] ) ? absint( $_SERVER['CONTENT_LENGTH'] ) : 0;
 
 		if ( (int) $content_length > self::MAX_REQUEST_SIZE ) {
 			return new \WP_Error( 'request_too_large', $this->get_error_msg( 'request_too_large' ) );
@@ -919,7 +930,7 @@ class Ajax {
 
 		foreach ( $ip_headers as $header ) {
 			if ( ! empty( $_SERVER[ $header ] ) ) {
-				$ips = explode( ',', sanitize_text_field( $_SERVER[ $header ] ) );
+				$ips = explode( ',', sanitize_text_field( (string) $_SERVER[ $header ] ) );
 				$ip  = trim( $ips[0] );
 				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
 					return $ip;
@@ -927,7 +938,7 @@ class Ajax {
 			}
 		}
 
-		return sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' );
+		return sanitize_text_field( (string) ( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
 	}
 
 	/**
@@ -937,7 +948,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function validate_user_agent() {
-		$user_agent = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' );
+		$user_agent = sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
 
 		if ( empty( $user_agent ) ) {
 			return new \WP_Error( 'invalid_user_agent', $this->get_error_msg( 'security_violation' ) );
@@ -977,7 +988,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function validate_admin_referer() {
-		$referer = sanitize_text_field( $_SERVER['HTTP_REFERER'] ?? '' );
+		$referer = sanitize_text_field( (string) ( $_SERVER['HTTP_REFERER'] ?? '' ) );
 
 		if ( ! empty( $referer ) ) {
 			$admin_url = admin_url();
@@ -994,8 +1005,8 @@ class Ajax {
 	/**
 	 * Sanitize and validate campaign data.
 	 *
-	 * @param array $campaign_data Raw campaign data.
-	 * @return array|\WP_Error Sanitized data or error.
+	 * @param array<string, mixed> $campaign_data Raw campaign data.
+	 * @return array<string, mixed>|\WP_Error Sanitized data or error.
 	 * @since x.x.x
 	 */
 	private function sanitize_campaign_data( $campaign_data ) {
@@ -1032,27 +1043,27 @@ class Ajax {
 					$sanitized[ $key ] = absint( $value );
 					break;
 				case 'title':
-					$sanitized[ $key ] = sanitize_text_field( $value );
+					$sanitized[ $key ] = sanitize_text_field( (string) $value );
 					if ( strlen( $sanitized[ $key ] ) > 200 ) {
 						return new \WP_Error( 'title_too_long', __( 'Campaign title is too long.', 'wp-ai-blogger' ) );
 					}
 					break;
 				case 'content':
-					$sanitized[ $key ] = wp_kses_post( $value );
+					$sanitized[ $key ] = wp_kses_post( (string) $value );
 					if ( strlen( $sanitized[ $key ] ) > self::MAX_CAMPAIGN_CONTENT_LENGTH ) {
 						return new \WP_Error( 'content_too_long', $this->get_error_msg( 'content_too_long' ) );
 					}
 					break;
 				case 'status':
 					$allowed_statuses  = [ 'draft', 'publish', 'private', 'pending' ];
-					$sanitized[ $key ] = in_array( $value, $allowed_statuses, true ) ? $value : 'draft';
+					$sanitized[ $key ] = is_string( $value ) && in_array( $value, $allowed_statuses, true ) ? $value : 'draft';
 					break;
 				case 'keywords':
 				case 'tags':
 					if ( is_array( $value ) ) {
-						$sanitized[ $key ] = array_map( 'sanitize_text_field', $value );
+						$sanitized[ $key ] = array_map( 'sanitize_text_field', array_map( 'strval', $value ) );
 					} else {
-						$sanitized[ $key ] = sanitize_text_field( $value );
+						$sanitized[ $key ] = sanitize_text_field( (string) $value );
 					}
 					break;
 				case 'category':
@@ -1064,7 +1075,7 @@ class Ajax {
 					}
 					break;
 				default:
-					$sanitized[ $key ] = sanitize_text_field( $value );
+					$sanitized[ $key ] = sanitize_text_field( (string) $value );
 			}
 		}
 
@@ -1074,8 +1085,8 @@ class Ajax {
 	/**
 	 * Sanitize meta input data.
 	 *
-	 * @param array $meta_data Raw meta data.
-	 * @return array Sanitized meta data.
+	 * @param array<string, mixed> $meta_data Raw meta data.
+	 * @return array<string, mixed> Sanitized meta data.
 	 * @since x.x.x
 	 */
 	private function sanitize_meta_input( $meta_data ) {
@@ -1109,18 +1120,18 @@ class Ajax {
 					break;
 				case 'tone':
 				case 'language':
-					$sanitized[ $key ] = sanitize_text_field( $value );
+					$sanitized[ $key ] = sanitize_text_field( (string) $value );
 					break;
 				case 'keywords':
 				case 'tags':
 					if ( is_array( $value ) ) {
-						$sanitized[ $key ] = array_map( 'sanitize_text_field', $value );
+						$sanitized[ $key ] = array_map( 'sanitize_text_field', array_map( 'strval', $value ) );
 					} else {
-						$sanitized[ $key ] = sanitize_text_field( $value );
+						$sanitized[ $key ] = sanitize_text_field( (string) $value );
 					}
 					break;
 				default:
-					$sanitized[ $key ] = sanitize_text_field( $value );
+					$sanitized[ $key ] = sanitize_text_field( (string) $value );
 			}
 		}
 
@@ -1136,6 +1147,8 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function remove_post_idea_from_db( $post_title ): void {
+		$lock_key = 'wp_ai_blogger_postideas_lock'; // Define early to avoid undefined variable issues.
+
 		try {
 			// Sanitize the title.
 			$post_title = sanitize_text_field( trim( $post_title ) );
@@ -1144,7 +1157,6 @@ class Ajax {
 			}
 
 			// Use WordPress transients for atomic operations to prevent race conditions.
-			$lock_key      = 'wp_ai_blogger_postideas_lock';
 			$max_lock_time = 10; // Maximum lock time in seconds.
 
 			// Try to acquire lock (retry up to 5 times).
@@ -1230,9 +1242,9 @@ class Ajax {
 	/**
 	 * Generate content from title using the API.
 	 *
-	 * @param string $title The post title.
-	 * @param array  $post_data Additional post data.
-	 * @return string|\WP_Error Generated content or error.
+	 * @param string               $title The post title.
+	 * @param array<string, mixed> $post_data Additional post data.
+	 * @return array<string, mixed>|\WP_Error Generated content or error.
 	 * @since x.x.x
 	 */
 	private function generate_content_from_title_api( $title, $post_data = [] ) {
@@ -1243,22 +1255,22 @@ class Ajax {
 			];
 
 			// Add optional parameters if they exist in post_data with fallback values.
-			if ( ! empty( $post_data['license'] ) ) {
+			if ( ! empty( $post_data['license'] ) && is_string( $post_data['license'] ) ) {
 				$api_data['license'] = sanitize_text_field( $post_data['license'] );
 			} else {
 				// Get license from plugin settings if not provided.
 				$api_data['license'] = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 			}
 
-			if ( ! empty( $post_data['site_title'] ) ) {
+			if ( ! empty( $post_data['site_title'] ) && is_string( $post_data['site_title'] ) ) {
 				$api_data['site_title'] = sanitize_text_field( $post_data['site_title'] );
 			}
 
-			if ( ! empty( $post_data['site_purpose'] ) ) {
+			if ( ! empty( $post_data['site_purpose'] ) && is_string( $post_data['site_purpose'] ) ) {
 				$api_data['site_purpose'] = sanitize_text_field( $post_data['site_purpose'] );
 			}
 
-			if ( ! empty( $post_data['site_description'] ) ) {
+			if ( ! empty( $post_data['site_description'] ) && is_string( $post_data['site_description'] ) ) {
 				$api_data['site_description'] = sanitize_text_field( $post_data['site_description'] );
 			}
 
@@ -1295,7 +1307,7 @@ class Ajax {
 						'Content-Type' => 'application/json',
 						'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
-					'body'    => wp_json_encode( $api_data ),
+					'body'    => $api_data ? wp_json_encode( $api_data ) : '',
 				]
 			);
 
@@ -1323,10 +1335,10 @@ class Ajax {
 			// Handle non-200 HTTP status codes with API error response.
 			if ( $http_code !== 200 ) {
 				// Try to extract error details from API response first.
-				if ( isset( $decoded_response['code'] ) && isset( $decoded_response['message'] ) ) {
-					$error_code    = $decoded_response['code'];
-					$error_message = $decoded_response['message'];
-					$error_data    = isset( $decoded_response['data']['status'] ) ? [ 'status' => $decoded_response['data']['status'] ] : [ 'status' => $http_code ];
+				if ( is_array( $decoded_response ) && isset( $decoded_response['code'] ) && isset( $decoded_response['message'] ) ) {
+					$error_code    = (string) $decoded_response['code'];
+					$error_message = (string) $decoded_response['message'];
+					$error_data    = isset( $decoded_response['data'] ) && is_array( $decoded_response['data'] ) && isset( $decoded_response['data']['status'] ) ? [ 'status' => (int) $decoded_response['data']['status'] ] : [ 'status' => $http_code ];
 
 					return new \WP_Error( $error_code, $error_message, $error_data );
 				}
@@ -1344,26 +1356,26 @@ class Ajax {
 			}
 
 			// Check API response status.
-			if ( isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
-				$error_message = $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' );
-				$error_code    = $decoded_response['code'] ?? 'api_error';
+			if ( is_array( $decoded_response ) && isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
+				$error_message = (string) ( $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' ) );
+				$error_code    = (string) ( $decoded_response['code'] ?? 'api_error' );
 
 				// Include HTTP status code if available.
-				$http_status = $decoded_response['data']['status'] ?? null;
+				$http_status = isset( $decoded_response['data'] ) && is_array( $decoded_response['data'] ) && isset( $decoded_response['data']['status'] ) ? (int) $decoded_response['data']['status'] : null;
 				$error_data  = $http_status ? [ 'status' => $http_status ] : null;
 
 				return new \WP_Error( $error_code, $error_message, $error_data );
 			}
 
 			// Extract generated content and images.
-			if ( ! isset( $decoded_response['post_content'] ) ) {
+			if ( ! is_array( $decoded_response ) || ! isset( $decoded_response['post_content'] ) ) {
 				return new \WP_Error(
 					'api_no_content',
 					__( 'API did not return generated content', 'wp-ai-blogger' )
 				);
 			}
 
-			$generated_content = $decoded_response['post_content'];
+			$generated_content = (string) $decoded_response['post_content'];
 
 			// Validate content length.
 			if ( empty( $generated_content ) || strlen( $generated_content ) < 50 ) {
@@ -1374,10 +1386,10 @@ class Ajax {
 			}
 
 			// Extract images array if present.
-			$images = $decoded_response['images'] ?? [];
+			$images = isset( $decoded_response['images'] ) && is_array( $decoded_response['images'] ) ? $decoded_response['images'] : [];
 
 			// Extract and update token data if present.
-			$token_data = $decoded_response['token_data'] ?? null;
+			$token_data = isset( $decoded_response['token_data'] ) && is_array( $decoded_response['token_data'] ) ? $decoded_response['token_data'] : null;
 
 			return [
 				'post_content' => $generated_content,
@@ -1396,8 +1408,8 @@ class Ajax {
 	/**
 	 * Process images from API response and replace placeholders in content.
 	 *
-	 * @param string $content The post content with placeholders.
-	 * @param array  $images Array of image data from API.
+	 * @param string                           $content The post content with placeholders.
+	 * @param array<int, array<string, mixed>> $images Array of image data from API.
 	 * @return string|\WP_Error Processed content with images or error.
 	 * @since x.x.x
 	 */
@@ -1412,15 +1424,15 @@ class Ajax {
 
 			// Process each image.
 			foreach ( $images as $image_data ) {
-				if ( empty( $image_data['url'] ) ) {
+				if ( ! is_array( $image_data ) || empty( $image_data['url'] ) ) {
 					// Skip images without URLs.
 					continue;
 				}
 
 				// Upload image to media library.
 				$attachment_id = $this->upload_image_to_media_library(
-					$image_data['url'],
-					$image_data['alt_text'] ?? 'Generated image'
+					(string) $image_data['url'],
+					isset( $image_data['alt_text'] ) ? (string) $image_data['alt_text'] : 'Generated image'
 				);
 
 				if ( is_wp_error( $attachment_id ) ) {
@@ -1433,7 +1445,7 @@ class Ajax {
 				$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
 
 				if ( empty( $image_alt ) ) {
-					$image_alt = $image_data['alt_text'] ?? 'Generated image';
+					$image_alt = isset( $image_data['alt_text'] ) ? (string) $image_data['alt_text'] : 'Generated image';
 				}
 
 				// Create Gutenberg image block.
@@ -1442,8 +1454,8 @@ class Ajax {
 					'<figure class="wp-block-image size-large"><img src="%s" alt="%s" class="wp-image-%d"/></figure>' . "\n" .
 					'<!-- /wp:image -->',
 					$attachment_id,
-					esc_url( $image_url ),
-					esc_attr( $image_alt ),
+					esc_url( (string) $image_url ),
+					esc_attr( (string) $image_alt ),
 					$attachment_id
 				);
 
@@ -1460,7 +1472,10 @@ class Ajax {
 				$image_block = $image_html_blocks[ $image_index ] ?? '';
 
 				// Replace first occurrence of the placeholder.
-				$processed_content = preg_replace( '/\{\{WP_AIB_IMAGE\}\}/', $image_block, $processed_content, 1 );
+				$replacement_result = preg_replace( '/\{\{WP_AIB_IMAGE\}\}/', $image_block, $processed_content, 1 );
+				if ( $replacement_result !== null ) {
+					$processed_content = $replacement_result;
+				}
 			}
 
 			return $processed_content;
@@ -1522,7 +1537,8 @@ class Ajax {
 			}
 
 			// Get image info from the URL.
-			$image_info = pathinfo( wp_parse_url( $image_url, PHP_URL_PATH ) );
+			$url_path   = wp_parse_url( $image_url, PHP_URL_PATH );
+			$image_info = is_string( $url_path ) ? pathinfo( $url_path ) : [];
 			$filename   = sanitize_file_name( $image_info['filename'] ?? 'generated-image' );
 			$extension  = $image_info['extension'] ?? 'jpg';
 
