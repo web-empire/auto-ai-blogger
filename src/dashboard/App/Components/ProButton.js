@@ -39,21 +39,19 @@ const ProButton = forwardRef( ( {
 		// Call custom onClick if provided
 		if ( onClick ) {
 			onClick( event );
-
-			// If the custom onClick prevented the default, don't open URL
+			// If the custom onClick prevented the default, don't do anything else
 			if ( event.defaultPrevented ) {
 				return;
 			}
 		}
 
-		// Only open URL if it's provided and not empty
-		if ( proUrl && proUrl.trim() !== '' ) {
-			// For links, let the browser handle the navigation
-			if ( isLink ) {
-				return; // Let the default link behavior handle this
-			}
+		// If we're rendering as a link and have a URL, let the browser handle it
+		if ( shouldRenderAsLink && proUrl && proUrl.trim() !== '' ) {
+			return; // Let the default link behavior handle this
+		}
 
-			// For buttons, prevent default and handle navigation via JavaScript
+		// For buttons with URL but no onClick, handle navigation
+		if ( proUrl && proUrl.trim() !== '' && ! onClick ) {
 			event.preventDefault();
 			event.stopPropagation();
 
@@ -71,7 +69,7 @@ const ProButton = forwardRef( ( {
 				window.location.href = proUrl;
 			}
 		}
-	}, [ disabled, loading, onClick, proUrl, isLink ] );
+	}, [ disabled, loading, onClick, proUrl, shouldRenderAsLink ] );
 
 	// Variant styles
 	const variants = {
@@ -99,14 +97,15 @@ const ProButton = forwardRef( ( {
 	// Loading classes
 	const loadingClasses = loading ? 'cursor-wait' : '';
 
-	// Determine element tag
-	const Tag = isLink ? 'a' : 'button';
+	// Determine element tag - if we have a URL but no custom onClick, render as link
+	const shouldRenderAsLink = isLink || ( proUrl && proUrl.trim() !== '' && ! onClick );
+	const Tag = shouldRenderAsLink ? 'a' : 'button';
 
 	// Filter out link-specific props when rendering as button
 	const { href, target, rel, ...buttonSafeProps } = props;
 
 	// Props for link or button
-	const elementProps = isLink ? {
+	const elementProps = shouldRenderAsLink ? {
 		href: proUrl,
 		target: '_blank',
 		rel: 'noopener noreferrer',
@@ -178,7 +177,7 @@ const ProButton = forwardRef( ( {
 			aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
 			aria-disabled={ disabled || loading }
 			{ ...elementProps }
-			{ ...( isLink ? props : buttonSafeProps ) }
+			{ ...( shouldRenderAsLink ? props : buttonSafeProps ) }
 		>
 			{ buttonContent }
 		</Tag>
