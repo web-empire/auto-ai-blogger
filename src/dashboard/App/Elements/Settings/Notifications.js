@@ -1,16 +1,11 @@
 import React, { useState, useCallback, memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Mail, MessageCircle, Bell, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
-import SettingField from '@Components/SettingField';
-import SettingLabel from '@Components/SettingLabel';
 import SwitchControl from '@Components/SwitchControl';
-import SettingDescription from '@Components/SettingDescription';
-import SettingInput from '@Components/SettingInput';
 import SettingsContainer from '@Components/SettingsContainer';
-import DynamicCard from '@Components/DynamicCard';
 import InfoCard from '@Components/InfoCard';
 
-// Enhanced notification type component
+// Enhanced notification type component.
 const NotificationCard = memo( ( {
 	icon,
 	title,
@@ -66,17 +61,18 @@ const NotificationCard = memo( ( {
 	}, [ onInputChange, validateInput ] );
 
 	return (
-		<div className={ `p-6 border rounded-lg transition-all duration-200 ${ enabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }` }>
+		<div className={ `border rounded-lg transition-all duration-200 ${ enabled ? 'p-4 border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }` }>
 			{ /* Header */ }
 			<div className="flex items-center justify-between mb-4">
-				<div className="flex items-center gap-3">
-					<div className={ `p-2 rounded-lg ${ enabled ? 'bg-indigo-100' : 'bg-gray-100' }` }>
+				<div className="flex items-start gap-3">
+					<div className={ `flex p-2 rounded-lg ${ enabled ? 'bg-indigo-100' : 'bg-gray-100' }` }>
 						{ React.cloneElement( icon, {
-							className: `w-5 h-5 ${ enabled ? 'text-indigo-600' : 'text-gray-400' }`,
+							className: `flex w-5 h-5 ${ enabled ? 'text-indigo-600' : 'text-gray-400' }`,
 						} ) }
 					</div>
-					<div>
-						<h3 className={ `text-lg font-semibold ${ enabled ? 'text-indigo-900' : 'text-gray-900' }` }>
+
+					<div className="flex flex-col gap-1">
+						<h3 className={ `text-lg font-semibold p-0 m-0 ${ enabled ? 'text-indigo-900' : 'text-gray-900' }` }>
 							{ title }
 						</h3>
 						<p className={ `text-sm ${ enabled ? 'text-indigo-700' : 'text-gray-600' }` }>
@@ -89,7 +85,7 @@ const NotificationCard = memo( ( {
 					checked={ enabled }
 					onChange={ onToggle }
 					disabled={ disabled }
-					aria-label={ __( `Toggle ${ title }`, 'wp-ai-blogger' ) }
+					aria-label={ __( 'Toggle', 'wp-ai-blogger' ) + ` ${ title }` }
 				/>
 			</div>
 
@@ -225,26 +221,15 @@ const Notifications = memo( () => {
 
 	return (
 		<div className="space-y-6">
-			{ /* Enhanced header using DynamicCard */ }
-			<DynamicCard
-				icon={ Bell }
-				heading={ __( 'Notification Settings', 'wp-ai-blogger' ) }
-				colorScheme="blue"
-				size="large"
-				className="border-b border-gray-200 pb-4"
-			/>
-
 			{ /* Settings container */ }
 			<SettingsContainer
-				title={ __( 'Review Notifications', 'wp-ai-blogger' ) }
-				description={ __( 'Get notified when drafted posts and auto-scheduled content require your review before publishing.', 'wp-ai-blogger' ) }
 				element={
 					<div className="space-y-6">
 						{ /* Email notifications */ }
 						<NotificationCard
 							icon={ <Mail /> }
 							title={ __( 'Email Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive notifications via email', 'wp-ai-blogger' ) }
+							description={ __( 'Receive notifications via email.', 'wp-ai-blogger' ) }
 							enabled={ notifications.email.enabled }
 							onToggle={ toggleEmail }
 							inputValue={ notifications.email.value }
@@ -259,7 +244,7 @@ const Notifications = memo( () => {
 						<NotificationCard
 							icon={ <MessageCircle /> }
 							title={ __( 'WhatsApp Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive instant notifications on WhatsApp', 'wp-ai-blogger' ) }
+							description={ __( 'Receive instant notifications on WhatsApp.', 'wp-ai-blogger' ) }
 							enabled={ notifications.whatsapp.enabled }
 							onToggle={ toggleWhatsApp }
 							inputValue={ notifications.whatsapp.value }
@@ -274,7 +259,7 @@ const Notifications = memo( () => {
 						<NotificationCard
 							icon={ <Phone /> }
 							title={ __( 'SMS Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive text message alerts', 'wp-ai-blogger' ) }
+							description={ __( 'Receive text message alerts.', 'wp-ai-blogger' ) }
 							enabled={ notifications.sms.enabled }
 							onToggle={ toggleSMS }
 							inputValue={ notifications.sms.value }
@@ -290,10 +275,10 @@ const Notifications = memo( () => {
 							icon={ Bell }
 							title={ __( 'Notification Types', 'wp-ai-blogger' ) }
 							items={ [
-								__( 'New content generated and ready for review', 'wp-ai-blogger' ),
-								__( 'Auto-scheduled posts about to be published', 'wp-ai-blogger' ),
-								__( 'Content generation errors or issues', 'wp-ai-blogger' ),
-								__( 'Campaign completion and performance summaries', 'wp-ai-blogger' ),
+								__( 'New content generated and ready for review.', 'wp-ai-blogger' ),
+								__( 'Auto-scheduled posts about to be published.', 'wp-ai-blogger' ),
+								__( 'Content generation errors or issues.', 'wp-ai-blogger' ),
+								__( 'Campaign completion and performance summaries.', 'wp-ai-blogger' ),
 							] }
 							colorScheme="blue"
 							className="mt-6"
@@ -303,11 +288,6 @@ const Notifications = memo( () => {
 				}
 				className="bg-white shadow-sm rounded-lg border border-gray-200"
 			/>
-
-			{ /* Screen reader summary */ }
-			<div className="sr-only" aria-live="polite">
-				{ __( `Email notifications: ${ notifications.email.enabled ? 'enabled' : 'disabled' }, WhatsApp notifications: ${ notifications.whatsapp.enabled ? 'enabled' : 'disabled' }, SMS notifications: ${ notifications.sms.enabled ? 'enabled' : 'disabled' }`, 'wp-ai-blogger' ) }
-			</div>
 		</div>
 	);
 } );

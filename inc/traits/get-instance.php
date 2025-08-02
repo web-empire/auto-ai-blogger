@@ -34,4 +34,3 @@ trait Get_Instance {
 		return self::$instance;
 	}
 }
-

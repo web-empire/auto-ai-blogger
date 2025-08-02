@@ -17,7 +17,7 @@ export const CoreVersion = () => {
 		<>
 			<div className="flex items-center">
 				<Tooltip
-					text={ __( 'CORE Version', 'wp-ai-blogger' ) }
+					text={ __( 'CORE', 'wp-ai-blogger' ) }
 					delay={ 100 }
 					className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 				>
@@ -31,20 +31,21 @@ export const CoreVersion = () => {
 			</div>
 
 			{ proAvailable && proVersion && (
-				<div className="flex items-center">
-					<span
-						className="mr-1 sm:mr-2"
-						aria-label={ `Pro version ${ proVersion }` }
+				<>
+					<span>-</span>
+					<Tooltip
+						text={ __( 'PRO', 'wp-ai-blogger' ) }
+						delay={ 100 }
+						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 					>
-						{ proVersion }
-					</span>
-					<span
-						className="ml-1 sm:ml-2 text-[0.625rem] leading-[1rem] font-medium text-white border border-slate-800 bg-slate-800 rounded-[0.1875rem] relative inline-flex flex-shrink-0 py-[0rem] px-1.5"
-						aria-label="Pro version indicator"
-					>
-						{ __( 'PRO', 'wp-ai-blogger' ) }
-					</span>
-				</div>
+						<span
+							className="select-none cursor-help"
+							aria-label={ `Pro version ${ proVersion }` }
+						>
+							V-{ proVersion }
+						</span>
+					</Tooltip>
+				</>
 			) }
 
 			{ wp?.hooks?.applyFilters?.(
@@ -140,13 +141,13 @@ export const TokenDisplayAndRefresh = () => {
 	const progressPercentage = totalTokens > 0 ? ( ( totalTokens - tokenRemaining ) / totalTokens ) * 100 : 0;
 	const getTokenStatus = () => {
 		const remaining = tokenRemaining;
-		if ( remaining >= 6000 ) {
+		if ( remaining >= 1000 ) {
 			return {
 				text: __( 'Plenty of tokens', 'wp-ai-blogger' ),
 				color: 'bg-green-500',
 			};
 		}
-		if ( remaining >= 3000 ) {
+		if ( remaining >= 100 ) {
 			return {
 				text: __( 'Moderate', 'wp-ai-blogger' ),
 				color: 'bg-amber-500',

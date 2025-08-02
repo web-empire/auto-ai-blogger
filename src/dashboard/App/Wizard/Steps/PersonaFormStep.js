@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useMemo, memo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2, Info } from 'lucide-react';
+import { ArrowRight, AlertCircle, CheckCircle2, User, Globe, FileText, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateApiData } from '@Utils/ApiData';
 
-// Enhanced form field component
+// Enhanced form field component.
 const FormField = memo( ( {
 	id,
 	label,
@@ -22,7 +22,6 @@ const FormField = memo( ( {
 } ) => {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ charCount, setCharCount ] = useState( value?.length || 0 );
-	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	const handleChange = useCallback( ( e ) => {
 		const newValue = e.target.value;
@@ -35,45 +34,19 @@ const FormField = memo( ( {
 
 	const fieldClasses = `
 		w-full pl-4 !pr-10 py-3 text-sm border rounded-lg transition-all duration-200
-		${ error
-		? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
-		: 'border-gray-300 bg-white focus:border-purple-500 focus:ring-purple-500'
-}
-		${ isFocused ? 'shadow-md' : 'shadow-sm' }
-		focus:outline-none focus:ring-2 focus:ring-opacity-50
-		placeholder:text-gray-400
+		${ error ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 bg-white focus:border-purple-500 focus:ring-purple-500' }
+		${ isFocused ? 'shadow-md' : 'shadow-sm' } focus:outline-none focus:ring-2 focus:ring-opacity-50 placeholder:text-gray-400
 	`;
 
 	return (
 		<div className="space-y-2">
 			<label
 				htmlFor={ id }
-				className="flex items-center gap-2 text-sm font-semibold text-gray-900"
+				className="flex items-center text-sm font-semibold text-gray-900 relative"
 			>
-				{ Icon && <Icon className="w-4 h-4 text-gray-600" aria-hidden="true" /> }
+				{ Icon && <Icon className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" /> }
 				{ label }
-				{ required && <span className="text-red-500" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
-				{ description && (
-					<div className="relative">
-						<button
-							type="button"
-							onMouseEnter={ () => setShowTooltip( true ) }
-							onMouseLeave={ () => setShowTooltip( false ) }
-							onFocus={ () => setShowTooltip( true ) }
-							onBlur={ () => setShowTooltip( false ) }
-							className="ml-1 text-gray-400 hover:text-gray-600 focus:outline-none"
-							aria-label={ __( 'Show field description', 'wp-ai-blogger' ) }
-						>
-							<Info className="w-4 h-4" />
-						</button>
-						{ showTooltip && (
-							<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
-								{ description }
-								<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-							</div>
-						) }
-					</div>
-				) }
+				{ required && <span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
 			</label>
 
 			<div className="relative">
@@ -120,14 +93,11 @@ const FormField = memo( ( {
 			{ /* Character count */ }
 			{ maxLength && (
 				<div className="flex justify-between items-center text-xs">
-					<span className={ `${ error ? 'text-red-600' : 'text-gray-500' }` }>
-						{ error && (
-							<span id={ `${ id }-error` } className="flex items-center gap-1">
-								<AlertCircle className="w-3 h-3" />
-								{ error }
-							</span>
-						) }
-					</span>
+					{
+						description && (
+							<p className="text-gray-400">{ description }</p>
+						)
+					}
 					<span className={ `${ charCount > maxLength * 0.9 ? 'text-orange-500' : 'text-gray-400' }` }>
 						{ charCount }/{ maxLength }
 					</span>
@@ -342,7 +312,7 @@ const PersonaFormStep = memo( () => {
 				} catch ( error ) {
 					console.error( `Failed to save ${ label }:`, error );
 					saveResults.push( { key, success: false, error } );
-					throw new Error( __( `Failed to save ${ label }`, 'wp-ai-blogger' ) );
+					throw new Error( `Failed to save ${ label }` );
 				}
 			}
 
@@ -411,11 +381,11 @@ const PersonaFormStep = memo( () => {
 									aria-valuenow={ completionPercentage }
 									aria-valuemin={ 0 }
 									aria-valuemax={ 100 }
-									aria-label={ __( `Form completion: ${ completionPercentage }%`, 'wp-ai-blogger' ) }
+									aria-label={ `Form completion: ${ completionPercentage }%` }
 								/>
 							</div>
 							<p className="text-indigo-100 text-sm mt-1">
-								{ __( `${ completionPercentage }% complete`, 'wp-ai-blogger' ) }
+								{ `${ completionPercentage }% ` + __( 'complete', 'wp-ai-blogger' ) }
 							</p>
 						</div>
 					</div>
@@ -433,7 +403,7 @@ const PersonaFormStep = memo( () => {
 								maxLength={ 100 }
 								icon={ Globe }
 								required
-								description={ __( 'The main title of your website or blog', 'wp-ai-blogger' ) }
+								description={ __( 'The main title of your website or blog.', 'wp-ai-blogger' ) }
 							/>
 
 							<FormField
@@ -461,7 +431,7 @@ const PersonaFormStep = memo( () => {
 								rows={ 6 }
 								icon={ FileText }
 								required
-								description={ __( 'Help AI understand your content needs', 'wp-ai-blogger' ) }
+								description={ __( 'Help AI understand your content need.', 'wp-ai-blogger' ) }
 							/>
 						</div>
 

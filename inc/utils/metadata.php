@@ -104,11 +104,11 @@ class Metadata {
 					'type'    => 'number',
 				],
 				'maxWords'                => [
-					'default' => 400,
+					'default' => 1000,
 					'type'    => 'number',
 				],
 				'maxTitleWords'           => [
-					'default' => 8,
+					'default' => 10,
 					'type'    => 'number',
 				],
 				'postsVisit'              => [
@@ -145,36 +145,36 @@ class Metadata {
 	 * @since 1.0.0
 	 */
 	public static function get_campaign_meta( $campaign_id, $key ) {
-		// Validate campaign ID
+		// Validate campaign ID.
 		$campaign_id = absint( $campaign_id );
 		if ( $campaign_id <= 0 ) {
 			return self::get_default_option( $key );
 		}
 
-		// Validate key
+		// Validate key.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return self::get_default_option( $key );
 		}
 
-		// Sanitize key
+		// Sanitize key.
 		$key = sanitize_key( $key );
 		if ( empty( $key ) ) {
 			return self::get_default_option( $key );
 		}
 
-		// Check if key exists in allowed settings
+		// Check if key exists in allowed settings.
 		$settings_dataset = self::get_settings_dataset();
 		if ( ! array_key_exists( $key, $settings_dataset ) ) {
 			return self::get_default_option( $key );
 		}
 
-		// Verify post exists and is a campaign
+		// Verify post exists and is a campaign.
 		$post = get_post( $campaign_id );
 		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 			return self::get_default_option( $key );
 		}
 
-		// Check user permissions
+		// Check user permissions.
 		if ( ! current_user_can( 'read_post', $campaign_id ) ) {
 			return self::get_default_option( $key );
 		}
@@ -182,7 +182,7 @@ class Metadata {
 		$meta_value = get_post_meta( $campaign_id, $key, true );
 
 		if ( ! empty( $meta_value ) ) {
-			// Sanitize output based on data type
+			// Sanitize output based on data type.
 			$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
 			return self::sanitize_output( $meta_value, $data_type );
 		}
@@ -201,36 +201,36 @@ class Metadata {
 	 * @since 1.0.0
 	 */
 	public static function update_campaign_meta( $campaign_id, $key, $value ) {
-		// Validate campaign ID
+		// Validate campaign ID.
 		$campaign_id = absint( $campaign_id );
 		if ( $campaign_id <= 0 ) {
 			return false;
 		}
 
-		// Validate key
+		// Validate key.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return false;
 		}
 
-		// Sanitize key
+		// Sanitize key.
 		$key = sanitize_key( $key );
 		if ( empty( $key ) ) {
 			return false;
 		}
 
-		// Check if key exists in allowed settings
+		// Check if key exists in allowed settings.
 		$settings_dataset = self::get_settings_dataset();
 		if ( ! array_key_exists( $key, $settings_dataset ) ) {
 			return false;
 		}
 
-		// Verify post exists and is a campaign
+		// Verify post exists and is a campaign.
 		$post = get_post( $campaign_id );
 		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 			return false;
 		}
 
-		// Check user permissions
+		// Check user permissions.
 		if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
 			return false;
 		}
@@ -378,7 +378,7 @@ class Metadata {
 		$defaults = self::get_default_settings();
 
 		$meta_data      = [];
-		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ]; // These keys are not metadata.
+		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ]; // These keys are not metadata..
 		foreach ( $postdata as $key => $value ) {
 			if ( in_array( $key, $skippable_keys, true ) ) {
 				continue;
@@ -463,4 +463,3 @@ class Metadata {
 		);
 	}
 }
-

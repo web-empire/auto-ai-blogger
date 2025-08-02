@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { aiClassNames } from '@Utils/aiClassNames';
-import { BellIcon, UserCircleIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { General, Notifications, License } from '@Elements/Settings';
 import ContentHeader from '@Components/ContentHeader';
 import { useSettingsSelector } from '@Utils/useSettingsSelector';
-import { TriangleAlert, ChevronRight, Loader2 } from 'lucide-react';
+import { TriangleAlert, ChevronRight, Loader2, Bell, Settings2, Key } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 import { useSelector } from 'react-redux';
 
@@ -137,26 +136,27 @@ function Settings() {
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ loadError, setLoadError ] = useState( null );
 
-	const settings = useSettingsSelector();	// Memoized navigation configuration
+	const settings = useSettingsSelector();	// Memoized navigation configuration.
+
 	const navigationConfig = useMemo( () => [
 		{
 			name: __( 'General', 'wp-ai-blogger' ),
 			slug: TAB_IDS.GENERAL,
-			icon: UserCircleIcon,
+			icon: Settings2,
 			component: General,
 			description: __( 'Basic site settings and configuration', 'wp-ai-blogger' ),
 		},
 		{
 			name: __( 'Notifications', 'wp-ai-blogger' ),
 			slug: TAB_IDS.NOTIFICATIONS,
-			icon: BellIcon,
+			icon: Bell,
 			component: Notifications,
 			description: __( 'Manage email and push notifications', 'wp-ai-blogger' ),
 		},
 		{
 			name: __( 'License', 'wp-ai-blogger' ),
 			slug: TAB_IDS.LICENSE,
-			icon: CubeIcon,
+			icon: Key,
 			component: License,
 			description: __( 'License activation and management', 'wp-ai-blogger' ),
 		},
@@ -283,7 +283,6 @@ function Settings() {
 			{ /* Enhanced sidebar navigation */ }
 			<aside
 				className="flex overflow-x-auto lg:block lg:w-72 py-8 px-4 lg:flex-none settings-nav"
-				role="complementary"
 				aria-label={ __( 'Settings navigation', 'wp-ai-blogger' ) }
 			>
 				<nav
@@ -324,6 +323,7 @@ function Settings() {
 						title={ currentTabData?.name }
 						description={ currentTabData?.description }
 						tab={ currentTab }
+						icon={ currentTabData?.icon }
 						{ ...settings }
 					/>
 
@@ -340,13 +340,6 @@ function Settings() {
 								) }
 								tabIndex={ currentTab === item.slug ? 0 : -1 }
 							>
-								{ /* Screen reader announcement for tab changes */ }
-								{ currentTab === item.slug && (
-									<div className="sr-only" aria-live="polite" aria-atomic="true">
-										{ __( `Showing ${ item.name } settings`, 'wp-ai-blogger' ) }
-									</div>
-								) }
-
 								{ /* Loading state */ }
 								{ isLoading && currentTab === item.slug ? (
 									<div

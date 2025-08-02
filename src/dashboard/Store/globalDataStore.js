@@ -83,7 +83,7 @@ const getInitialState = () => {
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
 
-		// Static configuration data that doesn't change during app lifecycle
+		// Static configuration data that doesn't change during app lifecycle.
 		homeSlug: safeParseLocalizedData( wpaib_localized_data.home_slug, 'string', 'wp-ai-blogger' ),
 		adminNonce: safeParseLocalizedData( wpaib_localized_data.admin_nonce, 'string', '' ),
 		ajaxUrl: safeParseLocalizedData( wpaib_localized_data.ajax_url, 'string', '/wp-admin/admin-ajax.php' ),

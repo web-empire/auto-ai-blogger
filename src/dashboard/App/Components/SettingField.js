@@ -54,8 +54,8 @@ const SettingField = forwardRef( ( {
 		evenly: 'justify-evenly',
 	};
 
-	// Memoize classes for performance
-	const fieldClasses = useMemo( () => {
+	// Memoize classes for performance.
+	const fieldClasses = useMemo( () => { // eslint-disable-line
 		return aiClassNames(
 			// Base classes
 			'flex w-full setting-field',

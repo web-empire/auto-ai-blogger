@@ -36,52 +36,7 @@ class Scheduler {
 			return;
 		}
 
-		// add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
-
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
-
-		// foreach ( $this->schedules as $campaign_id => $days ) {
-		// if ( ! wp_next_scheduled( 'wp_ai_blogger_create_blog_post' ) ) {
-		// $args = [ $campaign_id ];
-		// wp_schedule_event( time(), 'per_' . $days . '_days', 'wp_ai_blogger_create_blog_post', $args );
-		// }
-		// }
-	}
-
-	/**
-	 * Custom cron schedules.
-	 *
-	 * @param array $schedules Schedules.
-	 * @since 1.0.0
-	 * @return array
-	 */
-	public function custom_cron_schedules( $schedules ) {
-		// $this->schedules has the days so adjust them in schedules.
-		foreach ( $this->schedules as $campaign_id => $days ) {
-			// Check if the target is reached.
-			if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
-				continue;
-			}
-
-			// Add the schedule.
-			$days = absint( $days );
-
-			// Check if the schedule already exists.
-			if ( isset( $schedules[ 'per_' . $days . '_days' ] ) ) {
-				continue;
-			}
-
-			$schedules[ 'per_' . $days . '_days' ] = [
-				'interval' => $days * 24 * 60 * 60,
-				'display'  => sprintf(
-					/* translators: %d: number of days */
-					__( 'Every %d days', 'wp-ai-blogger' ),
-					$days
-				),
-			];
-		}
-
-		return $schedules;
 	}
 
 	/**
@@ -116,4 +71,3 @@ class Scheduler {
 		return wpaib_create_blog_post( $campaign_id );
 	}
 }
-

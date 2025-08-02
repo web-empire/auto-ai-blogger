@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Check, X, Zap, Crown, Users, BarChart3, Calendar, Sparkles, Target, Search, Shield, Headphones } from 'lucide-react';
+import { Check, X, Crown, BarChart3, Calendar, Sparkles, Target, Shield, Headphones } from 'lucide-react';
 
 // Enhanced feature categories for better organization
 export const FeatureCategories = {
@@ -38,12 +38,11 @@ export const FeatureCategories = {
 
 // Enhanced features with better categorization and metadata
 export const FeaturesList = [
-	// Content Generation Features
 	{
 		id: 'blog-topics',
 		name: __( 'Blog Post Topics', 'wp-ai-blogger' ),
 		category: 'content',
-		free: __( '5 per month', 'wp-ai-blogger' ),
+		free: __( '5 Per Month', 'wp-ai-blogger' ),
 		pro: __( 'Unlimited', 'wp-ai-blogger' ),
 		description: __( 'AI-generated blog post ideas tailored to your niche', 'wp-ai-blogger' ),
 		priority: 'high',
@@ -70,8 +69,8 @@ export const FeaturesList = [
 		id: 'humanized-content',
 		name: __( 'Humanized Content', 'wp-ai-blogger' ),
 		category: 'content',
-		free: __( 'Basic humanization', 'wp-ai-blogger' ),
-		pro: __( 'Advanced humanization', 'wp-ai-blogger' ),
+		free: __( 'Basic Humanization', 'wp-ai-blogger' ),
+		pro: __( 'Advanced Humanization', 'wp-ai-blogger' ),
 		description: __( 'Make AI content sound natural and engaging', 'wp-ai-blogger' ),
 		priority: 'medium',
 	},
@@ -92,8 +91,8 @@ export const FeaturesList = [
 		id: 'keyword-usage',
 		name: __( 'High-Ranking Keywords', 'wp-ai-blogger' ),
 		category: 'seo',
-		free: __( 'Basic research', 'wp-ai-blogger' ),
-		pro: __( 'Advanced keyword targeting', 'wp-ai-blogger' ),
+		free: __( 'Basic Research', 'wp-ai-blogger' ),
+		pro: __( 'Advanced Keyword Targeting', 'wp-ai-blogger' ),
 		description: __( 'Target high-ranking keywords for better SEO', 'wp-ai-blogger' ),
 		priority: 'high',
 	},
@@ -101,8 +100,8 @@ export const FeaturesList = [
 		id: 'seo-content',
 		name: __( 'SEO-Optimized Content', 'wp-ai-blogger' ),
 		category: 'seo',
-		free: __( 'Basic optimization', 'wp-ai-blogger' ),
-		pro: __( 'Advanced SEO features', 'wp-ai-blogger' ),
+		free: __( 'Basic Optimization', 'wp-ai-blogger' ),
+		pro: __( 'Advanced SEO Features', 'wp-ai-blogger' ),
 		description: __( 'Content optimized for search engines', 'wp-ai-blogger' ),
 		priority: 'high',
 	},
@@ -112,8 +111,8 @@ export const FeaturesList = [
 		id: 'analytics',
 		name: __( 'Performance Analytics', 'wp-ai-blogger' ),
 		category: 'analytics',
-		free: __( 'Basic stats', 'wp-ai-blogger' ),
-		pro: __( 'Advanced analytics', 'wp-ai-blogger' ),
+		free: __( 'Basic Stats', 'wp-ai-blogger' ),
+		pro: __( 'Advanced Analytics', 'wp-ai-blogger' ),
 		description: __( 'Track content performance and engagement', 'wp-ai-blogger' ),
 		priority: 'medium',
 	},
@@ -123,8 +122,8 @@ export const FeaturesList = [
 		id: 'support',
 		name: __( 'Premium Support', 'wp-ai-blogger' ),
 		category: 'support',
-		free: __( 'Community support', 'wp-ai-blogger' ),
-		pro: __( '24/7 priority support', 'wp-ai-blogger' ),
+		free: __( 'Community Support', 'wp-ai-blogger' ),
+		pro: __( '24/7 Priority Support', 'wp-ai-blogger' ),
 		description: __( 'Get help when you need it most', 'wp-ai-blogger' ),
 		priority: 'medium',
 	},
@@ -132,14 +131,14 @@ export const FeaturesList = [
 		id: 'updates',
 		name: __( 'Pro Updates & Features', 'wp-ai-blogger' ),
 		category: 'support',
-		free: __( 'Basic updates', 'wp-ai-blogger' ),
-		pro: __( 'Early access to new features', 'wp-ai-blogger' ),
+		free: __( 'Basic Updates', 'wp-ai-blogger' ),
+		pro: __( 'All Premium Features', 'wp-ai-blogger' ),
 		description: __( 'Access to the latest features and improvements', 'wp-ai-blogger' ),
 		priority: 'low',
 	},
 ];
 
-// Enhanced feature comparison component
+// Enhanced feature comparison component.
 export const FeatureComparisonTable = memo( () => {
 	// Group features by category
 	const featuresByCategory = useMemo( () => {

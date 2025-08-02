@@ -3,7 +3,7 @@ import WizardRoute from './WizardRoute';
 
 const Wizard = () => {
 	return (
-		<div className={ `wizard-route bg-white h-screen` }>
+		<div className={ `bg-white h-screen` }>
 			<WizardRoute />
 		</div>
 	);

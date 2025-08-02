@@ -53,8 +53,8 @@ const createSecureFormData = ( action, key, value, config = {} ) => {
  *
  * @param {string}   key      - Settings key.
  * @param {*}        value    - The data to send.
- * @param            config
  * @param {Function} dispatch - Redux dispatch function.
+ * @param {Object}   config   - Configuration object with nonce and ajaxUrl.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
@@ -111,13 +111,13 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
  *
  * @param {Object}  value              - The campaign data to send.
  * @param {boolean} isNew              - Is new campaign or not.
- * @param           config
  * @param {Object}  abortControllerRef - The ref object to hold abort controller.
+ * @param {Object}  config             - Configuration object with nonce and ajaxUrl.
  *
  * @return {Promise} Returns a promise representing the processed request.
  */
 const updateCampaign = async ( value, isNew, abortControllerRef = null, config = {} ) => {
-	// Validate campaign data
+	// Validate campaign data.
 	if ( ! value || typeof value !== 'object' ) {
 		const error = new Error( 'Invalid campaign data provided' );
 		console.error( error.message );

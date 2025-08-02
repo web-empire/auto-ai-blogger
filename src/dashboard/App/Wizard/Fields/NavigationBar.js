@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useMemo, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { X, Settings, User, CreditCard, Mail, CheckCircle2, Crown } from 'lucide-react';
+import { X, Settings, User, CreditCard, Mail, CheckCircle2 } from 'lucide-react';
 import BrandIcon from '@AppImages/crown.svg';
 import { updateApiData } from '@Utils/ApiData';
 import { useDispatch } from 'react-redux';
@@ -48,7 +48,7 @@ const StepIndicator = memo( ( { menu, isActive, isCompleted, onClick } ) => {
 			onClick={ handleClick }
 			onKeyDown={ handleKeyDown }
 			aria-current={ isActive ? 'step' : undefined }
-			aria-label={ __( `Go to ${ menu.name } step`, 'wp-ai-blogger' ) }
+			aria-label={ `Go to ${ menu.name } step` }
 		>
 			<Icon
 				className={ `
@@ -89,12 +89,7 @@ const ExitButton = memo( ( { onClick } ) => {
 	return (
 		<button
 			type="button"
-			className="
-				group relative p-2 rounded-full bg-gray-100 text-gray-500
-				hover:bg-red-100 hover:text-red-600
-				focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-				transition-all duration-200 transform hover:scale-105
-			"
+			className="flex group relative p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
 			onClick={ handleClick }
 			onKeyDown={ handleKeyDown }
 			aria-label={ __( 'Exit setup wizard', 'wp-ai-blogger' ) }
@@ -103,11 +98,7 @@ const ExitButton = memo( ( { onClick } ) => {
 			<X className="w-5 h-5" aria-hidden="true" />
 
 			{ /* Tooltip */ }
-			<span className="
-				absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1
-				text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100
-				transition-opacity duration-200 pointer-events-none whitespace-nowrap
-			">
+			<span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
 				{ __( 'Exit Setup', 'wp-ai-blogger' ) }
 			</span>
 		</button>
@@ -190,7 +181,7 @@ const NavigationBar = memo( () => {
 				<div className="flex h-16 justify-between items-center">
 					{ /* Brand section */ }
 					<div className="flex items-center gap-3">
-						<div className="flex-shrink-0">
+						<div className="flex-shrink-0 flex">
 							<img
 								className="h-8 w-auto"
 								src={ BrandIcon }
@@ -199,7 +190,6 @@ const NavigationBar = memo( () => {
 						</div>
 						<div className="hidden sm:block">
 							<h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-								<Crown className="w-5 h-5 text-indigo-600" aria-hidden="true" />
 								{ __( 'Setup Wizard', 'wp-ai-blogger' ) }
 							</h1>
 						</div>
@@ -252,7 +242,7 @@ const NavigationBar = memo( () => {
 
 			{ /* Screen reader announcements */ }
 			<div className="sr-only" aria-live="polite" aria-atomic="true">
-				{ __( `Currently on step: ${ menus.find( ( menu ) => menu.id === currentStep )?.name }`, 'wp-ai-blogger' ) }
+				{ `Currently on step: ${ menus.find( ( menu ) => menu.id === currentStep )?.name }` }
 			</div>
 		</header>
 	);

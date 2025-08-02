@@ -1,12 +1,10 @@
-import React from 'react';
-
-// Import components directly to avoid double lazy loading
+// Import components directly to avoid double lazy loading.
 import Persona from './Persona';
 
-// Direct export for backward compatibility
+// Direct export for backward compatibility.
 export { Persona };
 
-// Default export
+// Default export.
 export default {
 	Persona,
 };

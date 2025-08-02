@@ -18,11 +18,11 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 		<div className="space-y-2">
 			<label
 				htmlFor="wpaib-license"
-				className="flex items-center gap-2 text-sm font-semibold text-gray-900"
+				className="flex items-center text-sm font-semibold text-gray-900 relative"
 			>
-				<Key className="w-4 h-4 text-gray-600" aria-hidden="true" />
+				<Key className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" />
 				{ __( 'License Key', 'wp-ai-blogger' ) }
-				<span className="text-red-500" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span>
+				<span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span>
 			</label>
 
 			<div className="relative">
@@ -63,7 +63,7 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 			</div>
 
 			{ error && (
-				<p id="license-error" className="text-xs text-red-600 flex items-center gap-1">
+				<p id="license-error" className="text-xs text-red-600 flex items-center gap-1 force-mt-1">
 					<AlertCircle className="w-3 h-3" />
 					{ error }
 				</p>
@@ -282,8 +282,8 @@ const LicenseStep = memo( () => {
 				setError( errorMessage || __( 'License activation failed. Please check your license key.', 'wp-ai-blogger' ) );
 			}
 			return false;
-		} catch ( error ) {
-			console.error( 'License activation error:', error );
+		} catch ( failureError ) {
+			console.error( 'License activation error:', failureError );
 			setError( __( 'Connection failed. Please check your internet connection and try again.', 'wp-ai-blogger' ) );
 			return false;
 		} finally {
@@ -366,8 +366,8 @@ const LicenseStep = memo( () => {
 
 							<DynamicCard
 								heading={ __( 'No License Key?', 'wp-ai-blogger' ) }
-								subHeading={ __( 'Get started with free credits today', 'wp-ai-blogger' ) }
-								linkText={ __( 'Get Free Credits', 'wp-ai-blogger' ) }
+								subHeading={ __( 'Get started with free credits today.', 'wp-ai-blogger' ) }
+								linkText={ __( 'Claim Free Credits', 'wp-ai-blogger' ) }
 								linkUrl={ upgradeLink }
 								colorScheme="blue"
 								size="medium"
@@ -387,7 +387,7 @@ const LicenseStep = memo( () => {
 							) }
 
 							{ /* Submit button */ }
-							<div className="flex justify-center pt-4">
+							<div className="flex justify-center pt-6 m-0">
 								<SubmitButton
 									onClick={ handleSubmit }
 									disabled={ ! ( typeof license === 'string' && license.trim() ) }
@@ -420,7 +420,7 @@ const LicenseStep = memo( () => {
 			<div className="sr-only" aria-live="polite" aria-atomic="true">
 				{ processing && __( 'Activating your license…', 'wp-ai-blogger' ) }
 				{ licenseStatus === 'licensed' && __( 'License activated successfully. Proceeding to next step.', 'wp-ai-blogger' ) }
-				{ error && __( `License activation failed: ${ error }`, 'wp-ai-blogger' ) }
+				{ error && __( 'License activation failed:', 'wp-ai-blogger' ) + ` ${ error }` }
 			</div>
 		</main>
 	);

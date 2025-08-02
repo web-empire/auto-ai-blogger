@@ -3,7 +3,6 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
 import { RangeControl } from '@wordpress/components';
 import { Thermometer, Shield, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
-import DynamicCard from '@Components/DynamicCard';
 import InfoCard from '@Components/InfoCard';
 
 // Enhanced safety filter component
@@ -24,8 +23,8 @@ const SafetyFilterControl = memo( ( {
 		__( 'Block most', 'wp-ai-blogger' ),
 	], [] );
 
-	const getSeverityColor = ( value ) => {
-		switch ( value ) {
+	const getSeverityColor = ( severityValue ) => {
+		switch ( severityValue ) {
 			case 0: return 'text-gray-600 bg-gray-100';
 			case 1: return 'text-green-600 bg-green-100';
 			case 2: return 'text-yellow-600 bg-yellow-100';
@@ -230,11 +229,11 @@ const AdvancedSettings = memo( () => {
 							<Thermometer className="w-5 h-5 text-orange-600" aria-hidden="true" />
 						</div>
 						<div>
-							<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							<h3 className="text-lg font-semibold text-gray-900 mb-2 mt-0">
 								{ __( 'Advanced AI Settings', 'wp-ai-blogger' ) }
 							</h3>
 							<p className="text-sm text-gray-600">
-								{ __( 'Configure creativity temperature and content safety filters', 'wp-ai-blogger' ) }
+								{ __( 'Configure creativity temperature and content safety filters.', 'wp-ai-blogger' ) }
 							</p>
 						</div>
 					</div>
@@ -317,11 +316,6 @@ const AdvancedSettings = memo( () => {
 						</div>
 					</div>
 				) }
-			</div>
-
-			{ /* Screen reader summary */ }
-			<div className="sr-only" aria-live="polite">
-				{ __( `Advanced AI settings updated: Temperature ${ temperature }, Harassment filter ${ harassment }, Hate filter ${ hate }, Adult content filter ${ sexuallyExplicit }, Dangerous content filter ${ dangerousContent }`, 'wp-ai-blogger' ) }
 			</div>
 		</div>
 	);

@@ -9,7 +9,6 @@
  * @package wp-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
- *
  */
 
 namespace WPAIBlogger\Admin;
@@ -34,8 +33,6 @@ defined( 'ABSPATH' ) || exit;
 class Menu {
 	use Get_Instance;
 
-
-
 	/**
 	 * Settings page ID for Plugin settings.
 	 */
@@ -52,22 +49,22 @@ class Menu {
 
 		add_action( 'admin_init', [ $this, 'settings_admin_scripts' ] );
 
-		// Add security headers for admin pages
+		// Add security headers for admin pages.
 		add_action( 'admin_head', [ $this, 'add_admin_security_headers' ] );
 	}
 
 	/**
 	 * Add security headers for admin pages.
 	 *
-	 * @since 2.0.0
+	 * @since x.x.x
 	 */
 	public function add_admin_security_headers(): void {
-		// Only add headers on our plugin pages
+		// Only add headers on our plugin pages.
 		if ( ! $this->is_plugin_admin_page() ) {
 			return;
 		}
 
-		// Add Content Security Policy
+		// Add Content Security Policy.
 		if ( ! headers_sent() ) {
 			header( "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://wpaiblogger.com;" );
 			header( 'X-Content-Type-Options: nosniff' );
@@ -78,68 +75,50 @@ class Menu {
 	}
 
 	/**
-	 * Check if current page is our plugin admin page.
-	 *
-	 * @return bool
-	 * @since 2.0.0
-	 */
-	private function is_plugin_admin_page(): bool {
-		$page = $_GET['page'] ?? '';
-
-		if ( empty( $page ) ) {
-			return false;
-		}
-
-		$page = sanitize_text_field( wp_unslash( $page ) );
-
-		return $page === self::PAGE_ID || strpos( $page, self::PAGE_ID . '_' ) === 0;
-	}
-
-	/**
 	 * Initialize Admin Setup with security.
 	 *
 	 * @since 1.0.0
 	 */
 	public function settings_admin_scripts(): void {
-		// input validation and sanitization
-		if ( empty( $_GET['page'] ) ) {
+		$page = ! empty( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here as this is a static check.
+
+		// input validation and sanitization.
+		if ( empty( $page ) ) {
 			return;
 		}
 
-		$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
-
-		// Validate page parameter against expected values
+		// Validate page parameter against expected values.
 		if ( $page !== self::PAGE_ID && strpos( $page, self::PAGE_ID . '_' ) !== 0 ) {
 			return;
 		}
 
-		// Check user capabilities
+		// Check user capabilities.
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			return;
 		}
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'app_build_scripts' ] );
 
-		// Remove WordPress footer text securely
+		// Remove WordPress footer text securely.
 		add_filter(
 			'admin_footer_text',
 			function() {
-				// Only modify footer on our pages for security
+				// Only modify footer on our pages for security.
 				if ( $this->is_plugin_admin_page() ) {
 					return '';
 				}
-				return null; // Return null to preserve original behavior on other pages
+				return null; // Return null to preserve original behavior on other pages.
 			}
 		);
 
 		add_filter(
 			'update_footer',
 			function() {
-				// Only modify footer on our pages for security
+				// Only modify footer on our pages for security.
 				if ( $this->is_plugin_admin_page() ) {
 					return '';
 				}
-				return null; // Return null to preserve original behavior on other pages
+				return null; // Return null to preserve original behavior on other pages.
 			}
 		);
 	}
@@ -150,12 +129,12 @@ class Menu {
 	 * @since 1.0.0
 	 */
 	public function render_settings_page(): void {
-		// Security validation before rendering
+		// Security validation before rendering.
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-ai-blogger' ) );
 		}
 
-		// Additional CSRF protection
+		// Additional CSRF protection.
 		$nonce = wp_create_nonce( 'wp_ai_blogger_admin_page' );
 
 		echo '<div id="autoblog-main-page--wrapper" data-nonce="' . esc_attr( $nonce ) . '"></div>';
@@ -167,7 +146,7 @@ class Menu {
 	 * @since 1.0.0
 	 */
 	public function app_build_scripts(): void {
-		// Security checks
+		// Security checks.
 		if ( is_customize_preview() ) {
 			return;
 		}
@@ -180,39 +159,39 @@ class Menu {
 			return;
 		}
 
-		// Sanitized data collection
-		$blog_name = sanitize_text_field( Helper::get_option( 'blogName', get_bloginfo( 'name' ) ) );
+		// Sanitized data collection.
+		$blog_name                = sanitize_text_field( Helper::get_option( 'blogName', get_bloginfo( 'name' ) ) );
 		$admin_site_email_address = sanitize_email( Helper::get_option( 'adminEmail', get_option( 'admin_email' ) ) );
 
-		// Get settings with proper defaults - no need for redundant variables
-		$site_title = sanitize_text_field( Helper::get_option( 'siteTitle', $blog_name ) );
-		$site_description = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
-		$site_for = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
-		$license = sanitize_text_field( Helper::get_option( 'license', '' ) );
-		$temperature = (float) Helper::get_option( 'temperature', 1.0 );
-		$harassment = absint( Helper::get_option( 'harassment', 2 ) );
-		$hate = absint( Helper::get_option( 'hate', 2 ) );
+		// Get settings with proper defaults - no need for redundant variables.
+		$site_title        = sanitize_text_field( Helper::get_option( 'siteTitle', $blog_name ) );
+		$site_description  = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
+		$site_for          = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
+		$license           = sanitize_text_field( Helper::get_option( 'license', '' ) );
+		$temperature       = (float) Helper::get_option( 'temperature', 1.0 );
+		$harassment        = absint( Helper::get_option( 'harassment', 2 ) );
+		$hate              = absint( Helper::get_option( 'hate', 2 ) );
 		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
 		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
-		$post_ideas = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
-		$token_total = absint( Helper::get_option( 'tokenTotal', 0 ) );
-		$token_remaining = absint( Helper::get_option( 'tokenRemaining', 0 ) );
-		$license_status = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
+		$post_ideas        = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
+		$token_total       = absint( Helper::get_option( 'tokenTotal', 0 ) );
+		$token_remaining   = absint( Helper::get_option( 'tokenRemaining', 0 ) );
+		$license_status    = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
-		// Get data with proper error handling in the methods themselves
-		$post_statuses = $this->get_sanitized_post_statuses();
-		$categories = $this->get_sanitized_categories();
-		$tags = $this->get_sanitized_tags();
-		$authors = $this->get_sanitized_authors();
-		$post_types = $this->get_sanitized_post_types();
+		// Get data with proper error handling in the methods themselves.
+		$post_statuses     = $this->get_sanitized_post_statuses();
+		$categories        = $this->get_sanitized_categories();
+		$tags              = $this->get_sanitized_tags();
+		$authors           = $this->get_sanitized_authors();
+		$post_types        = $this->get_sanitized_post_types();
 		$postmeta_defaults = $this->sanitize_metadata_defaults( Metadata::get_default_settings() );
-		$all_campaigns = $this->sanitize_campaigns_data( wpaib_get_all_campaigns() );
-		$generated_posts = $this->sanitize_posts_data( wpaib_get_generated_posts() );
+		$all_campaigns     = $this->sanitize_campaigns_data( wpaib_get_all_campaigns() );
+		$generated_posts   = $this->sanitize_posts_data( wpaib_get_generated_posts() );
 
 		$localized_data = apply_filters(
 			'wp_ai_blogger_localized_admin_data',
 			[
-				// Core WordPress URLs and nonces
+				// Core WordPress URLs and nonces.
 				'ajax_url'           => admin_url( 'admin-ajax.php' ),
 				'rest_url'           => rest_url( WP_AI_BLOGGER_SLUG . '/v1/' ),
 				'admin_nonce'        => wp_create_nonce( 'wpaib_admin_nonce' ),
@@ -220,7 +199,7 @@ class Menu {
 				'admin_page_nonce'   => wp_create_nonce( 'wp_ai_blogger_admin_page' ),
 				'licensing_nonce'    => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
 
-				// Static configuration that doesn't change during app lifecycle
+				// Static configuration that doesn't change during app lifecycle.
 				'version'            => WP_AI_BLOGGER_VERSION,
 				'home_slug'          => sanitize_key( self::PAGE_ID ),
 				'admin_base_url'     => esc_url( admin_url( 'edit.php' ) ),
@@ -229,15 +208,17 @@ class Menu {
 				'pro_purchase_url'   => esc_url( 'https://wpaiblogger.com/' ),
 				'pro_available'      => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
 				'pro_version'        => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
-				'edit_post_link'     => esc_url( add_query_arg(
-					[
-						'post'   => '{{POST_ID}}',
-						'action' => 'edit',
-					],
-					admin_url( 'post.php' )
-				) ),
+				'edit_post_link'     => esc_url(
+					add_query_arg(
+						[
+							'post'   => '{{POST_ID}}',
+							'action' => 'edit',
+						],
+						admin_url( 'post.php' )
+					)
+				),
 
-				// User and site information
+				// User and site information.
 				'current_user_name'  => sanitize_text_field( wpaib_get_user_detail( 'name' ) ),
 				'current_user_email' => sanitize_email( wpaib_get_user_detail( 'email' ) ),
 				'current_user_id'    => get_current_user_id(),
@@ -246,7 +227,7 @@ class Menu {
 				'site_description'   => $site_description,
 				'site_for'           => $site_for,
 
-				// User settings and preferences
+				// User settings and preferences.
 				'userOnboarded'      => (bool) Helper::get_option( 'userOnboarded', false ),
 				'license'            => $license,
 				'license_status'     => $license_status,
@@ -257,11 +238,11 @@ class Menu {
 				'sexually_explicit'  => $sexually_explicit,
 				'dangerous_content'  => $dangerous_content,
 
-				// Token and licensing information
+				// Token and licensing information.
 				'token_total'        => $token_total,
 				'token_remaining'    => $token_remaining,
 
-				// WordPress data collections
+				// WordPress data collections.
 				'post_statuses'      => $post_statuses,
 				'categories'         => $categories,
 				'tags'               => $tags,
@@ -271,37 +252,31 @@ class Menu {
 				'all_campaigns'      => $all_campaigns,
 				'generated_posts'    => $generated_posts,
 
-				// System configuration
+				// System configuration.
 				'blog_name'          => $blog_name,
 				'security_level'     => 'enhanced',
 			]
 		);
 
-		// Debug logging in development
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'WP AI Blogger License Debug: ' . print_r( $license, true ) );
-			error_log( 'WP AI Blogger Localized Data: ' . print_r( $localized_data, true ) );
-		}
-
-		$handle = 'wp_ai_auto_blogger_admin_scripts';
-		$build_path = WP_AI_BLOGGER_BASE_URL . 'assets/build/';
+		$handle            = 'wp_ai_auto_blogger_admin_scripts';
+		$build_path        = WP_AI_BLOGGER_BASE_URL . 'assets/build/';
 		$script_asset_path = WP_AI_BLOGGER_DIR . 'assets/build/blog-app.asset.php';
 
-		// Validate script file exists
+		// Validate script file exists.
 		if ( ! file_exists( $script_asset_path ) ) {
 			return;
 		}
 
 		$script_info = include $script_asset_path;
 
-		// Validate script info structure
+		// Validate script info structure.
 		if ( ! is_array( $script_info ) || ! isset( $script_info['dependencies'] ) ) {
 			return;
 		}
 
 		$script_dep = array_merge( $script_info['dependencies'], [] );
 
-		// Validate script file exists
+		// Validate script file exists.
 		$script_file = $build_path . 'blog-app.js';
 		if ( ! $this->validate_script_file( WP_AI_BLOGGER_DIR . 'assets/build/blog-app.js' ) ) {
 			return;
@@ -319,7 +294,7 @@ class Menu {
 
 		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AI_BLOGGER_DIR . 'languages' );
 
-		// Validate and enqueue styles
+		// Validate and enqueue styles.
 		$style_file = is_rtl() ? $build_path . 'blog-app-rtl.css' : $build_path . 'blog-app.css';
 		$style_path = is_rtl() ? WP_AI_BLOGGER_DIR . 'assets/build/blog-app-rtl.css' : WP_AI_BLOGGER_DIR . 'assets/build/blog-app.css';
 
@@ -329,26 +304,71 @@ class Menu {
 	}
 
 	/**
+	 * Function to load the admin area actions.
+	 *
+	 * @since 1.0.0
+	 */
+	public function initialize_hooks(): void {
+		add_action( 'admin_menu', [ $this, 'register_plugin_menus' ] );
+	}
+
+	/**
+	 * Add submenu to admin menu.
+	 *
+	 * @since 1.0.0
+	 */
+	public function register_plugin_menus(): void {
+		if ( current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
+			add_submenu_page(
+				'edit.php',
+				__( 'AI Blogger', 'wp-ai-blogger' ),
+				__( 'AI Blogger', 'wp-ai-blogger' ),
+				WP_AI_BLOGGER_CAPABILITY,
+				self::PAGE_ID,
+				[ $this, 'render_settings_page' ]
+			);
+		}
+	}
+
+	/**
+	 * Check if current page is our plugin admin page.
+	 *
+	 * @return bool
+	 * @since x.x.x
+	 */
+	private function is_plugin_admin_page(): bool {
+		$page = ! empty( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here as this is a static check.
+
+		if ( empty( $page ) ) {
+			return false;
+		}
+
+		$page = sanitize_text_field( wp_unslash( $page ) );
+
+		return $page === self::PAGE_ID || strpos( $page, self::PAGE_ID . '_' ) === 0;
+	}
+
+	/**
 	 * Validates security input parameters
 	 *
 	 * @since 1.0.0
-	 * @param array $data Input data to validate
+	 * @param array $data Input data to validate.
 	 * @return array Validated data
 	 */
 	private function validate_security_input( array $data ): array {
 		$validated = [];
 
-		// Validate page parameter
+		// Validate page parameter.
 		if ( isset( $data['page'] ) ) {
 			$validated['page'] = sanitize_key( $data['page'] );
 		}
 
-		// Validate action parameter
+		// Validate action parameter.
 		if ( isset( $data['action'] ) ) {
 			$validated['action'] = sanitize_key( $data['action'] );
 		}
 
-		// Validate tab parameter
+		// Validate tab parameter.
 		if ( isset( $data['tab'] ) ) {
 			$validated['tab'] = sanitize_key( $data['tab'] );
 		}
@@ -360,7 +380,7 @@ class Menu {
 	 * Sanitizes license data
 	 *
 	 * @since 1.0.0
-	 * @param array $license License data
+	 * @param array $license License data.
 	 * @return array Sanitized license data
 	 */
 	private function sanitize_license_data( $license ): array {
@@ -368,7 +388,7 @@ class Menu {
 			return [];
 		}
 
-		$sanitized = [];
+		$sanitized    = [];
 		$allowed_keys = [ 'key', 'status', 'expires', 'sites_allowed', 'activations_left' ];
 
 		foreach ( $allowed_keys as $key ) {
@@ -398,7 +418,7 @@ class Menu {
 	 * Sanitizes post ideas data
 	 *
 	 * @since 1.0.0
-	 * @param mixed $post_ideas Post ideas data
+	 * @param mixed $post_ideas Post ideas data.
 	 * @return array Sanitized post ideas
 	 */
 	private function sanitize_post_ideas( $post_ideas ): array {
@@ -413,7 +433,7 @@ class Menu {
 			}
 		}
 
-		return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas
+		return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas.
 	}
 
 	/**
@@ -535,18 +555,40 @@ class Menu {
 	 * Sanitizes metadata defaults
 	 *
 	 * @since 1.0.0
-	 * @param array $defaults Metadata defaults
+	 * @param array $defaults Metadata defaults.
 	 * @return array Sanitized defaults
 	 */
 	private function sanitize_metadata_defaults( array $defaults ): array {
-		$sanitized = [];
-		$allowed_keys = [ 
-			'type', 'title', 'content', 'excerpt', 'status', 'keywords', 'postsTarget', 
-			'frequency', 'repeatInterval', 'repeatUnit', 'postType', 'postStatus', 
-			'summaryAsExcerpt', 'author', 'category', 'tag', 'categories', 'tags', 
-			'lastRun', 'lastPostID', 'postsCreated', 'maxWords', 'maxTitleWords', 
-			'postsVisit', 'overrideSitePersona', 'overrideSiteTitle', 
-			'overrideSiteDescription', 'overrideSiteFor'
+		$sanitized    = [];
+		$allowed_keys = [
+			'type',
+			'title',
+			'content',
+			'excerpt',
+			'status',
+			'keywords',
+			'postsTarget',
+			'frequency',
+			'repeatInterval',
+			'repeatUnit',
+			'postType',
+			'postStatus',
+			'summaryAsExcerpt',
+			'author',
+			'category',
+			'tag',
+			'categories',
+			'tags',
+			'lastRun',
+			'lastPostID',
+			'postsCreated',
+			'maxWords',
+			'maxTitleWords',
+			'postsVisit',
+			'overrideSitePersona',
+			'overrideSiteTitle',
+			'overrideSiteDescription',
+			'overrideSiteFor',
 		];
 
 		foreach ( $allowed_keys as $key ) {
@@ -609,7 +651,7 @@ class Menu {
 	 * Sanitizes campaigns data
 	 *
 	 * @since 1.0.0
-	 * @param array $campaigns Campaigns data
+	 * @param array $campaigns Campaigns data.
 	 * @return array Sanitized campaigns
 	 */
 	private function sanitize_campaigns_data( array $campaigns ): array {
@@ -621,7 +663,7 @@ class Menu {
 			}
 
 			$sanitized_campaign = [];
-			$allowed_keys = [ 'id', 'title', 'description', 'status', 'created_at', 'updated_at', 'post_count' ];
+			$allowed_keys       = [ 'id', 'title', 'description', 'status', 'created_at', 'updated_at', 'post_count' ];
 
 			foreach ( $allowed_keys as $key ) {
 				if ( isset( $campaign[ $key ] ) ) {
@@ -659,7 +701,7 @@ class Menu {
 	 * Sanitizes posts data
 	 *
 	 * @since 1.0.0
-	 * @param array $posts Posts data
+	 * @param array $posts Posts data.
 	 * @return array Sanitized posts
 	 */
 	private function sanitize_posts_data( array $posts ): array {
@@ -671,7 +713,7 @@ class Menu {
 			}
 
 			$sanitized_post = [];
-			$allowed_keys = [ 'id', 'title', 'status', 'created_at', 'updated_at', 'author_id', 'campaign_id' ];
+			$allowed_keys   = [ 'id', 'title', 'status', 'created_at', 'updated_at', 'author_id', 'campaign_id' ];
 
 			foreach ( $allowed_keys as $key ) {
 				if ( isset( $post[ $key ] ) ) {
@@ -707,7 +749,7 @@ class Menu {
 	 * Validates script file
 	 *
 	 * @since 1.0.0
-	 * @param string $file_path File path to validate
+	 * @param string $file_path File path to validate.
 	 * @return bool True if valid
 	 */
 	private function validate_script_file( string $file_path ): bool {
@@ -720,7 +762,7 @@ class Menu {
 			return false;
 		}
 
-		// Check file size (max 5MB)
+		// Check file size (max 5MB).
 		if ( filesize( $file_path ) > 5 * 1024 * 1024 ) {
 			return false;
 		}
@@ -732,7 +774,7 @@ class Menu {
 	 * Validates style file
 	 *
 	 * @since 1.0.0
-	 * @param string $file_path File path to validate
+	 * @param string $file_path File path to validate.
 	 * @return bool True if valid
 	 */
 	private function validate_style_file( string $file_path ): bool {
@@ -745,40 +787,11 @@ class Menu {
 			return false;
 		}
 
-		// Check file size (max 2MB)
+		// Check file size (max 2MB).
 		if ( filesize( $file_path ) > 2 * 1024 * 1024 ) {
 			return false;
 		}
 
 		return true;
 	}
-
-	/**
-	 * Function to load the admin area actions.
-	 *
-	 * @since 1.0.0
-	 */
-	public function initialize_hooks(): void {
-		add_action( 'admin_menu', [ $this, 'register_plugin_menus' ] );
-	}
-
-	/**
-	 * Add submenu to admin menu.
-	 *
-	 * @since 1.0.0
-	 */
-	public function register_plugin_menus(): void {
-		if ( current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
-			add_submenu_page(
-				'edit.php',
-				__( 'AI Blogger', 'wp-ai-blogger' ),
-				__( 'AI Blogger', 'wp-ai-blogger' ),
-				WP_AI_BLOGGER_CAPABILITY,
-				self::PAGE_ID,
-				[ $this, 'render_settings_page' ]
-			);
-		}
-	}
 }
-
-

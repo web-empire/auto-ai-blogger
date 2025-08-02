@@ -56,12 +56,12 @@ export default function SettingsSavedNotification() {
 	const notification = useSelector( ( state ) => {
 		const settingsNotification = state.settingsSavedNotification;
 
-		// Debug logging
+		// Debug logging.
 		if ( settingsNotification ) {
 			console.log( 'SettingsSavedNotification received:', settingsNotification );
 		}
 
-		// Support both string and object notifications
+		// Support both string and object notifications.
 		if ( typeof settingsNotification === 'string' ) {
 			return {
 				message: settingsNotification,
@@ -81,7 +81,7 @@ export default function SettingsSavedNotification() {
 		return null;
 	} );
 
-	// Memoized dismiss action
+	// Memoized dismiss action.
 	const dismissNotification = useCallback( () => {
 		dispatch( {
 			type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
@@ -89,7 +89,7 @@ export default function SettingsSavedNotification() {
 		} );
 	}, [ dispatch ] );
 
-	// Auto-dismiss effect with proper cleanup
+	// Auto-dismiss effect with proper cleanup.
 	useEffect( () => {
 		if ( notification?.message ) {
 			const timer = setTimeout( () => {
@@ -100,7 +100,7 @@ export default function SettingsSavedNotification() {
 		}
 	}, [ notification, dismissNotification ] );
 
-	// Memoized notification styles
+	// Memoized notification styles.
 	const notificationStyle = useMemo( () => {
 		if ( ! notification?.type ) {
 			return NotificationTypes.success;
@@ -108,7 +108,7 @@ export default function SettingsSavedNotification() {
 		return NotificationTypes[ notification.type ] || NotificationTypes.success;
 	}, [ notification?.type ] );
 
-	// Early return if no notification
+	// Early return if no notification.
 	if ( ! notification?.message ) {
 		return null;
 	}
@@ -119,7 +119,7 @@ export default function SettingsSavedNotification() {
 		<div
 			aria-live="assertive"
 			aria-atomic="true"
-			className="fixed flex px-3 py-6 pointer-events-none sm:py-6 sm:items-start top-[15px] right-0 w-full z-[1000001]"
+			className="fixed flex px-3 py-3 pointer-events-none sm:py-6 sm:items-start top-[15px] right-0 w-full z-[1000001]"
 			role="region"
 			aria-label="Notifications"
 		>
@@ -157,8 +157,8 @@ export default function SettingsSavedNotification() {
 						</div>
 
 						{ /* Main content */ }
-						<div className="p-5 pt-6">
-							<div className="flex items-start gap-4">
+						<div className="p-4">
+							<div className="flex items-center gap-4">
 								{ /* Enhanced icon with background and subtle animation */ }
 								<div className={ `
 									flex-shrink-0 w-10 h-10 ${ iconBg } rounded-full

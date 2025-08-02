@@ -32,9 +32,9 @@ const setInitialState = ( store ) => {
 				...( wpAiBloggerSettings.sexually_explicit !== undefined && { sexuallyExplicit: wpAiBloggerSettings.sexually_explicit } ),
 				...( wpAiBloggerSettings.dangerous_content !== undefined && { dangerousContent: wpAiBloggerSettings.dangerous_content } ),
 				...( wpAiBloggerSettings.post_ideas && typeof wpAiBloggerSettings.post_ideas === 'string' && { postIdeas: wpAiBloggerSettings.post_ideas } ),
-				// License handling: Use current state license if it exists, otherwise use API license
+				// License handling: Use current state license if it exists, otherwise use API license.
 				license: currentState.license || wpAiBloggerSettings.license || '',
-				// Only update tokens if API returns better data than what we already have
+				// Only update tokens if API returns better data than what we already have.
 				...( wpAiBloggerSettings.tokenTotal > currentState.tokenTotal && { tokenTotal: wpAiBloggerSettings.tokenTotal } ),
 				...( wpAiBloggerSettings.tokenRemaining > currentState.tokenRemaining && { tokenRemaining: wpAiBloggerSettings.tokenRemaining } ),
 			};

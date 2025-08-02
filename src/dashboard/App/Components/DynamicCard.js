@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import { __ } from '@wordpress/i18n';
-import { Shield, ExternalLink } from 'lucide-react';
+import { Gift } from 'lucide-react';
 
 /**
  * Reusable Dynamic Card component
@@ -8,13 +7,12 @@ import { Shield, ExternalLink } from 'lucide-react';
  */
 const DynamicCard = memo( ( {
 	// Content props
-	icon: Icon = Shield,
+	icon: Icon = Gift,
 	heading,
 	subHeading,
 	additionalInfo,
 	linkText,
 	linkUrl,
-	linkIcon: LinkIcon = ExternalLink,
 
 	// Styling props
 	size = 'medium', // 'small', 'medium', 'large'
@@ -131,61 +129,87 @@ const DynamicCard = memo( ( {
 	}
 
 	return (
-		<div className={ `
-			mt-6 ${ currentSize.container } ${ currentColor.background }
-			border ${ currentColor.border } rounded-xl ${ className }
-		` }>
-			{ /* Header section with icon and text */ }
-			{ ( Icon || heading || subHeading ) && (
-				<div className={ `flex items-center ${ currentSize.gap } ${ currentSize.marginBottom }` }>
-					{ Icon && (
-						<div className={ `${ currentSize.iconContainer } ${ currentColor.iconBg } rounded-lg` }>
-							<Icon className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } aria-hidden="true" />
-						</div>
-					) }
-					{ ( heading || subHeading ) && (
-						<div>
-							{ heading && (
-								<h3 className={ `${ currentSize.heading } !mt-0 ${ subHeading ? currentSize.headingMarginBottom : '!mb-0' }` }>
-									{ heading }
-								</h3>
+		linkText && linkUrl ? (
+			<a
+				href={ linkUrl }
+				target={ openInNewTab ? '_blank' : undefined }
+				rel={ openInNewTab ? 'noopener noreferrer' : undefined }
+				onClick={ handleLinkClick }
+				className={ `block outline-1 focus:outline-1 hover:outline-1 outline-solid outline-blue-500 rounded duration-200 hover:outline-blue-700 focus:outline-blue-700 transition-all` }
+				aria-label={ ariaLabel || ( openInNewTab ? `${ linkText } - opens in new tab` : linkText ) }
+			>
+				<div className={ `mt-6 ${ currentSize.container } ${ currentColor.background } border ${ currentColor.border } ${ className }` }>
+					{ /* Header section with icon and text */ }
+					{ ( Icon || heading || subHeading ) && (
+						<div className={ `flex items-center ${ currentSize.gap }` }>
+							{ Icon && (
+								<div className={ `${ currentSize.iconContainer } ${ currentColor.iconBg } rounded-sm flex` }>
+									<Icon className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } aria-hidden="true" />
+								</div>
 							) }
-							{ subHeading && (
-								<p className={ `${ currentSize.subHeading } text-gray-600` }>
-									{ subHeading }
-								</p>
+							{ ( heading || subHeading ) && (
+								<div className="flex flex-col gap-1">
+									{ heading && (
+										<h3 className={ `${ currentSize.heading } m-0 p-0` }>
+											{ heading }
+										</h3>
+									) }
+
+									{ subHeading && (
+										<p className={ `${ currentSize.subHeading } text-gray-600` }>
+											{ subHeading }
+										</p>
+									) }
+
+									{ /* Additional info section */ }
+									{ additionalInfo && (
+										<div className={ `${ currentSize.additionalInfo } text-gray-600 ${ linkText ? currentSize.marginBottom : '' }` }>
+											{ additionalInfo }
+										</div>
+									) }
+								</div>
 							) }
 						</div>
 					) }
 				</div>
-			) }
+			</a>
+		) : (
+			<div className={ `mt-6 ${ currentSize.container } ${ currentColor.background } border ${ currentColor.border } rounded-xl ${ className }` }>
+				{ /* Header section with icon and text */ }
+				{ ( Icon || heading || subHeading ) && (
+					<div className={ `flex items-center ${ currentSize.gap }` }>
+						{ Icon && (
+							<div className={ `${ currentSize.iconContainer } ${ currentColor.iconBg } rounded-lg flex` }>
+								<Icon className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } aria-hidden="true" />
+							</div>
+						) }
 
-			{ /* Additional info section */ }
-			{ additionalInfo && (
-				<div className={ `${ currentSize.additionalInfo } text-gray-600 ${ linkText ? currentSize.marginBottom : '' }` }>
-					{ additionalInfo }
-				</div>
-			) }
+						{ ( heading || subHeading ) && (
+							<div className="flex flex-col gap-1">
+								{ heading && (
+									<h3 className={ `${ currentSize.heading } m-0 p-0` }>
+										{ heading }
+									</h3>
+								) }
 
-			{ /* Link section */ }
-			{ linkText && linkUrl && (
-				<a
-					href={ linkUrl }
-					target={ openInNewTab ? '_blank' : undefined }
-					rel={ openInNewTab ? 'noopener noreferrer' : undefined }
-					onClick={ handleLinkClick }
-					className={ `
-						inline-flex items-center gap-2 ${ currentSize.linkText } ${ currentColor.linkColor }
-						focus:outline-none focus:ring-2 ${ currentColor.focusRing }
-						focus:ring-offset-2 rounded transition-colors duration-200
-					` }
-					aria-label={ ariaLabel || ( openInNewTab ? `${ linkText } - opens in new tab` : linkText ) }
-				>
-					{ linkText }
-					{ LinkIcon && <LinkIcon className={ currentSize.linkIconSize } aria-hidden="true" /> }
-				</a>
-			) }
-		</div>
+								{ subHeading && (
+									<p className={ `${ currentSize.subHeading } text-gray-600` }>
+										{ subHeading }
+									</p>
+								) }
+
+								{ /* Additional info section */ }
+								{ additionalInfo && (
+									<div className={ `${ currentSize.additionalInfo } text-gray-600` }>
+										{ additionalInfo }
+									</div>
+								) }
+							</div>
+						) }
+					</div>
+				) }
+			</div>
+		)
 	);
 } );
 

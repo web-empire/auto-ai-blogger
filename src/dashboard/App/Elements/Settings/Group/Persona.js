@@ -1,7 +1,7 @@
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelector } from 'react-redux';
-import { AlertTriangle, Info, CheckCircle2, Lightbulb } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
@@ -12,7 +12,6 @@ import AdvancedSettings from './AdvancedSettings';
 const Persona = memo( () => {
 	const dispatch = useDispatch();
 	const [ errors, setErrors ] = useState( {} );
-	const [ showTooltips, setShowTooltips ] = useState( {} );
 
 	// Redux selectors - values are already initialized from menu.php through Redux store
 	const siteTitle = useSelector( ( state ) => state.siteTitle );
@@ -70,38 +69,29 @@ const Persona = memo( () => {
 		return true;
 	}, [] );
 
-	// Optimized handlers - only update Redux state, let ContentHeader handle persistence
+	// Optimized handlers - only update Redux state, let ContentHeader handle persistence.
 	const handleSiteTitleChange = useCallback( ( e ) => {
 		const value = e.target.value;
 		dispatch( { type: 'UPDATE_SITE_TITLE', payload: value } );
-		// Immediate validation for better UX
+		// Immediate validation for better UX.
 		validateSiteTitle( value );
 	}, [ dispatch, validateSiteTitle ] );
 
 	const handleSiteForChange = useCallback( ( e ) => {
 		const value = e.target.value;
 		dispatch( { type: 'UPDATE_SITE_FOR', payload: value } );
-		// Immediate validation for better UX
+		// Immediate validation for better UX.
 		validateSiteFor( value );
 	}, [ dispatch, validateSiteFor ] );
 
 	const handleSiteDescriptionChange = useCallback( ( e ) => {
 		const value = e.target.value;
 		dispatch( { type: 'UPDATE_SITE_DESCRIPTION', payload: value } );
-		// Immediate validation for better UX
+		// Immediate validation for better UX.
 		validateSiteDescription( value );
 	}, [ dispatch, validateSiteDescription ] );
 
-	// Tooltip handlers
-	const handleTooltipShow = useCallback( ( field ) => {
-		setShowTooltips( ( prev ) => ( { ...prev, [ field ]: true } ) );
-	}, [] );
-
-	const handleTooltipHide = useCallback( ( field ) => {
-		setShowTooltips( ( prev ) => ( { ...prev, [ field ]: false } ) );
-	}, [] );
-
-	// Optimized character count with bounds checking
+	// Optimized character count with bounds checking.
 	const descriptionCount = siteDescription.length;
 	const maxDescriptionLength = 500;
 	const descriptionProgress = Math.min( 100, ( descriptionCount / maxDescriptionLength ) * 100 );
@@ -111,41 +101,14 @@ const Persona = memo( () => {
 		<div className="space-y-8">
 			{ /* Site information section */ }
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-					<Info className="w-5 h-5 text-blue-600" />
-					{ __( 'Site Information', 'wp-ai-blogger' ) }
-				</h3>
-
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<SettingField>
 						<SettingLabel
 							forId="name-of-the-blog"
-							title={
-								<div className="flex items-center gap-2">
-									{ __( 'Site Title', 'wp-ai-blogger' ) }
-									<div className="relative">
-										<button
-											type="button"
-											onMouseEnter={ () => handleTooltipShow( 'siteTitle' ) }
-											onMouseLeave={ () => handleTooltipHide( 'siteTitle' ) }
-											onFocus={ () => handleTooltipShow( 'siteTitle' ) }
-											onBlur={ () => handleTooltipHide( 'siteTitle' ) }
-											className="text-gray-400 hover:text-gray-600 focus:outline-none"
-											aria-label={ __( 'Show field description', 'wp-ai-blogger' ) }
-										>
-											<Info className="w-4 h-4" />
-										</button>
-										{ showTooltips.siteTitle && (
-											<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
-												{ __( 'The main title of your website or blog', 'wp-ai-blogger' ) }
-												<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-											</div>
-										) }
-									</div>
-								</div>
-							}
 							required={ true }
+							title={ __( 'Site Title', 'wp-ai-blogger' ) }
 						/>
+
 						<div className="relative">
 							<SettingInput
 								id="name-of-the-blog"
@@ -154,7 +117,8 @@ const Persona = memo( () => {
 								placeholder={ __( 'Enter your site title', 'wp-ai-blogger' ) }
 								maxLength={ 100 }
 								aria-describedby="site-title-error"
-								className={ `${ errors.siteTitle ? 'border-red-300 focus:ring-red-500' : '' } !pr-10` }
+								className={ `${ errors.siteTitle ? 'border-red-300 focus:ring-red-500' : '' }` }
+								inputClassName={ '!pr-10' }
 							/>
 							{ /* Check mark indicator */ }
 							<div className="absolute right-3 top-3">
@@ -165,46 +129,24 @@ const Persona = memo( () => {
 								) : null }
 							</div>
 						</div>
-						{ errors.siteTitle && (
-							<p id="site-title-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
-								<AlertTriangle className="w-3 h-3" />
-								{ errors.siteTitle }
-							</p>
-						) }
-						<p className="text-xs text-gray-500 mt-1">
-							{ siteTitle.length }/100 characters
+
+						<p className="text-xs text-gray-500 mt-1 flex justify-between">
+							{ errors.siteTitle ? (
+								<p id="site-title-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
+									{ errors.siteTitle }
+								</p>
+							) : <span> { __( 'The main title of your website or blog.', 'wp-ai-blogger' ) } </span> }
+							<span> { siteTitle.length }/100 </span>
 						</p>
 					</SettingField>
 
 					<SettingField>
 						<SettingLabel
 							forId="blog-for"
-							title={
-								<div className="flex items-center gap-2">
-									{ __( 'Site For', 'wp-ai-blogger' ) }
-									<div className="relative">
-										<button
-											type="button"
-											onMouseEnter={ () => handleTooltipShow( 'siteFor' ) }
-											onMouseLeave={ () => handleTooltipHide( 'siteFor' ) }
-											onFocus={ () => handleTooltipShow( 'siteFor' ) }
-											onBlur={ () => handleTooltipHide( 'siteFor' ) }
-											className="text-gray-400 hover:text-gray-600 focus:outline-none"
-											aria-label={ __( 'Show field description', 'wp-ai-blogger' ) }
-										>
-											<Info className="w-4 h-4" />
-										</button>
-										{ showTooltips.siteFor && (
-											<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
-												{ __( 'Who is your target audience?', 'wp-ai-blogger' ) }
-												<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-											</div>
-										) }
-									</div>
-								</div>
-							}
 							required={ true }
+							title={ __( 'Site For', 'wp-ai-blogger' ) }
 						/>
+
 						<div className="relative">
 							<SettingInput
 								id="blog-for"
@@ -213,7 +155,8 @@ const Persona = memo( () => {
 								placeholder={ __( 'Brief description of your site', 'wp-ai-blogger' ) }
 								maxLength={ 200 }
 								aria-describedby="site-for-error"
-								className={ `${ errors.siteFor ? 'border-red-300 focus:ring-red-500' : '' } !pr-10` }
+								className={ `${ errors.siteFor ? 'border-red-300 focus:ring-red-500' : '' }` }
+								inputClassName={ '!pr-10' }
 							/>
 							{ /* Check mark indicator */ }
 							<div className="absolute right-3 top-3">
@@ -224,14 +167,14 @@ const Persona = memo( () => {
 								) : null }
 							</div>
 						</div>
-						{ errors.siteFor && (
-							<p id="site-for-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
-								<AlertTriangle className="w-3 h-3" />
-								{ errors.siteFor }
-							</p>
-						) }
-						<p className="text-xs text-gray-500 mt-1">
-							{ siteFor.length }/200 characters
+
+						<p className="text-xs text-gray-500 mt-1 flex justify-between">
+							{ errors.siteFor ? (
+								<p id="site-for-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
+									{ errors.siteFor }
+								</p>
+							) : <span> { __( 'Who is your target audience?', 'wp-ai-blogger' ) } </span> }
+							<span> { siteFor.length }/200 </span>
 						</p>
 					</SettingField>
 				</div>
@@ -242,32 +185,10 @@ const Persona = memo( () => {
 				<SettingField>
 					<SettingLabel
 						forId="more-about-blog"
-						title={
-							<div className="flex items-center gap-2">
-								{ __( 'Detailed Site Information', 'wp-ai-blogger' ) }
-								<div className="relative">
-									<button
-										type="button"
-										onMouseEnter={ () => handleTooltipShow( 'siteDescription' ) }
-										onMouseLeave={ () => handleTooltipHide( 'siteDescription' ) }
-										onFocus={ () => handleTooltipShow( 'siteDescription' ) }
-										onBlur={ () => handleTooltipHide( 'siteDescription' ) }
-										className="text-gray-400 hover:text-gray-600 focus:outline-none"
-										aria-label={ __( 'Show field description', 'wp-ai-blogger' ) }
-									>
-										<Info className="w-4 h-4" />
-									</button>
-									{ showTooltips.siteDescription && (
-										<div className="absolute left-0 top-6 z-10 w-64 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg pointer-events-none">
-											{ __( 'Tell us more about your site', 'wp-ai-blogger' ) }
-											<div className="absolute -top-1 left-2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-										</div>
-									) }
-								</div>
-							</div>
-						}
+						title={ __( 'Detailed Site Information', 'wp-ai-blogger' ) }
 						required={ true }
 					/>
+
 					<div className="relative">
 						<textarea
 							id="more-about-blog"
@@ -291,34 +212,35 @@ const Persona = memo( () => {
 							{ descriptionCount }/{ maxDescriptionLength }
 						</div>
 					</div>
-					{ errors.siteDescription && (
+
+					{ errors.siteDescription ? (
 						<p id="site-description-error" className="text-xs text-red-600 mt-1 flex items-center gap-1">
-							<AlertTriangle className="w-3 h-3" />
 							{ errors.siteDescription }
 						</p>
-					) }
-					<p id="description-count" className="text-xs text-gray-500 mt-1">
-						{ __( 'This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger' ) }
-					</p>
-				</SettingField>
+					) : (
+						<p id="description-count" className="text-xs text-gray-500 mt-1">
+							{ __( 'This information helps AI generate more relevant and targeted content for your audience.', 'wp-ai-blogger' ) }
+						</p> ) }
 
-				{ /* Pro Tips section */ }
-				<InfoCard
-					icon={ Lightbulb }
-					title={ __( 'Pro Tips for Better Results', 'wp-ai-blogger' ) }
-					items={ [
-						__( 'Be specific about your target audience and industry', 'wp-ai-blogger' ),
-						__( 'Include your brand voice and tone preferences', 'wp-ai-blogger' ),
-						__( 'Mention any specific topics or keywords you focus on', 'wp-ai-blogger' ),
-					] }
-					colorScheme="blue"
-					className="mt-6"
-					ariaLabel={ __( 'Pro tips for better content generation results', 'wp-ai-blogger' ) }
-				/>
+				</SettingField>
 			</div>
 
 			{ /* Advanced AI Settings Component */ }
 			<AdvancedSettings />
+
+			{ /* Pro Tips section */ }
+			<InfoCard
+				icon={ Lightbulb }
+				title={ __( 'Pro Tips for Better Results', 'wp-ai-blogger' ) }
+				items={ [
+					__( 'Be specific about your target audience and industry.', 'wp-ai-blogger' ),
+					__( 'Include your brand voice and tone preferences.', 'wp-ai-blogger' ),
+					__( 'Mention any specific topics or keywords you focus on.', 'wp-ai-blogger' ),
+				] }
+				colorScheme="blue"
+				className="mt-6"
+				ariaLabel={ __( 'Pro tips for better content generation results', 'wp-ai-blogger' ) }
+			/>
 
 			{ /* Screen reader summary */ }
 			<div className="sr-only" aria-live="polite">

@@ -25,17 +25,33 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 class Helper {
-
 	/**
 	 * Allowed setting keys for security validation.
 	 *
 	 * @var array
 	 */
 	private static $allowed_keys = [
-		'userOnboarded', 'onboardingTab', 'userName', 'userEmail', 'siteTitle',
-		'siteDescription', 'siteFor', 'license', 'license_status', 'temperature',
-		'harassment', 'hate', 'sexuallyExplicit', 'dangerousContent', 'postIdeas',
-		'tokenTotal', 'tokenRemaining', 'apiKey', 'enableLogging', 'blogName', 'adminEmail'
+		'userOnboarded',
+		'onboardingTab',
+		'userName',
+		'userEmail',
+		'siteTitle',
+		'siteDescription',
+		'siteFor',
+		'license',
+		'license_status',
+		'temperature',
+		'harassment',
+		'hate',
+		'sexuallyExplicit',
+		'dangerousContent',
+		'postIdeas',
+		'tokenTotal',
+		'tokenRemaining',
+		'apiKey',
+		'enableLogging',
+		'blogName',
+		'adminEmail',
 	];
 
 	/**
@@ -48,27 +64,27 @@ class Helper {
 	 * @since 1.0.0
 	 */
 	public static function get_option( $key, $default = false ) {
-		// Validate key parameter
+		// Validate key parameter.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return $default;
 		}
 
-		// Sanitize key
+		// Sanitize key.
 		$key = sanitize_key( $key );
 
 		if ( empty( $key ) ) {
 			return $default;
 		}
 
-		// Check if key is in allowed list (compare sanitized versions)
-		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		// Check if key is in allowed list (compare sanitized versions).
+		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			return $default;
 		}
 
-		// Get the original camelCase key for further processing
-		$original_key_index = array_search($key, $sanitized_allowed_keys);
-		$original_key = self::$allowed_keys[$original_key_index];
+		// Get the original camelCase key for further processing.
+		$original_key_index = array_search( $key, $sanitized_allowed_keys );
+		$original_key       = self::$allowed_keys[ $original_key_index ];
 
 		$settings = Settings::get_ai_blogger_settings();
 
@@ -76,19 +92,19 @@ class Helper {
 			return $default;
 		}
 
-		// Validate settings array
+		// Validate settings array.
 		if ( ! array_key_exists( $key, $settings ) ) {
 			$settings[ $key ] = '';
 		}
 
 		$value = $settings[ $key ];
 
-		// Return default if value is empty and default is provided
+		// Return default if value is empty and default is provided.
 		if ( $value === '' && $default !== false ) {
 			return $default;
 		}
 
-		// Sanitize output based on key type (use original camelCase key)
+		// Sanitize output based on key type (use original camelCase key).
 		return self::sanitize_output( $original_key, $value );
 	}
 
@@ -102,34 +118,34 @@ class Helper {
 	 * @since 1.0.0
 	 */
 	public static function update_option( $key, $value = true ) {
-		// Validate key parameter
+		// Validate key parameter.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return false;
 		}
 
-		// Capability check
+		// Capability check.
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_cron() && ! wp_doing_ajax() ) {
 			return false;
 		}
 
-		// Sanitize key
+		// Sanitize key.
 		$key = sanitize_key( $key );
 
 		if ( empty( $key ) ) {
 			return false;
 		}
 
-		// Check if key is in allowed list (compare sanitized versions)
-		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		// Check if key is in allowed list (compare sanitized versions).
+		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			return false;
 		}
 
-		// Get the original camelCase key for switch statements
-		$original_key_index = array_search($key, $sanitized_allowed_keys);
-		$original_key = self::$allowed_keys[$original_key_index];
+		// Get the original camelCase key for switch statements.
+		$original_key_index = array_search( $key, $sanitized_allowed_keys );
+		$original_key       = self::$allowed_keys[ $original_key_index ];
 
-		// Sanitize value based on key type (use original camelCase key for switch)
+		// Sanitize value based on key type (use original camelCase key for switch).
 		$sanitized_value = self::sanitize_input( $original_key, $value );
 
 		if ( $sanitized_value === false ) {
@@ -138,17 +154,17 @@ class Helper {
 
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
-		// Validate settings is array
+		// Validate settings is array.
 		if ( ! is_array( $settings ) ) {
 			$settings = [];
 		}
 
-		// If the value is same as default then remove it from the DB.
+		// If the value is same as default then remove it from the DB..
 		$default_value = Settings::get_default_option( $original_key );
-		$is_default = false;
+		$is_default    = false;
 
-		// For all types, use direct comparison
-		// For postIdeas, empty string is the default
+		// For all types, use direct comparison.
+		// For postIdeas, empty string is the default.
 		$is_default = ( $default_value === $sanitized_value );
 
 		if ( $is_default ) {
@@ -157,23 +173,17 @@ class Helper {
 			$settings[ $key ] = $sanitized_value;
 		}
 
-		// Validate final settings array
+		// Validate final settings array.
 		$validated_settings = self::validate_settings_array( $settings );
 
-		$update_result = update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
+		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
 
-		// Debug logging for troubleshooting
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $original_key === 'postIdeas' ) {
-			$existing_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
-			$key_exists_before = isset( $existing_option[ $key ] );
-			$key_exists_after = isset( $validated_settings[ $key ] );
-			error_log( 'WP AI Blogger: Saving postIdeas - Key: ' . $original_key . ', Original Value: ' . json_encode( $value ) . ', Sanitized Value: ' . json_encode( $sanitized_value ) . ', Is Default: ' . ( $is_default ? 'true' : 'false' ) . ', Key Exists Before: ' . ( $key_exists_before ? 'true' : 'false' ) . ', Key Exists After: ' . ( $key_exists_after ? 'true' : 'false' ) . ', Existing DB: ' . json_encode( $existing_option ) . ', Validated Settings: ' . json_encode( $validated_settings ) . ', Update Result: ' . ( $update_result ? 'true' : 'false' ) );
-		}
-
-		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error
-		// We return the sanitized value regardless, as the operation was successful
+		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error.
+		// We return the sanitized value regardless, as the operation was successful.
 		return $sanitized_value;
-	}	/**
+	}
+
+	/**
 	 * Delete option from the database for the admin settings.
 	 *
 	 * @param  string $key The option key.
@@ -182,46 +192,96 @@ class Helper {
 	 * @since 1.0.0
 	 */
 	public static function delete_option( $key ): bool {
-		// Validate key parameter
+		// Validate key parameter.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return false;
 		}
 
-		// Capability check
+		// Capability check.
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_cron() ) {
 			return false;
 		}
 
-		// Sanitize key
+		// Sanitize key.
 		$key = sanitize_key( $key );
 
 		if ( empty( $key ) ) {
 			return false;
 		}
 
-		// Check if key is in allowed list (compare sanitized versions)
-		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		// Check if key is in allowed list (compare sanitized versions).
+		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
 			return false;
 		}
 
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
 
-		// Validate settings is array
+		// Validate settings is array.
 		if ( ! is_array( $settings ) ) {
-			return true; // Nothing to delete
+			return true; // Nothing to delete.
 		}
 
 		if ( ! isset( $settings[ $key ] ) ) {
-			return true; // Key doesn't exist, consider it deleted
+			return true; // Key doesn't exist, consider it deleted.
 		}
 
 		unset( $settings[ $key ] );
 
-		// Validate final settings array
+		// Validate final settings array.
 		$settings = self::validate_settings_array( $settings );
 
 		return update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
+	}
+
+	/**
+	 * Bulk update multiple options with validation.
+	 *
+	 * @since 1.0.0
+	 * @param array $options Array of key-value pairs to update.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function bulk_update_options( array $options ): bool {
+		// Capability check.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+
+		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+
+		if ( ! is_array( $settings ) ) {
+			$settings = [];
+		}
+
+		$updated = false;
+
+		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
+
+		foreach ( $options as $key => $value ) {
+			$key = sanitize_key( $key );
+
+			if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
+				continue;
+			}
+
+			// Get original camelCase key for sanitization.
+			$original_key_index = array_search( $key, $sanitized_allowed_keys );
+			$original_key       = self::$allowed_keys[ $original_key_index ];
+
+			$sanitized_value = self::sanitize_input( $original_key, $value );
+
+			if ( $sanitized_value !== false ) {
+				$settings[ $key ] = $sanitized_value;
+				$updated          = true;
+			}
+		}
+
+		if ( $updated ) {
+			$settings = self::validate_settings_array( $settings );
+			return update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
+		}
+
+		return true;
 	}
 
 	/**
@@ -239,7 +299,7 @@ class Helper {
 
 			case 'onboardingTab':
 				$allowed_tabs = [ 'welcome', 'settings', 'license', 'complete' ];
-				$value = sanitize_key( $value );
+				$value        = sanitize_key( $value );
 				return in_array( $value, $allowed_tabs, true ) ? $value : 'welcome';
 
 			case 'userName':
@@ -258,7 +318,7 @@ class Helper {
 
 			case 'license':
 				$license = sanitize_text_field( $value );
-				// License key validation
+				// License key validation.
 				if ( strlen( $license ) > 100 || ! preg_match( '/^[a-zA-Z0-9\-_]*$/', $license ) ) {
 					return false;
 				}
@@ -266,7 +326,7 @@ class Helper {
 
 			case 'license_status':
 				$allowed_statuses = [ 'licensed', 'unlicensed', 'expired', 'invalid' ];
-				$status = sanitize_key( $value );
+				$status           = sanitize_key( $value );
 				return in_array( $status, $allowed_statuses, true ) ? $status : 'unlicensed';
 
 			case 'temperature':
@@ -281,9 +341,9 @@ class Helper {
 				return max( 0, min( 4, $level ) );
 
 			case 'postIdeas':
-				// Convert to simple string format for easier handling
+				// Convert to simple string format for easier handling.
 				if ( is_array( $value ) ) {
-					// Convert array to newline-separated string
+					// Convert array to newline-separated string.
 					$cleaned_ideas = [];
 					foreach ( $value as $idea ) {
 						if ( is_string( $idea ) ) {
@@ -293,32 +353,32 @@ class Helper {
 							}
 						}
 					}
-					// Limit to 50 ideas and join with newlines
+					// Limit to 50 ideas and join with newlines.
 					$limited_ideas = array_slice( $cleaned_ideas, 0, 50 );
 					return ! empty( $limited_ideas ) ? implode( "\n", $limited_ideas ) : '';
 				}
 
 				if ( is_string( $value ) ) {
-					// Handle JSON string input by converting to array first, then to string
+					// Handle JSON string input by converting to array first, then to string.
 					$decoded = json_decode( $value, true );
 					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
-						// Recursively call with the decoded array
+						// Recursively call with the decoded array.
 						return self::sanitize_input( $key, $decoded );
 					}
 
-					// Try with stripslashes for double-escaped JSON
+					// Try with stripslashes for double-escaped JSON.
 					$unescaped = stripslashes( $value );
-					$decoded = json_decode( $unescaped, true );
+					$decoded   = json_decode( $unescaped, true );
 					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
-						// Recursively call with the decoded array
+						// Recursively call with the decoded array.
 						return self::sanitize_input( $key, $decoded );
 					}
 
-					// If not JSON, treat as plain string (newline-separated ideas)
+					// If not JSON, treat as plain string (newline-separated ideas).
 					return sanitize_textarea_field( $value );
 				}
 
-				// For any other type, return empty string
+				// For any other type, return empty string.
 				return '';
 
 			case 'blogName':
@@ -335,7 +395,7 @@ class Helper {
 
 			case 'apiKey':
 				$api_key = sanitize_text_field( $value );
-				// Basic API key validation
+				// Basic API key validation.
 				if ( strlen( $api_key ) > 200 || ! preg_match( '/^[a-zA-Z0-9\-_\.]*$/', $api_key ) ) {
 					return false;
 				}
@@ -345,14 +405,17 @@ class Helper {
 				return (bool) $value;
 
 			default:
-				// Unknown key type, apply basic sanitization
+				// Unknown key type, apply basic sanitization.
 				if ( is_string( $value ) ) {
 					return sanitize_text_field( $value );
-				} elseif ( is_array( $value ) ) {
+				}
+				if ( is_array( $value ) ) {
 					return array_map( 'sanitize_text_field', $value );
-				} elseif ( is_bool( $value ) ) {
+				}
+				if ( is_bool( $value ) ) {
 					return (bool) $value;
-				} elseif ( is_numeric( $value ) ) {
+				}
+				if ( is_numeric( $value ) ) {
 					return is_float( $value ) ? (float) $value : absint( $value );
 				}
 				return false;
@@ -404,14 +467,14 @@ class Helper {
 				return absint( $value );
 
 			case 'postIdeas':
-				// Return string format directly for frontend
+				// Return string format directly for frontend.
 				if ( is_string( $value ) ) {
 					return sanitize_textarea_field( $value );
 				}
 				return '';
 
 			default:
-				// Default sanitization for unknown keys
+				// Default sanitization for unknown keys.
 				if ( is_string( $value ) ) {
 					return sanitize_text_field( $value );
 				}
@@ -427,14 +490,14 @@ class Helper {
 	 * @return array Validated settings array.
 	 */
 	private static function validate_settings_array( array $settings ): array {
-		$validated = [];
-		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
+		$validated              = [];
+		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 
 		foreach ( $settings as $key => $value ) {
-			// Only include allowed keys (compare with sanitized versions)
+			// Only include allowed keys (compare with sanitized versions).
 			if ( in_array( $key, $sanitized_allowed_keys, true ) ) {
-				// Skip re-sanitization - the value should already be sanitized from update_option
-				// Only validate that the key is allowed and the value is not false
+				// Skip re-sanitization - the value should already be sanitized from update_option.
+				// Only validate that the key is allowed and the value is not false.
 				if ( $value !== false ) {
 					$validated[ $key ] = $value;
 				}
@@ -443,55 +506,4 @@ class Helper {
 
 		return $validated;
 	}
-
-	/**
-	 * Bulk update multiple options with validation.
-	 *
-	 * @since 1.0.0
-	 * @param array $options Array of key-value pairs to update.
-	 * @return bool True on success, false on failure.
-	 */
-	public static function bulk_update_options( array $options ): bool {
-		// Capability check
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return false;
-		}
-
-		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
-
-		if ( ! is_array( $settings ) ) {
-			$settings = [];
-		}
-
-		$updated = false;
-
-		$sanitized_allowed_keys = array_map('sanitize_key', self::$allowed_keys);
-
-		foreach ( $options as $key => $value ) {
-			$key = sanitize_key( $key );
-
-			if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
-				continue;
-			}
-
-			// Get original camelCase key for sanitization
-			$original_key_index = array_search($key, $sanitized_allowed_keys);
-			$original_key = self::$allowed_keys[$original_key_index];
-
-			$sanitized_value = self::sanitize_input( $original_key, $value );
-
-			if ( $sanitized_value !== false ) {
-				$settings[ $key ] = $sanitized_value;
-				$updated = true;
-			}
-		}
-
-		if ( $updated ) {
-			$settings = self::validate_settings_array( $settings );
-			return update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
-		}
-
-		return true;
-	}
 }
-

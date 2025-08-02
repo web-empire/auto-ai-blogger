@@ -1,13 +1,48 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Call to function is_wp_error\\(\\) with 0 will always evaluate to false\\.$#"
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^Call to function is_wp_error\\(\\) with bool will always evaluate to false\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
 			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
-			count: 3
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'code' on mixed\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'count' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'data' on mixed\\.$#"
+			count: 2
 			path: admin/ajax.php
 
 		-
 			message: "#^Cannot access offset 'id' on mixed\\.$#"
 			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'images' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'message' on mixed\\.$#"
+			count: 2
 			path: admin/ajax.php
 
 		-
@@ -17,7 +52,7 @@ parameters:
 
 		-
 			message: "#^Cannot access offset 'post_content' on mixed\\.$#"
-			count: 1
+			count: 2
 			path: admin/ajax.php
 
 		-
@@ -27,12 +62,122 @@ parameters:
 
 		-
 			message: "#^Cannot access offset 'status' on mixed\\.$#"
-			count: 1
+			count: 4
 			path: admin/ajax.php
 
 		-
 			message: "#^Cannot access offset 'title' on mixed\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'token_data' on mixed\\.$#"
 			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access property \\$cap on WP_Post_Type\\|null\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Left side of && is always false\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_content_from_title_api\\(\\) has parameter \\$post_data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_content_from_title_api\\(\\) never returns string so it can be removed from the return type\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_content_from_title_api\\(\\) should return string\\|WP_Error but returns array\\<string, mixed\\>\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:process_images_and_replace_placeholders\\(\\) has parameter \\$images with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:process_images_and_replace_placeholders\\(\\) should return string\\|WP_Error but returns string\\|null\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:sanitize_campaign_data\\(\\) has parameter \\$campaign_data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:sanitize_campaign_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:sanitize_meta_input\\(\\) has parameter \\$meta_data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:sanitize_meta_input\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'filename' on array\\{dirname\\?\\: string, basename\\: string, extension\\?\\: string, filename\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'images' does not exist on string\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'images' on string in empty\\(\\) does not exist\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'post_content' does not exist on string\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'remaining' on \\*NEVER\\* in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'token_data' on string on left side of \\?\\? does not exist\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Offset 'total' on \\*NEVER\\* in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$campaign_data of method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:sanitize_campaign_data\\(\\) expects array, mixed given\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$code of class WP_Error constructor expects int\\|string, mixed given\\.$#"
+			count: 2
 			path: admin/ajax.php
 
 		-
@@ -46,7 +191,17 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_status\\: mixed, post_type\\: mixed, meta_input\\: mixed\\} given\\.$#"
+			message: "#^Parameter \\#1 \\$path of function pathinfo expects string, string\\|false\\|null given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$post_title of method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:remove_post_idea_from_db\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: string, post_content\\: string, post_status\\: 'draft'\\|'pending'\\|'private'\\|'publish', post_type\\: string, meta_input\\: mixed\\} given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -56,7 +211,47 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function strlen expects string, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of function esc_url expects string, string\\|false given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{timeout\\: 90, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: non\\-falsy\\-string\\}, body\\: non\\-empty\\-string\\|false\\} given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Parameter \\#2 \\$callback of function add_action expects callable\\(\\)\\: mixed, array\\{\\$this\\(WPAIBlogger\\\\Admin\\\\Ajax\\), mixed\\} given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#2 \\$message of class WP_Error constructor expects string, mixed given\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#2 \\$post_data of method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_content_from_title_api\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#3 \\$subject of function preg_replace expects array\\|string, string\\|null given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -76,14 +271,59 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Variable \\$sub_option_value might not be defined\\.$#"
+			message: "#^Result of && is always false\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 51
+			path: admin/ajax.php
+
+		-
+			message: "#^Variable \\$lock_key might not be defined\\.$#"
 			count: 1
 			path: admin/ajax.php
 
 		-
-			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
-			count: 3
+			message: "#^is_wp_error\\(bool\\) will always evaluate to false\\.$#"
+			count: 2
 			path: admin/ajax.php
+
+		-
+			message: "#^is_wp_error\\(int\\) will always evaluate to false\\.$#"
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^Call to an undefined static method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:update_ai_blogger_settings\\(\\)\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Cannot access offset 'count' on mixed\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:activate_license\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:check_rate_limit\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:deactivate_license\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
 
 		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
@@ -91,22 +331,97 @@ parameters:
 			path: admin/api.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_admin_settings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_allowed_setting_keys\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_license_args\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) should return bool\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
 			count: 1
 			path: admin/api.php
 
 		-
-			message: "#^Parameter \\$request of method WPAIBlogger\\\\Admin\\\\API\\:\\:get_permissions_check\\(\\) has invalid type WPAIBlogger\\\\Admin\\\\WP_REST_Request\\.$#"
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_settings_args\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:get_update_args\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:license_permissions_check\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:perform_security_checks\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:sanitize_settings_data\\(\\) has parameter \\$settings_data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:sanitize_settings_data\\(\\) never returns WP_Error so it can be removed from the return type\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:sanitize_settings_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:sanitize_settings_for_response\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:sanitize_settings_for_response\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:set_security_headers\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:update_admin_settings\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:update_permissions_check\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:validate_request_size\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\API\\:\\:verify_license\\(\\) has parameter \\$request with generic class WP_REST_Request but does not specify its types\\: T$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Parameter \\#1 \\$user_agent of method WPAIBlogger\\\\Admin\\\\API\\:\\:is_suspicious_user_agent\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: admin/api.php
+
+		-
+			message: "#^Parameter \\$result of method WPAIBlogger\\\\Admin\\\\API\\:\\:set_security_headers\\(\\) has invalid type WP_HTTP_Response_Interface\\.$#"
 			count: 1
 			path: admin/api.php
 
@@ -151,9 +466,184 @@ parameters:
 			path: admin/licensing.php
 
 		-
+			message: "#^Cannot access offset 'count' on mixed\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Cannot access offset 'data' on mixed\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Cannot access offset 'success' on mixed\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Expression in empty\\(\\) is not falsy\\.$#"
+			count: 3
+			path: admin/licensing.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Licensing\\:\\:fetch_and_save_token_data\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Licensing\\:\\:mask_license_key\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Parameter \\#1 \\$key of function sanitize_key expects string, mixed given\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Parameter \\#2 \\$args of function wp_remote_get expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{timeout\\: 15, redirection\\: 5, httpversion\\: '1\\.1', user\\-agent\\: non\\-falsy\\-string, headers\\: array\\{Accept\\: 'application/json', Content\\-Type\\: 'application/json'\\}, cookies\\: array\\{\\}, body\\: null, compress\\: false, \\.\\.\\.\\} given\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
+			message: "#^Parameter \\#2 \\$license_key of method WPAIBlogger\\\\Admin\\\\Licensing\\:\\:log_license_activity\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
 			message: "#^Property WPAIBlogger\\\\Admin\\\\Licensing\\:\\:\\$error_messages type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/licensing.php
+
+		-
+			message: "#^Result of \\|\\| is always false\\.$#"
+			count: 2
+			path: admin/licensing.php
+
+		-
+			message: "#^Cannot cast mixed to float\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_categories\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_post_statuses\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_post_types\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_campaigns_data\\(\\) has parameter \\$campaigns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_campaigns_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) has parameter \\$license with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_metadata_defaults\\(\\) has parameter \\$defaults with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_metadata_defaults\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_post_ideas\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_post_ideas\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_posts_data\\(\\) has parameter \\$posts with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_posts_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:validate_security_input\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:validate_security_input\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:validate_security_input\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Parameter \\#1 \\$email of function sanitize_email expects string, mixed given\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Parameter \\#1 \\$key of function sanitize_key expects string, mixed given\\.$#"
+			count: 1
+			path: admin/menu.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 6
+			path: admin/menu.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 4
+			path: admin/menu.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_textarea_field expects string, mixed given\\.$#"
+			count: 2
+			path: admin/menu.php
 
 		-
 			message: "#^Parameter \\#1 \\$value of function strval expects bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
@@ -176,22 +666,12 @@ parameters:
 			path: core/scheduler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) has parameter \\$schedules with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: core/scheduler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: core/scheduler.php
-
-		-
 			message: "#^Property WPAIBlogger\\\\Core\\\\Scheduler\\:\\:\\$schedules type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: core/scheduler.php
 
 		-
-			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			message: "#^Call to function is_wp_error\\(\\) with array will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -211,32 +691,27 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Cannot access offset mixed on mixed\\.$#"
+			message: "#^Function wpaib_get_all_campaigns\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 3
-			path: inc/functions/common.php
-
-		-
-			message: "#^Function wpaib_get_all_campaigns\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_array_depth\\(\\) has parameter \\$array with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_authors\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_categories\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_categories\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_generated_posts\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_generated_posts\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -246,17 +721,7 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_post_creation_api_response\\(\\) never returns WP_Error so it can be removed from the return type\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^Function wpaib_get_post_creation_api_response\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Function wpaib_get_post_creation_api_response\\(\\) should return array\\|WP_Error but empty return statement found\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -266,12 +731,12 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_post_statuses\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_post_statuses\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_post_types\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_post_types\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -281,47 +746,92 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_schedules\\(\\) should return array but returns mixed\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^Function wpaib_get_site_persona_details\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_tags\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_get_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_user_detail\\(\\) has no return type specified\\.$#"
+			message: "#^Function wpaib_sanitize_api_response\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#1 \\$campaign_id of static method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_meta\\(\\) expects int, mixed given\\.$#"
+			message: "#^Function wpaib_sanitize_api_response\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_sanitize_api_response\\(\\) should return array but returns string\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_sanitize_campaign_data\\(\\) has parameter \\$campaign_data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_sanitize_campaign_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_update_schedules\\(\\) has parameter \\$days with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$keywords of function wpaib_get_post_creation_api_response expects string, mixed given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 5
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: mixed, post_status\\: mixed, post_author\\: mixed, post_category\\?\\: array\\{mixed\\}, tags_input\\?\\: array\\{mixed\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_textarea_field expects string, mixed given\\.$#"
 			count: 2
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: string, post_status\\: string, post_author\\: string, post_category\\?\\: array\\{non\\-falsy\\-string\\}, tags_input\\?\\: array\\{non\\-falsy\\-string\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
+			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 30, redirection\\: 5, httpversion\\: '1\\.1', blocking\\: true, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'WP\\-AI\\-Blogger/0\\.0\\.1'\\}, body\\: non\\-empty\\-string\\|false, cookies\\: array\\{\\}, \\.\\.\\.\\} given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 45, redirection\\: 10, httpversion\\: '1\\.1', blocking\\: true, headers\\: array\\{Content\\-Type\\: 'application/json'\\}, body\\: non\\-empty\\-string\\|false, cookies\\: array\\{\\}\\} given\\.$#"
+			message: "#^Parameter \\#2 \\$max_title_words of function wpaib_get_post_creation_api_response expects int, mixed given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#2 \\$max_title_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
+			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, mixed given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, string given\\.$#"
+			message: "#^is_wp_error\\(array\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -751,14 +1261,59 @@ parameters:
 			path: inc/licensing/Updater.php
 
 		-
-			message: "#^Cannot access offset string on mixed\\.$#"
+			message: "#^Cannot cast mixed to float\\.$#"
+			count: 2
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:bulk_update_options\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:validate_settings_array\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:validate_settings_array\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Parameter \\#1 \\$email of function sanitize_email expects string, mixed given\\.$#"
 			count: 3
 			path: inc/utils/helper.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:update_option\\(\\) should return string but returns mixed\\.$#"
+			message: "#^Parameter \\#1 \\$key of function sanitize_key expects string, mixed given\\.$#"
+			count: 3
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 3
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 6
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_textarea_field expects string, mixed given\\.$#"
+			count: 2
+			path: inc/utils/helper.php
+
+		-
+			message: "#^Property WPAIBlogger\\\\Inc\\\\Utils\\\\Helper\\:\\:\\$allowed_keys type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/helper.php
+
+		-
+			message: "#^Cannot cast mixed to float\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
 
 		-
 			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:format_data\\(\\) has parameter \\$postdata with no value type specified in iterable type array\\.$#"
@@ -773,11 +1328,6 @@ parameters:
 		-
 			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_data\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
-			path: inc/utils/metadata.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:get_campaign_meta\\(\\) should return string but returns mixed\\.$#"
-			count: 2
 			path: inc/utils/metadata.php
 
 		-
@@ -796,18 +1346,28 @@ parameters:
 			path: inc/utils/metadata.php
 
 		-
+			message: "#^Parameter \\#1 \\$data of function wp_kses_post expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
+			message: "#^Parameter \\#1 \\$email of function sanitize_email expects string, mixed given\\.$#"
+			count: 1
+			path: inc/utils/metadata.php
+
+		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 2
+			count: 3
 			path: inc/utils/metadata.php
 
 		-
 			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
-			count: 2
+			count: 3
 			path: inc/utils/metadata.php
 
 		-
 			message: "#^Parameter \\#1 \\$url of function esc_url expects string, mixed given\\.$#"
-			count: 1
+			count: 2
 			path: inc/utils/metadata.php
 
 		-
@@ -853,6 +1413,11 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
 			count: 3
+			path: inc/utils/settings.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_textarea_field expects string, mixed given\\.$#"
+			count: 1
 			path: inc/utils/settings.php
 
 		-

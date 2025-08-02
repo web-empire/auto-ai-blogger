@@ -7,11 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // Enhanced progress indicator component
 const ProgressIndicator = memo( ( { currentStep, maxSteps } ) => {
-	const progressPercentage = useMemo( () =>
-		( ( currentStep + 1 ) / maxSteps ) * 100,
-	[ currentStep, maxSteps ]
-	);
-
 	return (
 		<div className="flex items-center gap-3" role="progressbar" aria-valuenow={ currentStep + 1 } aria-valuemin={ 1 } aria-valuemax={ maxSteps }>
 			{ /* Progress dots */ }
@@ -24,14 +19,14 @@ const ProgressIndicator = memo( ( { currentStep, maxSteps } ) => {
 							${ currentStep >= index ? 'bg-indigo-600 scale-110' : 'bg-gray-300' }
 							${ currentStep === index ? 'ring-2 ring-indigo-200 ring-offset-2' : '' }
 						` }
-						aria-label={ __( `Step ${ index + 1 } ${ currentStep >= index ? 'completed' : 'pending' }`, 'wp-ai-blogger' ) }
+						aria-label={ `Step ${ index + 1 } ${ currentStep >= index ? 'completed' : 'pending' }` }
 					/>
 				) ) }
 			</div>
 
 			{ /* Progress text */ }
 			<span className="text-sm text-gray-600 font-medium">
-				{ __( `${ currentStep + 1 } of ${ maxSteps }`, 'wp-ai-blogger' ) }
+				{ `${ currentStep + 1 } of ${ maxSteps }` }
 			</span>
 		</div>
 	);
@@ -48,6 +43,7 @@ const NavigationButton = memo( ( {
 	loading = false,
 	icon: Icon,
 	ariaLabel,
+	iconPlacement = 'left',
 } ) => {
 	const baseClasses = 'relative inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95';
 
@@ -80,12 +76,17 @@ const NavigationButton = memo( ( {
 			aria-label={ ariaLabel }
 			aria-busy={ loading }
 		>
-			{ loading ? (
+			{ loading && iconPlacement === 'left' ? (
 				<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-			) : Icon ? (
+			) : Icon && iconPlacement === 'left' ? (
 				<Icon className="w-4 h-4" aria-hidden="true" />
 			) : null }
 			<span>{ children }</span>
+			{ loading && iconPlacement === 'right' ? (
+				<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+			) : Icon && iconPlacement === 'right' ? (
+				<Icon className="w-4 h-4" aria-hidden="true" />
+			) : null }
 		</button>
 	);
 } );
@@ -216,7 +217,7 @@ const FooterNavigationBar = memo( ( props ) => {
 					{ /* Mobile progress text */ }
 					<div className="md:hidden">
 						<span className="text-sm text-gray-600 font-medium">
-							{ __( `Step ${ currentStep + 1 } of ${ maxSteps }`, 'wp-ai-blogger' ) }
+							{ __( 'Step', 'wp-ai-blogger' ) + ` ${ currentStep + 1 } ` + __( 'of', 'wp-ai-blogger' ) + ` ${ maxSteps }` }
 						</span>
 					</div>
 				</div>
@@ -228,6 +229,7 @@ const FooterNavigationBar = memo( ( props ) => {
 						variant={ nextButtonVariant }
 						loading={ isNavigating || isCompleting }
 						icon={ ! nextStep && currentActiveStep === 'ready' ? Check : ChevronRight }
+						iconPlacement="right"
 						ariaLabel={ __( 'Continue to next step', 'wp-ai-blogger' ) }
 					>
 						{ isCompleting ? __( 'Completing…', 'wp-ai-blogger' ) : getNextButtonText() }

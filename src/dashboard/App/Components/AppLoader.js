@@ -3,11 +3,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Enhanced App Loader component with better accessibility and animation
  *
- * @param  root0
- * @param  root0.size
- * @param  root0.message
- * @param  root0.fullScreen
- * @param  root0.className
+ * @param {Object}      props                   Component properties
+ * @param {string}      [props.size='default']  Size of the loader: 'small', 'default', or 'large'
+ * @param {string|null} [props.message=null]    Custom loading message
+ * @param {boolean}     [props.fullScreen=true] Whether to display the loader in full screen
+ * @param {string}      [props.className='']    Additional CSS classes
  */
 const AppLoader = ( {
 	size = 'default',

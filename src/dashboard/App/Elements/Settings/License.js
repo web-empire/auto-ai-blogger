@@ -3,11 +3,9 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingsContainer from '@Components/SettingsContainer';
-import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import DynamicCard from '@Components/DynamicCard';
-import { Key, Shield, Zap, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { Tooltip } from '@wordpress/components';
+import { Key, Shield, CheckCircle2, Loader2 } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
 
 // Enhanced license activation form
@@ -122,21 +120,23 @@ const LicenseForm = memo( ( {
 				) }
 			</div>
 
-			{ ! activated && <DynamicCard
-				heading={ __( 'No License Key?', 'wp-ai-blogger' ) }
-				subHeading={ __( 'Get started with free credits today', 'wp-ai-blogger' ) }
-				linkText={ __( 'Get Free Credits', 'wp-ai-blogger' ) }
-				linkUrl={ upgradeLink }
-				colorScheme="blue"
-				size="small"
-				ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
-			/> }
+			{ ! activated &&
+				<DynamicCard
+					heading={ __( 'No License Key?', 'wp-ai-blogger' ) }
+					subHeading={ __( 'Get started with free credits today', 'wp-ai-blogger' ) }
+					linkText={ __( 'Get Free Credits', 'wp-ai-blogger' ) }
+					linkUrl={ upgradeLink }
+					colorScheme="blue"
+					size="medium"
+					ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
+				/>
+			}
 
 			{ /* Token loading indicator */ }
 			{ tokenLoading && (
 				<div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
 					<Loader2 className="w-5 h-5 animate-spin text-green-600" />
-					<div>
+					<div className="flex flex-col gap-1">
 						<p className="text-sm font-medium text-green-800">
 							{ __( 'Fetching your token data…', 'wp-ai-blogger' ) }
 						</p>
@@ -152,14 +152,13 @@ const LicenseForm = memo( ( {
 
 LicenseForm.displayName = 'LicenseForm';
 
-// Main License component
+// Main License component.
 const License = memo( () => {
 	const dispatch = useDispatch();
 	const abortControllerRef = useRef( {} );
 
-	// Redux selectors with fallbacks
+	// Redux selectors with fallbacks.
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
-	const license = useSelector( ( state ) => state.license ) || '';
 	const upgradeLink = useSelector( ( state ) => state.upgradeLink ) || '#';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce ) || '';
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
@@ -392,19 +391,8 @@ const License = memo( () => {
 
 	return (
 		<div className="space-y-6 min-h-full">
-			{ /* Enhanced header using DynamicCard */ }
-			<DynamicCard
-				icon={ Zap }
-				heading={ __( 'License Management', 'wp-ai-blogger' ) }
-				colorScheme="indigo"
-				size="large"
-				className="border-b border-gray-200 pb-4"
-			/>
-
 			{ /* Settings container */ }
 			<SettingsContainer
-				title={ __( 'License Configuration', 'wp-ai-blogger' ) }
-				description={ __( 'Activate your license to unlock premium AI features and token access.', 'wp-ai-blogger' ) }
 				element={
 					<LicenseForm
 						licenseKey={ licenseKey }
@@ -419,7 +407,7 @@ const License = memo( () => {
 						upgradeLink={ upgradeLink }
 					/>
 				}
-				className="bg-white shadow-sm rounded-lg border border-gray-200 p-6"
+				className="bg-white shadow-sm rounded-lg border border-gray-200"
 			/>
 
 			{ /* Screen reader status */ }

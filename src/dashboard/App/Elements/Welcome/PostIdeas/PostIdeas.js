@@ -430,10 +430,10 @@ export default function PostIdeas() {
 					payload: __( 'Post created successfully! Click "Open Post" to edit it.', 'wp-ai-blogger' ),
 				} );
 			} )
-			.catch( ( error ) => {
+			.catch( ( newError ) => {
 				// Handle network errors or other exceptions
-				const errorMessage = error?.message || __( 'Network error occurred while creating post.', 'wp-ai-blogger' );
-				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), error );
+				const errorMessage = newError?.message || __( 'Network error occurred while creating post.', 'wp-ai-blogger' );
+				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), newError );
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: {
@@ -463,8 +463,14 @@ export default function PostIdeas() {
 					<h1 className="text-base font-semibold text-gray-900"> { __( 'Blog Post Suggestions', 'wp-ai-blogger' ) } </h1>
 					<p className="mt-2 text-sm text-gray-700">
 						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
+						{ ! proAvailable && (
+							<span className="block mt-1 text-amber-600 font-medium">
+								{ __( '⚡ Free users are limited to 5 post suggestions. Upgrade for unlimited ideas!', 'wp-ai-blogger' ) }
+							</span>
+						) }
 					</p>
 				</div>
+
 				<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-2">
 					<ProButton
 						variant="primary"
@@ -481,7 +487,7 @@ export default function PostIdeas() {
 								? __( 'Refresh (0/5)', 'wp-ai-blogger' )
 								: ( ! postIdeasFromRedux || postIdeasFromRedux.trim() === ''
 									? __( 'Refresh', 'wp-ai-blogger' )
-									: __( `Refresh (${ Math.min( postIdeasArr.length, 5 ) }/5)`, 'wp-ai-blogger' )
+									: `${ __( 'Refresh', 'wp-ai-blogger' ) } (${ Math.min( postIdeasArr.length, 5 ) }/5)`
 								)
 							)
 						}
@@ -557,7 +563,7 @@ export default function PostIdeas() {
 													<td colSpan="2" className="px-6 py-6 text-center">
 														<div className="flex flex-col items-center space-y-3">
 															<div className="text-amber-700 font-semibold text-sm">
-																🔒 { __( `${ postIdeasArr.length - 5 } more post ideas available with Pro!`, 'wp-ai-blogger' ) }
+																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }` }
 															</div>
 															<ProButton
 																variant="primary"

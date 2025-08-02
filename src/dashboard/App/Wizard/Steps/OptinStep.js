@@ -27,11 +27,11 @@ const FormField = memo( ( {
 		<div className="space-y-2">
 			<label
 				htmlFor={ id }
-				className="flex items-center gap-2 text-sm font-semibold text-gray-900"
+				className="flex items-center text-sm font-semibold text-gray-900 relative"
 			>
-				{ Icon && <Icon className="w-4 h-4 text-gray-600" aria-hidden="true" /> }
+				{ Icon && <Icon className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" /> }
 				{ label }
-				{ required && <span className="text-red-500" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
+				{ required && <span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
 			</label>
 
 			<div className="relative">
@@ -83,8 +83,7 @@ FormField.displayName = 'OptinFormField';
 
 // Enhanced benefit card component
 const BenefitCard = memo( ( { icon: Icon, title, description, highlight = false } ) => (
-	<div className={ `
-		p-4 rounded-xl border transition-all duration-200 hover:shadow-md
+	<div className={ `p-4 rounded-xl border transition-all duration-200 hover:shadow-md
 		${ highlight
 		? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200'
 		: 'bg-gray-50 border-gray-200'
@@ -92,13 +91,13 @@ const BenefitCard = memo( ( { icon: Icon, title, description, highlight = false 
 	` }>
 		<div className="flex items-start gap-3">
 			<div className={ `
-				p-2 rounded-lg shrink-0
+				p-2 rounded-lg shrink-0 flex
 				${ highlight ? 'bg-indigo-100' : 'bg-gray-100' }
 			` }>
 				<Icon className={ `w-5 h-5 ${ highlight ? 'text-indigo-600' : 'text-gray-600' }` } aria-hidden="true" />
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-900 mb-1">
+				<h3 className="text-sm font-semibold text-gray-900 mb-1 mt-0">
 					{ title }
 				</h3>
 				<p className="text-xs text-gray-600 leading-relaxed">
@@ -361,11 +360,11 @@ const OptinStep = memo( () => {
 
 									{ /* Trust indicator */ }
 									<div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-										<div className="flex items-center gap-2 mb-2">
+										<div className="flex items-start gap-2">
 											<CheckCircle2 className="w-5 h-5 text-green-600" aria-hidden="true" />
-											<span className="text-sm font-semibold text-green-800">
+											<h3 className="text-sm font-semibold text-green-800 mb-1 mt-0">
 												{ __( 'Privacy Guaranteed', 'wp-ai-blogger' ) }
-											</span>
+											</h3>
 										</div>
 										<p className="text-xs text-green-700">
 											{ __( 'We respect your privacy. No spam, unsubscribe anytime. Your data is secure and never shared.', 'wp-ai-blogger' ) }
@@ -400,7 +399,7 @@ const OptinStep = memo( () => {
 			{ /* Screen reader announcements */ }
 			<div className="sr-only" aria-live="polite" aria-atomic="true">
 				{ savingOptin && __( 'Saving your information…', 'wp-ai-blogger' ) }
-				{ errors.general && __( `Error: ${ errors.general }`, 'wp-ai-blogger' ) }
+				{ errors.general && `Error: ${ errors.general }` }
 			</div>
 		</main>
 	);

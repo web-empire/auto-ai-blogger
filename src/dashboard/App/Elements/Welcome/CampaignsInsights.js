@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MoveRight, Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, AlertTriangle } from 'lucide-react';
+import { MoveRight, Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -97,7 +97,7 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 					onClick={ () => onViewDetails( campaign ) }
 					onKeyDown={ handleKeyDown }
 					className="w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-2 hover:bg-indigo-50 transition-all duration-200"
-					aria-label={ __( `View details for ${ campaign.name }`, 'wp-ai-blogger' ) }
+					aria-label={ __( 'View details for campaign', 'wp-ai-blogger' ) }
 				>
 					<span>{ __( 'View Campaign Details', 'wp-ai-blogger' ) }</span>
 					<MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
@@ -243,7 +243,7 @@ function CampaignsInsights( { onError } ) {
 							{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
 						</h2>
 						<p className="text-gray-600 mt-1">
-							{ __( `Overview of your ${ campaignsData.totalCampaigns } campaigns`, 'wp-ai-blogger' ) }
+							{ __( 'Overview of your', 'wp-ai-blogger' ) + ` ${ campaignsData.totalCampaigns } ` + __( 'campaigns', 'wp-ai-blogger' ) }
 						</p>
 					</div>
 					{ campaignsData.activeCampaigns > 0 && (
@@ -305,11 +305,6 @@ function CampaignsInsights( { onError } ) {
 						</p>
 					</div>
 				) }
-			</div>
-
-			{ /* Screen reader summary */ }
-			<div className="sr-only" aria-live="polite" aria-atomic="true">
-				{ __( `Showing ${ campaignsData.campaigns.length } campaigns with ${ campaignsData.totalPosts } total posts and ${ campaignsData.totalVisits } total visits`, 'wp-ai-blogger' ) }
 			</div>
 		</section>
 	);

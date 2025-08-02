@@ -6,9 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Error component for invalid routes or access denied
  *
- * @param  root0
- * @param  root0.type
- * @param  root0.message
+ * @param {Object} props                    Component properties
+ * @param {string} [props.type='not-found'] Type of error to display
+ * @param {string} [props.message]          Custom error message
+ * @return {JSX.Element} Rendered error message
  */
 const RouteError = ( { type = 'not-found', message } ) => {
 	const errorMessages = {
@@ -62,12 +63,7 @@ const RouteError = ( { type = 'not-found', message } ) => {
 				</p>
 				<button
 					onClick={ () => {
-						try {
-							window.location.href = `?page=${ homeSlug }`;
-						} catch ( error ) {
-							console.warn( 'Error navigating to home page:', error );
-							window.location.href = '?page=wp-ai-blogger';
-						}
+						window.location.href = '?page=wp-ai-blogger';
 					} }
 					className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
 					type="button"
@@ -117,24 +113,6 @@ const ROUTE_MAP = {
 };
 
 /**
- * Loading component for Suspense fallback
- */
-const PageLoader = () => (
-	<div
-		className="flex items-center justify-center min-h-[400px] p-6"
-		aria-live="polite"
-		aria-label={ __( 'Loading page content', 'wp-ai-blogger' ) }
-	>
-		<div className="flex items-center space-x-3 text-slate-600">
-			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-			<span className="text-lg font-medium">
-				{ __( 'Loading…', 'wp-ai-blogger' ) }
-			</span>
-		</div>
-	</div>
-);
-
-/**
  * Enhanced PagesRoute component with better error handling and performance
  */
 const PagesRoute = () => {
@@ -144,8 +122,8 @@ const PagesRoute = () => {
 	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
 
-	// Memoize URL parsing with safe data access
-	const { page, path, isValidPage } = useMemo( () => {
+	// Memoize URL parsing with safe data access.
+	const { path, isValidPage } = useMemo( () => {
 		try {
 			const query = new URLSearchParams( search );
 			const currentPage = query.get( 'page' ) || '';
@@ -182,20 +160,10 @@ const PagesRoute = () => {
 	// Get route configuration safely
 	const routeConfig = ROUTE_MAP[ path ] || ROUTE_MAP[ '' ];
 
-	// Handle route not found
-	if ( ! routeConfig ) {
-		return <RouteError type="not-found" />;
-	}
-
-	// Handle license requirement
-	if ( routeConfig.requiresLicense && ! isLicensed ) {
-		return <RouteError type="access-denied" />;
-	}
-
 	const { component: Component, title } = routeConfig;
 
-	// Set document title for better UX and SEO
-	React.useEffect( () => {
+	// Set document title for better UX and SEO.
+	React.useEffect( () => { // eslint-disable-line
 		try {
 			if ( title ) {
 				const originalTitle = document.title;
@@ -210,6 +178,16 @@ const PagesRoute = () => {
 			console.warn( 'Error setting document title:', error );
 		}
 	}, [ title ] );
+
+	// Handle route not found
+	if ( ! routeConfig ) {
+		return <RouteError type="not-found" />;
+	}
+
+	// Handle license requirement
+	if ( routeConfig.requiresLicense && ! isLicensed ) {
+		return <RouteError type="access-denied" />;
+	}
 
 	// Render with error handling
 	try {

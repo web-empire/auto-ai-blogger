@@ -29,4 +29,3 @@ class Editor {
 	public function __construct() {
 	}
 }
-

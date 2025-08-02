@@ -14,22 +14,22 @@ class ErrorBoundary extends React.Component {
 		};
 	}
 
-	static getDerivedStateFromError( error ) {
-		// Update state so the next render will show the fallback UI
+	static getDerivedStateFromError() {
+		// Update state so the next render will show the fallback UI.
 		return { hasError: true };
 	}
 
 	componentDidCatch( error, errorInfo ) {
-		// Log the error for debugging
+		// Log the error for debugging.
 		console.error( 'React Error Boundary caught an error:', error, errorInfo );
 
-		// Store error details in state for display
+		// Store error details in state for display.
 		this.setState( {
 			error,
 			errorInfo,
 		} );
 
-		// Log to WordPress if available
+		// Log to WordPress if available.
 		if ( window.console && window.console.error ) {
 			console.error( 'WP AI Blogger React Error:', {
 				error: error.toString(),

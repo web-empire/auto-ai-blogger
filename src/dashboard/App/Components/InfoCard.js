@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Reusable InfoCard component for displaying informational content with optional lists
@@ -90,7 +89,7 @@ const InfoCard = memo( ( {
 					) }
 
 					{ items.length > 0 && (
-						<ul className={ `text-sm ${ colors.textColor } space-y-1 list-disc list-inside` }>
+						<ul className={ `text-sm ${ colors.textColor } space-y-1 list-disc list-inside mt-2` }>
 							{ items.map( ( item, index ) => (
 								<li key={ index }>{ item }</li>
 							) ) }

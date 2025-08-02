@@ -10,13 +10,13 @@ const StatusIcon = memo( ( { value, label } ) => {
 		switch ( value ) {
 			case 'yes':
 				return {
-					icon: <Check className="w-5 h-5 text-green-600" aria-hidden="true" />,
+					icon: <Check className="w-6 h-6 p-1 text-green-600" aria-hidden="true" />,
 					className: 'text-green-600 bg-green-50 border-green-200',
 					label: __( 'Available', 'wp-ai-blogger' ),
 				};
 			case 'no':
 				return {
-					icon: <X className="w-5 h-5 text-red-500" aria-hidden="true" />,
+					icon: <X className="w-6 h-6 p-1 text-red-500" aria-hidden="true" />,
 					className: 'text-red-500 bg-red-50 border-red-200',
 					label: __( 'Not available', 'wp-ai-blogger' ),
 				};
@@ -31,7 +31,7 @@ const StatusIcon = memo( ( { value, label } ) => {
 
 	return (
 		<div
-			className={ `inline-flex items-center justify-center w-8 h-8 rounded-full border-2 ${ iconConfig.className }` }
+			className={ `inline-flex items-center justify-center rounded-full border-2 ${ iconConfig.className }` }
 			aria-label={ `${ label }: ${ iconConfig.label }` }
 			title={ iconConfig.label }
 		>
@@ -74,10 +74,10 @@ const FeatureRow = memo( ( { feature, index } ) => {
 
 FeatureRow.displayName = 'FeatureRow';
 
-// Enhanced CTA section component
+// Enhanced CTA section component.
 const CallToActionSection = memo( () => {
-	const handleUpgradeClick = useCallback( ( e ) => {
-		// Add analytics tracking if needed
+	const handleUpgradeClick = useCallback( () => {
+		// Add analytics tracking if needed.
 		console.log( 'Pro upgrade button clicked' );
 	}, [] );
 
@@ -88,10 +88,10 @@ const CallToActionSection = memo( () => {
 		>
 			<div className="flex flex-col items-center text-center">
 				{ /* Enhanced icon with animation */ }
-				<div className="relative mb-6">
+				<div className="relative">
 					<div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
 					<div className="relative bg-green-500 p-4 rounded-full">
-						<Sprout className="w-8 h-8 text-white" aria-hidden="true" />
+						<Sprout className="w-8 h-8 text-white flex" aria-hidden="true" />
 					</div>
 				</div>
 
@@ -116,7 +116,7 @@ const CallToActionSection = memo( () => {
 						</span>
 						<span className="flex items-center gap-1">
 							<Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
-							{ __( 'Premium Templates', 'wp-ai-blogger' ) }
+							{ __( 'AI Driven Analytics', 'wp-ai-blogger' ) }
 						</span>
 					</div>
 				</div>
@@ -127,8 +127,8 @@ const CallToActionSection = memo( () => {
 				</div>
 
 				{ /* Additional trust signals */ }
-				<p className="mt-4 text-xs text-gray-500">
-					{ __( '30-day money-back guarantee • Cancel anytime • Instant activation', 'wp-ai-blogger' ) }
+				<p className="force-mt-4 text-xs text-gray-500">
+					{ __( '14-day money-back guarantee • Cancel anytime • Instant activation', 'wp-ai-blogger' ) }
 				</p>
 			</div>
 		</section>
@@ -138,17 +138,8 @@ const CallToActionSection = memo( () => {
 CallToActionSection.displayName = 'CallToActionSection';
 
 const FreeVsPro = () => {
-	// Memoize features to prevent unnecessary re-renders
+	// Memoize features to prevent unnecessary re-renders.
 	const memoizedFeatures = useMemo( () => Features || [], [] );
-
-	// Calculate feature statistics
-	const featureStats = useMemo( () => {
-		const totalFeatures = memoizedFeatures.length;
-		const freeFeatures = memoizedFeatures.filter( ( f ) => f.free === 'yes' ).length;
-		const proFeatures = memoizedFeatures.filter( ( f ) => f.pro === 'yes' ).length;
-
-		return { totalFeatures, freeFeatures, proFeatures };
-	}, [ memoizedFeatures ] );
 
 	return (
 		<div className="px-4 sm:px-6 lg:px-8 py-8">
@@ -158,13 +149,6 @@ const FreeVsPro = () => {
 					<h1 className="text-2xl font-bold text-gray-900 mb-2">
 						{ __( 'Free vs Pro', 'wp-ai-blogger' ) }
 					</h1>
-					<p className="text-gray-600">
-						{ __( `Compare ${ featureStats.totalFeatures } features across our plans`, 'wp-ai-blogger' ) }
-					</p>
-					<div className="flex gap-4 mt-2 text-sm text-gray-500">
-						<span>{ __( `Free: ${ featureStats.freeFeatures } features`, 'wp-ai-blogger' ) }</span>
-						<span>{ __( `Pro: ${ featureStats.proFeatures } features`, 'wp-ai-blogger' ) }</span>
-					</div>
 				</div>
 				<div className="flex-shrink-0">
 					<ProButton />
@@ -175,7 +159,7 @@ const FreeVsPro = () => {
 			<div className="mt-6 flex flex-col">
 				<div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
 					<div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-						<div className="overflow-hidden shadow-lg ring-1 ring-black/5 sm:rounded-xl">
+						<div className="overflow-hidden ring-1 ring-black/5 sm:rounded-xl">
 							<table
 								className="w-full divide-y divide-gray-300"
 								role="table"
@@ -186,7 +170,7 @@ const FreeVsPro = () => {
 									{ __( 'Detailed comparison of features available in Free and Pro versions of AI Blogger', 'wp-ai-blogger' ) }
 								</caption>
 
-								<thead className="bg-gradient-to-r from-gray-50 to-gray-100" role="rowgroup">
+								<thead className="bg-gradient-to-r from-gray-50 to-gray-100">
 									<tr role="row">
 										<th
 											scope="col"
@@ -225,7 +209,7 @@ const FreeVsPro = () => {
 									</tr>
 								</thead>
 
-								<tbody className="divide-y divide-gray-200 bg-white" role="rowgroup">
+								<tbody className="divide-y divide-gray-200 bg-white">
 									{ memoizedFeatures.map( ( feature, index ) => (
 										<FeatureRow key={ `feature-${ index }` } feature={ feature } index={ index } />
 									) ) }
