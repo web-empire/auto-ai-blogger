@@ -2,7 +2,7 @@ import React, { memo, useMemo, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Features } from '../Elements/FreeVsPro/Features';
 import ProButton from '@Components/ProButton';
-import { Sprout, Check, X, Star, Zap } from 'lucide-react';
+import { Sprout, Check, X, Star, Zap, LifeBuoy } from 'lucide-react';
 
 // Enhanced status icon component with better accessibility
 const StatusIcon = memo( ( { value, label } ) => {
@@ -111,7 +111,7 @@ const CallToActionSection = memo( () => {
 							{ __( 'Advanced AI Features', 'wp-ai-blogger' ) }
 						</span>
 						<span className="flex items-center gap-1">
-							<Check className="w-4 h-4 text-green-500" aria-hidden="true" />
+							<LifeBuoy className="w-4 h-4 text-green-500" aria-hidden="true" />
 							{ __( 'Priority Support', 'wp-ai-blogger' ) }
 						</span>
 						<span className="flex items-center gap-1">
@@ -144,11 +144,11 @@ const FreeVsPro = () => {
 	return (
 		<div className="px-4 sm:px-6 lg:px-8 py-8">
 			{ /* Enhanced header with statistics */ }
-			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 				<div className="flex-1">
-					<h1 className="text-2xl font-bold text-gray-900 mb-2">
+					<h2 id="free-vs-pro-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
 						{ __( 'Free vs Pro', 'wp-ai-blogger' ) }
-					</h1>
+					</h2>
 				</div>
 				<div className="flex-shrink-0">
 					<ProButton />

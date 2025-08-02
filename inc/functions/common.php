@@ -146,8 +146,8 @@ function wpaib_get_all_campaigns() {
 				$campaign_data = Metadata::get_campaign_data( $campaign->ID );
 
 				// Sanitize campaign data.
-				if ( is_array( $campaign_data ) ) {
-					$campaigns_data[ absint( $campaign->ID ) ] = wpaib_sanitize_campaign_data( $campaign_data );
+				if ( is_array( $campaign_data ) && ! empty( $campaign_data ) ) {
+					$campaigns_data[ absint( $campaign->ID ) ] = $campaign_data;
 				}
 			}
 		}
@@ -249,58 +249,6 @@ function wpaib_get_array_depth( array $array ): int {
 }
 
 /**
- * Sanitizes campaign data for output.
- *
- * @since x.x.x
- * @param array $campaign_data Raw campaign data.
- * @return array Sanitized campaign data.
- */
-function wpaib_sanitize_campaign_data( array $campaign_data ): array {
-	$sanitized    = [];
-	$allowed_keys = [ 'id', 'title', 'description', 'status', 'created_at', 'updated_at', 'post_count', 'keywords', 'settings' ];
-
-	foreach ( $allowed_keys as $key ) {
-		if ( ! isset( $campaign_data[ $key ] ) ) {
-			continue;
-		}
-
-		switch ( $key ) {
-			case 'id':
-			case 'post_count':
-				$sanitized[ $key ] = absint( $campaign_data[ $key ] );
-				break;
-			case 'title':
-				$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
-				break;
-			case 'description':
-				$sanitized[ $key ] = sanitize_textarea_field( $campaign_data[ $key ] );
-				break;
-			case 'status':
-				$sanitized[ $key ] = sanitize_key( $campaign_data[ $key ] );
-				break;
-			case 'created_at':
-			case 'updated_at':
-				$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
-				break;
-			case 'keywords':
-				if ( is_array( $campaign_data[ $key ] ) ) {
-					$sanitized[ $key ] = array_map( 'sanitize_text_field', $campaign_data[ $key ] );
-				} else {
-					$sanitized[ $key ] = sanitize_text_field( $campaign_data[ $key ] );
-				}
-				break;
-			case 'settings':
-				if ( is_array( $campaign_data[ $key ] ) ) {
-					$sanitized[ $key ] = wpaib_clean_data( $campaign_data[ $key ] );
-				}
-				break;
-		}
-	}
-
-	return $sanitized;
-}
-
-/**
  * Get all post statuses with security.
  *
  * @since 1.0.0
@@ -362,33 +310,27 @@ function wpaib_get_post_types() {
 				'wp_block',
 				'user_request',
 				'oembed_cache',
+				'sfwd-assignment',
+				'astra_adv_header',
+				'elementor_library',
+				'brizy_template',
+				'sc_collection',
+				'course',
+				'lesson',
+				'llms_membership',
+				'tutor_quiz',
+				'tutor_assignments',
+				'testimonial',
+				'frm_display',
+				'mec_esb',
+				'mec-events',
 			]
 		);
 
-		$queried_post_types = array_diff( $queried_post_types, $excluded_post_types );
+		$queried_post_types[] = 'post';
+		$queried_post_types[] = 'page';
 
-		// Add built-in post types with security check.
-		$builtin_post_types = [ 'post', 'page' ];
-
-		foreach ( $builtin_post_types as $post_type ) {
-			$post_type_obj = get_post_type_object( $post_type );
-			if ( $post_type_obj && current_user_can( $post_type_obj->cap->edit_posts ) ) {
-				$queried_post_types[] = $post_type;
-			}
-		}
-
-		// Sanitize post type names and get labels.
-		$sanitized_post_types = [];
-		foreach ( $queried_post_types as $post_type ) {
-			$post_type     = sanitize_key( $post_type );
-			$post_type_obj = get_post_type_object( $post_type );
-
-			if ( $post_type_obj && ! empty( $post_type_obj->labels->name ) ) {
-				$sanitized_post_types[ $post_type ] = sanitize_text_field( $post_type_obj->labels->name );
-			}
-		}
-
-		return $sanitized_post_types;
+		return array_diff( $queried_post_types, $excluded_post_types );
 
 	} catch ( \Exception $e ) {
 		return [ 'post' => 'Posts' ]; // Safe fallback.
@@ -521,11 +463,7 @@ function wpaib_get_authors() {
 				continue;
 			}
 
-			$authors[] = [
-				'id'    => absint( $user->ID ),
-				'name'  => sanitize_text_field( $user->display_name ),
-				'login' => sanitize_user( $user->user_login ),
-			];
+			$authors[ $user->ID ] = $user->display_name;
 		}
 
 		return $authors;
@@ -555,84 +493,31 @@ function wpaib_get_schedules() {
 			return [];
 		}
 
-		$validated_schedules = [];
-		foreach ( $schedules as $campaign_id => $days ) {
-			// Validate campaign ID.
-			$campaign_id = absint( $campaign_id );
-			if ( $campaign_id <= 0 ) {
+		foreach ( $schedules as $campaign_id => $schedule_data ) {
+			$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
+			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+
+			if ( $posts_target <= $posts_created ) {
+				unset( $schedules[ $campaign_id ] );
 				continue;
 			}
-
-			// Validate days.
-			if ( ! is_array( $days ) ) {
-				continue;
+			if ( is_array( $schedule_data ) ) {
+				// Ensure new format has all required fields.
+				$schedules[ $campaign_id ] = wp_parse_args(
+					$schedule_data,
+					[
+						'interval' => 1,
+						'unit'     => 'day',
+						'days'     => 1,
+					]
+				);
 			}
-
-			$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
-			$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
-
-			// Skip completed campaigns.
-			if ( $posts_target > 0 && $posts_target <= $posts_created ) {
-				continue;
-			}
-
-			$validated_schedules[ $campaign_id ] = array_map( 'sanitize_text_field', $days );
 		}
 
-		return $validated_schedules;
+		return $schedules;
 
 	} catch ( \Exception $e ) {
 		return [];
-	}
-}
-
-/**
- * Update custom schedules with security validation.
- *
- * @param int   $campaign_id Campaign ID.
- * @param array $days       Schedule days.
- * @return bool Success status.
- * @since 1.0.0
- */
-function wpaib_update_schedules( $campaign_id, $days ) {
-	// Check user capabilities.
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return false;
-	}
-
-	try {
-		// Validate campaign ID.
-		$campaign_id = absint( $campaign_id );
-		if ( $campaign_id <= 0 ) {
-			return false;
-		}
-
-		// Validate days array.
-		if ( ! is_array( $days ) ) {
-			return false;
-		}
-
-		// Sanitize days array.
-		$sanitized_days = array_map( 'sanitize_text_field', $days );
-		$sanitized_days = array_filter( $sanitized_days ); // Remove empty values.
-
-		if ( empty( $sanitized_days ) ) {
-			return false;
-		}
-
-		$schedules                 = wpaib_get_schedules();
-		$schedules[ $campaign_id ] = $sanitized_days;
-
-		$result = update_option( 'wpaib_auto_blogging_schedules', $schedules );
-
-		if ( $result ) {
-			do_action( 'wpaib_schedule_updated', $campaign_id, $sanitized_days );
-		}
-
-		return $result;
-
-	} catch ( \Exception $e ) {
-		return false;
 	}
 }
 
@@ -947,7 +832,11 @@ function wpaib_create_blog_post( $campaign_id ) {
 		return new \WP_Error( 'post_creation_failed', __( 'Failed to create the post.', 'wp-ai-blogger' ) );
 	}
 
-	// Update the campaign meta..
+	// Add campaign metadata to the created post.
+	add_post_meta( $post_id, 'wp_aib_reference', 1 );
+	add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
+
+	// Update the campaign meta.
 	$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
 	$posts_created = $posts_created ? $posts_created + 1 : 1;
 	Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $posts_created );
@@ -956,4 +845,132 @@ function wpaib_create_blog_post( $campaign_id ) {
 	Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
 
 	return $post_id;
+}
+
+/**
+ * Track post views for analytics.
+ *
+ * @param int $post_id Post ID.
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_track_post_view( $post_id ): void {
+	// Only track for campaign posts.
+	$is_campaign_post = get_post_meta( $post_id, 'wp_aib_campaign_id', true );
+	if ( ! $is_campaign_post ) {
+		return;
+	}
+
+	// Avoid counting views from admin, logged-in users, or bots.
+	if ( is_admin() || current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+
+	// Get current view count.
+	$current_views = absint( get_post_meta( $post_id, 'post_views_count', true ) ?? 0 );
+
+	// Increment view count.
+	$new_views = $current_views + 1;
+
+	// Update post meta.
+	update_post_meta( $post_id, 'post_views_count', $new_views );
+}
+
+/**
+ * Clear campaign schedule from WP Cron.
+ *
+ * @param int $campaign_id Campaign ID.
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_clear_campaign_schedule( $campaign_id ): void {
+	$campaign_id = absint( $campaign_id );
+	if ( ! $campaign_id ) {
+		return;
+	}
+
+	$hook_name = 'wp_ai_blogger_create_blog_post';
+	$args      = [ $campaign_id ];
+
+	// Get next scheduled time.
+	$timestamp = wp_next_scheduled( $hook_name, $args );
+
+	if ( $timestamp ) {
+		wp_unschedule_event( $timestamp, $hook_name, $args );
+	}
+
+	// Remove from schedules option.
+	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
+	if ( isset( $schedules[ $campaign_id ] ) ) {
+		unset( $schedules[ $campaign_id ] );
+		update_option( 'wpaib_auto_blogging_schedules', $schedules );
+	}
+}
+
+/**
+ * Update campaign schedules with interval and unit.
+ *
+ * @param int    $campaign_id Campaign ID.
+ * @param int    $interval    Repeat interval (number).
+ * @param string $unit        Repeat unit (day, week, month, year).
+ * @return void
+ * @since x.x.x
+ */
+function wpaib_update_schedules( $campaign_id, $interval, $unit = 'day' ): void {
+	// Validate inputs.
+	$campaign_id = absint( $campaign_id );
+	$interval    = absint( $interval );
+	$unit        = sanitize_text_field( $unit );
+
+	if ( ! $campaign_id || ! $interval ) {
+		return;
+	}
+
+	// Validate unit.
+	$allowed_units = [ 'day', 'week', 'month', 'year' ];
+	if ( ! in_array( $unit, $allowed_units, true ) ) {
+		$unit = 'day';
+	}
+
+	// Validate interval limits based on unit.
+	$max_intervals = [
+		'day'   => 365, // Max 1 year in days.
+		'week'  => 52,  // Max 1 year in weeks.
+		'month' => 24,  // Max 2 years in months.
+		'year'  => 5,   // Max 5 years.
+	];
+
+	if ( $interval > $max_intervals[ $unit ] ) {
+		$interval = $max_intervals[ $unit ];
+	}
+
+	$schedules = wpaib_get_schedules();
+
+	// Store both interval and unit for new system.
+	$schedules[ $campaign_id ] = [
+		'interval' => $interval,
+		'unit'     => $unit,
+		'days'     => wpaib_convert_to_days( $interval, $unit ), // For backward compatibility.
+	];
+
+	update_option( 'wpaib_auto_blogging_schedules', $schedules );
+}
+
+/**
+ * Convert interval and unit to days for scheduler compatibility.
+ *
+ * @param int    $interval Repeat interval.
+ * @param string $unit     Repeat unit.
+ * @return int Days equivalent.
+ * @since x.x.x
+ */
+function wpaib_convert_to_days( $interval, $unit ): int {
+	$multipliers = [
+		'day'   => 1,
+		'week'  => 7,
+		'month' => 30, // Approximate.
+		'year'  => 365, // Approximate.
+	];
+
+	return absint( $interval * ( $multipliers[ $unit ] ?? 1 ) );
 }

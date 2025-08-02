@@ -18,6 +18,7 @@ const ProButton = forwardRef( ( {
 	children = __( 'Upgrade to Pro', 'wp-ai-blogger' ),
 	onClick,
 	'aria-label': ariaLabel,
+	iconPosition = 'right',
 	...props
 }, ref ) => {
 	// Get pro purchase URL from Redux store
@@ -80,8 +81,8 @@ const ProButton = forwardRef( ( {
 		xl: 'px-6 py-4 text-lg',
 	};
 
-	// Base classes
-	const baseClasses = 'inline-flex items-center justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none';
+	// Base classes.
+	const baseClasses = 'flex items-center gap-2 justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none';
 
 	// Disabled classes
 	const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
@@ -135,12 +136,17 @@ const ProButton = forwardRef( ( {
 
 		return (
 			<>
-				{ icon && (
-					<span className="mr-2" aria-hidden="true">
+				{ ( icon && 'left' === iconPosition ) && (
+					<span className="flex" aria-hidden="true">
 						{ icon }
 					</span>
 				) }
 				{ children }
+				{ ( icon && 'right' === iconPosition ) && (
+					<span className="flex" aria-hidden="true">
+						{ icon }
+					</span>
+				) }
 			</>
 		);
 	}, [ loading, icon, children ] );

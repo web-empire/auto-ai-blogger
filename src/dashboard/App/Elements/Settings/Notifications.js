@@ -61,9 +61,9 @@ const NotificationCard = memo( ( {
 	}, [ onInputChange, validateInput ] );
 
 	return (
-		<div className={ `border rounded-lg transition-all duration-200 ${ enabled ? 'p-4 border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }` }>
+		<div className={ `border rounded-lg transition-all duration-200 p-4 ${ enabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-gray-50' }` }>
 			{ /* Header */ }
-			<div className="flex items-center justify-between mb-4">
+			<div className="flex items-center justify-between">
 				<div className="flex items-start gap-3">
 					<div className={ `flex p-2 rounded-lg ${ enabled ? 'bg-indigo-100' : 'bg-gray-100' }` }>
 						{ React.cloneElement( icon, {
@@ -91,7 +91,7 @@ const NotificationCard = memo( ( {
 
 			{ /* Input field */ }
 			{ enabled && (
-				<div className="space-y-3">
+				<div className="space-y-3 mt-4">
 					<div className="relative">
 						<input
 							type={ inputType }

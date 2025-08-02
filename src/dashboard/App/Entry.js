@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 
-// Lazy load components for better performance
+// Lazy load components for better performance.
 import AppLoader from '@Components/AppLoader';
 const Wizard = React.lazy( () => import( './Wizard' ) );
 const Dashboard = React.lazy( () => import( './Dashboard' ) );
@@ -44,13 +44,8 @@ const RouteLoader = () => (
 				</h3>
 				<div className="flex items-center justify-center space-x-1">
 					<span className="text-slate-600 font-medium">
-						{ __( 'Initializing AI engine', 'wp-ai-blogger' ) }
+						{ __( 'Initializing AI Engine', 'wp-ai-blogger' ) }
 					</span>
-					<div className="flex space-x-1">
-						<div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" style={ { animationDelay: '0s' } }></div>
-						<div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" style={ { animationDelay: '0.2s' } }></div>
-						<div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" style={ { animationDelay: '0.4s' } }></div>
-					</div>
 				</div>
 			</div>
 

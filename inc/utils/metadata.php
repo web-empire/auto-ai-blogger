@@ -55,10 +55,6 @@ class Metadata {
 					'default' => '',
 					'type'    => 'number',
 				],
-				'frequency'               => [
-					'default' => '',
-					'type'    => 'number',
-				],
 				'repeatInterval'          => [
 					'default' => 1,
 					'type'    => 'number',
@@ -92,7 +88,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'lastRun'                 => [
-					'default' => __( 'Never', 'wp-ai-blogger' ),
+					'default' => '',
 					'type'    => 'string',
 				],
 				'lastPostID'              => [
@@ -309,7 +305,7 @@ class Metadata {
 				return sanitize_email( $value );
 
 			case 'array':
-				return is_array( $value ) ? array_map( 'sanitize_text_field', $value ) : [];
+				return is_array( $value ) ? wpaib_clean_data( $value ) : [];
 
 			case 'html':
 				return wp_kses_post( $value );
@@ -406,9 +402,11 @@ class Metadata {
 		$metadata         = [];
 
 		foreach ( $settings_dataset as $key => $value ) {
-			$meta_value = get_post_meta( $post_id, $key, true );
+			$meta_value      = get_post_meta( $post_id, $key, true );
+			$sanitized_value = self::sanitize_output( $meta_value, $value['type'] ?? 'string' );
+
 			if ( ! empty( $meta_value ) ) {
-				$metadata[ $key ] = $meta_value;
+				$metadata[ $key ] = $sanitized_value;
 			} else {
 				$metadata[ $key ] = $value['default'];
 			}
@@ -439,14 +437,21 @@ class Metadata {
 
 		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
 		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
+		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
 
 		if ( ! $plain_metadata ) {
 			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
 			$metadata['postsTarget'] = $meta_posts_target;
 
-			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
+			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
+		}
+
+		if ( ! empty( $metadata['lastRun'] ) ) {
+			$metadata['lastRun'] = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $metadata['lastRun'] ) );
+		} else {
+			$metadata['lastRun'] = __( 'Never', 'wp-ai-blogger' );
 		}
 
 		return array_merge(
