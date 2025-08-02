@@ -532,13 +532,13 @@ export default function PostIdeas() {
 															/>
 														</div>
 													</td>
-													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6">
+													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm text-right sm:pr-6">
 														{ createdPosts.has( postTitle ) ? (
 															// Show "Open Post" for created posts
 															<a
 																target="_blank"
 																href={ createdPosts.get( postTitle ) }
-																className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold"
+																className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold justify-end"
 																onClick={ ( e ) => {
 																	// Let the default link behavior handle opening the post
 																	e.stopPropagation();
@@ -553,7 +553,7 @@ export default function PostIdeas() {
 																target="_blank"
 																href="#"
 																onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-																className={ `flex items-center gap-x-1 cursor-pointer ${
+																className={ `flex items-center gap-x-1 cursor-pointer justify-end ${
 																	creatingPosts.size > 0
 																		? ( creatingPosts.has( postTitle )
 																			? 'text-green-600 hover:text-green-900'
