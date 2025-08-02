@@ -52,6 +52,10 @@ class Helper {
 		'enableLogging',
 		'blogName',
 		'adminEmail',
+		'emailNotificationEnabled',
+		'emailNotificationValue',
+		'whatsappNotificationEnabled',
+		'whatsappNotificationValue',
 	];
 
 	/**
@@ -398,6 +402,34 @@ class Helper {
 
 			case 'enableLogging':
 				return (bool) $value;
+
+			case 'emailNotificationEnabled':
+			case 'whatsappNotificationEnabled':
+				return (bool) $value;
+
+			case 'emailNotificationValue':
+				// Support multiple email addresses separated by commas
+				if ( empty( $value ) ) {
+					return '';
+				}
+				$emails = array_map( 'trim', explode( ',', $value ) );
+				$valid_emails = [];
+				foreach ( $emails as $email ) {
+					$sanitized_email = sanitize_email( $email );
+					if ( is_email( $sanitized_email ) ) {
+						$valid_emails[] = $sanitized_email;
+					}
+				}
+				return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
+
+			case 'whatsappNotificationValue':
+				// Basic phone number validation (international format)
+				$phone = sanitize_text_field( $value );
+				// Allow international format: +[country code][number]
+				if ( ! empty( $phone ) && ! preg_match( '/^\+?[1-9]\d{1,14}$/', $phone ) ) {
+					return false;
+				}
+				return $phone;
 
 			default:
 				// Unknown key type, apply basic sanitization.

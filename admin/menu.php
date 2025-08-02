@@ -178,6 +178,12 @@ class Menu {
 		$token_remaining   = absint( Helper::get_option( 'tokenRemaining', 0 ) );
 		$license_status    = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
+		// Notification settings - default to disabled
+		$email_notification_enabled    = (bool) Helper::get_option( 'emailNotificationEnabled', false );
+		$email_notification_value      = sanitize_text_field( Helper::get_option( 'emailNotificationValue', $admin_site_email_address ) );
+		$whatsapp_notification_enabled = (bool) Helper::get_option( 'whatsappNotificationEnabled', false );
+		$whatsapp_notification_value   = sanitize_text_field( Helper::get_option( 'whatsappNotificationValue', '' ) );
+
 		// Get data with proper error handling in the methods themselves.
 		$post_statuses     = $this->get_sanitized_post_statuses();
 		$categories        = $this->get_sanitized_categories();
@@ -237,6 +243,12 @@ class Menu {
 				'hate'               => $hate,
 				'sexually_explicit'  => $sexually_explicit,
 				'dangerous_content'  => $dangerous_content,
+
+				// Notification settings.
+				'email_notification_enabled'    => $email_notification_enabled,
+				'email_notification_value'      => $email_notification_value,
+				'whatsapp_notification_enabled' => $whatsapp_notification_enabled,
+				'whatsapp_notification_value'   => $whatsapp_notification_value,
 
 				// Token and licensing information.
 				'token_total'        => $token_total,

@@ -103,6 +103,23 @@ class Settings {
 					'default' => '',
 					'type'    => 'string',
 				],
+				// Notification settings.
+				'emailNotificationEnabled'    => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'emailNotificationValue'      => [
+					'default' => wpaib_get_user_detail( 'email' ),
+					'type'    => 'email',
+				],
+				'whatsappNotificationEnabled' => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'whatsappNotificationValue'   => [
+					'default' => '',
+					'type'    => 'string',
+				],
 			]
 		);
 	}

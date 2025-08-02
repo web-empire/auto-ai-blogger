@@ -1,5 +1,6 @@
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
+import { useSelector, useDispatch } from 'react-redux';
 import { Mail, MessageCircle, Bell, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
 import SwitchControl from '@Components/SwitchControl';
 import SettingsContainer from '@Components/SettingsContainer';
@@ -147,17 +148,40 @@ NotificationCard.displayName = 'NotificationCard';
 
 // Enhanced notifications settings component
 const Notifications = memo( () => {
-	// Local state for notifications
+	const dispatch = useDispatch();
+
+	// Get notification settings from Redux store or set defaults
+	const emailNotificationEnabled = useSelector( ( state ) => state.emailNotificationEnabled ) ?? false;
+	const emailNotificationValue = useSelector( ( state ) => state.emailNotificationValue ) ??
+		( ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email ) || '' );
+	const whatsappNotificationEnabled = useSelector( ( state ) => state.whatsappNotificationEnabled ) ?? false;
+	const whatsappNotificationValue = useSelector( ( state ) => state.whatsappNotificationValue ) ?? '';
+
+	// Local state for notifications - initialized from Redux
 	const [ notifications, setNotifications ] = useState( {
 		email: {
-			enabled: false,
-			value: ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email ) || '',
+			enabled: emailNotificationEnabled,
+			value: emailNotificationValue,
 		},
 		whatsapp: {
-			enabled: false,
-			value: '',
+			enabled: whatsappNotificationEnabled,
+			value: whatsappNotificationValue,
 		},
 	} );
+
+	// Sync local state with Redux when Redux state changes
+	useEffect( () => {
+		setNotifications( {
+			email: {
+				enabled: emailNotificationEnabled,
+				value: emailNotificationValue,
+			},
+			whatsapp: {
+				enabled: whatsappNotificationEnabled,
+				value: whatsappNotificationValue,
+			},
+		} );
+	}, [ emailNotificationEnabled, emailNotificationValue, whatsappNotificationEnabled, whatsappNotificationValue ] );
 
 	// Email validation pattern (supports multiple emails)
 	const emailPattern = useMemo( () =>
@@ -171,35 +195,45 @@ const Notifications = memo( () => {
 	[]
 	);
 
-	// Toggle handlers
+	// Toggle handlers - update both local state and Redux
 	const toggleEmail = useCallback( () => {
+		const newEnabled = ! notifications.email.enabled;
 		setNotifications( ( prev ) => ( {
 			...prev,
-			email: { ...prev.email, enabled: ! prev.email.enabled },
+			email: { ...prev.email, enabled: newEnabled },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_ENABLED', payload: newEnabled } );
+	}, [ dispatch, notifications.email.enabled ] );
 
 	const toggleWhatsApp = useCallback( () => {
+		const newEnabled = ! notifications.whatsapp.enabled;
 		setNotifications( ( prev ) => ( {
 			...prev,
-			whatsapp: { ...prev.whatsapp, enabled: ! prev.whatsapp.enabled },
+			whatsapp: { ...prev.whatsapp, enabled: newEnabled },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_ENABLED', payload: newEnabled } );
+	}, [ dispatch, notifications.whatsapp.enabled ] );
 
-	// Input change handlers
+	// Input change handlers - update both local state and Redux
 	const updateEmail = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
 			...prev,
 			email: { ...prev.email, value },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_VALUE', payload: value } );
+	}, [ dispatch ] );
 
 	const updateWhatsApp = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
 			...prev,
 			whatsapp: { ...prev.whatsapp, value },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_VALUE', payload: value } );
+	}, [ dispatch ] );
 
 	return (
 		<div className="space-y-6">
