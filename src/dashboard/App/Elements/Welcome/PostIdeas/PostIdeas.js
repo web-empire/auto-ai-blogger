@@ -30,6 +30,7 @@ export default function PostIdeas() {
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
 	const proAvailable = useSelector( ( state ) => state.proAvailable );
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
@@ -190,8 +191,8 @@ export default function PostIdeas() {
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
-	const handleRefresh = ( e ) => {
-		// If pro is not available, don't handle the refresh - let ProButton handle the URL opening
+	const handleRefresh = useCallback( ( e ) => {
+		// This function should only be called when pro is available
 		if ( ! proAvailable ) {
 			return;
 		}
@@ -209,7 +210,7 @@ export default function PostIdeas() {
 		setIsApiError( false );
 		hasFetchedRef.current = false; // Reset the fetch flag to allow refetch
 		fetchPostIdeas();
-	};
+	}, [ proAvailable, dispatch, fetchPostIdeas ] );
 
 	if ( ! licenseEnabled ) {
 		return ( '' );
@@ -469,7 +470,8 @@ export default function PostIdeas() {
 						size="default"
 						icon={ <Crown className="w-4 h-4" /> }
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
-						onClick={ handleRefresh }
+						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
+						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
@@ -599,6 +601,7 @@ export default function PostIdeas() {
 																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }` }
 															</div>
 															<ProButton
+																url={ proPurchaseUrl }
 																variant="primary"
 																size="small"
 																icon={ <MoveRight className="w-4 h-4" /> }
@@ -626,6 +629,7 @@ export default function PostIdeas() {
 											<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
 												<div className="flex flex-col items-center space-y-2">
 													<ProButton
+														url={ proPurchaseUrl }
 														variant="primary"
 														size="default"
 														icon={ <MoveRight className="w-5 h-5" /> }

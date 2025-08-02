@@ -46,27 +46,30 @@ const ProButton = forwardRef( ( {
 			}
 		}
 
-		// For links, let the browser handle the navigation
-		if ( isLink ) {
-			return; // Let the default link behavior handle this
-		}
+		// Only open URL if it's provided and not empty
+		if ( proUrl && proUrl.trim() !== '' ) {
+			// For links, let the browser handle the navigation
+			if ( isLink ) {
+				return; // Let the default link behavior handle this
+			}
 
-		// For buttons, prevent default and handle navigation via JavaScript
-		event.preventDefault();
-		event.stopPropagation();
+			// For buttons, prevent default and handle navigation via JavaScript
+			event.preventDefault();
+			event.stopPropagation();
 
-		try {
-			// Open in new tab with security attributes
-			const newWindow = window.open( proUrl, '_blank', 'noopener,noreferrer' );
+			try {
+				// Open in new tab with security attributes
+				const newWindow = window.open( proUrl, '_blank', 'noopener,noreferrer' );
 
-			// Fallback if popup blocked
-			if ( ! newWindow ) {
+				// Fallback if popup blocked
+				if ( ! newWindow ) {
+					window.location.href = proUrl;
+				}
+			} catch ( error ) {
+				console.error( 'Failed to open upgrade URL:', error );
+				// Fallback to direct navigation
 				window.location.href = proUrl;
 			}
-		} catch ( error ) {
-			console.error( 'Failed to open upgrade URL:', error );
-			// Fallback to direct navigation
-			window.location.href = proUrl;
 		}
 	}, [ disabled, loading, onClick, proUrl, isLink ] );
 
@@ -98,6 +101,9 @@ const ProButton = forwardRef( ( {
 
 	// Determine element tag
 	const Tag = isLink ? 'a' : 'button';
+
+	// Filter out link-specific props when rendering as button
+	const { href, target, rel, ...buttonSafeProps } = props;
 
 	// Props for link or button
 	const elementProps = isLink ? {
@@ -172,7 +178,7 @@ const ProButton = forwardRef( ( {
 			aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
 			aria-disabled={ disabled || loading }
 			{ ...elementProps }
-			{ ...props }
+			{ ...( isLink ? props : buttonSafeProps ) }
 		>
 			{ buttonContent }
 		</Tag>
