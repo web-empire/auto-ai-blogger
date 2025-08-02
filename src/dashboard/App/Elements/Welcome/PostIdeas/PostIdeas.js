@@ -194,9 +194,9 @@ export default function PostIdeas() {
 		e.preventDefault();
 		e.stopPropagation();
 
-		// If pro is not available, return false to let ProButton handle the URL opening
+		// If pro is not available, don't handle the refresh - let ProButton handle the URL opening
 		if ( ! proAvailable ) {
-			return false;
+			return;
 		}
 
 		dispatch( {
