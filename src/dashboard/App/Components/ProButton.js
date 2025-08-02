@@ -92,7 +92,10 @@ const ProButton = forwardRef( ( {
 	};
 
 	// Base classes.
-	const baseClasses = 'flex items-center gap-2 justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none';
+	const baseClasses = 'flex items-center gap-2 justify-center rounded-md font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 border-none cursor-pointer transition-all duration-200 select-none no-underline';
+
+	// Link-specific style overrides to prevent default link styling
+	const linkStyleOverrides = shouldRenderAsLink ? 'text-current hover:text-current visited:text-current focus:text-current active:text-current decoration-none hover:no-underline' : '';
 
 	// Disabled classes
 	const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
@@ -168,6 +171,7 @@ const ProButton = forwardRef( ( {
 			ref={ ref }
 			className={ aiClassNames(
 				baseClasses,
+				linkStyleOverrides,
 				variants[ variant ] || variants.primary,
 				sizes[ size ] || sizes.default,
 				disabledClasses,
