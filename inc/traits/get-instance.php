@@ -3,7 +3,7 @@
  * Trait.
  *
  * @package AutoBlog_AI
- * @since x.x.x
+ * @since 1.0.0
  */
 
 namespace WPAIBlogger\Inc\Traits;
@@ -11,7 +11,7 @@ namespace WPAIBlogger\Inc\Traits;
 /**
  * Trait Get_Instance.
  *
- * @since x.x.x
+ * @since 1.0.0
  */
 trait Get_Instance {
 	/**
@@ -24,7 +24,7 @@ trait Get_Instance {
 	/**
 	 * Initiator
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return object initialized object of class.
 	 */
 	public static function get_instance() {

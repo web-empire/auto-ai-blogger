@@ -3,7 +3,7 @@
  * Metadata.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 1.0.0
  */
 
 namespace WPAIBlogger\Inc\Utils;
@@ -19,7 +19,7 @@ class Metadata {
 	/**
 	 * Cache the DB options
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @access public
 	 * @var array
 	 */
@@ -29,7 +29,7 @@ class Metadata {
 	 * Returns all default post settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function get_settings_dataset() {
 		return apply_filters(
@@ -55,9 +55,13 @@ class Metadata {
 					'default' => '',
 					'type'    => 'number',
 				],
-				'frequency'               => [
-					'default' => '',
+				'repeatInterval'          => [
+					'default' => 1,
 					'type'    => 'number',
+				],
+				'repeatUnit'              => [
+					'default' => 'day',
+					'type'    => 'string',
 				],
 				'postType'                => [
 					'default' => 'post',
@@ -84,7 +88,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'lastRun'                 => [
-					'default' => __( 'Never', 'wp-ai-blogger' ),
+					'default' => '',
 					'type'    => 'string',
 				],
 				'lastPostID'              => [
@@ -96,11 +100,11 @@ class Metadata {
 					'type'    => 'number',
 				],
 				'maxWords'                => [
-					'default' => 400,
+					'default' => 1000,
 					'type'    => 'number',
 				],
 				'maxTitleWords'           => [
-					'default' => 8,
+					'default' => 10,
 					'type'    => 'number',
 				],
 				'postsVisit'              => [
@@ -128,43 +132,111 @@ class Metadata {
 	}
 
 	/**
-	 * Returns the campaign meta value.
+	 * Returns the campaign meta value with security validation.
 	 *
 	 * @param int    $campaign_id The campaign ID.
 	 * @param string $key         The meta key.
-	 * @return string
+	 * @return mixed
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function get_campaign_meta( $campaign_id, $key ) {
+		// Validate campaign ID.
+		$campaign_id = absint( $campaign_id );
+		if ( $campaign_id <= 0 ) {
+			return self::get_default_option( $key );
+		}
+
+		// Validate key.
+		if ( ! is_string( $key ) || empty( $key ) ) {
+			return self::get_default_option( $key );
+		}
+
+		// Sanitize key.
+		$key = sanitize_key( $key );
+		if ( empty( $key ) ) {
+			return self::get_default_option( $key );
+		}
+
+		// Check if key exists in allowed settings.
+		$settings_dataset = self::get_settings_dataset();
+		if ( ! array_key_exists( $key, $settings_dataset ) ) {
+			return self::get_default_option( $key );
+		}
+
+		// Verify post exists and is a campaign.
+		$post = get_post( $campaign_id );
+		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			return self::get_default_option( $key );
+		}
+
+		// Check user permissions.
+		if ( ! current_user_can( 'read_post', $campaign_id ) ) {
+			return self::get_default_option( $key );
+		}
+
 		$meta_value = get_post_meta( $campaign_id, $key, true );
 
 		if ( ! empty( $meta_value ) ) {
-			return $meta_value;
+			// Sanitize output based on data type.
+			$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
+			return self::sanitize_output( $meta_value, $data_type );
 		}
 
 		return self::get_default_option( $key );
 	}
 
 	/**
-	 * Update the campaign meta value.
+	 * Update the campaign meta value with security validation.
 	 *
 	 * @param int    $campaign_id The campaign ID.
 	 * @param string $key         The meta key.
 	 * @param mixed  $value       The meta value.
 	 * @return bool
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function update_campaign_meta( $campaign_id, $key, $value ) {
-		$settings_dataset = self::get_settings_dataset();
+		// Validate campaign ID.
+		$campaign_id = absint( $campaign_id );
+		if ( $campaign_id <= 0 ) {
+			return false;
+		}
 
+		// Validate key.
+		if ( ! is_string( $key ) || empty( $key ) ) {
+			return false;
+		}
+
+		// Sanitize key.
+		$key = sanitize_key( $key );
+		if ( empty( $key ) ) {
+			return false;
+		}
+
+		// Check if key exists in allowed settings.
+		$settings_dataset = self::get_settings_dataset();
 		if ( ! array_key_exists( $key, $settings_dataset ) ) {
+			return false;
+		}
+
+		// Verify post exists and is a campaign.
+		$post = get_post( $campaign_id );
+		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			return false;
+		}
+
+		// Check user permissions.
+		if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
 			return false;
 		}
 
 		$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
 		$value     = self::sanitize_data( $value, $data_type );
+
+		if ( $value === false ) {
+			return false;
+		}
 
 		return update_post_meta( $campaign_id, $key, $value );
 	}
@@ -176,7 +248,7 @@ class Metadata {
 	 * @param  mixed  $default Option default value if option is not available.
 	 * @return mixed   Returns the option value
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function get_default_option( $key, $default = false ) {
 		$default_settings = self::get_default_settings();
@@ -192,7 +264,7 @@ class Metadata {
 	 * As per the settings dataset, return the default settings.
 	 *
 	 * @return array
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function get_default_settings() {
 		$settings_dataset = self::get_settings_dataset();
@@ -207,9 +279,49 @@ class Metadata {
 	}
 
 	/**
+	 * Sanitize output values based on data type.
+	 *
+	 * @since 1.0.0
+	 * @param mixed  $value     The value to sanitize.
+	 * @param string $data_type The data type for sanitization.
+	 * @return mixed Sanitized value.
+	 */
+	public static function sanitize_output( $value, $data_type = 'string' ) {
+		switch ( $data_type ) {
+			case 'bool':
+				return (bool) $value;
+
+			case 'int':
+			case 'number':
+				return absint( $value );
+
+			case 'float':
+				return (float) $value;
+
+			case 'url':
+				return esc_url( $value );
+
+			case 'email':
+				return sanitize_email( $value );
+
+			case 'array':
+				return is_array( $value ) ? wpaib_clean_data( $value ) : [];
+
+			case 'html':
+				return wp_kses_post( $value );
+
+			case 'text':
+			case 'string':
+			case 'default':
+			default:
+				return sanitize_text_field( $value );
+		}
+	}
+
+	/**
 	 * Data cleaner
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @access public
 	 *
 	 * @param mixed  $value     data from AJAX.
@@ -255,14 +367,14 @@ class Metadata {
 	 * Format post metadata in a way that it can be saved in the database via wp_insert_post.
 	 *
 	 * @param array $postdata The metadata to format.
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return array The formatted metadata.
 	 */
 	public static function format_data( $postdata ) {
 		$defaults = self::get_default_settings();
 
 		$meta_data      = [];
-		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ]; // These keys are not metadata.
+		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ]; // These keys are not metadata..
 		foreach ( $postdata as $key => $value ) {
 			if ( in_array( $key, $skippable_keys, true ) ) {
 				continue;
@@ -283,16 +395,18 @@ class Metadata {
 	 *
 	 * @param int $post_id The post ID.
 	 * @return array<mixed> The metadata.
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public static function get_metadata( $post_id ) {
 		$settings_dataset = self::get_settings_dataset();
 		$metadata         = [];
 
 		foreach ( $settings_dataset as $key => $value ) {
-			$meta_value = get_post_meta( $post_id, $key, true );
+			$meta_value      = get_post_meta( $post_id, $key, true );
+			$sanitized_value = self::sanitize_output( $meta_value, $value['type'] ?? 'string' );
+
 			if ( ! empty( $meta_value ) ) {
-				$metadata[ $key ] = $meta_value;
+				$metadata[ $key ] = $sanitized_value;
 			} else {
 				$metadata[ $key ] = $value['default'];
 			}
@@ -323,14 +437,21 @@ class Metadata {
 
 		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
 		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['frequency'] ?? 0 );
+		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
 
 		if ( ! $plain_metadata ) {
 			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
 			$metadata['postsTarget'] = $meta_posts_target;
 
-			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . _n( 'Day', 'Days', $meta_frequency, 'wp-ai-blogger' );
+			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
+		}
+
+		if ( ! empty( $metadata['lastRun'] ) ) {
+			$metadata['lastRun'] = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $metadata['lastRun'] ) );
+		} else {
+			$metadata['lastRun'] = __( 'Never', 'wp-ai-blogger' );
 		}
 
 		return array_merge(

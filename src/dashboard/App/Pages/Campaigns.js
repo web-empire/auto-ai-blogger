@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RefreshCw, Settings, Trash2, Info, FolderPlus, RotateCw } from 'lucide-react';
+import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
+import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
+import CampaignDeleteModal from '@Components/CampaignDeleteModal';
 import apiFetch from '@wordpress/api-fetch';
-import { useDispatch } from 'react-redux';
 
 export default function Campaigns() {
-	const dispatch = useDispatch();
 	const campaigns = wpaib_localized_data.all_campaigns;
 	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
+	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
+	const [ deleteModal, setDeleteModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -31,7 +33,7 @@ export default function Campaigns() {
 		} )
 			.then( ( data ) => {
 				if ( data.success ) {
-					return data.data;
+					return data.data.data;
 				}
 			} )
 			.catch( ( error ) => {
@@ -69,32 +71,59 @@ export default function Campaigns() {
 		setOpeningConfigureDrawer( false );
 	};
 
-	const runCampaign = ( e, campaignId ) => {
+	const openCampaignAnalytics = ( e, campaignId ) => {
 		e.preventDefault();
-		const formData = new window.FormData();
 
-		formData.append( 'action', 'wpaib_run_campaign' );
-		formData.append( 'security', wpaib_localized_data.admin_nonce );
-		formData.append( 'campaign_id', campaignId );
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
 
-		apiFetch( {
-			url: wpaib_localized_data.ajax_url,
-			method: 'POST',
-			body: formData,
-		} )
-			.then( ( data ) => {
-				if ( data.success ) {
-					// Campaign run successfully
-				}
+		// Open analytics modal
+		setAnalyticsModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
 
-				dispatch( {
-					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: data?.data?.message || __( 'Campaign run successfully.', 'wp-ai-blogger' ),
-				} );
-			} )
-			.catch( ( error ) => {
-				console.error( error );
-			} );
+	const viewCampaignPosts = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data to determine the post type
+		const campaignData = campaigns[ campaignId ];
+		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found
+
+		// Redirect to All Posts page with campaign filter
+		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		let filterUrl;
+
+		// For 'post' type, we don't need to specify post_type parameter
+		if ( postType === 'post' ) {
+			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+		} else {
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+		}
+
+		window.open( filterUrl, '_blank' );
+	};
+
+	const openDeleteModal = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
+
+		// Open delete modal
+		setDeleteModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
+
+	const handleCampaignDeleted = () => {
+		// Refresh the page or update the campaigns list
+		// For now, we'll refresh the page to update the campaigns list
+		window.location.reload();
 	};
 
 	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
@@ -126,6 +155,20 @@ export default function Campaigns() {
 					setOpenDrawer={ setOpenDrawer }
 					configureData={ configureData }
 				/>
+
+				<CampaignAnalyticsModal
+					isOpen={ analyticsModal.isOpen }
+					onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+					campaignId={ analyticsModal.campaignId }
+					campaignData={ analyticsModal.campaignData }
+				/>
+
+				<CampaignDeleteModal
+					isOpen={ deleteModal.isOpen }
+					onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+					campaignId={ deleteModal.campaignId }
+					onDeleted={ handleCampaignDeleted }
+				/>
 			</>
 		);
 	}
@@ -135,11 +178,11 @@ export default function Campaigns() {
 			<div className="sm:px-6 lg:px-8 py-8 px-4">
 				<div className="sm:flex sm:items-center">
 					<div className="sm:flex-auto">
-						<h1 className="text-base font-semibold text-gray-900">{ __( 'Campaigns', 'wp-ai-blogger' ) }</h1>
-						<p className="mt-2 text-sm text-gray-700">
-							{ __( 'Create and manage your blog campaigns.', 'wp-ai-blogger' ) }
-						</p>
+						<h2 id="free-vs-pro-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
+							{ __( 'Manage Campaigns', 'wp-ai-blogger' ) }
+						</h2>
 					</div>
+
 					<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
 						<button
 							type="button"
@@ -209,7 +252,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<span> { TrimWordsContent( campaign.last_post_title ) } </span>
+																	<TrimWordsContent content={ campaign.last_post_title } count={ 5 } />
 																</Tooltip>
 															) : (
 																<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>
@@ -230,6 +273,17 @@ export default function Campaigns() {
 																</Tooltip>
 															</a>
 
+															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																viewCampaignPosts( e, campaign.id );
+															} }>
+																<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																>
+																	<List className="w-4 h-4" />
+																</Tooltip>
+															</a>
+
 															<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
 																<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 																	delay={ 100 }
@@ -246,17 +300,19 @@ export default function Campaigns() {
 															</a>
 
 															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																runCampaign( e, campaign.id );
+																openCampaignAnalytics( e, campaign.id );
 															} }>
-																<Tooltip text={ __( 'Run now', 'wp-ai-blogger' ) }
+																<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<RefreshCw className="w-4 h-4" />
+																	<ChartNoAxesColumn className="w-4 h-4" />
 																</Tooltip>
 															</a>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900">
+															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																openDeleteModal( e, campaign.id );
+															} }>
 																<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
@@ -281,6 +337,20 @@ export default function Campaigns() {
 				openDrawer={ openDrawer }
 				setOpenDrawer={ setOpenDrawer }
 				configureData={ configureData }
+			/>
+
+			<CampaignAnalyticsModal
+				isOpen={ analyticsModal.isOpen }
+				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ analyticsModal.campaignId }
+				campaignData={ analyticsModal.campaignData }
+			/>
+
+			<CampaignDeleteModal
+				isOpen={ deleteModal.isOpen }
+				onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ deleteModal.campaignId }
+				onDeleted={ handleCampaignDeleted }
 			/>
 		</>
 	);

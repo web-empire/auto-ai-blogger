@@ -3,17 +3,19 @@
  * Loader.
  *
  * @package WPAIBlogger
- * @since x.x.x
+ * @since 1.0.0
  */
 
 namespace WPAIBlogger;
 
 use WPAIBlogger\Admin\Ajax;
 use WPAIBlogger\Admin\API;
+use WPAIBlogger\Admin\Filters;
 use WPAIBlogger\Admin\Licensing;
 use WPAIBlogger\Admin\Menu;
 use WPAIBlogger\Core\CPT;
 use WPAIBlogger\Core\Editor;
+use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Core\Scheduler;
 
@@ -22,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin_Loader
  *
- * @since x.x.x
+ * @since 1.0.0
  */
 class Loader {
 	/**
@@ -30,14 +32,14 @@ class Loader {
 	 *
 	 * @access private
 	 * @var object Class Instance.
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	private static $instance;
 
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function __construct() {
 		spl_autoload_register( [ $this, 'autoload' ] );
@@ -57,7 +59,7 @@ class Loader {
 	/**
 	 * Enqueue required setup after plugins loaded.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function setup(): void {
@@ -81,11 +83,17 @@ class Loader {
 			/* Ajax init */
 			Ajax::get_instance();
 
+			/* Filters init */
+			Filters::get_instance();
+
 			/* Licensing */
 			Licensing::get_instance();
 
 			/* Admin Menu init */
 			Menu::get_instance();
+		} else {
+			// Load Frontend Support.
+			Frontend::get_instance();
 		}
 	}
 
@@ -109,7 +117,7 @@ class Loader {
 	/**
 	 * Initiator
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 * @return object initialized object of class.
 	 */
 	public static function get_instance() {
@@ -153,7 +161,7 @@ class Loader {
 	/**
 	 * Plugin Activation actions.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function activation_actions(): void {
 	}
@@ -161,7 +169,7 @@ class Loader {
 	/**
 	 * Plugin Deactivation actions.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.0
 	 */
 	public function deactivation_actions(): void {
 	}

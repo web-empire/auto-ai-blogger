@@ -1,21 +1,126 @@
-import React, { useRef } from 'react';
+import React, { useRef, useCallback, useMemo, memo } from 'react';
 import { __ } from '@wordpress/i18n';
-import BrandIcon from '@AppImages/crown.svg';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, Settings, User, CreditCard, Mail, CheckCircle2 } from 'lucide-react';
+import BrandIcon from '@AppImages/crown.svg';
 import { updateApiData } from '@Utils/ApiData';
 import { useDispatch } from 'react-redux';
 
-const NavigationBar = () => {
+// Enhanced step indicator component
+const StepIndicator = memo( ( { menu, isActive, isCompleted, onClick } ) => {
+	const getStepIcon = ( stepId ) => {
+		const iconMap = {
+			welcome: Settings,
+			'persona-form': User,
+			license: CreditCard,
+			optin: Mail,
+			ready: CheckCircle2,
+		};
+		return iconMap[ stepId ] || Settings;
+	};
+
+	const Icon = getStepIcon( menu.id );
+
+	const handleClick = useCallback( ( e ) => {
+		e.preventDefault();
+		onClick( menu.id );
+	}, [ onClick, menu.id ] );
+
+	const handleKeyDown = useCallback( ( e ) => {
+		if ( e.key === 'Enter' || e.key === ' ' ) {
+			e.preventDefault();
+			handleClick( e );
+		}
+	}, [ handleClick ] );
+
+	return (
+		<button
+			type="button"
+			className={ `
+				group inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg
+				transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+				${ isActive
+			? 'bg-indigo-100 text-indigo-700 shadow-sm border-2 border-indigo-200'
+			: 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 border-2 border-transparent'
+		}
+				${ isCompleted && ! isActive ? 'text-green-600 hover:text-green-700 hover:bg-green-50' : '' }
+			` }
+			onClick={ handleClick }
+			onKeyDown={ handleKeyDown }
+			aria-current={ isActive ? 'step' : undefined }
+			aria-label={ `Go to ${ menu.name } step` }
+		>
+			<Icon
+				className={ `
+					w-4 h-4 transition-colors duration-200
+					${ isActive ? 'text-indigo-600' : '' }
+					${ isCompleted && ! isActive ? 'text-green-500' : '' }
+				` }
+				aria-hidden="true"
+			/>
+			<span className="hidden lg:inline">{ menu.name }</span>
+
+			{ /* Completion indicator */ }
+			{ isCompleted && ! isActive && (
+				<CheckCircle2 className="w-3 h-3 text-green-500 ml-1" aria-hidden="true" />
+			) }
+		</button>
+	);
+} );
+
+StepIndicator.displayName = 'WizardStepIndicator';
+
+// Enhanced exit button component
+const ExitButton = memo( ( { onClick } ) => {
+	const handleClick = useCallback( ( e ) => {
+		e.preventDefault();
+		if ( window.confirm( __( 'Are you sure you want to exit the setup wizard?', 'wp-ai-blogger' ) ) ) {
+			onClick();
+		}
+	}, [ onClick ] );
+
+	const handleKeyDown = useCallback( ( e ) => {
+		if ( e.key === 'Enter' || e.key === ' ' ) {
+			e.preventDefault();
+			handleClick( e );
+		}
+	}, [ handleClick ] );
+
+	return (
+		<button
+			type="button"
+			className="flex group relative p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+			onClick={ handleClick }
+			onKeyDown={ handleKeyDown }
+			aria-label={ __( 'Exit setup wizard', 'wp-ai-blogger' ) }
+			title={ __( 'Exit setup wizard', 'wp-ai-blogger' ) }
+		>
+			<X className="w-5 h-5" aria-hidden="true" />
+
+			{ /* Tooltip */ }
+			<span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+				{ __( 'Exit Setup', 'wp-ai-blogger' ) }
+			</span>
+		</button>
+	);
+} );
+
+ExitButton.displayName = 'WizardExitButton';
+
+const NavigationBar = memo( () => {
 	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
-
-	const search = useLocation().search;
+	const location = useLocation();
 	const navigate = useNavigate();
-	let step = new URLSearchParams( search ).get( 'step' );
-	step = step ? step : 'welcome';
 
-	const menus = [
+	// Enhanced URL parameter handling
+	const currentStep = useMemo( () => {
+		const params = new URLSearchParams( location.search );
+		return params.get( 'step' ) || 'welcome';
+	}, [ location.search ] );
+
+	// Enhanced menu configuration with completion tracking
+	const menus = useMemo( () => [
 		{
 			name: __( 'Welcome', 'wp-ai-blogger' ),
 			id: 'welcome',
@@ -36,73 +141,113 @@ const NavigationBar = () => {
 			name: __( 'Done', 'wp-ai-blogger' ),
 			id: 'ready',
 		},
-	];
+	], [] );
 
-	const handleClick = ( e ) => {
-		e.preventDefault();
+	// Determine completed steps (simplified logic - can be enhanced with actual completion state)
+	const getCompletedSteps = useCallback( () => {
+		const currentIndex = menus.findIndex( ( menu ) => menu.id === currentStep );
+		return menus.slice( 0, currentIndex ).map( ( menu ) => menu.id );
+	}, [ menus, currentStep ] );
 
-		dispatch( { type: 'UPDATE_USER_ONBOARDED', payload: true } );
-		updateApiData( 'userOnboarded', true, dispatch, abortControllerRef );
-	};
+	const completedSteps = useMemo( () => getCompletedSteps(), [ getCompletedSteps ] );
 
-	const handleStepRedirection = function ( e ) {
-		e.preventDefault();
+	// Enhanced exit handler
+	const handleExit = useCallback( async () => {
+		try {
+			dispatch( { type: 'UPDATE_USER_ONBOARDED', payload: true } );
+			await updateApiData( 'userOnboarded', true, dispatch, abortControllerRef );
 
-		if ( e.target.id ) {
-			const stepToRedirect = e.target.id;
-			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
+			// Navigate to dashboard or show success message
+			window.location.href = wpaib_localized_data.admin_app_url;
+		} catch ( error ) {
+			console.error( 'Failed to exit wizard:', error );
 		}
-	};
+	}, [ dispatch ] );
+
+	// Enhanced step navigation
+	const handleStepNavigation = useCallback( ( stepId ) => {
+		if ( stepId && stepId !== currentStep ) {
+			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepId }` );
+		}
+	}, [ navigate, currentStep ] );
 
 	return (
-		<header className="wpaib-setup-header bg-white border-b-[1px] fixed top-[32px] left-[160px] right-0 z-[999999] border-solid border-slate-200">
+		<header
+			className="wpaib-setup-header bg-white border-b border-gray-200 shadow-sm fixed top-[32px] left-[160px] right-0 z-[999999]"
+			role="banner"
+			aria-label={ __( 'Setup wizard navigation', 'wp-ai-blogger' ) }
+		>
 			<div className="px-4 sm:px-6 lg:px-8">
-				<div className="flex h-16 justify-between">
-					<div className="flex">
-						<div className="flex flex-shrink-0 items-center">
+				<div className="flex h-16 justify-between items-center">
+					{ /* Brand section */ }
+					<div className="flex items-center gap-3">
+						<div className="flex-shrink-0 flex">
 							<img
-								className="block lg:hidden h-6 w-auto"
+								className="h-8 w-auto"
 								src={ BrandIcon }
-								alt="WP Ai Blogger"
-							/>
-							<img
-								className="hidden lg:block h-6 w-auto"
-								src={ BrandIcon }
-								alt="WP Ai Blogger"
+								alt="WP AI Blogger"
 							/>
 						</div>
+						<div className="hidden sm:block">
+							<h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+								{ __( 'Setup Wizard', 'wp-ai-blogger' ) }
+							</h1>
+						</div>
 					</div>
-					<div className="hidden md:flex lg:space-x-8 space-x-4">
-						{ menus.map( ( menu ) => {
-							return (
-								<span
-									className={ `inline-flex items-center border-b-2 px-1 pt-1 lg:text-base font-medium focus:outline-none focus:shadow-none text-sm cursor-pointer ${
-										step === menu.id
-											? 'text-gray-800 wpaib-active-state-button'
-											: 'border-transparent text-gray-300 hover:border-gray-300 hover:text-gray-700'
-									}` }
-									id={ menu.id }
-									onClick={ handleStepRedirection }
-									key={ menu.id }
-								>
-									{ menu.name }
-								</span>
-							);
-						} ) }
-					</div>
-					<div className="hidden sm:ml-6 sm:flex sm:items-center">
-						<span
-							className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-							onClick={ handleClick }
-							title={ __( 'Exit setup wizard', 'wp-ai-blogger' ) }
-						>
-							<span className="sr-only">Exit Wizard</span>
-							<X className="h-5 w-5" />
+
+					{ /* Navigation steps */ }
+					<nav
+						className="hidden md:flex items-center space-x-2"
+						aria-label={ __( 'Setup wizard steps', 'wp-ai-blogger' ) }
+						role="navigation"
+					>
+						{ menus.map( ( menu ) => (
+							<StepIndicator
+								key={ menu.id }
+								menu={ menu }
+								isActive={ currentStep === menu.id }
+								isCompleted={ completedSteps.includes( menu.id ) }
+								onClick={ handleStepNavigation }
+							/>
+						) ) }
+					</nav>
+
+					{ /* Mobile step indicator */ }
+					<div className="md:hidden flex items-center">
+						<span className="text-sm text-gray-600 font-medium">
+							{ menus.find( ( menu ) => menu.id === currentStep )?.name || __( 'Setup', 'wp-ai-blogger' ) }
 						</span>
+					</div>
+
+					{ /* Exit button */ }
+					<div className="flex items-center">
+						<ExitButton onClick={ handleExit } />
 					</div>
 				</div>
 			</div>
+
+			{ /* Progress bar */ }
+			<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
+				<div
+					className="h-full bg-indigo-600 transition-all duration-300 ease-in-out"
+					style={ {
+						width: `${ ( ( menus.findIndex( ( m ) => m.id === currentStep ) + 1 ) / menus.length ) * 100 }%`,
+					} }
+					role="progressbar"
+					aria-valuenow={ menus.findIndex( ( m ) => m.id === currentStep ) + 1 }
+					aria-valuemin={ 1 }
+					aria-valuemax={ menus.length }
+				/>
+			</div>
+
+			{ /* Screen reader announcements */ }
+			<div className="sr-only" aria-live="polite" aria-atomic="true">
+				{ `Currently on step: ${ menus.find( ( menu ) => menu.id === currentStep )?.name }` }
+			</div>
 		</header>
 	);
-};
+} );
+
+NavigationBar.displayName = 'WizardNavigationBar';
+
 export default NavigationBar;

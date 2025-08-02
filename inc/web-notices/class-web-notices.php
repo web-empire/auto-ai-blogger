@@ -364,3 +364,4 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 	new Web_Notices();
 
 }
+

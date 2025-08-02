@@ -1,18 +1,21 @@
 import React from 'react';
 import MainNav from './MainNav';
-import { Route, Routes } from 'react-router-dom';
 import PagesRoute from './PagesRoute';
 import SettingsSavedNotification from './SettingsSavedNotification';
+import ErrorBoundary from '@Components/ErrorBoundary';
 
+/**
+ * Enhanced Dashboard component with error handling and performance optimization
+ */
 const Dashboard = () => {
 	return (
-		<>
-			<MainNav />
-			<SettingsSavedNotification />
-			<Routes>
-				<Route path="*" element={ <PagesRoute /> } />
-			</Routes>
-		</>
+		<div className="wp-ai-blogger-dashboard" role="main">
+			<ErrorBoundary>
+				<MainNav />
+				<SettingsSavedNotification />
+				<PagesRoute />
+			</ErrorBoundary>
+		</div>
 	);
 };
 
