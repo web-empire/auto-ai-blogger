@@ -1,8 +1,17 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { Ticket, FileText, Users } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 export default function QuickAccess() {
+	const licenseStatus = useSelector( ( state ) => state.license_status );
+	const licenseEnabled = licenseStatus === 'licensed';
+
+	// Don't render the component if license is not enabled
+	if ( ! licenseEnabled ) {
+		return null;
+	}
+
 	const quickAccessLinks = [
 		{
 			icon: <Ticket className="w-5 h-5" />,
