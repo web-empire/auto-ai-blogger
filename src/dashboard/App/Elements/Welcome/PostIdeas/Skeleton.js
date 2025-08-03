@@ -11,7 +11,7 @@ const SkeletonRow = memo( ( { index } ) => (
 		<td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
 			<div className="flex items-center">
 				{ /* Content placeholder - single line */ }
-				<div className="h-4 bg-gray-300 rounded animate-pulse" style={ { width: `${ (Math.random() * 40) + 60 }%` } } />
+				<div className="h-4 bg-gray-300 rounded animate-pulse" style={ { width: `${ ( Math.random() * 40 ) + 60 }%` } } />
 			</div>
 		</td>
 

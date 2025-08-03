@@ -7,18 +7,18 @@ export default function QuickAccess() {
 		{
 			icon: <Ticket className="w-5 h-5" />,
 			title: __( 'Open Support Ticket', 'wp-ai-blogger' ),
-			url: 'https://wpaiblogger.com/support/'
+			url: 'https://wpaiblogger.com/support/',
 		},
 		{
 			icon: <FileText className="w-5 h-5" />,
 			title: __( 'Help Center', 'wp-ai-blogger' ),
-			url: 'https://wpaiblogger.com/docs/'
+			url: 'https://wpaiblogger.com/docs/',
 		},
 		{
 			icon: <Users className="w-5 h-5" />,
 			title: __( 'Join our Community on Facebook', 'wp-ai-blogger' ),
-			url: 'https://www.facebook.com/groups/wpaiblogger'
-		}
+			url: 'https://www.facebook.com/groups/wpaiblogger',
+		},
 	];
 
 	return (

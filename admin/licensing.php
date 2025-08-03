@@ -657,7 +657,7 @@ class Licensing {
 		Helper::update_option( 'license_status', $status );
 
 		// Also update admin settings for frontend access.
-		Helper::update_option( 'licenseStatus', $status );		// Update cache.
+		Helper::update_option( 'licenseStatus', $status );      // Update cache.
 		self::update_license_cache( $license_key, $status );
 	}
 
@@ -855,7 +855,7 @@ class Licensing {
 		}
 
 		// Save token data using Helper class with validation.
-		$total_result = Helper::update_option( 'tokenTotal', $token_total );
+		$total_result     = Helper::update_option( 'tokenTotal', $token_total );
 		$remaining_result = Helper::update_option( 'tokenRemaining', $token_remaining );
 
 		// Return success status.

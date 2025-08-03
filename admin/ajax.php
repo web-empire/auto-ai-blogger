@@ -974,36 +974,6 @@ class Ajax {
 	}
 
 	/**
-	 * Get the client's IP address.
-	 *
-	 * @return string The client's IP address.
-	 * @since x.x.x
-	 */
-	private function get_client_ip() {
-		$ip_headers = [
-			'HTTP_CF_CONNECTING_IP',     // Cloudflare.
-			'HTTP_X_FORWARDED_FOR',      // Load balancers/proxies.
-			'HTTP_X_FORWARDED',          // Proxies.
-			'HTTP_X_CLUSTER_CLIENT_IP',  // Cluster environments.
-			'HTTP_FORWARDED_FOR',        // Proxies.
-			'HTTP_FORWARDED',            // Proxies.
-			'REMOTE_ADDR',                // Standard.
-		];
-
-		foreach ( $ip_headers as $header ) {
-			if ( ! empty( $_SERVER[ $header ] ) ) {
-				$ips = explode( ',', sanitize_text_field( (string) $_SERVER[ $header ] ) );
-				$ip  = trim( $ips[0] );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
-					return $ip;
-				}
-			}
-		}
-
-		return sanitize_text_field( (string) ( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
-	}
-
-	/**
 	 * Validate User-Agent header.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if suspicious.

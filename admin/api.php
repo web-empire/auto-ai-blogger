@@ -244,7 +244,7 @@ class API extends \WP_REST_Controller {
 	 */
 	public function update_admin_settings( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		// Rate limiting removed for admin dashboard operations
-		// as they are already protected by capability checks and authentication
+		// as they are already protected by capability checks and authentication.
 
 		// Validate request size.
 		$request_size_check = $this->validate_request_size( $request );
@@ -468,35 +468,6 @@ class API extends \WP_REST_Controller {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get the client's IP address.
-	 *
-	 * @return string The client's IP address.
-	 */
-	private function get_client_ip(): string {
-		$ip_headers = [
-			'HTTP_CF_CONNECTING_IP',     // Cloudflare.
-			'HTTP_X_FORWARDED_FOR',      // Load balancers/proxies.
-			'HTTP_X_FORWARDED',          // Proxies.
-			'HTTP_X_CLUSTER_CLIENT_IP',  // Cluster environments.
-			'HTTP_FORWARDED_FOR',        // Proxies.
-			'HTTP_FORWARDED',            // Proxies.
-			'REMOTE_ADDR',               // Standard.
-		];
-
-		foreach ( $ip_headers as $header ) {
-			if ( ! empty( $_SERVER[ $header ] ) ) {
-				$ips = explode( ',', sanitize_text_field( $_SERVER[ $header ] ) );
-				$ip  = trim( $ips[0] );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
-					return $ip;
-				}
-			}
-		}
-
-		return sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' );
 	}
 
 	/**
