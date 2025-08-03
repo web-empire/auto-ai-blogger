@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw, Crown, ExternalLink } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown, Edit } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -544,8 +544,8 @@ export default function PostIdeas() {
 																	e.stopPropagation();
 																} }
 															>
-																<ExternalLink className="w-5 h-5" />
-																{ __( 'Open Post', 'wp-ai-blogger' ) }
+																<Edit className="w-5 h-5" />
+																{ __( 'Edit', 'wp-ai-blogger' ) }
 															</a>
 														) : (
 															// Show "Create" or loading state
