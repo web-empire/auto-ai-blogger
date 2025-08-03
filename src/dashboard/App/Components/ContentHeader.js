@@ -112,6 +112,15 @@ const ContentHeader = ( {
 				throw new Error( __( 'No settings to save', 'wp-ai-blogger' ) );
 			}
 
+			// Validate notification settings
+			if ( emailNotificationEnabled && ( ! emailNotificationValue || ! emailNotificationValue.trim() ) ) {
+				throw new Error( __( 'Email address cannot be empty.', 'wp-ai-blogger' ) );
+			}
+
+			if ( whatsappNotificationEnabled && ( ! whatsappNotificationValue || ! whatsappNotificationValue.trim() ) ) {
+				throw new Error( __( 'Phone number cannot be empty.', 'wp-ai-blogger' ) );
+			}
+
 			// Save settings sequentially to avoid race conditions and database conflicts
 			const saveResults = [];
 			const totalSettings = Object.entries( settingsToSave ).length;
