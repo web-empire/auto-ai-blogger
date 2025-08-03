@@ -1035,7 +1035,7 @@ namespace WPAIBlogger\Core {
     /**
      * Update Compatibility
      *
-     * @package AutoBlog_AI
+     * @package wp-ai-blogger
      */
     /**
      * Update initial setup
@@ -1240,7 +1240,7 @@ namespace WPAIBlogger\Admin {
     /**
      * Frontend Compatibility
      *
-     * @package AutoBlog_AI
+     * @package wp-ai-blogger
      */
     /**
      * Menu setup

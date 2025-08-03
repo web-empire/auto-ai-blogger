@@ -1,6 +1,7 @@
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Mail, MessageCircle, Bell, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Mail, MessageCircle, Bell, AlertCircle, CheckCircle2 } from 'lucide-react';
 import SwitchControl from '@Components/SwitchControl';
 import SettingsContainer from '@Components/SettingsContainer';
 import InfoCard from '@Components/InfoCard';
@@ -25,6 +26,20 @@ const NotificationCard = memo( ( {
 
 	// Enhanced validation
 	const validateInput = useCallback( ( value ) => {
+		// If notification is enabled, the field is required
+		if ( enabled && ( ! value || ! value.trim() ) ) {
+			setIsValid( false );
+			if ( inputType === 'email' ) {
+				setValidationMessage( __( 'Email address is required when notifications are enabled', 'wp-ai-blogger' ) );
+			} else if ( inputType === 'tel' ) {
+				setValidationMessage( __( 'Phone number is required when notifications are enabled', 'wp-ai-blogger' ) );
+			} else {
+				setValidationMessage( __( 'This field is required when notifications are enabled', 'wp-ai-blogger' ) );
+			}
+			return false;
+		}
+
+		// If notification is disabled or field is empty, it's valid
 		if ( ! enabled || ! value.trim() ) {
 			setIsValid( true );
 			setValidationMessage( '' );
@@ -59,6 +74,18 @@ const NotificationCard = memo( ( {
 		onInputChange( value );
 		validateInput( value );
 	}, [ onInputChange, validateInput ] );
+
+	// Validate when the enabled state changes
+	useEffect( () => {
+		if ( enabled ) {
+			// When enabling, validate the current input value
+			validateInput( inputValue );
+		} else {
+			// When disabling, clear validation
+			setIsValid( true );
+			setValidationMessage( '' );
+		}
+	}, [ enabled, inputValue, validateInput ] );
 
 	return (
 		<div className={ `border rounded-lg transition-all duration-200 p-4 ${ enabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-gray-50' }` }>
@@ -99,6 +126,7 @@ const NotificationCard = memo( ( {
 							onChange={ handleInputChange }
 							placeholder={ inputPlaceholder }
 							disabled={ disabled }
+							required={ enabled }
 							className={ `
 								block w-full px-3 py-2 text-sm border rounded-lg
 								bg-white text-gray-900 placeholder:text-gray-400
@@ -109,16 +137,17 @@ const NotificationCard = memo( ( {
 							` }
 							aria-describedby={ `${ title.toLowerCase().replace( ' ', '-' ) }-help` }
 							aria-invalid={ ! isValid }
+							aria-required={ enabled }
 						/>
 
 						{ /* Validation indicator */ }
 						<div className="absolute inset-y-0 right-0 flex items-center pr-3">
-							{ inputValue && (
-								isValid ? (
-									<CheckCircle2 className="w-4 h-4 text-green-500" />
-								) : (
+							{ enabled && (
+								! isValid ? (
 									<AlertCircle className="w-4 h-4 text-red-500" />
-								)
+								) : inputValue && inputValue.trim() ? (
+									<CheckCircle2 className="w-4 h-4 text-green-500" />
+								) : null
 							) }
 						</div>
 					</div>
@@ -147,21 +176,40 @@ NotificationCard.displayName = 'NotificationCard';
 
 // Enhanced notifications settings component
 const Notifications = memo( () => {
-	// Local state for notifications
+	const dispatch = useDispatch();
+
+	// Get notification settings from Redux store or set defaults
+	const emailNotificationEnabled = useSelector( ( state ) => state.emailNotificationEnabled ) ?? false;
+	const emailNotificationValue = useSelector( ( state ) => state.emailNotificationValue ) ??
+		( ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email ) || '' );
+	const whatsappNotificationEnabled = useSelector( ( state ) => state.whatsappNotificationEnabled ) ?? false;
+	const whatsappNotificationValue = useSelector( ( state ) => state.whatsappNotificationValue ) ?? '';
+
+	// Local state for notifications - initialized from Redux
 	const [ notifications, setNotifications ] = useState( {
 		email: {
-			enabled: false,
-			value: ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email ) || '',
+			enabled: emailNotificationEnabled,
+			value: emailNotificationValue,
 		},
 		whatsapp: {
-			enabled: false,
-			value: '',
-		},
-		sms: {
-			enabled: false,
-			value: '',
+			enabled: whatsappNotificationEnabled,
+			value: whatsappNotificationValue,
 		},
 	} );
+
+	// Sync local state with Redux when Redux state changes
+	useEffect( () => {
+		setNotifications( {
+			email: {
+				enabled: emailNotificationEnabled,
+				value: emailNotificationValue,
+			},
+			whatsapp: {
+				enabled: whatsappNotificationEnabled,
+				value: whatsappNotificationValue,
+			},
+		} );
+	}, [ emailNotificationEnabled, emailNotificationValue, whatsappNotificationEnabled, whatsappNotificationValue ] );
 
 	// Email validation pattern (supports multiple emails)
 	const emailPattern = useMemo( () =>
@@ -175,49 +223,45 @@ const Notifications = memo( () => {
 	[]
 	);
 
-	// Toggle handlers
+	// Toggle handlers - update both local state and Redux
 	const toggleEmail = useCallback( () => {
+		const newEnabled = ! notifications.email.enabled;
 		setNotifications( ( prev ) => ( {
 			...prev,
-			email: { ...prev.email, enabled: ! prev.email.enabled },
+			email: { ...prev.email, enabled: newEnabled },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_ENABLED', payload: newEnabled } );
+	}, [ dispatch, notifications.email.enabled ] );
 
 	const toggleWhatsApp = useCallback( () => {
+		const newEnabled = ! notifications.whatsapp.enabled;
 		setNotifications( ( prev ) => ( {
 			...prev,
-			whatsapp: { ...prev.whatsapp, enabled: ! prev.whatsapp.enabled },
+			whatsapp: { ...prev.whatsapp, enabled: newEnabled },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_ENABLED', payload: newEnabled } );
+	}, [ dispatch, notifications.whatsapp.enabled ] );
 
-	const toggleSMS = useCallback( () => {
-		setNotifications( ( prev ) => ( {
-			...prev,
-			sms: { ...prev.sms, enabled: ! prev.sms.enabled },
-		} ) );
-	}, [] );
-
-	// Input change handlers
+	// Input change handlers - update both local state and Redux
 	const updateEmail = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
 			...prev,
 			email: { ...prev.email, value },
 		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_VALUE', payload: value } );
+	}, [ dispatch ] );
 
 	const updateWhatsApp = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
 			...prev,
 			whatsapp: { ...prev.whatsapp, value },
 		} ) );
-	}, [] );
-
-	const updateSMS = useCallback( ( value ) => {
-		setNotifications( ( prev ) => ( {
-			...prev,
-			sms: { ...prev.sms, value },
-		} ) );
-	}, [] );
+		// Update Redux store
+		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_VALUE', payload: value } );
+	}, [ dispatch ] );
 
 	return (
 		<div className="space-y-6">
@@ -255,30 +299,14 @@ const Notifications = memo( () => {
 							validationPattern={ phonePattern }
 						/>
 
-						{ /* SMS notifications */ }
-						<NotificationCard
-							icon={ <Phone /> }
-							title={ __( 'SMS Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive text message alerts.', 'wp-ai-blogger' ) }
-							enabled={ notifications.sms.enabled }
-							onToggle={ toggleSMS }
-							inputValue={ notifications.sms.value }
-							onInputChange={ updateSMS }
-							inputPlaceholder={ __( '+1234567890', 'wp-ai-blogger' ) }
-							inputType="tel"
-							helpText={ __( 'SMS notifications for critical alerts and publishing confirmations.', 'wp-ai-blogger' ) }
-							validationPattern={ phonePattern }
-						/>
-
 						{ /* Information box */ }
 						<InfoCard
 							icon={ Bell }
 							title={ __( 'Notification Types', 'wp-ai-blogger' ) }
 							items={ [
-								__( 'New content generated and ready for review.', 'wp-ai-blogger' ),
-								__( 'Auto-scheduled posts about to be published.', 'wp-ai-blogger' ),
-								__( 'Content generation errors or issues.', 'wp-ai-blogger' ),
-								__( 'Campaign completion and performance summaries.', 'wp-ai-blogger' ),
+								__( 'Campaign started', 'wp-ai-blogger' ),
+								__( 'New post created', 'wp-ai-blogger' ),
+								__( 'Campaign completed', 'wp-ai-blogger' ),
 							] }
 							colorScheme="blue"
 							className="mt-6"

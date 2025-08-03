@@ -2,7 +2,7 @@
 /**
  * Scheduler.
  *
- * @package AutoBlog_AI
+ * @package wp-ai-blogger
  * @since 1.0.0
  */
 

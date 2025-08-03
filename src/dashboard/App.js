@@ -16,7 +16,7 @@ if ( ! currentState.initialStateSetFlag ) {
 	} );
 }
 
-const container = document.getElementById( 'autoblog-main-page--wrapper' );
+const container = document.getElementById( 'wp-ai-blogger-main-page--wrapper' );
 
 if ( container ) {
 	const root = createRoot( container );

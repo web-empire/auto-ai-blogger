@@ -2,7 +2,7 @@
 /**
  * Settings.
  *
- * @package WPAIBlogger
+ * @package wp-ai-blogger
  * @since 1.0.0
  */
 
@@ -35,71 +35,88 @@ class Settings {
 		return apply_filters(
 			'wp_ai_blogger_settings_dataset',
 			[
-				'userOnboarded'    => [
+				'userOnboarded'               => [
 					'default' => false,
 					'type'    => 'bool',
 				],
-				'onboardingTab'    => [
+				'onboardingTab'               => [
 					'default' => 'welcome',
 					'type'    => 'string',
 				],
-				'userName'         => [
+				'userName'                    => [
 					'default' => wpaib_get_user_detail( 'name' ),
 					'type'    => 'name',
 				],
-				'userEmail'        => [
+				'userEmail'                   => [
 					'default' => wpaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
-				'siteTitle'        => [
+				'siteTitle'                   => [
 					'default' => get_bloginfo( 'name' ),
 					'type'    => 'string',
 				],
-				'siteDescription'  => [
+				'siteDescription'             => [
 					'default' => get_bloginfo( 'description' ),
 					'type'    => 'string',
 				],
-				'siteFor'          => [
+				'siteFor'                     => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'temperature'      => [
+				'temperature'                 => [
 					'default' => 1,
 					'type'    => 'float',
 				],
-				'harassment'       => [
+				'harassment'                  => [
 					'default' => 2,
 					'type'    => 'float',
 				],
-				'hate'             => [
+				'hate'                        => [
 					'default' => 2,
 					'type'    => 'float',
 				],
-				'sexuallyExplicit' => [
+				'sexuallyExplicit'            => [
 					'default' => 2,
 					'type'    => 'float',
 				],
-				'dangerousContent' => [
+				'dangerousContent'            => [
 					'default' => 2,
 					'type'    => 'float',
 				],
-				'license'          => [
+				'license'                     => [
 					'default' => '',
 					'type'    => 'string',
 				],
-				'license_status'   => [
+				'license_status'              => [
 					'default' => 'unlicensed',
 					'type'    => 'string',
 				],
-				'tokenTotal'       => [
+				'tokenTotal'                  => [
 					'default' => 0,
 					'type'    => 'int',
 				],
-				'tokenRemaining'   => [
+				'tokenRemaining'              => [
 					'default' => 0,
 					'type'    => 'int',
 				],
-				'postIdeas'        => [
+				'postIdeas'                   => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				// Notification settings.
+				'emailNotificationEnabled'    => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'emailNotificationValue'      => [
+					'default' => wpaib_get_user_detail( 'email' ),
+					'type'    => 'email',
+				],
+				'whatsappNotificationEnabled' => [
+					'default' => false,
+					'type'    => 'bool',
+				],
+				'whatsappNotificationValue'   => [
 					'default' => '',
 					'type'    => 'string',
 				],

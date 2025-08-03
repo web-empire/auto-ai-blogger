@@ -1,8 +1,9 @@
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Features } from '../Elements/FreeVsPro/Features';
 import ProButton from '@Components/ProButton';
 import { Sprout, Check, X, Star, Zap, LifeBuoy } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 // Enhanced status icon component with better accessibility
 const StatusIcon = memo( ( { value, label } ) => {
@@ -76,10 +77,8 @@ FeatureRow.displayName = 'FeatureRow';
 
 // Enhanced CTA section component.
 const CallToActionSection = memo( () => {
-	const handleUpgradeClick = useCallback( () => {
-		// Add analytics tracking if needed.
-		console.log( 'Pro upgrade button clicked' );
-	}, [] );
+	// Get pro purchase URL from Redux store
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl );
 
 	return (
 		<section
@@ -122,9 +121,7 @@ const CallToActionSection = memo( () => {
 				</div>
 
 				{ /* Enhanced CTA button */ }
-				<div onClick={ handleUpgradeClick }>
-					<ProButton variant="large" />
-				</div>
+				<ProButton url={ proPurchaseUrl } variant="large" />
 
 				{ /* Additional trust signals */ }
 				<p className="force-mt-4 text-xs text-gray-500">
@@ -141,6 +138,9 @@ const FreeVsPro = () => {
 	// Memoize features to prevent unnecessary re-renders.
 	const memoizedFeatures = useMemo( () => Features || [], [] );
 
+	// Get pro purchase URL from Redux store
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl );
+
 	return (
 		<div className="px-4 sm:px-6 lg:px-8 py-8">
 			{ /* Enhanced header with statistics */ }
@@ -151,7 +151,7 @@ const FreeVsPro = () => {
 					</h2>
 				</div>
 				<div className="flex-shrink-0">
-					<ProButton />
+					<ProButton url={ proPurchaseUrl } />
 				</div>
 			</div>
 
