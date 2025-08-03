@@ -112,32 +112,32 @@ class Helper {
 	 *
 	 * @param  string $key      The option key.
 	 * @param  mixed  $value    Option value to update.
-	 * @return mixed            Return the sanitized option value
+	 * @return array            Returns array with 'success' boolean and 'value' for the sanitized value
 	 *
 	 * @since 1.0.0
 	 */
 	public static function update_option( $key, $value = true ) {
 		// Validate key parameter.
 		if ( ! is_string( $key ) || empty( $key ) ) {
-			return false;
+			return [ 'success' => false, 'error' => 'Invalid key parameter' ];
 		}
 
 		// Capability check.
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_cron() && ! wp_doing_ajax() ) {
-			return false;
+			return [ 'success' => false, 'error' => 'Insufficient permissions' ];
 		}
 
 		// Sanitize key.
 		$key = sanitize_key( $key );
 
 		if ( empty( $key ) ) {
-			return false;
+			return [ 'success' => false, 'error' => 'Invalid key after sanitization' ];
 		}
 
 		// Check if key is in allowed list (compare sanitized versions).
 		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
-			return false;
+			return [ 'success' => false, 'error' => 'Key not in allowed list' ];
 		}
 
 		// Get the original camelCase key for switch statements.
@@ -150,7 +150,7 @@ class Helper {
 		// Check if sanitization failed (false can be a valid value for boolean fields)
 		$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
 		if ( $sanitized_value === false && ! in_array( $original_key, $boolean_fields, true ) ) {
-			return false;
+			return [ 'success' => false, 'error' => 'Sanitization failed' ];
 		}
 
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
@@ -179,12 +179,9 @@ class Helper {
 
 		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
 
-		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error.
-		// We return the sanitized value regardless, as the operation was successful.
-		return $sanitized_value;
-	}
-
-	/**
+		// Return success with the sanitized value
+		return [ 'success' => true, 'value' => $sanitized_value ];
+	}	/**
 	 * Delete option from the database for the admin settings.
 	 *
 	 * @param  string $key The option key.
@@ -478,11 +475,11 @@ class Helper {
 				// Get original camelCase key to check if it's a boolean field
 				$original_key_index = array_search( $key, $sanitized_allowed_keys );
 				$original_key       = self::$allowed_keys[ $original_key_index ];
-				
+
 				// Boolean fields can have false as a valid value
 				$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
 				$is_boolean_field = in_array( $original_key, $boolean_fields, true );
-				
+
 				// Include the value if it's not false, or if it's false but for a boolean field
 				if ( $value !== false || $is_boolean_field ) {
 					$validated[ $key ] = $value;

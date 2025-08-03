@@ -206,12 +206,7 @@ class Ajax {
 			// Update option with error handling.
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
 
-			// Boolean fields can legitimately return false as their value
-			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
-			$is_boolean_field = in_array( $sub_option_key, $boolean_fields, true );
-
-			// Only treat false as an error if it's not a boolean field with a false value
-			if ( $update_result === false && ! $is_boolean_field ) {
+			if ( ! $update_result['success'] ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
 			}
@@ -1348,10 +1343,18 @@ class Ajax {
 					// Check if this was the last post idea.
 					if ( empty( $updated_ideas ) ) {
 						// Set to "-1" to indicate post ideas are exhausted.
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+						$result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+						if ( ! $result['success'] ) {
+							// Log error but don't fail the post creation
+							error_log( 'Failed to update postIdeas: ' . ( $result['error'] ?? 'Unknown error' ) );
+						}
 					} else {
 						$updated_post_ideas_string = implode( "\n", $updated_ideas );
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+						$result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+						if ( ! $result['success'] ) {
+							// Log error but don't fail the post creation
+							error_log( 'Failed to update postIdeas: ' . ( $result['error'] ?? 'Unknown error' ) );
+						}
 					}
 				}
 			} finally {
