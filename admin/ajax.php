@@ -574,10 +574,12 @@ class Ajax {
 					$token_data = $api_result['token_data'] ?? null;
 
 					// Process images if they exist in the API response.
+					$featured_image_id = null;
 					if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
 						$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
 						if ( ! is_wp_error( $processed_result ) ) {
-							$post_content = $processed_result;
+							$post_content = $processed_result['content'];
+							$featured_image_id = $processed_result['featured_image_id'];
 						}
 					}
 				}
@@ -644,6 +646,13 @@ class Ajax {
 					]
 				);
 				return;
+			}
+
+			// Set featured image if available.
+			if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
+				$set_thumbnail_result = set_post_thumbnail( $post_id, $featured_image_id );
+				// Note: We don't fail the post creation if thumbnail setting fails
+				// as the post content already includes the images.
 			}
 
 			// Remove this title from the postIdeas DB option (but keep Redux unchanged).
@@ -1472,20 +1481,24 @@ class Ajax {
 	 *
 	 * @param string                           $content The post content with placeholders.
 	 * @param array<int, array<string, mixed>> $images Array of image data from API.
-	 * @return string|\WP_Error Processed content with images or error.
+	 * @return array<string, mixed>|\WP_Error Processed data with content and featured image ID or error.
 	 * @since x.x.x
 	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		try {
 			if ( empty( $images ) || ! is_array( $images ) ) {
-				return $content;
+				return [
+					'content' => $content,
+					'featured_image_id' => null,
+				];
 			}
 
 			$processed_content = $content;
 			$image_html_blocks = [];
+			$featured_image_id = null;
 
 			// Process each image.
-			foreach ( $images as $image_data ) {
+			foreach ( $images as $index => $image_data ) {
 				if ( ! is_array( $image_data ) || empty( $image_data['url'] ) ) {
 					// Skip images without URLs.
 					continue;
@@ -1500,6 +1513,11 @@ class Ajax {
 				if ( is_wp_error( $attachment_id ) ) {
 					// Log error but continue processing other images.
 					continue;
+				}
+
+				// Set the first successfully uploaded image as featured image.
+				if ( $featured_image_id === null ) {
+					$featured_image_id = $attachment_id;
 				}
 
 				// Get the uploaded image details.
@@ -1540,7 +1558,10 @@ class Ajax {
 				}
 			}
 
-			return $processed_content;
+			return [
+				'content' => $processed_content,
+				'featured_image_id' => $featured_image_id,
+			];
 
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
