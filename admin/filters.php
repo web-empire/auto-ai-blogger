@@ -9,6 +9,7 @@
 namespace WPAIBlogger\Admin;
 
 use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPAIBlogger\Inc\Utils\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -53,9 +54,9 @@ class Filters {
 		}
 
 		// Check if current post type is supported by the plugin.
-		$supported_post_types = wpaib_get_post_types();
+		$supported_post_types = Sanitizer::get_sanitized_post_types();
 
-		if ( ! in_array( $current_post_type, $supported_post_types, true ) ) {
+		if ( ! isset( $supported_post_types[ $current_post_type ] ) ) {
 			return;
 		}
 
@@ -99,8 +100,8 @@ class Filters {
 		}
 
 		// Check if current post type is supported by the plugin.
-		$supported_post_types = wpaib_get_post_types();
-		if ( ! in_array( $current_post_type, $supported_post_types, true ) ) {
+		$supported_post_types = Sanitizer::get_sanitized_post_types();
+		if ( ! isset( $supported_post_types[ $current_post_type ] ) ) {
 			return $query;
 		}
 
@@ -186,7 +187,7 @@ class Filters {
 	 * @return void
 	 */
 	private function add_column_hooks(): void {
-		$supported_post_types = wpaib_get_post_types();
+		$supported_post_types = Sanitizer::get_sanitized_post_types();
 
 		foreach ( $supported_post_types as $post_type ) {
 			// Add column to each supported post type.

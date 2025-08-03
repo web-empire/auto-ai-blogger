@@ -2,9 +2,10 @@ import { __ } from '@wordpress/i18n';
 import { forwardRef, useCallback, useMemo, useState } from 'react';
 import { aiClassNames } from '@Utils/aiClassNames';
 import { useSelector } from 'react-redux';
+import { Loader } from 'lucide-react';
 
 /**
- * Enhanced ProButton component with better accessibility and customization
+ * Enhanced ProButton component with better accessibility and customization.
  */
 const ProButton = forwardRef( ( {
 	className = '',
@@ -24,8 +25,9 @@ const ProButton = forwardRef( ( {
 	...props
 }, ref ) => {
 	const [ showTooltip, setShowTooltip ] = useState( false );
-	// Get pro purchase URL from Redux store
-	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
+
+	// Get pro purchase URL from Redux store.
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || wpaib_localized_data.pro_purchase_url;
 
 	// Determine the URL to use
 	const proUrl = useMemo( () => {
@@ -127,26 +129,7 @@ const ProButton = forwardRef( ( {
 		if ( loading ) {
 			return (
 				<>
-					<svg
-						className="animate-spin -ml-1 mr-2 h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						aria-hidden="true"
-					>
-						<circle
-							className="opacity-25"
-							cx="12"
-							cy="12"
-							r="10"
-							stroke="currentColor"
-							strokeWidth="4"
-						/>
-						<path
-							className="opacity-75"
-							fill="currentColor"
-							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-						/>
-					</svg>
+					<Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />
 					{ __( 'Loading…', 'wp-ai-blogger' ) }
 				</>
 			);
@@ -160,14 +143,14 @@ const ProButton = forwardRef( ( {
 
 		return (
 			<>
-				{ iconPosition === 'left' && iconElement }
+				{ ( icon && iconPosition === 'left' ) && iconElement }
 				{ children }
-				{ iconPosition === 'right' && iconElement }
+				{ ( icon && iconPosition === 'right' ) && iconElement }
 			</>
 		);
 	}, [ loading, icon, iconPosition, children ] );
 
-	// Tooltip position styles
+	// Tooltip position styles.
 	const tooltipPositions = {
 		top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
 		bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
@@ -175,12 +158,10 @@ const ProButton = forwardRef( ( {
 		right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
 	};
 
-	const tooltipClasses = `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
-
 	return (
 		<div className="relative inline-block">
 			{ tooltip && showTooltip && (
-				<div className={ tooltipClasses }>
+				<div className={ `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50` }>
 					{ tooltip }
 				</div>
 			) }

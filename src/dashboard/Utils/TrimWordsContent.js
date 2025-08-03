@@ -8,7 +8,7 @@ import { useMemo } from 'react';
  * @param {string} suffix    - Suffix to add when text is trimmed
  * @return {string} Trimmed text
  */
-const trimTextByWords = ( text, wordLimit = 40, suffix = '...' ) => {
+const TrimTextByWords = ( text, wordLimit = 40, suffix = '...' ) => {
 	// Input validation
 	if ( typeof text !== 'string' ) {
 		return '';
@@ -52,7 +52,7 @@ const TrimWordsContent = ( {
 } ) => {
 	// Memoize the trimmed content to prevent unnecessary recalculations
 	const trimmedContent = useMemo( () => {
-		return trimTextByWords( content, count, suffix );
+		return TrimTextByWords( content, count, suffix );
 	}, [ content, count, suffix ] );
 
 	// Determine if content was actually trimmed
@@ -84,7 +84,7 @@ const TrimWordsContent = ( {
  */
 export const useTrimmedContent = ( content, count = 40, suffix = '...' ) => {
 	return useMemo( () => {
-		return trimTextByWords( content, count, suffix );
+		return TrimTextByWords( content, count, suffix );
 	}, [ content, count, suffix ] );
 };
 
@@ -128,4 +128,4 @@ export const trimTextByChars = ( text, charLimit = 200, suffix = '...' ) => {
 	return text.substring( 0, cutPoint ) + suffix;
 };
 
-export { TrimWordsContent, trimTextByWords };
+export { TrimWordsContent, TrimTextByWords };

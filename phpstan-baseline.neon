@@ -296,56 +296,6 @@ parameters:
 			path: admin/menu.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_categories\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_post_statuses\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_post_types\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:get_sanitized_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) has parameter \\$license with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) is unused\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_license_data\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_post_ideas\\(\\) is unused\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:sanitize_post_ideas\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/menu.php
-
-		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Menu\\:\\:validate_security_input\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/menu.php
@@ -1139,6 +1089,31 @@ parameters:
 			message: "#^Property WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:\\$dashboard_options type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/utils/metadata.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Sanitizer\\:\\:get_sanitized_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/sanitizer.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Sanitizer\\:\\:get_sanitized_categories\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/sanitizer.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Sanitizer\\:\\:get_sanitized_post_statuses\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/sanitizer.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Sanitizer\\:\\:get_sanitized_post_types\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/sanitizer.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Sanitizer\\:\\:get_sanitized_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/utils/sanitizer.php
 
 		-
 			message: "#^Method WPAIBlogger\\\\Inc\\\\Utils\\\\Settings\\:\\:get_ai_blogger_settings\\(\\) return type has no value type specified in iterable type array\\.$#"

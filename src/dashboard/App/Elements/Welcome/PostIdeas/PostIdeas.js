@@ -447,7 +447,7 @@ export default function PostIdeas() {
 	};
 
 	return (
-		<div className="px-4 sm:px-6 lg:px-8 pt-2 pb-8">
+		<div className="px-4 sm:px-6 lg:px-8 pt-4 pb-8">
 			<div className="sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-col gap-2">
 					<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-4 p-0 m-0">
@@ -467,7 +467,7 @@ export default function PostIdeas() {
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
 						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
-						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
+						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 Suggestions, Upgrade to Pro', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
 					>
