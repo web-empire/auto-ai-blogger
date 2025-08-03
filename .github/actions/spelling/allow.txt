@@ -3,7 +3,6 @@ absint
 ABSPATH
 allowedposttags
 astra
-autoblog
 autocrlf
 autoload
 Axksscg

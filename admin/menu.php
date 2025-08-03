@@ -137,7 +137,7 @@ class Menu {
 		// Additional CSRF protection.
 		$nonce = wp_create_nonce( 'wp_ai_blogger_admin_page' );
 
-		echo '<div id="autoblog-main-page--wrapper" data-nonce="' . esc_attr( $nonce ) . '"></div>';
+		echo '<div id="wp-ai-blogger-main-page--wrapper" data-nonce="' . esc_attr( $nonce ) . '"></div>';
 	}
 
 	/**

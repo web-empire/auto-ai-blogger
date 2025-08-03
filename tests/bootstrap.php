@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file.
  *
- * @package WP AI Blogger
+ * @package wp-ai-blogger
  */
 
 if ( PHP_MAJOR_VERSION >= 8 ) {

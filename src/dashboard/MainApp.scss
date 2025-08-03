@@ -11,7 +11,7 @@
 	padding: 0;
 }
 
-#autoblog-main-page--wrapper,
+#wp-ai-blogger-main-page--wrapper,
 .ai-blogger-container {
 	font-family: inter, sans-serif;
 	position: relative;
@@ -41,11 +41,11 @@
 .posts_page_wp-ai-blogger .clear {
 	display: none;
 }
-#autoblog-main-page--wrapper {
+#wp-ai-blogger-main-page--wrapper {
 	height: 100%;
 }
 #headlessui-portal-root button,
-#autoblog-main-page--wrapper button {
+#wp-ai-blogger-main-page--wrapper button {
 	cursor: pointer;
 	border: none;
 }
@@ -79,7 +79,7 @@
 }
 
 #headlessui-portal-root p,
-#autoblog-main-page--wrapper p {
+#wp-ai-blogger-main-page--wrapper p {
 	margin: 0;
 	padding: 0;
 	&.wpaib-step-text {
@@ -186,7 +186,7 @@
 	color: #2563eb;
 }
 
-#autoblog-main-page--wrapper a {
+#wp-ai-blogger-main-page--wrapper a {
 	text-decoration: none;
 }
 
