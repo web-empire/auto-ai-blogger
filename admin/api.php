@@ -33,16 +33,6 @@ class API extends \WP_REST_Controller {
 	use Get_Instance;
 
 	/**
-	 * Maximum requests per hour for rate limiting.
-	 */
-	private const RATE_LIMIT_MAX_REQUESTS = 120;
-
-	/**
-	 * Rate limiting time window in seconds (1 hour).
-	 */
-	private const RATE_LIMIT_WINDOW = 3600;
-
-	/**
 	 * Maximum request size in bytes (1MB).
 	 */
 	private const MAX_REQUEST_SIZE = 1048576;
@@ -226,11 +216,6 @@ class API extends \WP_REST_Controller {
 	 * @since 1.0.0
 	 */
 	public function get_admin_settings( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
-		// Rate limiting check.
-		$rate_limit_check = $this->check_rate_limit( $request );
-		if ( is_wp_error( $rate_limit_check ) ) {
-			return $rate_limit_check;
-		}
 
 		// Get settings with proper error handling.
 		$settings = Settings::get_ai_blogger_settings();
@@ -258,11 +243,8 @@ class API extends \WP_REST_Controller {
 	 * @since 1.0.0
 	 */
 	public function update_admin_settings( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
-		// Rate limiting check.
-		$rate_limit_check = $this->check_rate_limit( $request );
-		if ( is_wp_error( $rate_limit_check ) ) {
-			return $rate_limit_check;
-		}
+		// Rate limiting removed for admin dashboard operations
+		// as they are already protected by capability checks and authentication
 
 		// Validate request size.
 		$request_size_check = $this->validate_request_size( $request );
@@ -484,66 +466,6 @@ class API extends \WP_REST_Controller {
 				);
 			}
 		}
-
-		return true;
-	}
-
-	/**
-	 * Check rate limiting for the current request.
-	 *
-	 * @param \WP_REST_Request $request The request object.
-	 * @return \WP_Error|bool True if allowed, WP_Error if rate limited.
-	 */
-	private function check_rate_limit( \WP_REST_Request $request ): \WP_Error|bool {
-		$client_ip = $this->get_client_ip();
-		$user_id   = get_current_user_id();
-
-		// Create unique key for rate limiting (prefer user ID over IP).
-		$rate_key  = $user_id > 0 ? 'user_' . $user_id : 'ip_' . $client_ip;
-		$cache_key = 'wp_ai_blogger_rate_limit_' . md5( $rate_key );
-
-		// Get cached data.
-		$cached_data = get_transient( $cache_key );
-
-		if ( $cached_data === false ) {
-			// First request - set counter.
-			set_transient(
-				$cache_key,
-				[
-					'count'      => 1,
-					'start_time' => time(),
-				],
-				self::RATE_LIMIT_WINDOW
-			);
-			return true;
-		}
-
-		// Ensure cached data is an array with proper structure.
-		if ( ! is_array( $cached_data ) || ! isset( $cached_data['count'] ) ) {
-			// Reset corrupted cache.
-			set_transient(
-				$cache_key,
-				[
-					'count'      => 1,
-					'start_time' => time(),
-				],
-				self::RATE_LIMIT_WINDOW
-			);
-			return true;
-		}
-
-		// Check if limit exceeded.
-		if ( (int) $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
-			return new \WP_Error(
-				'rate_limit_exceeded',
-				__( 'Too many requests. Please try again later.', 'wp-ai-blogger' ),
-				[ 'status' => 429 ]
-			);
-		}
-
-		// Increment counter.
-		$cached_data['count'] = (int) $cached_data['count'] + 1;
-		set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
 
 		return true;
 	}

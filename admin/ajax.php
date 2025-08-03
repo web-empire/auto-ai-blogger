@@ -37,16 +37,6 @@ class Ajax {
 	use Get_Instance;
 
 	/**
-	 * Maximum AJAX requests per user per hour.
-	 */
-	private const RATE_LIMIT_MAX_REQUESTS = 200;
-
-	/**
-	 * Rate limiting time window in seconds (1 hour).
-	 */
-	private const RATE_LIMIT_WINDOW = 3600;
-
-	/**
 	 * Maximum request size in bytes (2MB for AJAX operations).
 	 */
 	private const MAX_REQUEST_SIZE = 2097152;
@@ -942,12 +932,6 @@ class Ajax {
 				return new \WP_Error( 'permission_denied', $this->get_error_msg( 'permission' ) );
 			}
 
-			// Rate limiting check.
-			$rate_limit_check = $this->check_ajax_rate_limit();
-			if ( is_wp_error( $rate_limit_check ) ) {
-				return $rate_limit_check;
-			}
-
 			// Validate request size.
 			$request_size_check = $this->validate_ajax_request_size();
 			if ( is_wp_error( $request_size_check ) ) {
@@ -971,50 +955,6 @@ class Ajax {
 		} catch ( \Exception $e ) {
 			return new \WP_Error( 'security_error', $this->get_error_msg( 'security_violation' ) );
 		}
-	}
-
-	/**
-	 * Check rate limiting for AJAX requests.
-	 *
-	 * @return bool|\WP_Error True if allowed, WP_Error if rate limited.
-	 * @since x.x.x
-	 */
-	private function check_ajax_rate_limit() {
-		$user_id   = get_current_user_id();
-		$client_ip = $this->get_client_ip();
-
-		// Create unique key for rate limiting (prefer user ID over IP).
-		$rate_key  = $user_id > 0 ? 'user_' . $user_id : 'ip_' . $client_ip;
-		$cache_key = 'wp_ai_blogger_ajax_rate_limit_' . md5( $rate_key );
-
-		// Get cached data.
-		$cached_data = get_transient( $cache_key );
-
-		if ( $cached_data === false ) {
-			// First request - set counter.
-			set_transient(
-				$cache_key,
-				[
-					'count'      => 1,
-					'start_time' => time(),
-				],
-				self::RATE_LIMIT_WINDOW
-			);
-			return true;
-		}
-
-		// Check if limit exceeded.
-		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) && $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
-			return new \WP_Error( 'rate_limit_exceeded', $this->get_error_msg( 'rate_limit' ) );
-		}
-
-		// Increment counter.
-		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) ) {
-			$cached_data['count']++;
-			set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
-		}
-
-		return true;
 	}
 
 	/**
