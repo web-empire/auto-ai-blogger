@@ -24,7 +24,7 @@ const SkeletonRow = memo( ( { index } ) => (
 SkeletonRow.displayName = 'SkeletonRow';
 
 // Enhanced skeleton table component
-const Skeleton = memo( ( { rows = 5, className = '' } ) => {
+const Skeleton = memo( ( { rows = 5 } ) => {
 	// Memoize skeleton rows for performance
 	const skeletonRows = useMemo( () =>
 		Array.from( { length: rows }, ( _, index ) => (

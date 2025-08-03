@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useSelector, useDispatch } from 'react-redux';
-import { Mail, MessageCircle, Bell, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, MessageCircle, Bell, AlertCircle, CheckCircle2 } from 'lucide-react';
 import SwitchControl from '@Components/SwitchControl';
 import SettingsContainer from '@Components/SettingsContainer';
 import InfoCard from '@Components/InfoCard';
