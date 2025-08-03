@@ -2,6 +2,7 @@
 // Import components directly to avoid double lazy loading
 import CampaignsInsights from './CampaignsInsights';
 import PostIdeas from './PostIdeas/PostIdeas';
+import QuickAccess from './QuickAccess/QuickAccess';
 import TokenNotification from './TokenNotification';
 
 // Component metadata for better organization
@@ -18,12 +19,19 @@ export const welcomeComponents = {
 		description: 'AI-generated blog post ideas and suggestions',
 		category: 'content',
 	},
+	QUICK_ACCESS: {
+		component: QuickAccess,
+		name: 'QuickAccess',
+		description: 'Quick access links to support, documentation and community',
+		category: 'navigation',
+	},
 };
 
 // Export individual components (maintaining backward compatibility)
 export {
 	CampaignsInsights,
 	PostIdeas,
+	QuickAccess,
 	TokenNotification,
 };
 
@@ -34,6 +42,7 @@ export const components = Object.values( welcomeComponents );
 export default {
 	CampaignsInsights,
 	PostIdeas,
+	QuickAccess,
 	welcomeComponents,
 	components,
 };

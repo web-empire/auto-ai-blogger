@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw, Crown } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown, Edit } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -30,6 +30,7 @@ export default function PostIdeas() {
 	const postIdeasFromRedux = useSelector( ( state ) => state.postIdeas );
 	const licenseStatus = useSelector( ( state ) => state.license_status );
 	const proAvailable = useSelector( ( state ) => state.proAvailable );
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl );
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
@@ -40,6 +41,7 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
+	const [ createdPosts, setCreatedPosts ] = useState( new Map() ); // Track which posts have been created (title -> editUrl)
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -189,14 +191,14 @@ export default function PostIdeas() {
 		}
 	}, [ postIdeas, licenseEnabled ] );
 
-	const handleRefresh = ( e ) => {
-		e.preventDefault();
-		e.stopPropagation();
-
+	const handleRefresh = useCallback( ( e ) => {
+		// This function should only be called when pro is available
 		if ( ! proAvailable ) {
-			window.open( wpaib_localized_data.pro_purchase_url, '_blank' );
 			return;
 		}
+
+		e.preventDefault();
+		e.stopPropagation();
 
 		dispatch( {
 			type: UPDATE_POST_IDEAS,
@@ -208,7 +210,7 @@ export default function PostIdeas() {
 		setIsApiError( false );
 		hasFetchedRef.current = false; // Reset the fetch flag to allow refetch
 		fetchPostIdeas();
-	};
+	}, [ proAvailable, dispatch, fetchPostIdeas ] );
 
 	if ( ! licenseEnabled ) {
 		return ( '' );
@@ -307,18 +309,13 @@ export default function PostIdeas() {
 			return;
 		}
 
-		// Prevent multiple clicks for the same post
-		if ( creatingPosts.has( title ) ) {
+		// Prevent multiple clicks for the same post OR if any post is being created
+		if ( creatingPosts.has( title ) || creatingPosts.size > 0 ) {
 			return;
 		}
 
 		// Add this post to the creating set
 		setCreatingPosts( ( prev ) => new Set( prev ).add( title ) );
-
-		// Update button to show loading state
-		const originalContent = e.target.innerHTML;
-		e.target.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5)); backdrop-filter: blur(4px);"><circle class="opacity-30" cx="12" cy="12" r="10" stroke-width="3"></circle><path class="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${ __( 'Creating…', 'wp-ai-blogger' ) }`;
-		e.target.style.pointerEvents = 'none';
 
 		const formData = new window.FormData();
 		formData.append( 'action', 'wpaib_create_post' );
@@ -363,9 +360,6 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -381,9 +375,6 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
@@ -398,14 +389,14 @@ export default function PostIdeas() {
 							duration: 5000,
 						},
 					} );
-					// Reset button state
-					e.target.innerHTML = originalContent;
-					e.target.style.pointerEvents = 'auto';
 					return;
 				}
 
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
+
+				// Store the created post information
+				setCreatedPosts( ( prev ) => new Map( prev ).set( title, editUrl ) );
 
 				// Handle token data if present (update Redux state only, database already updated)
 				if ( response.data.token_data &&
@@ -426,13 +417,6 @@ export default function PostIdeas() {
 					await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
 				}
 
-				// Update button to "Edit"
-				e.target.dataset.type = 'open-post';
-				e.target.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line-icon lucide-pen-line"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> ${ __( 'Edit', 'wp-ai-blogger' ) }`;
-				e.target.href = editUrl;
-				e.target.style.pointerEvents = 'auto';
-				e.target.className = 'text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold';
-
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: __( 'Post created successfully! Click "Edit" to edit it.', 'wp-ai-blogger' ),
@@ -451,8 +435,6 @@ export default function PostIdeas() {
 					},
 				} );
 				// Reset button state
-				e.target.innerHTML = originalContent;
-				e.target.style.pointerEvents = 'auto';
 			} )
 			.finally( () => {
 				// Remove this post from the creating set
@@ -470,11 +452,6 @@ export default function PostIdeas() {
 				<div className="flex flex-col gap-2">
 					<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-4 p-0 m-0">
 						{ __( 'Blog Post Suggestions', 'wp-ai-blogger' ) }
-						{ ! proAvailable && (
-							<span className="block text-sm text-amber-600 font-normal">
-								{ `⚡ ${ __( 'Upgrade for Unlimited Ideas!', 'wp-ai-blogger' ) }` }
-							</span>
-						) }
 					</h2>
 
 					<p className="mt-4 text-sm text-gray-700">
@@ -488,7 +465,8 @@ export default function PostIdeas() {
 						size="default"
 						icon={ <Crown className="w-4 h-4" /> }
 						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
-						onClick={ handleRefresh }
+						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
+						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 suggestions, upgrade to pro', 'wp-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
@@ -554,18 +532,57 @@ export default function PostIdeas() {
 															/>
 														</div>
 													</td>
-
-													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm sm:pr-6 text-right">
-														<a
-															target="_blank"
-															href="#"
-															onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
-															className="text-indigo-600 hover:text-indigo-900 flex items-center gap-x-1 cursor-pointer justify-self-end"
-															data-type="create"
-														>
-															<Plus className="w-5 h-5" />
-															{ __( 'Create', 'wp-ai-blogger' ) }
-														</a>
+													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm text-right sm:pr-6">
+														{ createdPosts.has( postTitle ) ? (
+															// Show "Open Post" for created posts
+															<a
+																target="_blank"
+																href={ createdPosts.get( postTitle ) }
+																className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold justify-end"
+																onClick={ ( e ) => {
+																	// Let the default link behavior handle opening the post
+																	e.stopPropagation();
+																} } rel="noreferrer"
+															>
+																<Edit className="w-5 h-5" />
+																{ __( 'Edit', 'wp-ai-blogger' ) }
+															</a>
+														) : (
+															// Show "Create" or loading state
+															<a
+																target="_blank"
+																href="#"
+																onClick={ ( e ) => wpaib_create_post( e, postTitle || '' ) }
+																className={ `flex items-center gap-x-1 cursor-pointer justify-end ${
+																	creatingPosts.size > 0
+																		? ( creatingPosts.has( postTitle )
+																			? 'text-green-600 hover:text-green-900'
+																			: 'text-gray-400 cursor-not-allowed' )
+																		: 'text-indigo-600 hover:text-indigo-900'
+																}` }
+																data-type="create"
+																style={ {
+																	pointerEvents: creatingPosts.size > 0 && ! creatingPosts.has( postTitle ) ? 'none' : 'auto',
+																} }
+															>
+																{ creatingPosts.has( postTitle ) ? (
+																	// Show loading state for the current post being created
+																	<>
+																		<svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style={ { filter: 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.5))', backdropFilter: 'blur(4px)' } }>
+																			<circle className="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" strokeWidth="3"></circle>
+																			<path className="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+																		</svg>
+																		{ __( 'Creating…', 'wp-ai-blogger' ) }
+																	</>
+																) : (
+																	// Show normal or disabled state
+																	<>
+																		<Plus className="w-5 h-5" />
+																		{ __( 'Create', 'wp-ai-blogger' ) }
+																	</>
+																) }
+															</a>
+														) }
 													</td>
 												</tr>
 											) ) }
@@ -579,6 +596,7 @@ export default function PostIdeas() {
 																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }` }
 															</div>
 															<ProButton
+																url={ proPurchaseUrl }
 																variant="primary"
 																size="small"
 																icon={ <MoveRight className="w-4 h-4" /> }
@@ -606,6 +624,7 @@ export default function PostIdeas() {
 											<td colSpan="2" className="px-3 py-3.5 text-center text-sm font-semibold">
 												<div className="flex flex-col items-center space-y-2">
 													<ProButton
+														url={ proPurchaseUrl }
 														variant="primary"
 														size="default"
 														icon={ <MoveRight className="w-5 h-5" /> }

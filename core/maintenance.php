@@ -2,7 +2,7 @@
 /**
  * Maintenance.
  *
- * @package WP_AI_Blogger
+ * @package wp-ai-blogger
  * @since 1.0.0
  */
 
@@ -13,7 +13,7 @@ use WPAIBlogger\Inc\Traits\Get_Instance;
 /**
  * Update Compatibility
  *
- * @package WP_AI_Blogger
+ * @package wp-ai-blogger
  */
 
 /**

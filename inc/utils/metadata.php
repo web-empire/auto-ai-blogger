@@ -2,7 +2,7 @@
 /**
  * Metadata.
  *
- * @package WPAIBlogger
+ * @package wp-ai-blogger
  * @since 1.0.0
  */
 

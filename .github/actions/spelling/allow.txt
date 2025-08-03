@@ -3,7 +3,6 @@ absint
 ABSPATH
 allowedposttags
 astra
-autoblog
 autocrlf
 autoload
 Axksscg
@@ -173,3 +172,4 @@ numberposts
 strtotime
 typenow
 userdata
+whatsapp

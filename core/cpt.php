@@ -5,7 +5,7 @@
  * This class will holds the Campaigns related to the admin area modification
  * along with the plugin functionalities.
  *
- * @package WP AI Blogger
+ * @package wp-ai-blogger
  * @since 1.0.0
  */
 

@@ -52,6 +52,10 @@ class Helper {
 		'enableLogging',
 		'blogName',
 		'adminEmail',
+		'emailNotificationEnabled',
+		'emailNotificationValue',
+		'whatsappNotificationEnabled',
+		'whatsappNotificationValue',
 	];
 
 	/**
@@ -108,32 +112,44 @@ class Helper {
 	 *
 	 * @param  string $key      The option key.
 	 * @param  mixed  $value    Option value to update.
-	 * @return mixed            Return the sanitized option value
+	 * @return array            Returns array with 'success' boolean and 'value' for the sanitized value
 	 *
 	 * @since 1.0.0
 	 */
 	public static function update_option( $key, $value = true ) {
 		// Validate key parameter.
 		if ( ! is_string( $key ) || empty( $key ) ) {
-			return false;
+			return [
+				'success' => false,
+				'error'   => __( 'Invalid key parameter', 'wp-ai-blogger' ),
+			];
 		}
 
 		// Capability check.
 		if ( ! current_user_can( 'manage_options' ) && ! wp_doing_cron() && ! wp_doing_ajax() ) {
-			return false;
+			return [
+				'success' => false,
+				'error'   => 'Insufficient permissions',
+			];
 		}
 
 		// Sanitize key.
 		$key = sanitize_key( $key );
 
 		if ( empty( $key ) ) {
-			return false;
+			return [
+				'success' => false,
+				'error'   => 'Invalid key after sanitization',
+			];
 		}
 
 		// Check if key is in allowed list (compare sanitized versions).
 		$sanitized_allowed_keys = array_map( 'sanitize_key', self::$allowed_keys );
 		if ( ! in_array( $key, $sanitized_allowed_keys, true ) ) {
-			return false;
+			return [
+				'success' => false,
+				'error'   => 'Key not in allowed list',
+			];
 		}
 
 		// Get the original camelCase key for switch statements.
@@ -143,8 +159,13 @@ class Helper {
 		// Sanitize value based on key type (use original camelCase key for switch).
 		$sanitized_value = self::sanitize_input( $original_key, $value );
 
-		if ( $sanitized_value === false ) {
-			return false;
+		// Check if sanitization failed (false can be a valid value for boolean fields).
+		$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+		if ( $sanitized_value === false && ! in_array( $original_key, $boolean_fields, true ) ) {
+			return [
+				'success' => false,
+				'error'   => 'Sanitization failed',
+			];
 		}
 
 		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
@@ -154,7 +175,7 @@ class Helper {
 			$settings = [];
 		}
 
-		// If the value is same as default then remove it from the DB..
+		// If the value is same as default then remove it from the DB.
 		$default_value = Settings::get_default_option( $original_key );
 		$is_default    = false;
 
@@ -173,9 +194,11 @@ class Helper {
 
 		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
 
-		// Note: update_option() returns false if the value is unchanged, which is not necessarily an error.
-		// We return the sanitized value regardless, as the operation was successful.
-		return $sanitized_value;
+		// Return success with the sanitized value.
+		return [
+			'success' => true,
+			'value'   => $sanitized_value,
+		];
 	}
 
 	/**
@@ -265,7 +288,11 @@ class Helper {
 
 			$sanitized_value = self::sanitize_input( $original_key, $value );
 
-			if ( $sanitized_value !== false ) {
+			// Check if sanitization failed (false can be a valid value for boolean fields).
+			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+			$is_valid_value = $sanitized_value !== false || in_array( $original_key, $boolean_fields, true );
+
+			if ( $is_valid_value ) {
 				$settings[ $key ] = $sanitized_value;
 				$updated          = true;
 			}
@@ -399,6 +426,40 @@ class Helper {
 			case 'enableLogging':
 				return (bool) $value;
 
+			case 'emailNotificationEnabled':
+			case 'whatsappNotificationEnabled':
+				return (bool) $value;
+
+			case 'emailNotificationValue':
+				// Support multiple email addresses separated by commas.
+				if ( empty( $value ) ) {
+					return '';
+				}
+				$emails       = array_map( 'trim', explode( ',', $value ) );
+				$valid_emails = [];
+				foreach ( $emails as $email ) {
+					$sanitized_email = sanitize_email( $email );
+					if ( is_email( $sanitized_email ) ) {
+						$valid_emails[] = $sanitized_email;
+					}
+				}
+				// Return empty string if no valid emails (rather than false) to allow saving when disabled.
+				return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
+
+			case 'whatsappNotificationValue':
+				// Basic phone number validation (international format).
+				$phone = sanitize_text_field( $value );
+				// Allow empty values (for when notification is disabled).
+				if ( empty( $phone ) ) {
+					return '';
+				}
+				// Allow international format: +[country code][number].
+				if ( ! preg_match( '/^\+?[1-9]\d{1,14}$/', $phone ) ) {
+					// Return empty string instead of false to allow saving when invalid/empty.
+					return '';
+				}
+				return $phone;
+
 			default:
 				// Unknown key type, apply basic sanitization.
 				if ( is_string( $value ) ) {
@@ -431,9 +492,16 @@ class Helper {
 		foreach ( $settings as $key => $value ) {
 			// Only include allowed keys (compare with sanitized versions).
 			if ( in_array( $key, $sanitized_allowed_keys, true ) ) {
-				// Skip re-sanitization - the value should already be sanitized from update_option.
-				// Only validate that the key is allowed and the value is not false.
-				if ( $value !== false ) {
+				// Get original camelCase key to check if it's a boolean field.
+				$original_key_index = array_search( $key, $sanitized_allowed_keys );
+				$original_key       = self::$allowed_keys[ $original_key_index ];
+
+				// Boolean fields can have false as a valid value.
+				$boolean_fields   = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+				$is_boolean_field = in_array( $original_key, $boolean_fields, true );
+
+				// Include the value if it's not false, or if it's false but for a boolean field.
+				if ( $value !== false || $is_boolean_field ) {
 					$validated[ $key ] = $value;
 				}
 			}

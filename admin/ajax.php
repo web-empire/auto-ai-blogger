@@ -37,16 +37,6 @@ class Ajax {
 	use Get_Instance;
 
 	/**
-	 * Maximum AJAX requests per user per hour.
-	 */
-	private const RATE_LIMIT_MAX_REQUESTS = 200;
-
-	/**
-	 * Rate limiting time window in seconds (1 hour).
-	 */
-	private const RATE_LIMIT_WINDOW = 3600;
-
-	/**
 	 * Maximum request size in bytes (2MB for AJAX operations).
 	 */
 	private const MAX_REQUEST_SIZE = 2097152;
@@ -195,7 +185,7 @@ class Ajax {
 			}
 
 			$sub_option_value = '';
-			if ( ! empty( $_POST['value'] ) ) {
+			if ( isset( $_POST['value'] ) ) {
 				if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
 					$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
 				} else {
@@ -206,7 +196,7 @@ class Ajax {
 			// Update option with error handling.
 			$update_result = Helper::update_option( $sub_option_key, $sub_option_value );
 
-			if ( $update_result === false ) {
+			if ( ! $update_result['success'] ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 				return;
 			}
@@ -558,8 +548,10 @@ class Ajax {
 			}
 
 			// If no content provided, generate content from title via API.
-			$post_content = $post_data['post_content'] ?? '';
-			$token_data   = null; // Initialize token data variable.
+			$featured_image_id = null;
+			$post_content      = $post_data['post_content'] ?? '';
+			$token_data        = null; // Initialize token data variable.
+
 			if ( empty( $post_content ) && ! empty( $post_title ) ) {
 				$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
 				if ( is_wp_error( $api_result ) ) {
@@ -587,7 +579,8 @@ class Ajax {
 					if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
 						$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
 						if ( ! is_wp_error( $processed_result ) ) {
-							$post_content = $processed_result;
+							$post_content      = $processed_result['content'];
+							$featured_image_id = $processed_result['featured_image_id'];
 						}
 					}
 				}
@@ -654,6 +647,12 @@ class Ajax {
 					]
 				);
 				return;
+			}
+
+			// Set featured image if available.
+			if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
+				set_post_thumbnail( $post_id, $featured_image_id );
+				// Note: We don't fail the post creation if thumbnail setting fails as the post content already includes the images.
 			}
 
 			// Remove this title from the postIdeas DB option (but keep Redux unchanged).
@@ -942,12 +941,6 @@ class Ajax {
 				return new \WP_Error( 'permission_denied', $this->get_error_msg( 'permission' ) );
 			}
 
-			// Rate limiting check.
-			$rate_limit_check = $this->check_ajax_rate_limit();
-			if ( is_wp_error( $rate_limit_check ) ) {
-				return $rate_limit_check;
-			}
-
 			// Validate request size.
 			$request_size_check = $this->validate_ajax_request_size();
 			if ( is_wp_error( $request_size_check ) ) {
@@ -974,50 +967,6 @@ class Ajax {
 	}
 
 	/**
-	 * Check rate limiting for AJAX requests.
-	 *
-	 * @return bool|\WP_Error True if allowed, WP_Error if rate limited.
-	 * @since x.x.x
-	 */
-	private function check_ajax_rate_limit() {
-		$user_id   = get_current_user_id();
-		$client_ip = $this->get_client_ip();
-
-		// Create unique key for rate limiting (prefer user ID over IP).
-		$rate_key  = $user_id > 0 ? 'user_' . $user_id : 'ip_' . $client_ip;
-		$cache_key = 'wp_ai_blogger_ajax_rate_limit_' . md5( $rate_key );
-
-		// Get cached data.
-		$cached_data = get_transient( $cache_key );
-
-		if ( $cached_data === false ) {
-			// First request - set counter.
-			set_transient(
-				$cache_key,
-				[
-					'count'      => 1,
-					'start_time' => time(),
-				],
-				self::RATE_LIMIT_WINDOW
-			);
-			return true;
-		}
-
-		// Check if limit exceeded.
-		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) && $cached_data['count'] >= self::RATE_LIMIT_MAX_REQUESTS ) {
-			return new \WP_Error( 'rate_limit_exceeded', $this->get_error_msg( 'rate_limit' ) );
-		}
-
-		// Increment counter.
-		if ( is_array( $cached_data ) && isset( $cached_data['count'] ) ) {
-			$cached_data['count']++;
-			set_transient( $cache_key, $cached_data, self::RATE_LIMIT_WINDOW );
-		}
-
-		return true;
-	}
-
-	/**
 	 * Validate AJAX request size.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if too large.
@@ -1031,36 +980,6 @@ class Ajax {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get the client's IP address.
-	 *
-	 * @return string The client's IP address.
-	 * @since x.x.x
-	 */
-	private function get_client_ip() {
-		$ip_headers = [
-			'HTTP_CF_CONNECTING_IP',     // Cloudflare.
-			'HTTP_X_FORWARDED_FOR',      // Load balancers/proxies.
-			'HTTP_X_FORWARDED',          // Proxies.
-			'HTTP_X_CLUSTER_CLIENT_IP',  // Cluster environments.
-			'HTTP_FORWARDED_FOR',        // Proxies.
-			'HTTP_FORWARDED',            // Proxies.
-			'REMOTE_ADDR',                // Standard.
-		];
-
-		foreach ( $ip_headers as $header ) {
-			if ( ! empty( $_SERVER[ $header ] ) ) {
-				$ips = explode( ',', sanitize_text_field( (string) $_SERVER[ $header ] ) );
-				$ip  = trim( $ips[0] );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
-					return $ip;
-				}
-			}
-		}
-
-		return sanitize_text_field( (string) ( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
 	}
 
 	/**
@@ -1532,17 +1451,21 @@ class Ajax {
 	 *
 	 * @param string                           $content The post content with placeholders.
 	 * @param array<int, array<string, mixed>> $images Array of image data from API.
-	 * @return string|\WP_Error Processed content with images or error.
+	 * @return array<string, mixed>|\WP_Error Processed data with content and featured image ID or error.
 	 * @since x.x.x
 	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		try {
 			if ( empty( $images ) || ! is_array( $images ) ) {
-				return $content;
+				return [
+					'content'           => $content,
+					'featured_image_id' => null,
+				];
 			}
 
 			$processed_content = $content;
 			$image_html_blocks = [];
+			$featured_image_id = null;
 
 			// Process each image.
 			foreach ( $images as $image_data ) {
@@ -1560,6 +1483,11 @@ class Ajax {
 				if ( is_wp_error( $attachment_id ) ) {
 					// Log error but continue processing other images.
 					continue;
+				}
+
+				// Set the first successfully uploaded image as featured image.
+				if ( $featured_image_id === null ) {
+					$featured_image_id = $attachment_id;
 				}
 
 				// Get the uploaded image details.
@@ -1600,7 +1528,10 @@ class Ajax {
 				}
 			}
 
-			return $processed_content;
+			return [
+				'content'           => $processed_content,
+				'featured_image_id' => $featured_image_id,
+			];
 
 		} catch ( \Exception $e ) {
 			return new \WP_Error(

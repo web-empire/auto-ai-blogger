@@ -101,6 +101,12 @@ const getInitialState = () => {
 		proVersion: safeParseLocalizedData( wpaib_localized_data.pro_version, 'string', '' ),
 		postTypes: safeParseLocalizedData( wpaib_localized_data.post_types, 'object', {} ),
 
+		// Notification settings - default to false/empty
+		emailNotificationEnabled: safeParseLocalizedData( wpaib_localized_data.email_notification_enabled, 'boolean', false ),
+		emailNotificationValue: safeParseLocalizedData( wpaib_localized_data.email_notification_value, 'string', wpaib_localized_data.admin_email || '' ),
+		whatsappNotificationEnabled: safeParseLocalizedData( wpaib_localized_data.whatsapp_notification_enabled, 'boolean', false ),
+		whatsappNotificationValue: safeParseLocalizedData( wpaib_localized_data.whatsapp_notification_value, 'string', '' ),
+
 		isLoading: false,
 		error: null,
 	};

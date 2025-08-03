@@ -1,7 +1,7 @@
-=== AutoBlog AI ===
+=== WP AI BLOGGER ===
 
-Contributors: webempire
-Tags: wp, docs, wp docs hub, knowledge base, article
+Contributors: wpsolvex
+Tags: ai, artificial intelligence, blog, blogging, content creation, auto blogging, automated content, ai writer, content generator, seo, chatgpt, openai, automation, post generator, article writer
 Tested up to: 6.7
 Stable tag: 0.0.1
 License: GPLv2 or later
