@@ -223,10 +223,7 @@ class Licensing {
 			$this->update_license_status( $license_key, 'licensed' );
 
 			// Save license data to admin settings for frontend access.
-			$result = Helper::update_option( 'license_status', 'licensed' );
-			if ( ! $result['success'] ) {
-				error_log( 'Failed to update license_status: ' . ( $result['error'] ?? 'Unknown error' ) );
-			}
+			Helper::update_option( 'license_status', 'licensed' );
 
 			// Log successful activation.
 			$this->log_license_activity( 'activate', $license_key, get_current_user_id() );
@@ -284,20 +281,9 @@ class Licensing {
 			$this->update_license_status( '', 'unlicensed' );
 
 			// Clear license data from admin settings.
-			$license_result = Helper::update_option( 'license_status', 'unlicensed' );
-			$total_result = Helper::update_option( 'tokenTotal', 0 );
-			$remaining_result = Helper::update_option( 'tokenRemaining', 0 );
-
-			// Log any update errors but don't fail the deactivation
-			if ( ! $license_result['success'] ) {
-				error_log( 'Failed to update license_status: ' . ( $license_result['error'] ?? 'Unknown error' ) );
-			}
-			if ( ! $total_result['success'] ) {
-				error_log( 'Failed to update tokenTotal: ' . ( $total_result['error'] ?? 'Unknown error' ) );
-			}
-			if ( ! $remaining_result['success'] ) {
-				error_log( 'Failed to update tokenRemaining: ' . ( $remaining_result['error'] ?? 'Unknown error' ) );
-			}
+			Helper::update_option( 'license_status', 'unlicensed' );
+			Helper::update_option( 'tokenTotal', 0 );
+			Helper::update_option( 'tokenRemaining', 0 );
 
 			// Log successful deactivation.
 			$this->log_license_activity( 'deactivate', $current_license, get_current_user_id() );
@@ -667,24 +653,11 @@ class Licensing {
 		}
 
 		// Update options securely.
-		$license_result = Helper::update_option( 'license', $license_key );
-		$status_result = Helper::update_option( 'license_status', $status );
+		Helper::update_option( 'license', $license_key );
+		Helper::update_option( 'license_status', $status );
 
 		// Also update admin settings for frontend access.
-		$admin_status_result = Helper::update_option( 'licenseStatus', $status );
-
-		// Log any update errors
-		if ( ! $license_result['success'] ) {
-			error_log( 'Failed to update license: ' . ( $license_result['error'] ?? 'Unknown error' ) );
-		}
-		if ( ! $status_result['success'] ) {
-			error_log( 'Failed to update license_status: ' . ( $status_result['error'] ?? 'Unknown error' ) );
-		}
-		if ( ! $admin_status_result['success'] ) {
-			error_log( 'Failed to update licenseStatus: ' . ( $admin_status_result['error'] ?? 'Unknown error' ) );
-		}
-
-		// Update cache.
+		Helper::update_option( 'licenseStatus', $status );		// Update cache.
 		self::update_license_cache( $license_key, $status );
 	}
 
@@ -785,10 +758,7 @@ class Licensing {
 		// If status is not set, check license and update.
 		if ( empty( $license_status ) ) {
 			$license_status = self::is_license_active() ? 'licensed' : 'unlicensed';
-			$result = Helper::update_option( 'license_status', $license_status );
-			if ( ! $result['success'] ) {
-				error_log( 'Failed to update license_status: ' . ( $result['error'] ?? 'Unknown error' ) );
-			}
+			Helper::update_option( 'license_status', $license_status );
 		}
 
 		return sanitize_key( $license_status );

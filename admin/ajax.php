@@ -1283,18 +1283,10 @@ class Ajax {
 					// Check if this was the last post idea.
 					if ( empty( $updated_ideas ) ) {
 						// Set to "-1" to indicate post ideas are exhausted.
-						$result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
-						if ( ! $result['success'] ) {
-							// Log error but don't fail the post creation
-							error_log( 'Failed to update postIdeas: ' . ( $result['error'] ?? 'Unknown error' ) );
-						}
+						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
 					} else {
 						$updated_post_ideas_string = implode( "\n", $updated_ideas );
-						$result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
-						if ( ! $result['success'] ) {
-							// Log error but don't fail the post creation
-							error_log( 'Failed to update postIdeas: ' . ( $result['error'] ?? 'Unknown error' ) );
-						}
+						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
 					}
 				}
 			} finally {
