@@ -150,8 +150,6 @@ const ProButton = forwardRef( ( {
 		);
 	}, [ loading, icon, iconPosition, children ] );
 
-	const tooltipClasses = `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50`;
-
 	// Tooltip position styles.
 	const tooltipPositions = {
 		top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
@@ -163,7 +161,7 @@ const ProButton = forwardRef( ( {
 	return (
 		<div className="relative inline-block">
 			{ tooltip && showTooltip && (
-				<div className={ tooltipClasses }>
+				<div className={ `absolute ${ tooltipPositions[ tooltipPosition ] || tooltipPositions.top } bg-gray-800 text-white text-xs rounded px-2 py-1 max-w-xs text-center whitespace-nowrap z-50` }>
 					{ tooltip }
 				</div>
 			) }

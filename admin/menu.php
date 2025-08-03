@@ -16,6 +16,7 @@ namespace WPAIBlogger\Admin;
 use WPAIBlogger\Inc\Traits\Get_Instance;
 use WPAIBlogger\Inc\Utils\Helper;
 use WPAIBlogger\Inc\Utils\Metadata;
+use WPAIBlogger\Inc\Utils\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -185,11 +186,11 @@ class Menu {
 		$whatsapp_notification_value   = sanitize_text_field( Helper::get_option( 'whatsappNotificationValue', '' ) );
 
 		// Get data with proper error handling in the methods themselves.
-		$post_statuses     = $this->get_sanitized_post_statuses();
-		$categories        = $this->get_sanitized_categories();
-		$tags              = $this->get_sanitized_tags();
-		$authors           = $this->get_sanitized_authors();
-		$post_types        = $this->get_sanitized_post_types();
+		$post_statuses     = Sanitizer::get_sanitized_post_statuses();
+		$categories        = Sanitizer::get_sanitized_categories();
+		$tags              = Sanitizer::get_sanitized_tags();
+		$authors           = Sanitizer::get_sanitized_authors();
+		$post_types        = Sanitizer::get_sanitized_post_types();
 		$postmeta_defaults = Metadata::get_default_settings();
 		$all_campaigns     = wpaib_get_all_campaigns();
 		$generated_posts   = wpaib_get_generated_posts();
@@ -386,181 +387,6 @@ class Menu {
 		}
 
 		return $validated;
-	}
-
-	/**
-	 * Sanitizes license data
-	 *
-	 * @since 1.0.0
-	 * @param array $license License data.
-	 * @return array Sanitized license data
-	 */
-	private function sanitize_license_data( $license ): array {
-		if ( ! is_array( $license ) ) {
-			return [];
-		}
-
-		$sanitized    = [];
-		$allowed_keys = [ 'key', 'status', 'expires', 'sites_allowed', 'activations_left' ];
-
-		foreach ( $allowed_keys as $key ) {
-			if ( isset( $license[ $key ] ) ) {
-				switch ( $key ) {
-					case 'key':
-						$sanitized[ $key ] = sanitize_text_field( $license[ $key ] );
-						break;
-					case 'status':
-						$sanitized[ $key ] = sanitize_key( $license[ $key ] );
-						break;
-					case 'expires':
-						$sanitized[ $key ] = sanitize_text_field( $license[ $key ] );
-						break;
-					case 'sites_allowed':
-					case 'activations_left':
-						$sanitized[ $key ] = absint( $license[ $key ] );
-						break;
-				}
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Sanitizes post ideas data
-	 *
-	 * @since 1.0.0
-	 * @param mixed $post_ideas Post ideas data.
-	 * @return array Sanitized post ideas
-	 */
-	private function sanitize_post_ideas( $post_ideas ): array {
-		if ( ! is_array( $post_ideas ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $post_ideas as $idea ) {
-			if ( is_string( $idea ) ) {
-				$sanitized[] = sanitize_textarea_field( $idea );
-			}
-		}
-
-		return array_slice( $sanitized, 0, 50 ); // Limit to 50 ideas.
-	}
-
-	/**
-	 * Gets sanitized post statuses
-	 *
-	 * @since 1.0.0
-	 * @return array Sanitized post statuses
-	 */
-	private function get_sanitized_post_statuses(): array {
-		$statuses = wpaib_get_post_statuses();
-		if ( ! is_array( $statuses ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $statuses as $key => $label ) {
-			$sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $label );
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Gets sanitized categories
-	 *
-	 * @since 1.0.0
-	 * @return array Sanitized categories
-	 */
-	private function get_sanitized_categories(): array {
-		$categories = wpaib_get_categories();
-		if ( ! is_array( $categories ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $categories as $category ) {
-			if ( isset( $category['id'], $category['name'] ) ) {
-				$sanitized[] = [
-					'id'   => absint( $category['id'] ),
-					'name' => sanitize_text_field( $category['name'] ),
-				];
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Gets sanitized tags
-	 *
-	 * @since 1.0.0
-	 * @return array Sanitized tags
-	 */
-	private function get_sanitized_tags(): array {
-		$tags = wpaib_get_tags();
-		if ( ! is_array( $tags ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $tags as $tag ) {
-			if ( isset( $tag['id'], $tag['name'] ) ) {
-				$sanitized[] = [
-					'id'   => absint( $tag['id'] ),
-					'name' => sanitize_text_field( $tag['name'] ),
-				];
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Gets sanitized authors
-	 *
-	 * @since 1.0.0
-	 * @return array Sanitized authors
-	 */
-	private function get_sanitized_authors(): array {
-		$authors = wpaib_get_authors();
-		if ( ! is_array( $authors ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $authors as $author ) {
-			if ( isset( $author['id'], $author['name'] ) ) {
-				$sanitized[] = [
-					'id'   => absint( $author['id'] ),
-					'name' => sanitize_text_field( $author['name'] ),
-				];
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Gets sanitized post types
-	 *
-	 * @since 1.0.0
-	 * @return array Sanitized post types
-	 */
-	private function get_sanitized_post_types(): array {
-		$post_types = wpaib_get_post_types();
-		if ( ! is_array( $post_types ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $post_types as $key => $label ) {
-			$sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $label );
-		}
-
-		return $sanitized;
 	}
 
 	/**
