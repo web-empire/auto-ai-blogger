@@ -548,8 +548,10 @@ class Ajax {
 			}
 
 			// If no content provided, generate content from title via API.
-			$post_content = $post_data['post_content'] ?? '';
-			$token_data   = null; // Initialize token data variable.
+			$featured_image_id = null;
+			$post_content      = $post_data['post_content'] ?? '';
+			$token_data        = null; // Initialize token data variable.
+
 			if ( empty( $post_content ) && ! empty( $post_title ) ) {
 				$api_result = $this->generate_content_from_title_api( $post_title, $post_data );
 				if ( is_wp_error( $api_result ) ) {
@@ -574,11 +576,10 @@ class Ajax {
 					$token_data = $api_result['token_data'] ?? null;
 
 					// Process images if they exist in the API response.
-					$featured_image_id = null;
 					if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
 						$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_result['images'] );
 						if ( ! is_wp_error( $processed_result ) ) {
-							$post_content = $processed_result['content'];
+							$post_content      = $processed_result['content'];
 							$featured_image_id = $processed_result['featured_image_id'];
 						}
 					}
@@ -650,9 +651,8 @@ class Ajax {
 
 			// Set featured image if available.
 			if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
-				$set_thumbnail_result = set_post_thumbnail( $post_id, $featured_image_id );
-				// Note: We don't fail the post creation if thumbnail setting fails
-				// as the post content already includes the images.
+				set_post_thumbnail( $post_id, $featured_image_id );
+				// Note: We don't fail the post creation if thumbnail setting fails as the post content already includes the images.
 			}
 
 			// Remove this title from the postIdeas DB option (but keep Redux unchanged).
@@ -1458,7 +1458,7 @@ class Ajax {
 		try {
 			if ( empty( $images ) || ! is_array( $images ) ) {
 				return [
-					'content' => $content,
+					'content'           => $content,
 					'featured_image_id' => null,
 				];
 			}
@@ -1468,7 +1468,7 @@ class Ajax {
 			$featured_image_id = null;
 
 			// Process each image.
-			foreach ( $images as $index => $image_data ) {
+			foreach ( $images as $image_data ) {
 				if ( ! is_array( $image_data ) || empty( $image_data['url'] ) ) {
 					// Skip images without URLs.
 					continue;
@@ -1529,7 +1529,7 @@ class Ajax {
 			}
 
 			return [
-				'content' => $processed_content,
+				'content'           => $processed_content,
 				'featured_image_id' => $featured_image_id,
 			];
 

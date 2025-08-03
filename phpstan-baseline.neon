@@ -96,6 +96,11 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Parameter \\#2 \\$thumbnail_id of function set_post_thumbnail expects int, float\\|int\\<min, \\-1\\>\\|int\\<1, max\\>\\|string given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: admin/ajax.php
