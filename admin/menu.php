@@ -205,7 +205,7 @@ class Menu {
 				'admin_base_url'     => esc_url( admin_url( 'edit.php' ) ),
 				'admin_app_url'      => esc_url( admin_url( 'edit.php?page=' . self::PAGE_ID ) ),
 				'upgrade_link'       => defined( 'WP_AI_BLOGGER_UPGRADE_LINK' ) ? esc_url( WP_AI_BLOGGER_UPGRADE_LINK ) : '#',
-				'pro_purchase_url'   => esc_url( 'https://wpaiblogger.com/' ),
+				'pro_purchase_url'   => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
 				'pro_available'      => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
 				'pro_version'        => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
 				'edit_post_link'     => esc_url(

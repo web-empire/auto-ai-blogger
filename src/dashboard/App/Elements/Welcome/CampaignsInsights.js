@@ -1,8 +1,13 @@
-import React, { useMemo, useCallback, memo } from 'react';
+import React, { useMemo, useCallback, memo, useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MoveRight, Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, CalendarCheck, ChartPie } from 'lucide-react';
+import { Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, ChartNoAxesColumn, RotateCw, Settings, List } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { TrimWordsContent } from '@Utils/TrimWordsContent';
+import { ConfigureDrawer } from '@Elements/Campaigns';
+import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
+import { Tooltip } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 
 // Enhanced metric card component with animations and accessibility.
 const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, className = '', getOnlyDetails = false } ) => (
@@ -19,7 +24,7 @@ const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, clas
 				<span className="text-sm font-medium text-gray-600">{ metric }</span>
 			</div>
 
-			<div className={ `${ getOnlyDetails ? 'text-base' : 'text-xl' } font-bold text-gray-900` } aria-label={ `${ metric }: ${ value }` }>
+			<div className={ `${ getOnlyDetails ? 'text-base' : 'text-xl' } font-medium text-gray-900` } aria-label={ `${ metric }: ${ value }` }>
 				{ value }
 				{ trend && (
 					<div className={ `flex items-center gap-1 text-xs ${ trend > 0 ? 'text-green-600' : 'text-red-600' }` }>
@@ -30,26 +35,140 @@ const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, clas
 			</div>
 		</div>
 
-		<div className="space-y-1">
-			{ description && (
+		{ description && (
+			<div className="space-y-1">
 				<p className="text-xs text-gray-500">{ description }</p>
-			) }
-		</div>
+			</div>
+		) }
 	</div>
 ) );
 
 MetricCard.displayName = 'CampaignMetricCard';
 
 // Enhanced campaign card component with better UX.
-const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
-	const handleKeyDown = useCallback( ( e ) => {
-		if ( e.key === 'Enter' || e.key === ' ' ) {
-			e.preventDefault();
-			onViewDetails( campaign );
-		}
-	}, [ campaign, onViewDetails ] );
+const CampaignCard = memo( ( { campaign } ) => {
+	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
+	const campaigns = useSelector( ( state ) => state.allCampaigns ) || {};
 	const isPerformant = ( campaign?.postsVisit || 0 ) > 100;
+	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
+	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
+	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults );
+	const [ openViewDrawer, setOpenViewDrawer ] = useState( false );
+	const [ openDrawer, setOpenDrawer ] = useState( false );
+	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
+
+	const viewCampaignConfiguration = ( e ) => {
+		e.preventDefault();
+
+		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
+		if ( ! campaignId ) {
+			return;
+		}
+
+		fetchCampaignMetaData( campaignId )
+			.then( ( data ) => {
+				if ( data ) {
+					setViewConfigureData(
+						{
+							...data,
+							type: 'view',
+						}
+					);
+					setOpenViewDrawer( true );
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+	};
+
+	const fetchCampaignMetaData = async ( campaignId ) => {
+		const formData = new window.FormData();
+
+		formData.append( 'action', 'wpaib_get_campaign_metadata' );
+		formData.append( 'security', wpaib_localized_data.admin_nonce );
+		formData.append( 'campaign_id', campaignId );
+
+		const response = await apiFetch( {
+			url: wpaib_localized_data.ajax_url,
+			method: 'POST',
+			body: formData,
+		} )
+			.then( ( data ) => {
+				if ( data.success ) {
+					return data.data.data;
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+
+		return response;
+	};
+
+	const configureCampaign = ( e ) => {
+		e.preventDefault();
+		setOpeningConfigureDrawer( true );
+
+		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
+		if ( ! campaignId ) {
+			return;
+		}
+
+		fetchCampaignMetaData( campaignId )
+			.then( ( data ) => {
+				if ( data ) {
+					setConfigureData(
+						{
+							...data,
+							type: 'edit',
+						}
+					);
+					setOpenDrawer( true );
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+			} );
+
+		setOpeningConfigureDrawer( false );
+	};
+
+	const viewCampaignPosts = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data to determine the post type
+		const campaignData = campaigns[ campaignId ];
+		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found.
+
+		// Redirect to All Posts page with campaign filter
+		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		let filterUrl;
+
+		// For 'post' type, we don't need to specify post_type parameter
+		if ( postType === 'post' ) {
+			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+		} else {
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+		}
+
+		window.open( filterUrl, '_blank' );
+	};
+
+	const openCampaignAnalytics = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data.
+		const campaignData = campaigns[ campaignId ];
+
+		// Open analytics modal.
+		setAnalyticsModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
 
 	return (
 		<div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-solid border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 group">
@@ -60,14 +179,7 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 				</div>
 			) }
 
-			<div className="p-6">
-				{ /* Campaign header */ }
-				<div className="mb-4">
-					<h4 className="text-base font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors p-0 m-0">
-						{ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
-					</h4>
-				</div>
-
+			<div className="p-4">
 				{ /* Metrics grid */ }
 				<div className="flex flex-col gap-2">
 					<MetricCard
@@ -93,18 +205,72 @@ const CampaignCard = memo( ( { campaign, onViewDetails } ) => {
 			</div>
 
 			{ /* Enhanced footer with action */ }
-			<div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-				<button
-					type="button"
-					onClick={ () => onViewDetails( campaign ) }
-					onKeyDown={ handleKeyDown }
-					className="w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-0 bg-transparent transition-all duration-200"
-					aria-label={ __( 'View details for campaign', 'wp-ai-blogger' ) }
-				>
-					<span>{ __( 'View Campaign Details', 'wp-ai-blogger' ) }</span>
-					<MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-				</button>
+			<div className="bg-gray-50 p-4 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-all duration-200" onClick={ viewCampaignConfiguration }>
+				<TrimWordsContent
+					content={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
+					count={ 5 }
+				/>
+
+				<div className="flex items-center gap-x-3">
+					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+						viewCampaignPosts( e, campaign.id );
+					} }>
+						<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
+							delay={ 100 }
+							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+						>
+							<List className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+						</Tooltip>
+					</a>
+
+					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
+						<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
+							delay={ 100 }
+							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+						>
+							{
+								openingConfigureDrawer ? (
+									<RotateCw className="w-4 h-4 animate-spin text-indigo-600 hover:text-indigo-700" />
+								) : (
+									<Settings className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+								)
+							}
+						</Tooltip>
+					</a>
+
+					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+						openCampaignAnalytics( e, campaign.id );
+					} }>
+						<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
+							delay={ 100 }
+							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+						>
+							<ChartNoAxesColumn className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+						</Tooltip>
+					</a>
+				</div>
 			</div>
+
+			<ConfigureDrawer
+				openDrawer={ openDrawer }
+				setOpenDrawer={ setOpenDrawer }
+				configureData={ configureData }
+				mode="edit"
+			/>
+
+			<ConfigureDrawer
+				openDrawer={ openViewDrawer }
+				setOpenDrawer={ setOpenViewDrawer }
+				configureData={ viewConfigureData }
+				mode="view"
+			/>
+
+			<CampaignAnalyticsModal
+				isOpen={ analyticsModal.isOpen }
+				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ analyticsModal.campaignId }
+				campaignData={ analyticsModal.campaignData }
+			/>
 		</div>
 	);
 } );
@@ -187,7 +353,7 @@ function CampaignsInsights( { onError } ) {
 		};
 	}, [ allCampaigns ] );
 
-	// Enhanced navigation handlers
+	// Enhanced navigation handlers.
 	const handleNavigateToLicense = useCallback( ( event ) => {
 		event.preventDefault();
 		try {
@@ -198,21 +364,12 @@ function CampaignsInsights( { onError } ) {
 		}
 	}, [ navigate, onError, homeSlug ] );
 
-	const handleViewCampaignDetails = useCallback( ( campaign ) => {
-		try {
-			navigate( `?page=${ homeSlug }&path=campaigns&id=${ campaign.id }` );
-		} catch ( error ) {
-			console.error( 'Navigation error:', error );
-			onError?.( error, { component: 'CampaignsInsights', action: 'view_campaign_details' } );
-		}
-	}, [ navigate, onError, homeSlug ] );
-
-	// License check
+	// License check.
 	if ( licenseStatus !== 'licensed' ) {
 		return <LicenseRequiredState onNavigateToLicense={ handleNavigateToLicense } />;
 	}
 
-	// Empty state
+	// Empty state.
 	if ( ! campaignsData.campaigns || campaignsData.campaigns.length === 0 ) {
 		return (
 			<section
@@ -237,52 +394,6 @@ function CampaignsInsights( { onError } ) {
 			className="px-4 sm:px-6 lg:px-8 py-8"
 			aria-labelledby="campaigns-insights-heading"
 		>
-			{ /* Enhanced header with summary stats */ }
-			<div className="mb-8">
-				<div className="flex items-center justify-between">
-					<div>
-						<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
-							{ __( 'Overall Metrics', 'wp-ai-blogger' ) }
-						</h2>
-					</div>
-
-					{ campaignsData.activeCampaigns > 0 && (
-						<div className="flex items-center gap-1 text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm font-medium">
-							<TrendingUp className="w-4 h-4" aria-hidden="true" />
-							<span>{ campaignsData.activeCampaigns } { __( 'active', 'wp-ai-blogger' ) }</span>
-						</div>
-					) }
-				</div>
-
-				{ /* Summary metrics */ }
-				<div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
-					<MetricCard
-						metric={ __( 'Total Posts', 'wp-ai-blogger' ) }
-						value={ campaignsData.totalPosts.toLocaleString() }
-						icon={ BarChart3 }
-						className="bg-blue-50 border-blue-200"
-					/>
-					<MetricCard
-						metric={ __( 'Total Visits', 'wp-ai-blogger' ) }
-						value={ campaignsData.totalVisits.toLocaleString() }
-						icon={ Eye }
-						className="bg-green-50 border-green-200"
-					/>
-					<MetricCard
-						metric={ __( 'Active Campaigns', 'wp-ai-blogger' ) }
-						value={ `${ campaignsData.activeCampaigns }/${ campaignsData.totalCampaigns }` }
-						icon={ CalendarCheck }
-						className="bg-purple-50 border-purple-200"
-					/>
-					<MetricCard
-						metric={ __( 'Analytics', 'wp-ai-blogger' ) }
-						value={ `${ campaignsData.activeCampaigns }/${ campaignsData.totalCampaigns }` }
-						icon={ ChartPie }
-						className="bg-purple-50 border-purple-200"
-					/>
-				</div>
-			</div>
-
 			{ /* Enhanced campaigns grid */ }
 			<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
 				{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
@@ -297,7 +408,6 @@ function CampaignsInsights( { onError } ) {
 						<CampaignCard
 							key={ campaign?.id || `campaign-${ index }` }
 							campaign={ campaign }
-							onViewDetails={ handleViewCampaignDetails }
 						/>
 					) )
 				) : (

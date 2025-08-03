@@ -101,7 +101,7 @@ const CallToActionSection = memo( () => {
 				</h2>
 
 				{ /* Enhanced description with benefits */ }
-				<div className="max-w-2xl space-y-3 mb-8">
+				<div className="max-w-2xl space-y-3 mb-4">
 					<p className="text-lg text-gray-700">
 						{ __( 'Unlock all the features and take your blog to the next level with AI Blogger Pro.', 'wp-ai-blogger' ) }
 					</p>
@@ -128,7 +128,7 @@ const CallToActionSection = memo( () => {
 
 				{ /* Additional trust signals */ }
 				<p className="force-mt-4 text-xs text-gray-500">
-					{ __( '14-day money-back guarantee • Cancel anytime • Instant activation', 'wp-ai-blogger' ) }
+					{ __( '14-day Money-back Guarantee • Cancel Anytime • Instant Activation', 'wp-ai-blogger' ) }
 				</p>
 			</div>
 		</section>

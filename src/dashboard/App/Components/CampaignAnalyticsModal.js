@@ -95,7 +95,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 							{ /* Header */ }
 							<div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6 flex-shrink-0">
 								<div className="flex items-center space-x-3">
-									<div className="p-2 bg-indigo-100 rounded-lg">
+									<div className="p-2 bg-indigo-100 rounded-lg flex">
 										<BarChart3 className="w-6 h-6 text-indigo-600" />
 									</div>
 									<div>
@@ -107,10 +107,11 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 										</p>
 									</div>
 								</div>
+
 								<button
 									type="button"
 									onClick={ closeModal }
-									className="text-gray-400 hover:text-gray-500 focus:outline-none rounded"
+									className="text-gray-400 hover:text-gray-500 focus:outline-none rounded flex"
 								>
 									<span className="sr-only">Close</span>
 									<XMarkIcon className="h-5 w-5 flex" />
@@ -248,13 +249,13 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 										<div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
 											<div className="flex items-center justify-between">
 												<div className="flex items-center space-x-3">
-													<div className="p-2 bg-white bg-opacity-20 rounded-lg">
+													<div className="p-2 bg-white bg-opacity-20 rounded-lg flex">
 														<Crown className="w-5 h-5 text-white" />
 													</div>
 													<div>
 														<h4 className="text-base font-bold m-0">{ __( 'Unlock AI Backed Analytics', 'wp-ai-blogger' ) }</h4>
 														<p className="text-indigo-100 text-sm m-0">
-															{ __( 'Drive better results with in-depth analytics, keyword performance tracking, and smart AI recommendations — all backed by real data.', 'wp-ai-blogger' ) }
+															{ __( 'Boost results with smart AI insights, keyword tracking, and real-time analytics.', 'wp-ai-blogger' ) }
 														</p>
 													</div>
 												</div>

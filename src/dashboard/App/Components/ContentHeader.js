@@ -42,11 +42,6 @@ const ContentHeader = ( {
 	onSaveComplete,
 	onSaveError,
 } ) => {
-	// Don't render for license tab - check this FIRST before any other processing
-	if ( tab === 'license' ) {
-		return null;
-	}
-
 	const abortControllerRef = useRef( {} ); // eslint-disable-line
 	const dispatch = useDispatch(); // eslint-disable-line
 	const [ processing, setProcessing ] = useState( false ); // eslint-disable-line

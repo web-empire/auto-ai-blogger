@@ -43,20 +43,21 @@ const SafetyFilterControl = memo( ( {
 	], [ blockLabels ] );
 
 	return (
-		<div className="p-4 border border-gray-200 rounded-lg bg-white">
+		<div className="p-2 border border-gray-200 rounded-lg bg-white">
 			{ /* Header with icon and title */ }
-			<div className="flex items-center gap-3 mb-3">
-				<div className={ `p-2 rounded-lg ${ getSeverityColor( value ) }` }>
+			<div className="flex items-center gap-3 mb-2">
+				<div className={ `p-2 rounded-lg flex ${ getSeverityColor( value ) }` }>
 					<Icon className="w-4 h-4" aria-hidden="true" />
 				</div>
-				<div className="flex-1">
-					<h3 className="text-sm font-semibold text-gray-900">{ title }</h3>
-					<p className="text-xs text-gray-600">{ description }</p>
-				</div>
-				<div className={ `px-2 py-1 rounded-full text-xs font-medium ${ getSeverityColor( value ) }` }>
-					{ blockLabels[ value ] || 'Unknown' }
+				<div className="flex-1 flex justify-between items-center">
+					<h3 className="text-sm font-semibold text-gray-900 p- m-0">{ title }</h3>
+					<div className={ `px-2 py-1 rounded-full text-xs font-medium ${ getSeverityColor( value ) }` }>
+						{ blockLabels[ value ] || __( 'Unknown', 'wp-ai-blogger' ) }
+					</div>
 				</div>
 			</div>
+
+			<p className="text-xs text-gray-600 mb-3">{ description }</p>
 
 			{ /* Range control */ }
 			<div className="mt-3">
@@ -119,9 +120,9 @@ const TemperatureControl = memo( ( { value, onChange, disabled = false } ) => {
 	};
 
 	return (
-		<div className="p-4 border border-gray-200 rounded-lg bg-white">
+		<div className="p-2 border border-gray-200 rounded-lg bg-white">
 			<div className="flex items-center gap-3 mb-3">
-				<div className={ `p-2 rounded-lg ${ getTemperatureColor( value ) }` }>
+				<div className={ `p-2 rounded-lg flex ${ getTemperatureColor( value ) }` }>
 					<Thermometer className="w-4 h-4" aria-hidden="true" />
 				</div>
 				<div className="flex-1">
@@ -129,7 +130,7 @@ const TemperatureControl = memo( ( { value, onChange, disabled = false } ) => {
 						{ __( 'Creativity Temperature', 'wp-ai-blogger' ) }
 					</h3>
 					<p className="text-xs text-gray-600">
-						{ __( 'Controls randomness and creativity in content generation', 'wp-ai-blogger' ) }
+						{ __( 'Controls randomness and creativity in content generation.', 'wp-ai-blogger' ) }
 					</p>
 				</div>
 				<div className={ `px-2 py-1 rounded-full text-xs font-medium ${ getTemperatureColor( value ) }` }>
@@ -220,7 +221,7 @@ const AdvancedSettings = memo( () => {
 				<button
 					type="button"
 					onClick={ () => setIsAdvancedOpen( ! isAdvancedOpen ) }
-					className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset"
+					className={ `${ isAdvancedOpen ? '' : 'rounded-b-lg' } w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 rounded-t-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset` }
 					aria-expanded={ isAdvancedOpen }
 					aria-controls="advanced-settings-content"
 				>
@@ -250,7 +251,7 @@ const AdvancedSettings = memo( () => {
 				{ isAdvancedOpen && (
 					<div
 						id="advanced-settings-content"
-						className="px-4 pb-4 space-y-6 border-t border-gray-100"
+						className="px-4 pb-4 space-y-6 border border-solid border-gray-200 rounded-b-lg"
 					>
 						{ /* Temperature control */ }
 						<div className="pt-4">
@@ -263,7 +264,6 @@ const AdvancedSettings = memo( () => {
 						{ /* Safety filters */ }
 						<div className="space-y-4">
 							<h4 className="text-md font-semibold text-gray-900 flex items-center gap-2">
-								<Shield className="w-5 h-5 text-green-600" />
 								{ __( 'Content Safety Filters', 'wp-ai-blogger' ) }
 							</h4>
 
@@ -271,7 +271,7 @@ const AdvancedSettings = memo( () => {
 								<SafetyFilterControl
 									id="harassment"
 									title={ __( 'Harassment Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks harassing or bullying content', 'wp-ai-blogger' ) }
+									description={ __( 'Blocks harassing or bullying content.', 'wp-ai-blogger' ) }
 									value={ harassment }
 									onChange={ handleHarassmentChange }
 									icon={ Shield }
@@ -280,7 +280,7 @@ const AdvancedSettings = memo( () => {
 								<SafetyFilterControl
 									id="hate"
 									title={ __( 'Hate Speech Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks hateful or discriminatory content', 'wp-ai-blogger' ) }
+									description={ __( 'Blocks hateful or discriminatory content.', 'wp-ai-blogger' ) }
 									value={ hate }
 									onChange={ handleHateChange }
 									icon={ AlertTriangle }
@@ -289,7 +289,7 @@ const AdvancedSettings = memo( () => {
 								<SafetyFilterControl
 									id="sexually-explicit"
 									title={ __( 'Adult Content Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks sexually explicit content', 'wp-ai-blogger' ) }
+									description={ __( 'Blocks sexually explicit content.', 'wp-ai-blogger' ) }
 									value={ sexuallyExplicit }
 									onChange={ handleSexuallyExplicitChange }
 									icon={ Shield }
@@ -298,7 +298,7 @@ const AdvancedSettings = memo( () => {
 								<SafetyFilterControl
 									id="dangerous-content"
 									title={ __( 'Dangerous Content Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks potentially harmful instructions', 'wp-ai-blogger' ) }
+									description={ __( 'Blocks potentially harmful instructions.', 'wp-ai-blogger' ) }
 									value={ dangerousContent }
 									onChange={ handleDangerousContentChange }
 									icon={ AlertTriangle }

@@ -8,6 +8,8 @@ import SwitchControl from '@Components/SwitchControl';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
+import { Tooltip } from '@wordpress/components';
+import { TriangleAlert } from 'lucide-react';
 
 export default function ConfigureDrawer( props ) {
 	const abortControllerRef = useRef( {} );
@@ -144,13 +146,18 @@ export default function ConfigureDrawer( props ) {
 														<div className="flex items-center justify-between">
 															<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
 																{ __( 'Posts Target', 'wp-ai-blogger' ) }
-																<QuestionMarkCircleIcon
-																	aria-hidden="true"
-																	title={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
-																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
-																/>
+																<Tooltip
+																	text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																>
+																	<QuestionMarkCircleIcon
+																		aria-hidden="true"
+																		className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																	/>
+																</Tooltip>
 															</label>
-															<div className="mt-2">
+															<div className="mt-2 flex items-center gap-1">
 																<input
 																	id="campaign-target"
 																	name="campaign-target"
@@ -158,19 +165,37 @@ export default function ConfigureDrawer( props ) {
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
 																	type="number"
 																	readOnly={ isViewMode }
+																	disabled={ drawerData.type === 'edit' }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
+																{ drawerData.type === 'new' && (
+																	<Tooltip
+																		text={ `${ __( 'Post targets are locked after campaign creation. Use a new campaign for different ones.', 'wp-ai-blogger' ) }` }
+																		delay={ 100 }
+																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																	>
+																		<TriangleAlert
+																			aria-hidden="true"
+																			className="size-4 ml-1 text-orange-400"
+																		/>
+																	</Tooltip>
+																) }
 															</div>
 														</div>
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="campaign-repeat-after" className="flex items-center text-sm/6 font-medium text-gray-900">
 																{ __( 'Repeat After', 'wp-ai-blogger' ) }
-																<QuestionMarkCircleIcon
-																	aria-hidden="true"
-																	title={ __( 'Set how often the campaign should run automatically.', 'wp-ai-blogger' ) }
-																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
-																/>
+																<Tooltip
+																	text={ __( 'Set how often the campaign should run automatically.', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																>
+																	<QuestionMarkCircleIcon
+																		aria-hidden="true"
+																		className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																	/>
+																</Tooltip>
 															</label>
 
 															<div className="mt-2 flex gap-2">
