@@ -1338,6 +1338,7 @@ class Ajax {
 			}
 
 			// Make API request.
+			/* COMMENTED OUT FOR TESTING - ORIGINAL API REQUEST
 			$api_url = 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title';
 
 			$response = wp_remote_post(
@@ -1349,6 +1350,32 @@ class Ajax {
 						'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 					'body'    => $api_data ? wp_json_encode( $api_data ) : '',
+				]
+			);
+			*/
+
+			// TESTING: Local AI Agent Request
+			$local_api_url = 'http://localhost:3000/generate';
+
+			// Prepare payload for local AI agent
+			$local_payload = [
+				'postTitle' => $title,
+				'sitePersona' => [
+					'siteTitle' => $api_data['site_title'] ?? '',
+					'siteFor' => $api_data['site_purpose'] ?? '',
+					'siteDescription' => $api_data['site_description'] ?? '',
+				],
+			];
+
+			$response = wp_remote_post(
+				$local_api_url,
+				[
+					'timeout' => 90,
+					'headers' => [
+						'Content-Type' => 'application/json',
+						'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+					],
+					'body'    => wp_json_encode( $local_payload ),
 				]
 			);
 
