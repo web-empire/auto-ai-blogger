@@ -143,44 +143,39 @@ export default function ConfigureDrawer( props ) {
 															</div>
 														</div>
 
-														<div className="flex items-center justify-between">
-															<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Posts Target', 'wp-ai-blogger' ) }
-																<Tooltip
-																	text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
-																>
-																	<QuestionMarkCircleIcon
-																		aria-hidden="true"
-																		className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
-																	/>
-																</Tooltip>
-															</label>
-															<div className="mt-2 flex items-center gap-1">
-																<input
-																	id="campaign-target"
-																	name="campaign-target"
-																	defaultValue={ drawerData.postsTarget }
-																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
-																	type="number"
-																	readOnly={ isViewMode }
-																	disabled={ drawerData.type === 'edit' }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
-																/>
-																{ drawerData.type === 'new' && (
+														<div className="grid grid-cols-1 gap-2">
+															<div className="flex items-center justify-between">
+																<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
+																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
 																	<Tooltip
-																		text={ `${ __( 'Post targets are locked after campaign creation. Use a new campaign for different ones.', 'wp-ai-blogger' ) }` }
+																		text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																	>
-																		<TriangleAlert
+																		<QuestionMarkCircleIcon
 																			aria-hidden="true"
-																			className="size-4 ml-1 text-orange-400"
+																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
 																		/>
 																	</Tooltip>
-																) }
+																</label>
+																<div className="mt-2 flex items-center gap-1">
+																	<input
+																		id="campaign-target"
+																		name="campaign-target"
+																		defaultValue={ drawerData.postsTarget }
+																		onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
+																		type="number"
+																		readOnly={ isViewMode }
+																		disabled={ drawerData.type === 'edit' }
+																		className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	/>
+																</div>
 															</div>
+															{ drawerData.type === 'new' && (
+																<div className="text-xs text-gray-500 text-right">
+																	{ __( 'Once set, campaign targets are unchangeable.', 'wp-ai-blogger' ) }
+																</div>
+															) }
 														</div>
 
 														<div className="flex items-center justify-between">
@@ -313,11 +308,10 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-type"
-																	value={ drawerData.postType || '' }
+																	value={ drawerData.postType }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postType: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
-																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																	{ Object.entries( postTypes ).map( ( [ type, label ] ) => (
 																		<option key={ type } value={ type }>
 																			{ label }
@@ -335,11 +329,10 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-author"
-																	value={ drawerData.author || '' }
+																	value={ drawerData.author }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, author: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
-																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																	{ authors.map( ( author ) => (
 																		<option key={ author.id } value={ author.id }>
 																			{ author.name }
@@ -357,11 +350,10 @@ export default function ConfigureDrawer( props ) {
 																<select
 																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
 																	id="post-status"
-																	value={ drawerData.postStatus || '' }
+																	value={ drawerData.postStatus }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postStatus: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
-																	<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
 																	{ Object.entries( postStatuses ).map( ( [ key, label ] ) => (
 																		<option key={ key } value={ key }>
 																			{ label }

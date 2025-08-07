@@ -68,7 +68,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'postStatus'              => [
-					'default' => 'publish',
+					'default' => 'draft',
 					'type'    => 'string',
 				],
 				'summaryAsExcerpt'        => [
@@ -76,7 +76,7 @@ class Metadata {
 					'type'    => 'bool',
 				],
 				'author'                  => [
-					'default' => '',
+					'default' => get_current_user_id(),
 					'type'    => 'string',
 				],
 				'category'                => [
