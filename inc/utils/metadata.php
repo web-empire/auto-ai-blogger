@@ -63,6 +63,10 @@ class Metadata {
 					'default' => 'day',
 					'type'    => 'string',
 				],
+				'repeatOn'                => [
+					'default' => [],
+					'type'    => 'array',
+				],
 				'postType'                => [
 					'default' => 'post',
 					'type'    => 'string',
