@@ -288,7 +288,7 @@ class Ajax {
 
 			// Add schedule data in DB separately to manage effectively.
 			if ( ! empty( $formatted_campaign_data['meta_input']['repeatInterval'] ) && ! empty( $formatted_campaign_data['meta_input']['repeatUnit'] ) ) {
-				wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input'] );
+				wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['repeatInterval'], $formatted_campaign_data['meta_input']['repeatUnit'] );
 			}
 
 			wp_send_json_success(
@@ -404,7 +404,7 @@ class Ajax {
 
 			// Add schedule data in DB separately to manage effectively.
 			if ( ! empty( $formatted_campaign_data['meta_input']['repeatInterval'] ) && ! empty( $formatted_campaign_data['meta_input']['repeatUnit'] ) ) {
-				wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input'] );
+				wpaib_update_schedules( $campaign_id, $formatted_campaign_data['meta_input']['repeatInterval'], $formatted_campaign_data['meta_input']['repeatUnit'] );
 			}
 
 			wp_send_json_success(

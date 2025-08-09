@@ -180,7 +180,7 @@ export default function ConfigureDrawer( props ) {
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="campaign-repeat-after" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Repeat Every', 'wp-ai-blogger' ) }
+																{ __( 'Repeat After', 'wp-ai-blogger' ) }
 																<Tooltip
 																	text={ __( 'Set how often the campaign should run automatically.', 'wp-ai-blogger' ) }
 																	delay={ 100 }
@@ -218,37 +218,6 @@ export default function ConfigureDrawer( props ) {
 																</select>
 															</div>
 														</div>
-														{ 'week' === drawerData.repeatUnit && (
-															<div className="flex items-center justify-between ">
-																<label className="text-sm/6 font-medium text-gray-900">
-																	{ __( 'Repeat On', 'wp-ai-blogger' ) }
-																</label>
-																<div className="flex flex-wrap gap-2 justify-end">
-																	{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
-																		<button
-																			key={ day }
-																			type="button"
-																			onClick={ () => {
-																				if ( isViewMode ) return;
-																				const repeatOn = drawerData.repeatOn || [];
-																				const newRepeatOn = repeatOn.includes( day )
-																					? repeatOn.filter( ( d ) => d !== day )
-																					: [ ...repeatOn, day ];
-																				setDrawerData( { ...drawerData, repeatOn: newRepeatOn } );
-																			} }
-																			className={ `capitalize text-xs p-2 rounded-full border ${
-																				( drawerData.repeatOn || [] ).includes( day )
-																					? 'bg-indigo-600 text-white border-indigo-600'
-																					: 'bg-white text-gray-900 border-gray-300'
-																			} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
-																			disabled={ isViewMode }
-																		>
-																			{ day }
-																		</button>
-																	) ) }
-																</div>
-															</div>
-														) }
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="use-summary-as-excerpt" className="block text-sm/6 font-medium text-gray-900">
