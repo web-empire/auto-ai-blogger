@@ -63,12 +63,16 @@ class Metadata {
 					'default' => 'day',
 					'type'    => 'string',
 				],
+				'repeatOn'                => [
+					'default' => [],
+					'type'    => 'array',
+				],
 				'postType'                => [
 					'default' => 'post',
 					'type'    => 'string',
 				],
 				'postStatus'              => [
-					'default' => 'publish',
+					'default' => 'draft',
 					'type'    => 'string',
 				],
 				'summaryAsExcerpt'        => [
@@ -76,7 +80,7 @@ class Metadata {
 					'type'    => 'bool',
 				],
 				'author'                  => [
-					'default' => '',
+					'default' => get_current_user_id(),
 					'type'    => 'string',
 				],
 				'category'                => [
