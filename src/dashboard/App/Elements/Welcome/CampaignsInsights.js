@@ -316,7 +316,7 @@ const EmptyState = memo( () => (
 		<h3 className="text-lg font-medium text-gray-900 mb-2">
 			{ __( 'No Campaign Data Available', 'wp-ai-blogger' ) }
 		</h3>
-		<p className="text-gray-500 max-w-md mx-auto">
+		<p className="text-gray-500 max-w-md !m-auto">
 			{ __( 'Campaign insights will appear here once you create and run your first campaign.', 'wp-ai-blogger' ) }
 		</p>
 	</div>
