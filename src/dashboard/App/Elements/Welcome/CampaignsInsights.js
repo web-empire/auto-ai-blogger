@@ -196,7 +196,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 						getOnlyDetails={ true }
 					/>
 					<MetricCard
-						metric={ __( 'Last Run', 'wp-ai-blogger' ) }
+						metric={ __( 'Last Post Run', 'wp-ai-blogger' ) }
 						value={ campaign?.lastRun || __( 'Never', 'wp-ai-blogger' ) }
 						icon={ Calendar }
 						getOnlyDetails={ true }

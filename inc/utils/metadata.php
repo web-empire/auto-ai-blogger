@@ -52,7 +52,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'postsTarget'             => [
-					'default' => '',
+					'default' => 1,
 					'type'    => 'number',
 				],
 				'repeatInterval'          => [

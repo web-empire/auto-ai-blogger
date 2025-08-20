@@ -265,7 +265,7 @@ export default function Campaigns() {
 
 														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
 															<a href="#" className="text-gray-500 hover:text-indigo-900">
-																<Tooltip text={ `${ __( 'Last run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }` }
+																<Tooltip text={ `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }` }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>

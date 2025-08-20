@@ -186,7 +186,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 														<CalendarCheck className="w-4 h-4 text-gray-500 mr-1" />
 														<span className="text-sm font-medium text-gray-900">{ campaignData?.lastRun }</span>
 													</div>
-													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Last Run', 'wp-ai-blogger' ) }</p>
+													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Last Post Run', 'wp-ai-blogger' ) }</p>
 												</div>
 
 												<div className="text-center p-3 bg-gray-50 rounded-lg">
@@ -270,11 +270,11 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 													<CheckCircle className="w-4 h-4 text-green-300" />
 													<span className="text-sm">{ __( 'AI Based Content Quality Score', 'wp-ai-blogger' ) }</span>
 												</div>
-												<div className="flex items-center space-x-1">
+												<div className="flex items-center justify-center space-x-1">
 													<CheckCircle className="w-4 h-4 text-green-300" />
 													<span className="text-sm">{ __( 'Advanced Conversion Tracking', 'wp-ai-blogger' ) }</span>
 												</div>
-												<div className="flex items-center space-x-1">
+												<div className="flex items-center justify-end space-x-1">
 													<CheckCircle className="w-4 h-4 text-green-300" />
 													<span className="text-sm">{ __( 'AI Performance Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
 												</div>
