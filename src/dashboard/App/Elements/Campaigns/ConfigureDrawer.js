@@ -9,7 +9,7 @@ import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
 import { Tooltip } from '@wordpress/components';
-import { TriangleAlert } from 'lucide-react';
+import DynamicCard from '@Components/DynamicCard';
 
 export default function ConfigureDrawer( props ) {
 	const abortControllerRef = useRef( {} );
@@ -25,6 +25,7 @@ export default function ConfigureDrawer( props ) {
 	const categories = wpaib_localized_data?.categories || {};
 	const tags = wpaib_localized_data?.tags || {};
 	const isViewMode = mode === 'view';
+	const [ errorMessage, setErrorMessage ] = useState( '' );
 
 	useEffect( () => {
 		setDrawerData( configureData );
@@ -39,6 +40,30 @@ export default function ConfigureDrawer( props ) {
 
 	const handleCampaign = ( e ) => {
 		e.preventDefault();
+
+		if ( ! drawerData.title ) {
+			setErrorMessage( __( 'Name should not be empty.', 'wp-ai-blogger' ) );
+			setTimeout( () => {
+				setErrorMessage( '' );
+			}, 2000 );
+			return;
+		}
+		if ( ! drawerData.keywords ) {
+			setErrorMessage( __( 'Keywords should not be empty.', 'wp-ai-blogger' ) );
+			setTimeout( () => {
+				setErrorMessage( '' );
+			}, 2000 );
+			return;
+		}
+		if ( ! drawerData.postsTarget ) {
+			setErrorMessage( __( 'Posts Target should not be empty.', 'wp-ai-blogger' ) );
+			setTimeout( () => {
+				setErrorMessage( '' );
+			}, 2000 );
+			return;
+		}
+
+		setErrorMessage( '' );
 		setHandlingCampaign( true );
 		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef );
 	};
@@ -122,6 +147,7 @@ export default function ConfigureDrawer( props ) {
 																	type="text"
 																	readOnly={ isViewMode }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
 															</div>
 														</div>
@@ -139,6 +165,7 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.keywords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
 																	readOnly={ isViewMode }
+																	placeholder={ __( 'Yoga, Fitness, Health', 'wp-ai-blogger' ) }
 																/>
 															</div>
 														</div>
@@ -165,6 +192,7 @@ export default function ConfigureDrawer( props ) {
 																		defaultValue={ drawerData.postsTarget }
 																		onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
 																		type="number"
+																		min="1"
 																		readOnly={ isViewMode }
 																		disabled={ drawerData.type === 'edit' }
 																		className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
@@ -220,7 +248,7 @@ export default function ConfigureDrawer( props ) {
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
 															<div className="flex items-center justify-between ">
-																<label className="text-sm/6 font-medium text-gray-900">
+																<label className="text-sm/6 font-medium text-gray-900">  {/* eslint-disable-line */}
 																	{ __( 'Repeat On', 'wp-ai-blogger' ) }
 																</label>
 																<div className="flex flex-wrap gap-2 justify-end">
@@ -229,7 +257,9 @@ export default function ConfigureDrawer( props ) {
 																			key={ day }
 																			type="button"
 																			onClick={ () => {
-																				if ( isViewMode ) return;
+																				if ( isViewMode ) {
+																					return;
+																				}
 																				const repeatOn = drawerData.repeatOn || [];
 																				const newRepeatOn = repeatOn.includes( day )
 																					? repeatOn.filter( ( d ) => d !== day )
@@ -272,10 +302,10 @@ export default function ConfigureDrawer( props ) {
 																	<div className="absolute flex h-6 mt-1 items-center">
 																		<input
 																			defaultValue="public"
-																			defaultChecked
 																			id="privacy-public"
 																			name="privacy"
 																			type="radio"
+																			checked={ drawerData.status === 'publish' }
 																			aria-describedby="privacy-public-description"
 																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																			onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'publish' } ) }
@@ -301,6 +331,7 @@ export default function ConfigureDrawer( props ) {
 																				id="privacy-private-to-project"
 																				name="privacy"
 																				type="radio"
+																				checked={ drawerData.status === 'draft' }
 																				aria-describedby="privacy-private-to-project-description"
 																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																				onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'draft' } ) }
@@ -466,7 +497,9 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.maxTitleWords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
 																	type="number"
+																	min="1"
 																	readOnly={ isViewMode }
+																	disabled={ wpaib_localized_data.pro_available ? false : true }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
@@ -484,7 +517,9 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.maxWords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
 																	type="number"
+																	min="1"
 																	readOnly={ isViewMode }
+																	disabled={ wpaib_localized_data.pro_available ? false : true }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
@@ -554,6 +589,18 @@ export default function ConfigureDrawer( props ) {
 																</a>
 															</div>
 														</div>
+
+														{ ! wpaib_localized_data.pro_available &&
+															<DynamicCard
+																heading={ __( 'Unlock Premium Features', 'wp-ai-blogger' ) }
+																subHeading={ __( 'Upgrade to Pro for more features and benefits.', 'wp-ai-blogger' ) }
+																linkText={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+																linkUrl={ wpaib_localized_data.pro_purchase_url }
+																colorScheme="blue"
+																size="medium"
+																ariaLabel={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+															/>
+														}
 													</div>
 												</div>
 											</div>
@@ -561,24 +608,31 @@ export default function ConfigureDrawer( props ) {
 									}
 								</div>
 
-								<div className="flex shrink-0 justify-end px-4 py-4">
-									<button
-										type="button"
-										onClick={ closePopup }
-										className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-									>
-										{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
-									</button>
+								<div className="flex shrink-0 justify-between items-center px-4 py-4">
+									<div className="text-red-600">
+										{ errorMessage }
+									</div>
 
-									{ ! isViewMode && (
+									<div className="flex items-center space-x-2">
 										<button
-											onClick={ handleCampaign }
-											disabled={ handlingCampaign }
-											className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
+											type="button"
+											onClick={ closePopup }
+											className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 										>
-											{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+											{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
 										</button>
-									) }
+
+										{ ! isViewMode && (
+											<button
+												onClick={ handleCampaign }
+												disabled={ handlingCampaign }
+												className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
+											>
+												{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+											</button>
+										) }
+									</div>
+
 								</div>
 							</form>
 						</DialogPanel>

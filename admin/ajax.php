@@ -815,6 +815,11 @@ class Ajax {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
 			}
 
+			// Get campaign metadata.
+			$campaign_meta = Metadata::get_campaign_data( $campaign_id, true );
+			$posts_target  = absint( $campaign_meta['postsTarget'] ?? 0 );
+			$posts_created = absint( $campaign_meta['postsCreated'] ?? 0 );
+
 			$published_posts = get_posts(
 				[
 					'post_type'              => 'any',
@@ -854,11 +859,6 @@ class Ajax {
 				);
 				$total_comments = absint( $comment_count );
 			}
-
-			// Get campaign metadata.
-			$campaign_meta = Metadata::get_campaign_data( $campaign_id );
-			$posts_target  = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
-			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 
 			// Calculate success rate.
 			$success_rate = $posts_target > 0 ? round( $posts_created / $posts_target * 100 ) : 100;

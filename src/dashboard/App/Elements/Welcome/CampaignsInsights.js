@@ -197,7 +197,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 					/>
 					<MetricCard
 						metric={ __( 'Last Post Run', 'wp-ai-blogger' ) }
-						value={ campaign?.lastRun || __( 'Never', 'wp-ai-blogger' ) }
+						value={ campaign?.lastRun || __( 'Not Started Yet.', 'wp-ai-blogger' ) }
 						icon={ Calendar }
 						getOnlyDetails={ true }
 					/>
@@ -223,6 +223,17 @@ const CampaignCard = memo( ( { campaign } ) => {
 						</Tooltip>
 					</a>
 
+					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+						openCampaignAnalytics( e, campaign.id );
+					} }>
+						<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
+							delay={ 100 }
+							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+						>
+							<ChartNoAxesColumn className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+						</Tooltip>
+					</a>
+
 					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
 						<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 							delay={ 100 }
@@ -235,17 +246,6 @@ const CampaignCard = memo( ( { campaign } ) => {
 									<Settings className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
 								)
 							}
-						</Tooltip>
-					</a>
-
-					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-						openCampaignAnalytics( e, campaign.id );
-					} }>
-						<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
-							delay={ 100 }
-							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-						>
-							<ChartNoAxesColumn className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
 						</Tooltip>
 					</a>
 				</div>
@@ -399,7 +399,7 @@ function CampaignsInsights( { onError } ) {
 				{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
 			</h2>
 			<div
-				className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6"
+				className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-6"
 				role="region"
 				aria-label={ __( 'Campaigns list', 'wp-ai-blogger' ) }
 			>

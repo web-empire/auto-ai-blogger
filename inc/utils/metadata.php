@@ -44,7 +44,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'status'                  => [
-					'default' => 'publish',
+					'default' => 'draft',
 					'type'    => 'string',
 				],
 				'keywords'                => [
@@ -455,7 +455,7 @@ class Metadata {
 		if ( ! empty( $metadata['lastRun'] ) ) {
 			$metadata['lastRun'] = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $metadata['lastRun'] ) );
 		} else {
-			$metadata['lastRun'] = __( 'Never', 'wp-ai-blogger' );
+			$metadata['lastRun'] = __( 'Not Started Yet.', 'wp-ai-blogger' );
 		}
 
 		return array_merge(

@@ -820,11 +820,12 @@ function wpaib_create_blog_post( $campaign_id ) {
 	$post_category = Metadata::get_campaign_meta( $campaign_id, 'category' );
 	$post_tag      = Metadata::get_campaign_meta( $campaign_id, 'tags' );
 
-	// Advanced settings..
-	$max_title_words   = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' );
-	$max_content_words = Metadata::get_campaign_meta( $campaign_id, 'maxWords' );
+	// Advanced settings.
+	$is_pro_available  = defined( 'WP_AI_BLOGGER_PRO_VERSION' );
+	$max_title_words   = $is_pro_available ? Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) : 10;
+	$max_content_words = $is_pro_available ? Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) : 1000;
 
-	// Perform the API call to get the content..
+	// Perform the API call to get the content.
 	$api_response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details );
 
 	if ( is_wp_error( $api_response ) ) {

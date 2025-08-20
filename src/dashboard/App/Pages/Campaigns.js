@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn } from 'lucide-react';
+import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn, CalendarArrowUp } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
@@ -264,6 +264,15 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
+															<a href="#" className="text-gray-500 hover:text-indigo-900">
+																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${ campaign.created_at }` }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																>
+																	<CalendarArrowUp className="w-4 h-4" />
+																</Tooltip>
+															</a>
+
 															<a href="#" className="text-gray-500 hover:text-indigo-900">
 																<Tooltip text={ `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }` }
 																	delay={ 100 }
