@@ -945,7 +945,7 @@ function wpaib_update_schedules( $campaign_id, $interval, $unit = 'day' ): void 
 	$schedules[ $campaign_id ] = [
 		'interval' => $interval,
 		'unit'     => $unit,
-		'days'     => wpaib_convert_to_days( $interval, $unit ), // For backward compatibility.
+		'days'     => wpaib_convert_to_days( $interval, $unit ),
 	];
 
 	update_option( 'wpaib_auto_blogging_schedules', $schedules );

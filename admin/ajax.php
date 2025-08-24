@@ -62,6 +62,7 @@ class Ajax {
 		'wpaib_create_post',
 		'wpaib_run_campaign',
 		'wpaib_get_campaign_analytics',
+		'wpaib_delete_campaign'
 	];
 
 	/**
@@ -113,6 +114,7 @@ class Ajax {
 		add_action( 'wp_ajax_wpaib_get_campaign_metadata', [ $this, 'add_security_headers' ], 1 );
 		add_action( 'wp_ajax_wpaib_create_post', [ $this, 'add_security_headers' ], 1 );
 		add_action( 'wp_ajax_wpaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_wpaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
 	}
 
 	/**
@@ -799,7 +801,7 @@ class Ajax {
 	public function wpaib_get_campaign_analytics(): void {
 		try {
 			// security validation.
-			$security_check = $this->validate_ajax_security( 'update_campaign' );
+			$security_check = $this->validate_ajax_security( 'get_campaign_analytics' );
 			if ( is_wp_error( $security_check ) ) {
 				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
 				return;
@@ -1644,6 +1646,54 @@ class Ajax {
 				'image_upload_exception',
 				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
 			);
+		}
+	}
+
+	/**
+	 * Handler to delete campaign with security.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function wpaib_delete_campaign(): void {
+		try {
+			// security validation.
+			$security_check = $this->validate_ajax_security( 'delete_campaign' );
+			if ( is_wp_error( $security_check ) ) {
+				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
+				return;
+			}
+
+			// Nonce validation.
+			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+				return;
+			}
+
+			// Validate campaign ID.
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+			if ( ! $campaign_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				return;
+			}
+
+			// Check if campaign exists and user can read it.
+			$campaign_post = get_post( $campaign_id );
+			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+				return;
+			}
+
+			if ( ! current_user_can( 'delete_post', $campaign_id ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
+				return;
+			}
+
+			wpaib_clear_campaign_schedule( $campaign_id );
+			wp_delete_post( $campaign_id, true );
+			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
 		}
 	}
 }
