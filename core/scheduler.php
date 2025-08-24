@@ -36,7 +36,7 @@ class Scheduler {
 			return;
 		}
 
-		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ] );
+		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ], 10, 1 );
 
 		// Initialize WP Cron schedules for campaigns.
 		add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
@@ -138,7 +138,16 @@ class Scheduler {
 					continue;
 				}
 
-				// Check if the target is reached..
+				// Check campaign post existence & status should be publish.
+				$campaign_post = get_post( $campaign_id );
+				if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+					continue;
+				}
+				if ( $campaign_post->post_status !== 'publish' ) {
+					continue;
+				}
+
+				// Check if the target is reached.
 				if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
 					wpaib_clear_campaign_schedule( $campaign_id );
 					continue;
