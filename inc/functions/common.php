@@ -66,42 +66,14 @@ function wpaib_get_user_detail( $detail ) {
  * Clean the plugin data with security validation.
  *
  * @param mixed $data Data to clean.
- * @param int   $depth Current recursion depth.
  * @return mixed Cleaned data.
  * @since 1.0.0
  */
-function wpaib_clean_data( $data, $depth = 0 ) {
-	// Prevent infinite recursion.
-	$max_depth = 10;
-	if ( $depth > $max_depth ) {
-		return null;
-	}
-
+function wpaib_clean_data( $data ) {
 	if ( is_array( $data ) ) {
-		$cleaned = [];
-		foreach ( $data as $key => $value ) {
-			$clean_key = sanitize_key( $key );
-			if ( ! empty( $clean_key ) ) {
-				$cleaned[ $clean_key ] = wpaib_clean_data( $value, $depth + 1 );
-			}
-		}
-		return $cleaned;
+		return array_map( 'wpaib_clean_data', $data );
 	}
-
-	if ( is_string( $data ) ) {
-		return sanitize_text_field( $data );
-	}
-
-	if ( is_numeric( $data ) ) {
-		return is_float( $data ) ? floatval( $data ) : absint( $data );
-	}
-
-	if ( is_bool( $data ) ) {
-		return (bool) $data;
-	}
-
-	// Return null for unsupported data types.
-	return null;
+	return is_scalar( $data ) ? sanitize_text_field( (string) $data ) : $data;
 }
 
 /**

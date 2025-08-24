@@ -364,7 +364,7 @@ class Ajax {
 				return;
 			}
 
-			// data sanitization.
+			// Data sanitization.
 			$sanitized_campaign = $this->sanitize_campaign_data( $campaign_details );
 			if ( is_wp_error( $sanitized_campaign ) ) {
 				wp_send_json_error( [ 'message' => $sanitized_campaign->get_error_message() ] );
@@ -1067,6 +1067,8 @@ class Ajax {
 			'meta_input',
 			'post_count',
 			'schedule',
+			'repeatWeeklyOn',
+			'startDate',
 		];
 
 		$sanitized = [];
@@ -1101,6 +1103,7 @@ class Ajax {
 					break;
 				case 'keywords':
 				case 'tags':
+				case 'repeatWeeklyOn':
 					if ( is_array( $value ) ) {
 						$sanitized[ $key ] = array_map( 'sanitize_text_field', array_map( 'strval', $value ) );
 					} else {

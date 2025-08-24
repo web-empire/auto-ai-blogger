@@ -8,6 +8,7 @@ import SwitchControl from '@Components/SwitchControl';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
+import DateTimeField from '@Components/DateTimeField';
 import { Tooltip } from '@wordpress/components';
 import DynamicCard from '@Components/DynamicCard';
 
@@ -57,6 +58,20 @@ export default function ConfigureDrawer( props ) {
 		}
 		if ( ! drawerData.postsTarget ) {
 			setErrorMessage( __( 'Posts Target should not be empty.', 'wp-ai-blogger' ) );
+			setTimeout( () => {
+				setErrorMessage( '' );
+			}, 2000 );
+			return;
+		}
+		if ( ! drawerData.startDate ) {
+			setErrorMessage( __( 'Start Date should not be empty.', 'wp-ai-blogger' ) );
+			setTimeout( () => {
+				setErrorMessage( '' );
+			}, 2000 );
+			return;
+		}
+		if ( 'week' === drawerData.repeatUnit && drawerData.repeatWeeklyOn.length === 0 ) {
+			setErrorMessage( __( 'Week days should not be empty.', 'wp-ai-blogger' ) );
 			setTimeout( () => {
 				setErrorMessage( '' );
 			}, 2000 );
@@ -241,15 +256,13 @@ export default function ConfigureDrawer( props ) {
 																>
 																	<option value="day">{ __( 'Day(s)', 'wp-ai-blogger' ) }</option>
 																	<option value="week">{ __( 'Week(s)', 'wp-ai-blogger' ) }</option>
-																	<option value="month">{ __( 'Month(s)', 'wp-ai-blogger' ) }</option>
-																	<option value="year">{ __( 'Year(s)', 'wp-ai-blogger' ) }</option>
 																</select>
 															</div>
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
 															<div className="flex items-center justify-between ">
 																<label className="text-sm/6 font-medium text-gray-900">  {/* eslint-disable-line */}
-																	{ __( 'Repeat On', 'wp-ai-blogger' ) }
+																	{ __( 'On Days', 'wp-ai-blogger' ) }
 																</label>
 																<div className="flex flex-wrap gap-2 justify-end">
 																	{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
@@ -260,14 +273,14 @@ export default function ConfigureDrawer( props ) {
 																				if ( isViewMode ) {
 																					return;
 																				}
-																				const repeatOn = drawerData.repeatOn || [];
-																				const newRepeatOn = repeatOn.includes( day )
-																					? repeatOn.filter( ( d ) => d !== day )
-																					: [ ...repeatOn, day ];
-																				setDrawerData( { ...drawerData, repeatOn: newRepeatOn } );
+																				const repeatWeeklyOn = drawerData.repeatWeeklyOn || [];
+																				const newRepeatOn = repeatWeeklyOn.includes( day )
+																					? repeatWeeklyOn.filter( ( d ) => d !== day )
+																					: [ ...repeatWeeklyOn, day ];
+																				setDrawerData( { ...drawerData, repeatWeeklyOn: newRepeatOn } );
 																			} }
 																			className={ `capitalize text-xs p-2 rounded-full border ${
-																				( drawerData.repeatOn || [] ).includes( day )
+																				( drawerData.repeatWeeklyOn || [] ).includes( day )
 																					? 'bg-indigo-600 text-white border-indigo-600'
 																					: 'bg-white text-gray-900 border-gray-300'
 																			} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
@@ -279,6 +292,22 @@ export default function ConfigureDrawer( props ) {
 																</div>
 															</div>
 														) }
+
+														<div className="flex items-center justify-between">
+															<label htmlFor="start-date" className="block text-sm/6 font-medium text-gray-900">
+																{ __( 'Start Date', 'wp-ai-blogger' ) }
+															</label>
+															<div className="mt-2">
+																<DateTimeField
+																	id="start-date"
+																	name="start-date"
+																	value={ drawerData.startDate }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
+																	readOnly={ isViewMode }
+																	placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
+																/>
+															</div>
+														</div>
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="use-summary-as-excerpt" className="block text-sm/6 font-medium text-gray-900">
@@ -609,9 +638,9 @@ export default function ConfigureDrawer( props ) {
 								</div>
 
 								<div className="flex shrink-0 justify-between items-center px-4 py-4">
-									<div className="text-red-600">
+									<em className="text-red-600">
 										{ errorMessage }
-									</div>
+									</em>
 
 									<div className="flex items-center space-x-2">
 										<button

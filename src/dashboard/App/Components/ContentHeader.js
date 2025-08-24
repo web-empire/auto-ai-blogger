@@ -204,7 +204,7 @@ const ContentHeader = ( {
 
 				<div className="flex justify-between items-center gap-2 w-full">
 					{ headerTitle && (
-						<h1 className={ `text-2xl font-bold text-gray-900 m-0 p-0` }>
+						<h1 className={ `text-xl font-bold text-gray-900 m-0 p-0` }>
 							{ headerTitle }
 						</h1>
 					) }

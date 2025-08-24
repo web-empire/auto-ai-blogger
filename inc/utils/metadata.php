@@ -63,9 +63,13 @@ class Metadata {
 					'default' => 'day',
 					'type'    => 'string',
 				],
-				'repeatOn'                => [
+				'repeatWeeklyOn'          => [
 					'default' => [],
 					'type'    => 'array',
+				],
+				'startDate'               => [
+					'default' => '',
+					'type'    => 'string',
 				],
 				'postType'                => [
 					'default' => 'post',
