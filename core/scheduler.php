@@ -32,15 +32,30 @@ class Scheduler {
 	public function __construct() {
 		$this->schedules = wpaib_get_schedules();
 
-		if ( empty( $this->schedules ) ) {
-			return;
-		}
-
+		// Always register the hook, even if no schedules exist yet.
 		add_action( 'wp_ai_blogger_create_blog_post', [ $this, 'create_blog_post' ], 10, 1 );
 
 		// Initialize WP Cron schedules for campaigns.
 		add_filter( 'cron_schedules', [ $this, 'custom_cron_schedules' ] );
-		$this->setup_campaign_schedules();
+
+		if ( ! empty( $this->schedules ) ) {
+			$this->setup_campaign_schedules();
+		}
+	}
+
+	/**
+	 * Refresh the schedules and re-setup campaigns.
+	 * Call this after adding new campaigns to ensure they get scheduled.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function refresh_schedules(): void {
+		$this->schedules = wpaib_get_schedules();
+
+		if ( ! empty( $this->schedules ) ) {
+			$this->setup_campaign_schedules();
+		}
 	}
 
 	/**

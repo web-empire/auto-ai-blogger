@@ -18,6 +18,7 @@ use WPAIBlogger\Core\Editor;
 use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Core\Scheduler;
+use WPAIBlogger\Inc\CronHandler;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -78,6 +79,9 @@ class Loader {
 
 		/* Load Editor Support */
 		Editor::get_instance();
+
+		/* Cron Handler init (always loaded for cron functionality) */
+		CronHandler::get_instance();
 
 		if ( is_admin() ) {
 			/* Ajax init */

@@ -44,7 +44,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'status'                  => [
-					'default' => 'draft',
+					'default' => 'publish',
 					'type'    => 'string',
 				],
 				'keywords'                => [
@@ -178,8 +178,8 @@ class Metadata {
 			return self::get_default_option( $key );
 		}
 
-		// Check user permissions.
-		if ( ! current_user_can( 'read_post', $campaign_id ) ) {
+		// Check user permissions (skip during cron execution).
+		if ( ! wp_doing_cron() && ! current_user_can( 'read_post', $campaign_id ) ) {
 			return self::get_default_option( $key );
 		}
 
@@ -234,8 +234,8 @@ class Metadata {
 			return false;
 		}
 
-		// Check user permissions.
-		if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
+		// Check user permissions (skip during cron execution).
+		if ( ! wp_doing_cron() && ! current_user_can( 'edit_post', $campaign_id ) ) {
 			return false;
 		}
 
