@@ -269,9 +269,7 @@ class Ajax {
 
 			// Debug: Log the campaign status being set
 			$campaign_status = $formatted_campaign_data['status'] ?? 'draft';
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( "WP AI Blogger: Creating campaign with status: {$campaign_status}" );
-			}
+
 
 			// Create a new campaign with error handling.
 			$campaign_id = \wp_insert_post(
@@ -740,14 +738,9 @@ class Ajax {
 				return;
 			}
 
-			// Additional validation: Check if function exists.
-			if ( ! function_exists( 'wpaib_create_blog_post' ) ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign execution function not available.', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Run the campaign with error handling.
-			$post_id = wpaib_create_blog_post( $campaign_id );
+			// Run the campaign using CronHandler.
+			$cron_handler = \WPAIBlogger\Inc\CronHandler::get_instance();
+			$post_id = $cron_handler->create_single_post_from_campaign( $campaign_id );
 
 			if ( is_wp_error( $post_id ) ) {
 				wp_send_json_error(
@@ -1663,9 +1656,7 @@ class Ajax {
 		try {
 			// Only schedule if campaign is active and has valid scheduling data
 			if ( empty( $meta_input['repeatInterval'] ) || empty( $meta_input['repeatUnit'] ) ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: No scheduling data for campaign {$campaign_id}" );
-				}
+
 				return;
 			}
 
@@ -1682,9 +1673,6 @@ class Ajax {
 			// Check if campaign post is published (active)
 			$campaign_post = get_post( $campaign_id );
 			if ( ! $campaign_post ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: Campaign {$campaign_id} not found, skipping scheduling" );
-				}
 				return;
 			}
 
@@ -1699,13 +1687,7 @@ class Ajax {
 						'ID' => $campaign_id,
 						'post_status' => 'publish'
 					] );
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-						error_log( "WP AI Blogger: Updated campaign {$campaign_id} status from {$campaign_post->post_status} to publish" );
-					}
 				} else {
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-						error_log( "WP AI Blogger: Campaign {$campaign_id} not active (status: {$campaign_post->post_status}), skipping scheduling" );
-					}
 					return;
 				}
 			}
@@ -1719,15 +1701,8 @@ class Ajax {
 			// Schedule recurring posts
 			wp_schedule_event( time() + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
 
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				$next_run = wp_next_scheduled( 'wpaib_create_single_post', [ $campaign_id ] );
-				error_log( "WP AI Blogger: Campaign {$campaign_id} scheduled successfully. Next run: " . ( $next_run ? date( 'Y-m-d H:i:s', $next_run ) : 'Not found' ) );
-			}
-
 		} catch ( Exception $e ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( "WP AI Blogger: Scheduling error for campaign {$campaign_id}: " . $e->getMessage() );
-			}
+			// Silently handle scheduling errors
 		}
 	}
 
@@ -1793,10 +1768,6 @@ class Ajax {
 	 */
 	public function create_single_post_from_campaign( $campaign_id ): void {
 		try {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( "WP AI Blogger: create_single_post_from_campaign called for campaign {$campaign_id}" );
-			}
-
 			$campaign_id = absint( $campaign_id );
 			if ( ! $campaign_id ) {
 				return;
@@ -1805,9 +1776,6 @@ class Ajax {
 			// Get campaign
 			$campaign = get_post( $campaign_id );
 			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN || $campaign->post_status !== 'publish' ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: Campaign {$campaign_id} not found or not active" );
-				}
 				return;
 			}
 
@@ -1818,29 +1786,14 @@ class Ajax {
 			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
 				// Target reached, clear schedule
 				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: Campaign {$campaign_id} target reached, unscheduled" );
-				}
 				return;
 			}
 
 			// Create the post
 			$post_id = $this->generate_post_from_campaign( $campaign_id );
 
-			if ( is_wp_error( $post_id ) ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: Post creation failed for campaign {$campaign_id}: " . $post_id->get_error_message() );
-				}
-			} elseif ( $post_id ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( "WP AI Blogger: Post {$post_id} created successfully for campaign {$campaign_id}" );
-				}
-			}
-
 		} catch ( Exception $e ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( "WP AI Blogger: Exception in create_single_post_from_campaign: " . $e->getMessage() );
-			}
+			// Silently handle exceptions
 		}
 	}
 
@@ -2023,7 +1976,8 @@ class Ajax {
 				return;
 			}
 
-			wpaib_clear_campaign_schedule( $campaign_id );
+			// Clear scheduled events for this campaign
+			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 			wp_delete_post( $campaign_id, true );
 			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
 		} catch ( \Exception $e ) {

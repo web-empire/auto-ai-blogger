@@ -17,7 +17,6 @@ use WPAIBlogger\Core\CPT;
 use WPAIBlogger\Core\Editor;
 use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
-use WPAIBlogger\Core\Scheduler;
 use WPAIBlogger\Inc\CronHandler;
 
 defined( 'ABSPATH' ) || exit;
@@ -67,9 +66,6 @@ class Loader {
 
 		/* Maintenance init */
 		Maintenance::get_instance();
-
-		/* Scheduler init */
-		Scheduler::get_instance();
 
 		/* API init */
 		API::get_instance();
