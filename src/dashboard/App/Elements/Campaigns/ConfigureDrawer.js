@@ -80,7 +80,20 @@ export default function ConfigureDrawer( props ) {
 
 		setErrorMessage( '' );
 		setHandlingCampaign( true );
-		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef );
+
+		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef )
+			.then( ( response ) => {
+				console.log( 'Campaign operation completed successfully:', response );
+				// The ApiData.js handles the reload, so we don't need to do anything here
+			} )
+			.catch( ( error ) => {
+				console.error( 'Campaign operation failed:', error );
+				setHandlingCampaign( false );
+				setErrorMessage( error.message || 'An error occurred while saving the campaign.' );
+				setTimeout( () => {
+					setErrorMessage( '' );
+				}, 5000 );
+			} );
 	};
 
 	return (

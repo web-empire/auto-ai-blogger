@@ -151,17 +151,18 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null, config =
 		if ( response?.success ) {
 			// Instead of immediate reload, provide feedback first
 			console.log( `Campaign ${ isNew ? 'created' : 'updated' } successfully` );
+			console.log( 'Response data:', response.data );
 
 			// Optional: dispatch success action for UI feedback
 			// dispatch({ type: 'CAMPAIGN_SAVE_SUCCESS', payload: response.data });
 
-			// Delayed reload to allow user to see success message
-			setTimeout( () => {
-				window.location.reload();
-			}, 1000 );
+			// Reload to show updated campaign list
+			window.location.reload();
 
 			return response;
 		}
+
+		console.error( 'Campaign operation failed:', response );
 		throw new Error( response?.data?.message || `Failed to ${ isNew ? 'create' : 'update' } campaign` );
 	} catch ( error ) {
 		// Handle different types of errors
@@ -171,6 +172,7 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null, config =
 		}
 
 		console.error( 'Campaign Error:', error.message );
+		console.error( 'Full error object:', error );
 
 		// Show user-friendly error message
 		if ( typeof window !== 'undefined' && window.alert ) {

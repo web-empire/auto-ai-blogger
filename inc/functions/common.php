@@ -469,51 +469,7 @@ function wpaib_get_authors() {
 	}
 }
 
-/**
- * Get all custom schedules to schedule auto blog posts with security.
- *
- * @return array Sanitized schedules.
- * @since 1.0.0
- */
-function wpaib_get_schedules() {
-	// Check user capabilities.
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return [];
-	}
 
-	try {
-		$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
-
-		// Validate data structure.
-		if ( ! is_array( $schedules ) || empty( $schedules ) ) {
-			return [];
-		}
-
-		foreach ( $schedules as $campaign_id => $schedule_data ) {
-			if ( wpaib_is_campaign_posts_target_achieved( $campaign_id ) ) {
-				unset( $schedules[ $campaign_id ] );
-				continue;
-			}
-
-			if ( is_array( $schedule_data ) ) {
-				// Ensure new format has all required fields.
-				$schedules[ $campaign_id ] = wp_parse_args(
-					$schedule_data,
-					[
-						'interval' => 1,
-						'unit'     => 'day',
-						'days'     => 1,
-					]
-				);
-			}
-		}
-
-		return $schedules;
-
-	} catch ( \Exception $e ) {
-		return [];
-	}
-}
 
 /**
  * Check if the campaign posts target is achieved with security validation.
@@ -561,8 +517,8 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @return array|WP_Error Sanitized API response or error.
  */
 function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details ) {
-	// Check user capabilities.
-	if ( ! current_user_can( 'edit_posts' ) ) {
+	// Check user capabilities (skip during cron execution).
+	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return new WP_Error( 'insufficient_permissions', 'Insufficient permissions to create posts.' );
 	}
 
@@ -599,25 +555,36 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		}
 
 		// Validate license token.
-		$license = sanitize_text_field( WP_AI_BLOGGER_PUBLIC_TOKEN );
+		$license = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 		if ( empty( $license ) ) {
 			return new WP_Error( 'missing_license', 'License token is required.' );
 		}
 
-		// Prepare request body.
-		$body_args = array_merge(
-			[
-				'keywords'      => explode( ',', $keywords ),
-				'maxTitleWords' => $max_title_words,
-				'maxWords'      => $max_content_words,
-				'license'       => $license,
-				'site_url'      => esc_url_raw( get_site_url() ),
-			],
-			$sanitized_persona
-		);
+		// Get additional settings to match server API format
+		$settings = Settings::get_ai_blogger_settings();
 
-		// Validate API endpoint.
-		$api_url = WP_AI_BLOGGER_POST_CREATION_API;
+		// Prepare request body to match the server API generate_campaign_post method exactly
+		$body_args = [
+			// Required by server API generate_campaign_post method
+			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
+			'maxTitleWords'     => $max_title_words,
+			'maxWords'          => $max_content_words,
+			'name'              => 'Campaign Post', // Campaign name - server expects this
+			'license'           => $license,
+
+			// Safety settings - required by server
+			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
+			'harassment'        => absint( $settings['harassment'] ?? 2 ),
+			'hate'              => absint( $settings['hate'] ?? 2 ),
+			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
+			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
+
+			// Site persona - required by server
+			'site_title'        => isset( $sanitized_persona['site_title'] ) ? $sanitized_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
+			'site_purpose'      => isset( $sanitized_persona['site_purpose'] ) ? $sanitized_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
+			'site_description'  => isset( $sanitized_persona['site_description'] ) ? $sanitized_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
+		];      // Validate API endpoint.
+		$api_url   = WP_AI_BLOGGER_POST_CREATION_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
@@ -715,8 +682,8 @@ function wpaib_sanitize_api_response( $data ) {
  * @since 1.0.0
  */
 function wpaib_get_site_persona_details( $campaign_id = 0 ) {
-	// Check user capabilities.
-	if ( ! current_user_can( 'edit_posts' ) ) {
+	// Check user capabilities (skip during cron execution).
+	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return [];
 	}
 
@@ -739,12 +706,20 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
 
 		// Handle campaign-specific overrides.
 		if ( $campaign_id > 0 ) {
-			$override_site_details = Metadata::get_campaign_meta( $campaign_id, 'overrideSitePersona' );
+			// Use get_post_meta directly during cron to avoid permission issues
+			if ( wp_doing_cron() ) {
+				$override_site_details = get_post_meta( $campaign_id, 'overrideSitePersona', true );
+				$overridden_title      = get_post_meta( $campaign_id, 'overrideSiteTitle', true );
+				$overridden_desc       = get_post_meta( $campaign_id, 'overrideSiteDescription', true );
+				$overridden_for        = get_post_meta( $campaign_id, 'overrideSiteFor', true );
+			} else {
+				$override_site_details = Metadata::get_campaign_meta( $campaign_id, 'overrideSitePersona' );
+				$overridden_title      = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' );
+				$overridden_desc       = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' );
+				$overridden_for        = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' );
+			}
 
 			if ( $override_site_details ) {
-				$overridden_title = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' );
-				$overridden_desc  = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' );
-				$overridden_for   = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' );
 
 				if ( ! empty( $overridden_title ) ) {
 					$persona_details['site_title'] = sanitize_text_field( $overridden_title );
@@ -777,70 +752,7 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  * @return int|WP_Error
  * @since 1.0.0
  */
-function wpaib_create_blog_post( $campaign_id ) {
-	// Site persona settings..
-	$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
-	// General settings..
-	$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
-	$summary_as_excerpt = Metadata::get_campaign_meta( $campaign_id, 'summaryAsExcerpt' );
-
-	// Filters settings..
-	$post_type     = Metadata::get_campaign_meta( $campaign_id, 'postType' );
-	$post_author   = Metadata::get_campaign_meta( $campaign_id, 'author' );
-	$post_status   = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
-	$post_category = Metadata::get_campaign_meta( $campaign_id, 'category' );
-	$post_tag      = Metadata::get_campaign_meta( $campaign_id, 'tags' );
-
-	// Advanced settings.
-	$is_pro_available  = defined( 'WP_AI_BLOGGER_PRO_VERSION' );
-	$max_title_words   = $is_pro_available ? Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) : 10;
-	$max_content_words = $is_pro_available ? Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) : 1000;
-
-	// Perform the API call to get the content.
-	$api_response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details );
-
-	if ( is_wp_error( $api_response ) ) {
-		return $api_response;
-	}
-
-	// Create the post..
-	$post_data = [
-		'post_title'   => $api_response['post_title'],
-		'post_content' => $api_response['post_content'],
-		'post_type'    => $post_type,
-		'post_status'  => $post_status,
-		'post_author'  => $post_author,
-	];
-	if ( ! empty( $post_category ) ) {
-		$post_data['post_category'] = [ $post_category ];
-	}
-	if ( ! empty( $post_tag ) ) {
-		$post_data['tags_input'] = [ $post_tag ];
-	}
-	if ( $summary_as_excerpt ) {
-		$post_data['post_excerpt'] = $api_response['summary'];
-	}
-
-	$post_id = wp_insert_post( $post_data );
-	if ( is_wp_error( $post_id ) ) {
-		return new \WP_Error( 'post_creation_failed', __( 'Failed to create the post.', 'wp-ai-blogger' ) );
-	}
-
-	// Add campaign metadata to the created post.
-	add_post_meta( $post_id, 'wp_aib_reference', 1 );
-	add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
-
-	// Update the campaign meta.
-	$posts_created = absint( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
-	$posts_created = $posts_created ? $posts_created + 1 : 1;
-	Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $posts_created );
-
-	Metadata::update_campaign_meta( $campaign_id, 'lastRun', time() );
-	Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
-
-	return $post_id;
-}
 
 /**
  * Track post views for analytics.
@@ -871,101 +783,8 @@ function wpaib_track_post_view( $post_id ): void {
 	update_post_meta( $post_id, 'post_views_count', $new_views );
 }
 
-/**
- * Clear campaign schedule from WP Cron.
- *
- * @param int $campaign_id Campaign ID.
- * @return void
- * @since x.x.x
- */
-function wpaib_clear_campaign_schedule( $campaign_id ): void {
-	$campaign_id = absint( $campaign_id );
-	if ( ! $campaign_id ) {
-		return;
-	}
 
-	$hook_name = 'wp_ai_blogger_create_blog_post';
-	$args      = [ $campaign_id ];
 
-	// Get next scheduled time.
-	$timestamp = wp_next_scheduled( $hook_name, $args );
 
-	if ( $timestamp ) {
-		wp_unschedule_event( $timestamp, $hook_name, $args );
-	}
 
-	// Remove from schedules option.
-	$schedules = get_option( 'wpaib_auto_blogging_schedules', [] );
-	if ( isset( $schedules[ $campaign_id ] ) ) {
-		unset( $schedules[ $campaign_id ] );
-		update_option( 'wpaib_auto_blogging_schedules', $schedules );
-	}
-}
 
-/**
- * Update campaign schedules with interval and unit.
- *
- * @param int    $campaign_id Campaign ID.
- * @param int    $interval    Repeat interval (number).
- * @param string $unit        Repeat unit (day, week, month, year).
- * @return void
- * @since x.x.x
- */
-function wpaib_update_schedules( $campaign_id, $interval, $unit = 'day' ): void {
-	// Validate inputs.
-	$campaign_id = absint( $campaign_id );
-	$interval    = absint( $interval );
-	$unit        = sanitize_text_field( $unit );
-
-	if ( ! $campaign_id || ! $interval ) {
-		return;
-	}
-
-	// Validate unit.
-	$allowed_units = [ 'day', 'week', 'month', 'year' ];
-	if ( ! in_array( $unit, $allowed_units, true ) ) {
-		$unit = 'day';
-	}
-
-	// Validate interval limits based on unit.
-	$max_intervals = [
-		'day'   => 365, // Max 1 year in days.
-		'week'  => 52,  // Max 1 year in weeks.
-		'month' => 24,  // Max 2 years in months.
-		'year'  => 5,   // Max 5 years.
-	];
-
-	if ( $interval > $max_intervals[ $unit ] ) {
-		$interval = $max_intervals[ $unit ];
-	}
-
-	$schedules = wpaib_get_schedules();
-
-	// Store both interval and unit for new system.
-	$schedules[ $campaign_id ] = [
-		'interval' => $interval,
-		'unit'     => $unit,
-		'days'     => wpaib_convert_to_days( $interval, $unit ),
-	];
-
-	update_option( 'wpaib_auto_blogging_schedules', $schedules );
-}
-
-/**
- * Convert interval and unit to days for scheduler compatibility.
- *
- * @param int    $interval Repeat interval.
- * @param string $unit     Repeat unit.
- * @return int Days equivalent.
- * @since x.x.x
- */
-function wpaib_convert_to_days( $interval, $unit ): int {
-	$multipliers = [
-		'day'   => 1,
-		'week'  => 7,
-		'month' => 30, // Approximate.
-		'year'  => 365, // Approximate.
-	];
-
-	return absint( $interval * ( $multipliers[ $unit ] ?? 1 ) );
-}
