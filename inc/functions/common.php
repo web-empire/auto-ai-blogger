@@ -566,25 +566,25 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		// Prepare request body to match the server API generate_campaign_post method exactly
 		$body_args = [
 			// Required by server API generate_campaign_post method
-			'keywords'            => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
-			'maxTitleWords'       => $max_title_words,
-			'maxWords'            => $max_content_words,
-			'name'                => 'Campaign Post', // Campaign name - server expects this
-			'license'             => $license,
+			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
+			'maxTitleWords'     => $max_title_words,
+			'maxWords'          => $max_content_words,
+			'name'              => 'Campaign Post', // Campaign name - server expects this
+			'license'           => $license,
 
 			// Safety settings - required by server
-			'temperature'         => floatval( $settings['temperature'] ?? 0.7 ),
-			'harassment'          => absint( $settings['harassment'] ?? 2 ),
-			'hate'                => absint( $settings['hate'] ?? 2 ),
-			'sexually_explicit'   => absint( $settings['sexuallyExplicit'] ?? 2 ),
-			'dangerous_content'   => absint( $settings['dangerousContent'] ?? 2 ),
+			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
+			'harassment'        => absint( $settings['harassment'] ?? 2 ),
+			'hate'              => absint( $settings['hate'] ?? 2 ),
+			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
+			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
 
 			// Site persona - required by server
-			'site_title'          => isset( $sanitized_persona['site_title'] ) ? $sanitized_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
-			'site_purpose'        => isset( $sanitized_persona['site_purpose'] ) ? $sanitized_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
-			'site_description'    => isset( $sanitized_persona['site_description'] ) ? $sanitized_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
-		];		// Validate API endpoint.
-		$api_url = WP_AI_BLOGGER_POST_CREATION_API;
+			'site_title'        => isset( $sanitized_persona['site_title'] ) ? $sanitized_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
+			'site_purpose'      => isset( $sanitized_persona['site_purpose'] ) ? $sanitized_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
+			'site_description'  => isset( $sanitized_persona['site_description'] ) ? $sanitized_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
+		];      // Validate API endpoint.
+		$api_url   = WP_AI_BLOGGER_POST_CREATION_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
@@ -709,14 +709,14 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
 			// Use get_post_meta directly during cron to avoid permission issues
 			if ( wp_doing_cron() ) {
 				$override_site_details = get_post_meta( $campaign_id, 'overrideSitePersona', true );
-				$overridden_title = get_post_meta( $campaign_id, 'overrideSiteTitle', true );
-				$overridden_desc = get_post_meta( $campaign_id, 'overrideSiteDescription', true );
-				$overridden_for = get_post_meta( $campaign_id, 'overrideSiteFor', true );
+				$overridden_title      = get_post_meta( $campaign_id, 'overrideSiteTitle', true );
+				$overridden_desc       = get_post_meta( $campaign_id, 'overrideSiteDescription', true );
+				$overridden_for        = get_post_meta( $campaign_id, 'overrideSiteFor', true );
 			} else {
 				$override_site_details = Metadata::get_campaign_meta( $campaign_id, 'overrideSitePersona' );
-				$overridden_title = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' );
-				$overridden_desc = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' );
-				$overridden_for = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' );
+				$overridden_title      = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteTitle' );
+				$overridden_desc       = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteDescription' );
+				$overridden_for        = Metadata::get_campaign_meta( $campaign_id, 'overrideSiteFor' );
 			}
 
 			if ( $override_site_details ) {

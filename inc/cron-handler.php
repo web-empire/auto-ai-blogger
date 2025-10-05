@@ -59,9 +59,9 @@ class CronHandler {
 				return;
 			}
 
-			$wp_status = $campaign->post_status;
+			$wp_status   = $campaign->post_status;
 			$meta_status = Metadata::get_campaign_meta( $campaign_id, 'status' );
-			$is_active = ( $meta_status === 'publish' || $wp_status === 'publish' );
+			$is_active   = ( $meta_status === 'publish' || $wp_status === 'publish' );
 
 			if ( ! $is_active ) {
 				return;
@@ -71,10 +71,9 @@ class CronHandler {
 
 			if ( $result['success'] ) {
 				$this->schedule_next_post( $campaign_id );
-			}
-
+			}       
 		} catch ( \Exception $e ) {
-			error_log( "WP AI Blogger: Exception in create_single_post_from_campaign: " . $e->getMessage() );
+			error_log( 'WP AI Blogger: Exception in create_single_post_from_campaign: ' . $e->getMessage() );
 		}
 	}
 
@@ -83,75 +82,75 @@ class CronHandler {
 	 */
 	public function generate_post_from_campaign( $campaign_id ): array {
 		try {
-			$keywords = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
-			$max_words = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?: 1000;
-			$max_title_words = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) ?: 10;
-			$post_type = Metadata::get_campaign_meta( $campaign_id, 'postType' );
-			$post_status = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
-			$author_id = Metadata::get_campaign_meta( $campaign_id, 'author' );
-			$category = Metadata::get_campaign_meta( $campaign_id, 'category' );
-			$tag = Metadata::get_campaign_meta( $campaign_id, 'tag' );
+			$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
+			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?: 1000;
+			$max_title_words    = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) ?: 10;
+			$post_type          = Metadata::get_campaign_meta( $campaign_id, 'postType' );
+			$post_status        = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
+			$author_id          = Metadata::get_campaign_meta( $campaign_id, 'author' );
+			$category           = Metadata::get_campaign_meta( $campaign_id, 'category' );
+			$tag                = Metadata::get_campaign_meta( $campaign_id, 'tag' );
 			$summary_as_excerpt = Metadata::get_campaign_meta( $campaign_id, 'summaryAsExcerpt' );
 
-		if ( empty( $keywords ) ) {
+			if ( empty( $keywords ) ) {
+				return [
+					'success' => false,
+					'message' => 'No keywords found for campaign',
+				];
+			}
+
+			$api_response = $this->call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words );
+
+			if ( ! $api_response['success'] ) {
+				return [
+					'success' => false,
+					'message' => 'API call failed: ' . $api_response['message'],
+				];
+			}
+
+			$api_data = $api_response['data'];
+
+			$post_data = [
+				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
+				'post_content' => wp_kses_post( $api_data['post_content'] ?? '' ),
+				'post_status'  => $post_status ?: 'draft',
+				'post_type'    => $post_type ?: 'post',
+				'post_author'  => $author_id ?: get_current_user_id(),
+			];      if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
+				$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
+			}
+
+			$post_id = wp_insert_post( $post_data );
+
+			if ( is_wp_error( $post_id ) || ! $post_id ) {
+				return [
+					'success' => false,
+					'message' => 'Failed to create WordPress post: ' . ( is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Unknown error' ),
+				];
+			}
+
+			if ( ! empty( $category ) ) {
+				wp_set_post_categories( $post_id, [ $category ] );
+			}
+			if ( ! empty( $tag ) ) {
+				wp_set_post_tags( $post_id, $tag );
+			}
+
+			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
+			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
+			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
+
 			return [
-				'success' => false,
-				'message' => 'No keywords found for campaign'
+				'success' => true,
+				'message' => "Post created successfully with ID: {$post_id}",
+				'post_id' => $post_id,
 			];
-		}
-
-		$api_response = $this->call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words );
-
-		if ( ! $api_response['success'] ) {
-			return [
-				'success' => false,
-				'message' => 'API call failed: ' . $api_response['message']
-			];
-		}
-
-		$api_data = $api_response['data'];
-
-		$post_data = [
-			'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
-			'post_content' => wp_kses_post( $api_data['post_content'] ?? '' ),
-			'post_status'  => $post_status ?: 'draft',
-			'post_type'    => $post_type ?: 'post',
-			'post_author'  => $author_id ?: get_current_user_id(),
-		];		if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
-			$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
-		}
-
-		$post_id = wp_insert_post( $post_data );
-
-		if ( is_wp_error( $post_id ) || ! $post_id ) {
-			return [
-				'success' => false,
-				'message' => 'Failed to create WordPress post: ' . ( is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Unknown error' )
-			];
-		}
-
-		if ( ! empty( $category ) ) {
-			wp_set_post_categories( $post_id, [ $category ] );
-		}
-		if ( ! empty( $tag ) ) {
-			wp_set_post_tags( $post_id, $tag );
-		}
-
-		$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
-		Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
-		Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
-		Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
-
-		return [
-			'success' => true,
-			'message' => "Post created successfully with ID: {$post_id}",
-			'post_id' => $post_id
-		];
 
 		} catch ( \Exception $e ) {
 			return [
 				'success' => false,
-				'message' => 'Exception: ' . $e->getMessage()
+				'message' => 'Exception: ' . $e->getMessage(),
 			];
 		}
 	}
@@ -161,14 +160,14 @@ class CronHandler {
 	 */
 	private function call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words ): array {
 		try {
-			$max_words = $max_words ?: 1000;
+			$max_words       = $max_words ?: 1000;
 			$max_title_words = $max_title_words ?: 10;
 
 			$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
 			$max_retries = 2;
 			$retry_delay = 3;
-			$response = null;
+			$response    = null;
 
 			for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
 				$response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_words, $site_persona_details );
@@ -177,7 +176,7 @@ class CronHandler {
 					break;
 				}
 
-				$error_code = $response->get_error_code();
+				$error_code    = $response->get_error_code();
 				$error_message = $response->get_error_message();
 
 				if ( in_array( $error_code, [ 'api_error' ], true ) &&
@@ -197,19 +196,19 @@ class CronHandler {
 			if ( is_wp_error( $response ) ) {
 				return [
 					'success' => false,
-					'message' => $response->get_error_message()
+					'message' => $response->get_error_message(),
 				];
 			}
 
 			return [
 				'success' => true,
-				'data' => $response
+				'data'    => $response,
 			];
 
 		} catch ( \Exception $e ) {
 			return [
 				'success' => false,
-				'message' => 'API Exception: ' . $e->getMessage()
+				'message' => 'API Exception: ' . $e->getMessage(),
 			];
 		}
 	}
@@ -220,16 +219,16 @@ class CronHandler {
 	private function schedule_next_post( $campaign_id ): void {
 		try {
 			$repeat_interval = Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' );
-			$repeat_unit = Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' );
-			$posts_target = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
-			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+			$repeat_unit     = Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' );
+			$posts_target    = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
+			$posts_created   = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 
 			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
 				return;
 			}
 
 			$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
-			$next_run = time() + $interval_seconds;
+			$next_run         = time() + $interval_seconds;
 
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 

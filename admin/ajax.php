@@ -62,7 +62,7 @@ class Ajax {
 		'wpaib_create_post',
 		'wpaib_run_campaign',
 		'wpaib_get_campaign_analytics',
-		'wpaib_delete_campaign'
+		'wpaib_delete_campaign',
 	];
 
 	/**
@@ -740,7 +740,7 @@ class Ajax {
 
 			// Run the campaign using CronHandler.
 			$cron_handler = \WPAIBlogger\Inc\CronHandler::get_instance();
-			$post_id = $cron_handler->create_single_post_from_campaign( $campaign_id );
+			$post_id      = $cron_handler->create_single_post_from_campaign( $campaign_id );
 
 			if ( is_wp_error( $post_id ) ) {
 				wp_send_json_error(
@@ -1661,7 +1661,7 @@ class Ajax {
 			}
 
 			$interval = absint( $meta_input['repeatInterval'] );
-			$unit = sanitize_text_field( $meta_input['repeatUnit'] );
+			$unit     = sanitize_text_field( $meta_input['repeatUnit'] );
 
 			if ( ! $interval ) {
 				return;
@@ -1683,10 +1683,12 @@ class Ajax {
 
 				if ( $intended_status === 'publish' ) {
 					// User wants the campaign to be active, update the post status
-					wp_update_post( [
-						'ID' => $campaign_id,
-						'post_status' => 'publish'
-					] );
+					wp_update_post(
+						[
+							'ID'          => $campaign_id,
+							'post_status' => 'publish',
+						] 
+					);
 				} else {
 					return;
 				}
@@ -1746,15 +1748,18 @@ class Ajax {
 		$schedule_name = "wpaib_{$interval}_{$unit}";
 
 		// Register custom schedule if not exists
-		add_filter( 'cron_schedules', function( $schedules ) use ( $schedule_name, $interval, $unit ) {
-			if ( ! isset( $schedules[ $schedule_name ] ) ) {
-				$schedules[ $schedule_name ] = [
-					'interval' => $this->calculate_interval_seconds( $interval, $unit ),
-					'display'  => sprintf( 'Every %d %s%s', $interval, $unit, $interval > 1 ? 's' : '' ),
-				];
-			}
-			return $schedules;
-		} );
+		add_filter(
+			'cron_schedules',
+			function( $schedules ) use ( $schedule_name, $interval, $unit ) {
+				if ( ! isset( $schedules[ $schedule_name ] ) ) {
+					$schedules[ $schedule_name ] = [
+						'interval' => $this->calculate_interval_seconds( $interval, $unit ),
+						'display'  => sprintf( 'Every %d %s%s', $interval, $unit, $interval > 1 ? 's' : '' ),
+					];
+				}
+				return $schedules;
+			} 
+		);
 
 		return $schedule_name;
 	}
@@ -1781,7 +1786,7 @@ class Ajax {
 
 			// Check if target reached
 			$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-			$posts_target = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
+			$posts_target  = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
 
 			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
 				// Target reached, clear schedule
@@ -1806,20 +1811,20 @@ class Ajax {
 	 */
 	private function generate_post_from_campaign( $campaign_id ) {
 		// Get campaign metadata
-		$keywords = get_post_meta( $campaign_id, 'keywords', true );
-		$post_type = get_post_meta( $campaign_id, 'postType', true ) ?: 'post';
-		$post_status = get_post_meta( $campaign_id, 'postStatus', true ) ?: 'draft';
-		$post_author = get_post_meta( $campaign_id, 'author', true ) ?: 1;
-		$post_category = get_post_meta( $campaign_id, 'category', true );
-		$post_tag = get_post_meta( $campaign_id, 'tags', true );
+		$keywords           = get_post_meta( $campaign_id, 'keywords', true );
+		$post_type          = get_post_meta( $campaign_id, 'postType', true ) ?: 'post';
+		$post_status        = get_post_meta( $campaign_id, 'postStatus', true ) ?: 'draft';
+		$post_author        = get_post_meta( $campaign_id, 'author', true ) ?: 1;
+		$post_category      = get_post_meta( $campaign_id, 'category', true );
+		$post_tag           = get_post_meta( $campaign_id, 'tags', true );
 		$summary_as_excerpt = get_post_meta( $campaign_id, 'summaryAsExcerpt', true );
 
 		// Get site persona details
 		$site_persona = [
-			'name' => get_bloginfo( 'name' ),
-			'site_title' => get_bloginfo( 'name' ),
-			'site_purpose' => get_bloginfo( 'description' ),
-			'site_description' => get_bloginfo( 'description' )
+			'name'             => get_bloginfo( 'name' ),
+			'site_title'       => get_bloginfo( 'name' ),
+			'site_purpose'     => get_bloginfo( 'description' ),
+			'site_description' => get_bloginfo( 'description' ),
 		];
 
 		// Get API response
@@ -1886,26 +1891,26 @@ class Ajax {
 		$settings = \WPAIBlogger\Inc\Utils\Settings::get_ai_blogger_settings();
 
 		// Prepare API request to match server API generate_campaign_post method exactly
-		$body = [
+		$body         = [
 			// Required by server API generate_campaign_post method
-			'keywords'            => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
-			'maxTitleWords'       => 10,
-			'maxWords'            => 1000,
-			'name'                => 'Manual Post Creation', // Campaign name - server expects this
-			'license'             => \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' ),
+			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
+			'maxTitleWords'     => 10,
+			'maxWords'          => 1000,
+			'name'              => 'Manual Post Creation', // Campaign name - server expects this
+			'license'           => \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' ),
 
 			// Safety settings - required by server
-			'temperature'         => floatval( $settings['temperature'] ?? 0.7 ),
-			'harassment'          => absint( $settings['harassment'] ?? 2 ),
-			'hate'                => absint( $settings['hate'] ?? 2 ),
-			'sexually_explicit'   => absint( $settings['sexuallyExplicit'] ?? 2 ),
-			'dangerous_content'   => absint( $settings['dangerousContent'] ?? 2 ),
+			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
+			'harassment'        => absint( $settings['harassment'] ?? 2 ),
+			'hate'              => absint( $settings['hate'] ?? 2 ),
+			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
+			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
 
 			// Site persona - required by server
-			'site_title'          => isset( $site_persona['site_title'] ) ? $site_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
-			'site_purpose'        => isset( $site_persona['site_purpose'] ) ? $site_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
-			'site_description'    => isset( $site_persona['site_description'] ) ? $site_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
-		];		$args = [
+			'site_title'        => isset( $site_persona['site_title'] ) ? $site_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
+			'site_purpose'      => isset( $site_persona['site_purpose'] ) ? $site_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
+			'site_description'  => isset( $site_persona['site_description'] ) ? $site_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
+		];      $args = [
 			'method'  => 'POST',
 			'timeout' => 30,
 			'headers' => [
