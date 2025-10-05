@@ -397,7 +397,7 @@ class Ajax {
 				return;
 			}
 
-			// Update campaign scheduling using new system
+			// Update campaign scheduling using new system.
 			$this->schedule_campaign_posts( $campaign_id, $formatted_campaign_data['meta_input'] );
 
 			wp_send_json_success(
@@ -989,7 +989,7 @@ class Ajax {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
 			}
 
-			// Clear scheduled events for this campaign
+			// Clear scheduled events for this campaign.
 			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 			wp_delete_post( $campaign_id, true );
 			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
@@ -1794,8 +1794,8 @@ class Ajax {
 		$multipliers = [
 			'day'   => DAY_IN_SECONDS,
 			'week'  => WEEK_IN_SECONDS,
-			'month' => 30 * DAY_IN_SECONDS, // Approximate
-			'year'  => 365 * DAY_IN_SECONDS, // Approximate
+			'month' => 30 * DAY_IN_SECONDS,
+			'year'  => 365 * DAY_IN_SECONDS,
 		];
 
 		return $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
