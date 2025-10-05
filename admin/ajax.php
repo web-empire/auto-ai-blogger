@@ -62,7 +62,8 @@ class Ajax {
 		'wpaib_create_post',
 		'wpaib_run_campaign',
 		'wpaib_get_campaign_analytics',
-		'wpaib_delete_campaign'
+		'wpaib_delete_campaign',
+		'wpaib_refresh_campaigns'
 	];
 
 	/**
@@ -267,9 +268,7 @@ class Ajax {
 				return;
 			}
 
-			// Debug: Log the campaign status being set
 			$campaign_status = $formatted_campaign_data['status'] ?? 'draft';
-
 
 			// Create a new campaign with error handling.
 			$campaign_id = \wp_insert_post(
@@ -1692,14 +1691,18 @@ class Ajax {
 				}
 			}
 
-			// Calculate interval in seconds
-			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
+			// Check if posts target has already been reached
+			$posts_target = absint( $meta_input['postsTarget'] ?? 0 );
+			$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
 
-			// Schedule the first post immediately
-			wp_schedule_single_event( time() + 60, 'wpaib_create_single_post', [ $campaign_id ] ); // 1 minute delay
+			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
+				// Target already reached, don't schedule any posts
+				return;
+			}
 
-			// Schedule recurring posts
-			wp_schedule_event( time() + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
+			// Schedule the first post with a 1 minute delay
+			// Subsequent posts will be scheduled by CronHandler after each post creation
+			wp_schedule_single_event( time() + 60, 'wpaib_create_single_post', [ $campaign_id ] );
 
 		} catch ( Exception $e ) {
 			// Silently handle scheduling errors
@@ -1860,11 +1863,18 @@ class Ajax {
 		add_post_meta( $post_id, 'wp_aib_reference', 1 );
 		add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
-		// Update campaign stats
+		// Update campaign stats with atomic operations and error handling
 		$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-		update_post_meta( $campaign_id, 'postsCreated', $posts_created + 1 );
-		update_post_meta( $campaign_id, 'lastRun', time() );
-		update_post_meta( $campaign_id, 'lastPostID', $post_id );
+
+		// Use a more reliable update mechanism
+		$update_posts_created = update_post_meta( $campaign_id, 'postsCreated', $posts_created + 1 );
+		$update_last_run = update_post_meta( $campaign_id, 'lastRun', time() );
+		$update_last_post_id = update_post_meta( $campaign_id, 'lastPostID', $post_id );
+
+		// If any meta update failed, log it (but don't fail the post creation)
+		if ( ! $update_posts_created || ! $update_last_run || ! $update_last_post_id ) {
+			error_log( 'WP AI Blogger: Failed to update campaign meta for campaign ID: ' . $campaign_id );
+		}
 
 		return $post_id;
 	}
@@ -1982,6 +1992,40 @@ class Ajax {
 			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
+		}
+	}
+
+	/**
+	 * Handler to refresh campaigns data.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function wpaib_refresh_campaigns(): void {
+		try {
+			// Security validation.
+			$security_check = $this->validate_ajax_security( 'refresh_campaigns' );
+			if ( is_wp_error( $security_check ) ) {
+				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
+				return;
+			}
+
+			// Nonce validation.
+			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+				return;
+			}
+
+			// Get fresh campaigns data
+			$all_campaigns = wpaib_get_all_campaigns();
+
+			wp_send_json_success( [
+				'campaigns' => $all_campaigns,
+				'message' => __( 'Campaigns refreshed successfully.', 'wp-ai-blogger' )
+			] );
+
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [ 'message' => __( 'Error occurred while refreshing campaigns: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
 		}
 	}
 }

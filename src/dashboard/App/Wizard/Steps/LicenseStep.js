@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { ArrowRight, Key, CheckCircle2, AlertCircle, Shield, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,6 @@ import { updateApiData } from '@Utils/ApiData';
 import DynamicCard from '@Components/DynamicCard';
 import apiFetch from '@wordpress/api-fetch';
 
-// Enhanced license input component
 const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) => {
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -50,7 +49,6 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 					aria-invalid={ !! error }
 				/>
 
-				{ /* Status indicator */ }
 				<div className="absolute right-3 top-3">
 					{ processing ? (
 						<Loader2 className="w-4 h-4 text-indigo-500 animate-spin" aria-hidden="true" />
@@ -74,7 +72,6 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 
 LicenseInput.displayName = 'LicenseInput';
 
-// Enhanced submit button
 const SubmitButton = memo( ( { onClick, disabled, loading, children } ) => {
 	const handleClick = useCallback( ( e ) => {
 		e.preventDefault();
@@ -118,7 +115,6 @@ const LicenseStep = memo( () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	// Redux state
 	const reduxLicense = useSelector( ( state ) => state.license );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce );
@@ -126,9 +122,7 @@ const LicenseStep = memo( () => {
 	const adminAppUrl = useSelector( ( state ) => state.adminAppUrl );
 	const licenseStatusFromRedux = useSelector( ( state ) => state.licenseStatus );
 
-	// Component state
 	const [ license, setLicense ] = useState( () => {
-		// Ensure we always have a string value
 		const initialLicense = reduxLicense || '';
 		return typeof initialLicense === 'string' ? initialLicense : '';
 	} );
@@ -136,11 +130,8 @@ const LicenseStep = memo( () => {
 	const [ processing, setProcessing ] = useState( false );
 	const [ error, setError ] = useState( '' );
 
-	// Enhanced token fetching in background
 	const fetchTokenDataInBackground = useCallback( async ( licenseKey ) => {
 		try {
-			console.log( 'Fetching token data in background for license:', licenseKey.substring( 0, 8 ) + '...' );
-
 			const tokenResponse = await fetch( `https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data?license=${ licenseKey }`, {
 				method: 'GET',
 				headers: {
@@ -152,7 +143,6 @@ const LicenseStep = memo( () => {
 				const tokenData = await tokenResponse.json();
 
 				if ( tokenData && tokenData.success && tokenData.data ) {
-					// Update Redux store with token data
 					dispatch( {
 						type: 'UPDATE_TOKEN_TOTAL',
 						payload: tokenData.data.total,
@@ -162,13 +152,9 @@ const LicenseStep = memo( () => {
 						payload: tokenData.data.remaining,
 					} );
 
-					// Update API data in database
 					await updateApiData( 'tokenTotal', tokenData.data.total, dispatch, abortControllerRef );
 					await updateApiData( 'tokenRemaining', tokenData.data.remaining, dispatch, abortControllerRef );
 
-					console.log( 'Token data fetched and updated:', tokenData.data );
-
-					// Show success notification
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: {
@@ -178,7 +164,6 @@ const LicenseStep = memo( () => {
 						},
 					} );
 				} else {
-					console.warn( 'Invalid token data response:', tokenData );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: {
@@ -189,7 +174,6 @@ const LicenseStep = memo( () => {
 					} );
 				}
 			} else {
-				console.warn( 'Failed to fetch token data, status:', tokenResponse.status );
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: {
@@ -200,7 +184,6 @@ const LicenseStep = memo( () => {
 				} );
 			}
 		} catch ( tokenError ) {
-			console.error( 'Token data fetch error:', tokenError );
 			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 				payload: {
@@ -212,32 +195,19 @@ const LicenseStep = memo( () => {
 		}
 	}, [ dispatch ] );
 
-	// Enhanced license activation
 	const activateLicense = useCallback( async () => {
-		// Ensure license is a string and not empty
 		const licenseValue = typeof license === 'string' ? license.trim() : '';
 		if ( ! licenseValue || processing ) {
 			return false;
 		}
 
-		// Validate nonce is available
 		if ( ! licensingNonce ) {
-			console.error( 'LicenseStep: No licensing nonce available', { licensingNonce } );
 			setError( __( 'Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger' ) );
 			return false;
 		}
 
 		setProcessing( true );
 		setError( '' );
-
-		// Debug logging
-		if ( process.env.NODE_ENV === 'development' ) {
-			console.log( 'LicenseStep: Activating license', {
-				licenseValue: licenseValue.substring( 0, 8 ) + '...',
-				licensingNonce: licensingNonce.substring( 0, 8 ) + '...',
-				ajaxUrl,
-			} );
-		}
 
 		try {
 			const formData = new FormData();
@@ -253,7 +223,6 @@ const LicenseStep = memo( () => {
 			} );
 
 			if ( response.success ) {
-				// Update Redux state
 				dispatch( {
 					type: 'UPDATE_LICENSE_STATUS',
 					payload: 'licensed',
@@ -262,17 +231,14 @@ const LicenseStep = memo( () => {
 
 				setLicenseStatus( 'licensed' );
 
-				// Update API data
 				await updateApiData( 'license', licenseValue, dispatch, abortControllerRef );
 
-				// Fetch token data in background after successful activation
 				fetchTokenDataInBackground( licenseValue );
 
 				return true;
 			}
-			// Handle specific error types
+
 			const errorMessage = response.data?.message || response.message || '';
-			console.error( 'License activation failed:', response );
 
 			if ( errorMessage.includes( 'nonce' ) || errorMessage.includes( 'security' ) ) {
 				setError( __( 'Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger' ) );
@@ -283,17 +249,14 @@ const LicenseStep = memo( () => {
 			}
 			return false;
 		} catch ( failureError ) {
-			console.error( 'License activation error:', failureError );
 			setError( __( 'Connection failed. Please check your internet connection and try again.', 'wp-ai-blogger' ) );
 			return false;
 		} finally {
 			setProcessing( false );
 		}
-	}, [ license, processing, licensingNonce, dispatch, ajaxUrl ] );
+	}, [ license, processing, licensingNonce, dispatch, ajaxUrl, fetchTokenDataInBackground ] );
 
-	// Enhanced form submission
 	const handleSubmit = useCallback( async () => {
-		// Ensure license is a string and not empty
 		const licenseValue = typeof license === 'string' ? license.trim() : '';
 		if ( ! licenseValue ) {
 			setError( __( 'License key is required.', 'wp-ai-blogger' ) );
@@ -302,24 +265,20 @@ const LicenseStep = memo( () => {
 
 		const success = await activateLicense();
 		if ( success ) {
-			// Small delay for better UX
 			setTimeout( () => {
 				navigate( `${ adminAppUrl }&step=optin` );
 			}, 1000 );
 		}
-	}, [ license, activateLicense, navigate ] );
+	}, [ license, activateLicense, navigate, adminAppUrl ] );
 
-	// Handle license input change
 	const handleLicenseChange = useCallback( ( value ) => {
-		// Ensure we always set a string value
 		const stringValue = typeof value === 'string' ? value : '';
 		setLicense( stringValue );
 		if ( error ) {
 			setError( '' );
-		} // Clear error when user types
+		}
 	}, [ error ] );
 
-	// Button text logic
 	const getButtonText = () => {
 		if ( processing ) {
 			return licenseStatus === 'licensed' ? __( 'Proceeding…', 'wp-ai-blogger' ) : __( 'Activating…', 'wp-ai-blogger' );
@@ -335,7 +294,6 @@ const LicenseStep = memo( () => {
 		>
 			<div className="w-full max-w-2xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-					{ /* Header */ }
 					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
 						<div className="mb-4">
 							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
@@ -351,7 +309,6 @@ const LicenseStep = memo( () => {
 						</p>
 					</div>
 
-					{ /* Form */ }
 					<div className="p-8">
 						<form className="space-y-6" onSubmit={ ( e ) => {
 							e.preventDefault(); handleSubmit();
@@ -374,7 +331,6 @@ const LicenseStep = memo( () => {
 								ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
 							/>
 
-							{ /* Success message */ }
 							{ licenseStatus === 'licensed' && ! error && (
 								<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
 									<div className="flex items-center gap-2">
@@ -386,7 +342,6 @@ const LicenseStep = memo( () => {
 								</div>
 							) }
 
-							{ /* Submit button */ }
 							<div className="flex justify-center pt-6 m-0">
 								<SubmitButton
 									onClick={ handleSubmit }
@@ -398,7 +353,6 @@ const LicenseStep = memo( () => {
 							</div>
 						</form>
 
-						{ /* Additional info */ }
 						<div className="mt-8 text-center">
 							<p className="text-sm text-gray-600 leading-relaxed">
 								{ __( 'Your license key connects your site to our AI services and allocates content generation tokens. ', 'wp-ai-blogger' ) }
@@ -416,7 +370,6 @@ const LicenseStep = memo( () => {
 				</div>
 			</div>
 
-			{ /* Screen reader announcements */ }
 			<div className="sr-only" aria-live="polite" aria-atomic="true">
 				{ processing && __( 'Activating your license…', 'wp-ai-blogger' ) }
 				{ licenseStatus === 'licensed' && __( 'License activated successfully. Proceeding to next step.', 'wp-ai-blogger' ) }

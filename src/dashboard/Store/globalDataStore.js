@@ -183,25 +183,7 @@ const createEnhancedStore = () => {
 			}
 		};
 
-		// Log store creation in development with state summary
-		if ( process.env.NODE_ENV === 'development' ) {
-			const state = store.getState();
-			console.log( 'AI Blogger Dashboard store created successfully' );
-			console.log( 'Initial state summary:', {
-				userOnboarded: state.userOnboarded,
-				siteTitle: state.siteTitle || 'Not set',
-				temperature: state.temperature,
-				safetyFilters: {
-					harassment: state.harassment,
-					hate: state.hate,
-					sexuallyExplicit: state.sexuallyExplicit,
-					dangerousContent: state.dangerousContent,
-				},
-				licenseStatus: state.license_status,
-				totalProperties: Object.keys( state ).length,
-			} );
-		}
-
+		// Store creation completed
 		return store;
 	} catch ( error ) {
 		console.error( 'Critical error: Failed to create Redux store:', error );

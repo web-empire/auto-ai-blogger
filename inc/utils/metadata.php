@@ -11,16 +11,15 @@ namespace WPAIBlogger\Inc\Utils;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * This class will holds the code related to the managing of settings of the plugin.
+ * Campaign metadata management class.
  *
  * @class Metadata
  */
 class Metadata {
 	/**
-	 * Cache the DB options
+	 * Cache for dashboard options.
 	 *
 	 * @since 1.0.0
-	 * @access public
 	 * @var array
 	 */
 	public static $dashboard_options = [];
@@ -149,36 +148,25 @@ class Metadata {
 	 * @since 1.0.0
 	 */
 	public static function get_campaign_meta( $campaign_id, $key ) {
-		// Validate campaign ID.
 		$campaign_id = absint( $campaign_id );
 		if ( $campaign_id <= 0 ) {
 			return self::get_default_option( $key );
 		}
 
-		// Validate key.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return self::get_default_option( $key );
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
-			return self::get_default_option( $key );
-		}
-
-		// Check if key exists in allowed settings.
 		$settings_dataset = self::get_settings_dataset();
 		if ( ! array_key_exists( $key, $settings_dataset ) ) {
 			return self::get_default_option( $key );
 		}
 
-		// Verify post exists and is a campaign.
 		$post = get_post( $campaign_id );
 		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 			return self::get_default_option( $key );
 		}
 
-		// Check user permissions (skip during cron execution).
 		if ( ! wp_doing_cron() && ! current_user_can( 'read_post', $campaign_id ) ) {
 			return self::get_default_option( $key );
 		}
@@ -186,7 +174,6 @@ class Metadata {
 		$meta_value = get_post_meta( $campaign_id, $key, true );
 
 		if ( ! empty( $meta_value ) ) {
-			// Sanitize output based on data type.
 			$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
 			return self::sanitize_output( $meta_value, $data_type );
 		}
@@ -205,36 +192,29 @@ class Metadata {
 	 * @since 1.0.0
 	 */
 	public static function update_campaign_meta( $campaign_id, $key, $value ) {
-		// Validate campaign ID.
 		$campaign_id = absint( $campaign_id );
 		if ( $campaign_id <= 0 ) {
 			return false;
 		}
 
-		// Validate key.
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return false;
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
-			return false;
-		}
-
-		// Check if key exists in allowed settings.
 		$settings_dataset = self::get_settings_dataset();
 		if ( ! array_key_exists( $key, $settings_dataset ) ) {
 			return false;
 		}
 
-		// Verify post exists and is a campaign.
 		$post = get_post( $campaign_id );
-		if ( ! $post || $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+		if ( ! $post ) {
 			return false;
 		}
 
-		// Check user permissions (skip during cron execution).
+		if ( $post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			return false;
+		}
+
 		if ( ! wp_doing_cron() && ! current_user_can( 'edit_post', $campaign_id ) ) {
 			return false;
 		}
@@ -242,7 +222,7 @@ class Metadata {
 		$data_type = $settings_dataset[ $key ]['type'] ?? 'string';
 		$value     = self::sanitize_data( $value, $data_type );
 
-		if ( $value === false ) {
+		if ( false === $value ) {
 			return false;
 		}
 
@@ -252,10 +232,9 @@ class Metadata {
 	/**
 	 * Returns an option from the default options.
 	 *
-	 * @param  string $key     The option key.
-	 * @param  mixed  $default Option default value if option is not available.
-	 * @return mixed   Returns the option value
-	 *
+	 * @param string $key     The option key.
+	 * @param mixed  $default Option default value if option is not available.
+	 * @return mixed Returns the option value.
 	 * @since 1.0.0
 	 */
 	public static function get_default_option( $key, $default = false ) {
@@ -327,15 +306,12 @@ class Metadata {
 	}
 
 	/**
-	 * Data cleaner
+	 * Sanitize data based on type.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param mixed  $value     data from AJAX.
-	 * @param string $data_type datatype to sanitize further.
-	 *
+	 * @param mixed  $value     Data to sanitize.
+	 * @param string $data_type Data type to sanitize for.
 	 * @return mixed Sanitized data.
+	 * @since 1.0.0
 	 */
 	public static function sanitize_data( $value, $data_type = 'default' ) {
 		$output = '';
@@ -382,7 +358,7 @@ class Metadata {
 		$defaults = self::get_default_settings();
 
 		$meta_data      = [];
-		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ]; // These keys are not metadata..
+		$skippable_keys = [ 'title', 'status', 'post_content', 'type', 'isNew' ];
 		foreach ( $postdata as $key => $value ) {
 			if ( in_array( $key, $skippable_keys, true ) ) {
 				continue;
@@ -424,12 +400,12 @@ class Metadata {
 	}
 
 	/**
-	 * Get passed campaign post data.
+	 * Get campaign post data.
 	 *
 	 * @param int  $post_id The post ID.
 	 * @param bool $plain_metadata Whether to return plain metadata.
-	 * @since 0.0.1
-	 * @return array|bool The campaign data or false if not found.
+	 * @return array|false The campaign data or false if not found.
+	 * @since 1.0.0
 	 */
 	public static function get_campaign_data( $post_id, $plain_metadata = false ) {
 		$campaign = get_post( $post_id );
@@ -443,10 +419,55 @@ class Metadata {
 			return false;
 		}
 
-		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
-		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
-		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
+		$campaign_posts = get_posts(
+			[
+				'post_type'      => get_post_types( [ 'public' => true ] ),
+				'post_status'    => [ 'publish', 'draft', 'private', 'pending', 'future' ],
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'cache_results'  => false,
+				'no_found_rows'  => true,
+				'meta_query'     => [
+					[
+						'key'     => 'wp_aib_campaign_id',
+						'value'   => $post_id,
+						'compare' => '=',
+					],
+				],
+			]
+		);
+
+		$meta_posts_created = is_array( $campaign_posts ) ? count( $campaign_posts ) : 0;
+
+		$last_post_title = '';
+		if ( $meta_posts_created > 0 ) {
+			$latest_post = get_posts(
+				[
+					'post_type'      => get_post_types( [ 'public' => true ] ),
+					'post_status'    => [ 'publish', 'draft', 'private', 'pending', 'future' ],
+					'posts_per_page' => 1,
+					'orderby'        => 'date',
+					'order'          => 'DESC',
+					'cache_results'  => false,
+					'no_found_rows'  => true,
+					'meta_query'     => [
+						[
+							'key'     => 'wp_aib_campaign_id',
+							'value'   => $post_id,
+							'compare' => '=',
+						],
+					],
+				]
+			);
+
+			if ( ! empty( $latest_post ) && is_array( $latest_post ) ) {
+				$last_post_title = $latest_post[0]->post_title;
+			}
+		}
+
+		$meta_posts_target = absint( $metadata['postsTarget'] ?? 0 );
+		$meta_frequency    = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit       = $metadata['repeatUnit'] ?? 'day';
 
 		if ( ! $plain_metadata ) {
 			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
@@ -471,8 +492,69 @@ class Metadata {
 				'status'          => $campaign->post_status,
 				'created_at'      => $campaign->post_date,
 				'updated_at'      => $campaign->post_modified,
-				'last_post_title' => get_the_title( $metadata['lastPostID'] ?? 0 ),
+				'last_post_title' => $last_post_title,
 			]
 		);
+	}
+
+	/**
+	 * Sync campaign counters with actual database values.
+	 *
+	 * @param int $post_id The campaign post ID.
+	 * @return bool True if sync was successful, false otherwise.
+	 * @since 1.0.0
+	 */
+	public static function sync_campaign_counters( $post_id ) {
+		$campaign = get_post( $post_id );
+
+		if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			return false;
+		}
+
+		$campaign_posts = get_posts(
+			[
+				'post_type'      => get_post_types( [ 'public' => true ] ),
+				'post_status'    => [ 'publish', 'draft', 'private', 'pending', 'future' ],
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_query'     => [
+					[
+						'key'     => 'wp_aib_campaign_id',
+						'value'   => $post_id,
+						'compare' => '=',
+					],
+				],
+			]
+		);
+
+		$actual_count        = is_array( $campaign_posts ) ? count( $campaign_posts ) : 0;
+		$update_count_result = update_post_meta( $post_id, 'postsCreated', $actual_count );
+
+		if ( $actual_count > 0 ) {
+			$latest_post = get_posts(
+				[
+					'post_type'      => get_post_types( [ 'public' => true ] ),
+					'post_status'    => [ 'publish', 'draft', 'private', 'pending', 'future' ],
+					'posts_per_page' => 1,
+					'orderby'        => 'date',
+					'order'          => 'DESC',
+					'meta_query'     => [
+						[
+							'key'     => 'wp_aib_campaign_id',
+							'value'   => $post_id,
+							'compare' => '=',
+						],
+					],
+				]
+			);
+
+			if ( ! empty( $latest_post ) && is_array( $latest_post ) ) {
+				update_post_meta( $post_id, 'lastPostID', $latest_post[0]->ID );
+			}
+		} else {
+			delete_post_meta( $post_id, 'lastPostID' );
+		}
+
+		return false !== $update_count_result;
 	}
 }
