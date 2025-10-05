@@ -267,16 +267,12 @@ class Ajax {
 				return;
 			}
 
-			// Debug: Log the campaign status being set
-			$campaign_status = $formatted_campaign_data['status'] ?? 'draft';
-
-
 			// Create a new campaign with error handling.
 			$campaign_id = \wp_insert_post(
 				[
 					'post_title'   => $formatted_campaign_data['title'],
 					'post_content' => $formatted_campaign_data['content'] ?? '',
-					'post_status'  => $campaign_status,
+					'post_status'  => $formatted_campaign_data['status'] ?? 'draft',
 					'post_type'    => WP_AI_BLOGGER_CPT_CAMPAIGN,
 					'meta_input'   => $formatted_campaign_data['meta_input'] ?? [],
 				]
@@ -292,7 +288,7 @@ class Ajax {
 				return;
 			}
 
-			// New simplified post creation scheduler
+			// New simplified post creation scheduler.
 			$this->schedule_campaign_posts( $campaign_id, $formatted_campaign_data['meta_input'] );
 
 			wp_send_json_success(
@@ -1687,7 +1683,7 @@ class Ajax {
 						[
 							'ID'          => $campaign_id,
 							'post_status' => 'publish',
-						] 
+						]
 					);
 				} else {
 					return;
@@ -1758,7 +1754,7 @@ class Ajax {
 					];
 				}
 				return $schedules;
-			} 
+			}
 		);
 
 		return $schedule_name;
