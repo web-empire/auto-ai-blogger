@@ -14,9 +14,7 @@
 namespace WPAIBlogger\Inc;
 
 use WPAIBlogger\Inc\Traits\Get_Instance;
-use WPAIBlogger\Inc\Utils\Helper;
 use WPAIBlogger\Inc\Utils\Metadata;
-use WPAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,14 +36,10 @@ class CronHandler {
 	}
 
 	/**
-	 * Register cron actions.
-	 */
-	private function init_hooks() {
-		add_action( 'wpaib_create_single_post', [ $this, 'create_single_post_from_campaign' ] );
-	}
-
-	/**
 	 * Create a single post from campaign (cron callback).
+	 *
+	 * @param int $campaign_id The ID of the campaign.
+	 * @since x.x.x
 	 */
 	public function create_single_post_from_campaign( $campaign_id ): void {
 		try {
@@ -71,20 +65,24 @@ class CronHandler {
 
 			if ( $result['success'] ) {
 				$this->schedule_next_post( $campaign_id );
-			}       
+			}
 		} catch ( \Exception $e ) {
-			error_log( 'WP AI Blogger: Exception in create_single_post_from_campaign: ' . $e->getMessage() );
+			return;
 		}
 	}
 
 	/**
 	 * Generate a post from campaign data.
+	 *
+	 * @param int $campaign_id The ID of the campaign.
+	 * @return array An array containing the success status and message.
+	 * @since x.x.x
 	 */
 	public function generate_post_from_campaign( $campaign_id ): array {
 		try {
 			$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
-			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?: 1000;
-			$max_title_words    = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) ?: 10;
+			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
+			$max_title_words    = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) ?? 10;
 			$post_type          = Metadata::get_campaign_meta( $campaign_id, 'postType' );
 			$post_status        = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
 			$author_id          = Metadata::get_campaign_meta( $campaign_id, 'author' );
@@ -95,7 +93,7 @@ class CronHandler {
 			if ( empty( $keywords ) ) {
 				return [
 					'success' => false,
-					'message' => 'No keywords found for campaign',
+					'message' => __( 'No keywords found for campaign', 'wp-ai-blogger' ),
 				];
 			}
 
@@ -113,10 +111,12 @@ class CronHandler {
 			$post_data = [
 				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
 				'post_content' => wp_kses_post( $api_data['post_content'] ?? '' ),
-				'post_status'  => $post_status ?: 'draft',
-				'post_type'    => $post_type ?: 'post',
-				'post_author'  => $author_id ?: get_current_user_id(),
-			];      if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
+				'post_status'  => $post_status ? $post_status : 'draft',
+				'post_type'    => $post_type ? $post_type : 'post',
+				'post_author'  => $author_id ? $author_id : get_current_user_id(),
+			];
+
+			if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
 				$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
 			}
 
@@ -156,12 +156,26 @@ class CronHandler {
 	}
 
 	/**
+	 * Register cron actions.
+	 */
+	private function init_hooks(): void {
+		add_action( 'wpaib_create_single_post', [ $this, 'create_single_post_from_campaign' ] );
+	}
+
+	/**
 	 * Call the post creation API with retry logic.
+	 *
+	 * @param int    $campaign_id The ID of the campaign.
+	 * @param string $keywords The keywords for the post.
+	 * @param int    $max_words The maximum number of words for the post.
+	 * @param int    $max_title_words The maximum number of words for the title.
+	 * @return array An array containing the API response data.
+	 * @since x.x.x
 	 */
 	private function call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words ): array {
 		try {
-			$max_words       = $max_words ?: 1000;
-			$max_title_words = $max_title_words ?: 10;
+			$max_words       = $max_words ? $max_words : 1000;
+			$max_title_words = $max_title_words ? $max_title_words : 10;
 
 			$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
@@ -180,9 +194,11 @@ class CronHandler {
 				$error_message = $response->get_error_message();
 
 				if ( in_array( $error_code, [ 'api_error' ], true ) &&
-					 ( strpos( $error_message, '502' ) !== false ||
-					   strpos( $error_message, '503' ) !== false ||
-					   strpos( $error_message, '504' ) !== false ) ) {
+					(
+						strpos( $error_message, '502' ) !== false ||
+						strpos( $error_message, '503' ) !== false ||
+						strpos( $error_message, '504' ) !== false )
+					) {
 
 					if ( $attempt < $max_retries ) {
 						sleep( $retry_delay );
@@ -215,6 +231,10 @@ class CronHandler {
 
 	/**
 	 * Schedule the next post for this campaign.
+	 *
+	 * @param int $campaign_id Campaign ID.
+	 * @return void
+	 * @since x.x.x
 	 */
 	private function schedule_next_post( $campaign_id ): void {
 		try {
@@ -233,12 +253,17 @@ class CronHandler {
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 
 		} catch ( \Exception $e ) {
-			error_log( "WP AI Blogger: Failed to schedule next post for campaign {$campaign_id}: " . $e->getMessage() );
+			return;
 		}
 	}
 
 	/**
 	 * Convert repeat interval and unit to seconds.
+	 *
+	 * @param int    $interval Repeat interval.
+	 * @param string $unit Repeat unit.
+	 * @return int Interval in seconds.
+	 * @since x.x.x
 	 */
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );

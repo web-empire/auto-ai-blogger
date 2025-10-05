@@ -469,8 +469,6 @@ function wpaib_get_authors() {
 	}
 }
 
-
-
 /**
  * Check if the campaign posts target is achieved with security validation.
  *
@@ -560,29 +558,29 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 			return new WP_Error( 'missing_license', 'License token is required.' );
 		}
 
-		// Get additional settings to match server API format
+		// Get additional settings to match server API format.
 		$settings = Settings::get_ai_blogger_settings();
 
-		// Prepare request body to match the server API generate_campaign_post method exactly
+		// Prepare request body to match the server API generate_campaign_post method exactly.
 		$body_args = [
-			// Required by server API generate_campaign_post method
+			// Required by server API generate_campaign_post method.
 			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
 			'maxTitleWords'     => $max_title_words,
 			'maxWords'          => $max_content_words,
-			'name'              => 'Campaign Post', // Campaign name - server expects this
+			'name'              => 'Campaign Post', // Campaign name - server expects this.
 			'license'           => $license,
 
-			// Safety settings - required by server
+			// Safety settings - required by server.
 			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
 			'harassment'        => absint( $settings['harassment'] ?? 2 ),
 			'hate'              => absint( $settings['hate'] ?? 2 ),
 			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
 			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
 
-			// Site persona - required by server
-			'site_title'        => isset( $sanitized_persona['site_title'] ) ? $sanitized_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
-			'site_purpose'      => isset( $sanitized_persona['site_purpose'] ) ? $sanitized_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
-			'site_description'  => isset( $sanitized_persona['site_description'] ) ? $sanitized_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
+			// Site persona - required by server.
+			'site_title'        => $sanitized_persona['site_title'] ?? ( $settings['siteTitle'] ?? '' ),
+			'site_purpose'      => $sanitized_persona['site_purpose'] ?? ( $settings['siteFor'] ?? '' ),
+			'site_description'  => $sanitized_persona['site_description'] ?? ( $settings['siteDescription'] ?? '' ),
 		];      // Validate API endpoint.
 		$api_url   = WP_AI_BLOGGER_POST_CREATION_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
@@ -706,7 +704,7 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
 
 		// Handle campaign-specific overrides.
 		if ( $campaign_id > 0 ) {
-			// Use get_post_meta directly during cron to avoid permission issues
+			// Use get_post_meta directly during cron to avoid permission issues.
 			if ( wp_doing_cron() ) {
 				$override_site_details = get_post_meta( $campaign_id, 'overrideSitePersona', true );
 				$overridden_title      = get_post_meta( $campaign_id, 'overrideSiteTitle', true );
@@ -753,7 +751,6 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  * @since 1.0.0
  */
 
-
 /**
  * Track post views for analytics.
  *
@@ -782,9 +779,3 @@ function wpaib_track_post_view( $post_id ): void {
 	// Update post meta.
 	update_post_meta( $post_id, 'post_views_count', $new_views );
 }
-
-
-
-
-
-

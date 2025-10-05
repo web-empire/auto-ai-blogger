@@ -24,11 +24,6 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Admin AJAX class for WP AI Blogger.
  *
- * This class handles AJAX requests for admin operations including
- * settings management, campaign operations, and post creation.
- * Implements security measures including rate limiting,
- * input validation, and proper authentication.
- *
  * @package wp-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
@@ -921,6 +916,89 @@ class Ajax {
 	}
 
 	/**
+	 * Create a single post from a campaign (called by cron).
+	 *
+	 * @param int $campaign_id Campaign ID.
+	 * @return void
+	 * @since x.x.x
+	 */
+	public function create_single_post_from_campaign( $campaign_id ): void {
+		try {
+			$campaign_id = absint( $campaign_id );
+			if ( ! $campaign_id ) {
+				return;
+			}
+
+			// Get campaign.
+			$campaign = get_post( $campaign_id );
+			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN || $campaign->post_status !== 'publish' ) {
+				return;
+			}
+
+			// Check if target reached.
+			$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
+			$posts_target  = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
+
+			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
+				// Target reached, clear schedule.
+				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+				return;
+			}
+
+			// Create the post.
+			$this->generate_post_from_campaign( $campaign_id );
+
+		} catch ( \Exception $e ) {
+			return;
+		}
+	}
+
+	/**
+	 * Handler to delete campaign with security.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function wpaib_delete_campaign(): void {
+		try {
+			// security validation.
+			$security_check = $this->validate_ajax_security( 'delete_campaign' );
+			if ( is_wp_error( $security_check ) ) {
+				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
+				return;
+			}
+
+			// Nonce validation.
+			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+			}
+
+			// Validate campaign ID.
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+			if ( ! $campaign_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+			}
+
+			// Check if campaign exists and user can read it.
+			$campaign_post = get_post( $campaign_id );
+			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			}
+
+			if ( ! current_user_can( 'delete_post', $campaign_id ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
+			}
+
+			// Clear scheduled events for this campaign
+			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_delete_post( $campaign_id, true );
+			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
+		}
+	}
+
+	/**
 	 * Perform comprehensive security validation for AJAX requests.
 	 *
 	 * @param string $action The AJAX action being performed.
@@ -1650,7 +1728,7 @@ class Ajax {
 	 */
 	private function schedule_campaign_posts( $campaign_id, $meta_input ): void {
 		try {
-			// Only schedule if campaign is active and has valid scheduling data
+			// Only schedule if campaign is active and has valid scheduling data.
 			if ( empty( $meta_input['repeatInterval'] ) || empty( $meta_input['repeatUnit'] ) ) {
 
 				return;
@@ -1663,22 +1741,22 @@ class Ajax {
 				return;
 			}
 
-			// Clear any existing scheduled events for this campaign
+			// Clear any existing scheduled events for this campaign.
 			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 
-			// Check if campaign post is published (active)
+			// Check if campaign post is published (active).
 			$campaign_post = get_post( $campaign_id );
 			if ( ! $campaign_post ) {
 				return;
 			}
 
-			// If campaign status is draft, try to update it to publish if user intended it to be active
+			// If campaign status is draft, try to update it to publish if user intended it to be active.
 			if ( $campaign_post->post_status !== 'publish' ) {
-				// Check if user set status to publish in the form
+				// Check if user set status to publish in the form.
 				$intended_status = $meta_input['status'] ?? null;
 
 				if ( $intended_status === 'publish' ) {
-					// User wants the campaign to be active, update the post status
+					// User wants the campaign to be active, update the post status.
 					wp_update_post(
 						[
 							'ID'          => $campaign_id,
@@ -1690,17 +1768,17 @@ class Ajax {
 				}
 			}
 
-			// Calculate interval in seconds
+			// Calculate interval in seconds.
 			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
 
-			// Schedule the first post immediately
-			wp_schedule_single_event( time() + 60, 'wpaib_create_single_post', [ $campaign_id ] ); // 1 minute delay
+			// Schedule the first post immediately.
+			wp_schedule_single_event( time() + 60, 'wpaib_create_single_post', [ $campaign_id ] ); // 1 minute delay.
 
-			// Schedule recurring posts
+			// Schedule recurring posts.
 			wp_schedule_event( time() + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
 
-		} catch ( Exception $e ) {
-			// Silently handle scheduling errors
+		} catch ( \Exception $e ) {
+			return;
 		}
 	}
 
@@ -1732,7 +1810,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function get_wp_cron_schedule( $interval, $unit ): string {
-		// Use built-in schedules when possible
+		// Use built-in schedules when possible.
 		if ( $interval === 1 && $unit === 'day' ) {
 			return 'daily';
 		}
@@ -1740,10 +1818,10 @@ class Ajax {
 			return 'weekly';
 		}
 
-		// Create custom schedule name
+		// Create custom schedule name.
 		$schedule_name = "wpaib_{$interval}_{$unit}";
 
-		// Register custom schedule if not exists
+		// Register custom schedule if not exists.
 		add_filter(
 			'cron_schedules',
 			function( $schedules ) use ( $schedule_name, $interval, $unit ) {
@@ -1761,44 +1839,6 @@ class Ajax {
 	}
 
 	/**
-	 * Create a single post from a campaign (called by cron).
-	 *
-	 * @param int $campaign_id Campaign ID.
-	 * @return void
-	 * @since x.x.x
-	 */
-	public function create_single_post_from_campaign( $campaign_id ): void {
-		try {
-			$campaign_id = absint( $campaign_id );
-			if ( ! $campaign_id ) {
-				return;
-			}
-
-			// Get campaign
-			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN || $campaign->post_status !== 'publish' ) {
-				return;
-			}
-
-			// Check if target reached
-			$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-			$posts_target  = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
-
-			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
-				// Target reached, clear schedule
-				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
-				return;
-			}
-
-			// Create the post
-			$post_id = $this->generate_post_from_campaign( $campaign_id );
-
-		} catch ( Exception $e ) {
-			// Silently handle exceptions
-		}
-	}
-
-	/**
 	 * Generate a post from campaign data.
 	 *
 	 * @param int $campaign_id Campaign ID.
@@ -1806,16 +1846,16 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function generate_post_from_campaign( $campaign_id ) {
-		// Get campaign metadata
+		// Get campaign metadata.
 		$keywords           = get_post_meta( $campaign_id, 'keywords', true );
-		$post_type          = get_post_meta( $campaign_id, 'postType', true ) ?: 'post';
-		$post_status        = get_post_meta( $campaign_id, 'postStatus', true ) ?: 'draft';
-		$post_author        = get_post_meta( $campaign_id, 'author', true ) ?: 1;
+		$post_type          = get_post_meta( $campaign_id, 'postType', true ) ?? 'post';
+		$post_status        = get_post_meta( $campaign_id, 'postStatus', true ) ?? 'draft';
+		$post_author        = get_post_meta( $campaign_id, 'author', true ) ?? 1;
 		$post_category      = get_post_meta( $campaign_id, 'category', true );
 		$post_tag           = get_post_meta( $campaign_id, 'tags', true );
 		$summary_as_excerpt = get_post_meta( $campaign_id, 'summaryAsExcerpt', true );
 
-		// Get site persona details
+		// Get site persona details.
 		$site_persona = [
 			'name'             => get_bloginfo( 'name' ),
 			'site_title'       => get_bloginfo( 'name' ),
@@ -1823,14 +1863,14 @@ class Ajax {
 			'site_description' => get_bloginfo( 'description' ),
 		];
 
-		// Get API response
+		// Get API response.
 		$api_response = $this->call_post_creation_api( $keywords, $site_persona );
 
 		if ( is_wp_error( $api_response ) ) {
 			return $api_response;
 		}
 
-		// Create the post
+		// Create the post.
 		$post_data = [
 			'post_title'   => $api_response['post_title'] ?? 'Auto Generated Post',
 			'post_content' => $api_response['post_content'] ?? '',
@@ -1854,14 +1894,14 @@ class Ajax {
 		$post_id = wp_insert_post( $post_data );
 
 		if ( is_wp_error( $post_id ) || ! $post_id ) {
-			return new WP_Error( 'post_creation_failed', 'Failed to create post' );
+			return new \WP_Error( 'post_creation_failed', 'Failed to create post' );
 		}
 
-		// Add campaign reference
+		// Add campaign reference.
 		add_post_meta( $post_id, 'wp_aib_reference', 1 );
 		add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
-		// Update campaign stats
+		// Update campaign stats.
 		$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
 		update_post_meta( $campaign_id, 'postsCreated', $posts_created + 1 );
 		update_post_meta( $campaign_id, 'lastRun', time() );
@@ -1880,32 +1920,32 @@ class Ajax {
 	 */
 	private function call_post_creation_api( $keywords, $site_persona ) {
 		if ( empty( $keywords ) ) {
-			return new WP_Error( 'missing_keywords', 'Keywords are required' );
+			return new \WP_Error( 'missing_keywords', 'Keywords are required' );
 		}
 
-		// Get settings for proper API format
+		// Get settings for proper API format.
 		$settings = \WPAIBlogger\Inc\Utils\Settings::get_ai_blogger_settings();
 
-		// Prepare API request to match server API generate_campaign_post method exactly
+		// Prepare API request to match server API generate_campaign_post method exactly.
 		$body         = [
-			// Required by server API generate_campaign_post method
+			// Required by server API generate_campaign_post method.
 			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
 			'maxTitleWords'     => 10,
 			'maxWords'          => 1000,
-			'name'              => 'Manual Post Creation', // Campaign name - server expects this
+			'name'              => 'Manual Post Creation', // Campaign name - server expects this.
 			'license'           => \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' ),
 
-			// Safety settings - required by server
+			// Safety settings - required by server.
 			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
 			'harassment'        => absint( $settings['harassment'] ?? 2 ),
 			'hate'              => absint( $settings['hate'] ?? 2 ),
 			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
 			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
 
-			// Site persona - required by server
-			'site_title'        => isset( $site_persona['site_title'] ) ? $site_persona['site_title'] : ( $settings['siteTitle'] ?? '' ),
-			'site_purpose'      => isset( $site_persona['site_purpose'] ) ? $site_persona['site_purpose'] : ( $settings['siteFor'] ?? '' ),
-			'site_description'  => isset( $site_persona['site_description'] ) ? $site_persona['site_description'] : ( $settings['siteDescription'] ?? '' ),
+			// Site persona - required by server.
+			'site_title'        => $site_persona['site_title'] ?? ( $settings['siteTitle'] ?? '' ),
+			'site_purpose'      => $site_persona['site_purpose'] ?? ( $settings['siteFor'] ?? '' ),
+			'site_description'  => $site_persona['site_description'] ?? ( $settings['siteDescription'] ?? '' ),
 		];      $args = [
 			'method'  => 'POST',
 			'timeout' => 30,
@@ -1924,65 +1964,16 @@ class Ajax {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( $response_code !== 200 ) {
-			return new WP_Error( 'api_error', "API returned status code: {$response_code}" );
+			return new \WP_Error( 'api_error', "API returned status code: {$response_code}" );
 		}
 
 		$body = wp_remote_retrieve_body( $response );
 		$data = json_decode( $body, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			return new WP_Error( 'invalid_json', 'Invalid JSON response from API' );
+			return new \WP_Error( 'invalid_json', 'Invalid JSON response from API' );
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Handler to delete campaign with security.
-	 *
-	 * @since 1.0.0
-	 * @return void
-	 */
-	public function wpaib_delete_campaign(): void {
-		try {
-			// security validation.
-			$security_check = $this->validate_ajax_security( 'delete_campaign' );
-			if ( is_wp_error( $security_check ) ) {
-				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
-				return;
-			}
-
-			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
-				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
-				return;
-			}
-
-			// Validate campaign ID.
-			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
-			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Check if campaign exists and user can read it.
-			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			if ( ! current_user_can( 'delete_post', $campaign_id ) ) {
-				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
-				return;
-			}
-
-			// Clear scheduled events for this campaign
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
-			wp_delete_post( $campaign_id, true );
-			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
-		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
-		}
 	}
 }
