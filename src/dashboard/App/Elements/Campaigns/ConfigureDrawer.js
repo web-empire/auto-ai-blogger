@@ -306,20 +306,18 @@ export default function ConfigureDrawer( props ) {
 															</div>
 														) }
 
-														<div className="flex items-center justify-between">
-															<label htmlFor="start-date" className="block text-sm/6 font-medium text-gray-900">
+														<div>
+															<label htmlFor="start-date" className="block text-sm/6 font-medium text-gray-900 mb-2">
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
 															</label>
-															<div className="mt-2">
-																<DateTimeField
-																	id="start-date"
-																	name="start-date"
-																	value={ drawerData.startDate }
-																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
-																	readOnly={ isViewMode }
-																	placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
-																/>
-															</div>
+															<DateTimeField
+																id="start-date"
+																name="start-date"
+																value={ drawerData.startDate }
+																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
+																readOnly={ isViewMode }
+																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
+															/>
 														</div>
 
 														<div className="flex items-center justify-between">
