@@ -296,8 +296,8 @@ const DateTimeField = forwardRef( ( {
 				</p>
 			) }
 
-			<p className="mt-2 text-sm text-gray-500">
-				{ __( 'Note: Times are in 5-minute intervals. Past dates and times cannot be selected.', 'wp-ai-blogger' ) }
+			<p className="mt-1 text-xs text-gray-400">
+				{ __( 'Past dates/times cannot be selected.', 'wp-ai-blogger' ) }
 			</p>
 
 			{ error && (
