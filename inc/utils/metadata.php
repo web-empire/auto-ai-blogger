@@ -160,9 +160,8 @@ class Metadata {
 			return self::get_default_option( $key );
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
+		// Validate key format (allow alphanumeric and camelCase)
+		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return self::get_default_option( $key );
 		}
 
@@ -216,9 +215,8 @@ class Metadata {
 			return false;
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
+		// Validate key format (allow alphanumeric and camelCase)
+		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return false;
 		}
 
@@ -346,7 +344,7 @@ class Metadata {
 
 			case 'int':
 			case 'number':
-				$output = ! empty( $value ) ? absint( $value ) : '';
+				$output = isset( $value ) && is_numeric( $value ) ? absint( $value ) : 0;
 				break;
 
 			case 'url':

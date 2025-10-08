@@ -706,6 +706,7 @@ class Ajax {
 
 			// Validate campaign ID.
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+
 			if ( ! $campaign_id ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
 				return;
@@ -731,18 +732,19 @@ class Ajax {
 
 			// Run the campaign using CronHandler.
 			$cron_handler = \WPAIBlogger\Inc\CronHandler::get_instance();
-			$post_id      = $cron_handler->create_single_post_from_campaign( $campaign_id );
+			$result       = $cron_handler->generate_post_from_campaign( $campaign_id );
 
-			if ( is_wp_error( $post_id ) ) {
+			if ( ! $result['success'] ) {
 				wp_send_json_error(
 					[
-						'message'     => $post_id->get_error_message(),
+						'message'     => $result['message'],
 						'campaign_id' => $campaign_id,
 					]
 				);
 				return;
 			}
 
+			$post_id = $result['post_id'] ?? null;
 			if ( ! $post_id ) {
 				wp_send_json_error(
 					[
