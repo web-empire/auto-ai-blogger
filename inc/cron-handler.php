@@ -61,9 +61,21 @@ class CronHandler {
 				return;
 			}
 
+			// Update scheduled count at the beginning of attempt (regardless of success/failure)
+			$posts_scheduled = Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' );
+			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', intval( $posts_scheduled ) + 1 );
+			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
+
 			$result = $this->generate_post_from_campaign( $campaign_id );
 
 			if ( $result['success'] ) {
+				$this->schedule_next_post( $campaign_id );
+			} else {
+				// Increment failed count when post creation fails
+				$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
+				Metadata::update_campaign_meta( $campaign_id, 'postsFailed', intval( $posts_failed ) + 1 );
+				
+				// Still schedule next post even if this one failed (continue the campaign)
 				$this->schedule_next_post( $campaign_id );
 			}
 		} catch ( \Exception $e ) {
@@ -143,7 +155,6 @@ class CronHandler {
 			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
-			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
 
 			return [
 				'success' => true,
@@ -242,12 +253,12 @@ class CronHandler {
 	 */
 	private function schedule_next_post( $campaign_id ): void {
 		try {
-			$repeat_interval = Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' );
-			$repeat_unit     = Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' );
-			$posts_target    = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
-			$posts_created   = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+			$repeat_interval  = Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' );
+			$repeat_unit      = Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' );
+			$posts_target     = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
+			$posts_scheduled  = Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' );
 
-			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
+			if ( $posts_target > 0 && $posts_scheduled >= $posts_target ) {
 				return;
 			}
 

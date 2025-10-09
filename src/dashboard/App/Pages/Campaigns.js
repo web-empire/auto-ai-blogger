@@ -284,7 +284,7 @@ export default function Campaigns() {
 														{ __( 'Status', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-														{ __( 'Posts/Target', 'wp-ai-blogger' ) }
+														{ __( 'Created (Scheduled)/Target', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
 														{ __( 'Latest Post', 'wp-ai-blogger' ) }
@@ -307,11 +307,30 @@ export default function Campaigns() {
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 															{(() => {
-																// Parse posts created and target from postsTarget string (format: "created / target")
+																// Parse posts from postsTarget string 
+																// Formats: "created / target" or "created (scheduled) / target"
 																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
-																const postsCreated = parseInt(postsTargetParts[0]) || 0;
+																const leftPart = postsTargetParts[0] || '0';
 																const postsTarget = parseInt(postsTargetParts[1]) || 0;
-																const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+																
+																// Check if there's a scheduled count in parentheses
+																let postsCreated = 0;
+																let postsScheduled = 0;
+																
+																if (leftPart.includes('(')) {
+																	// Format: "created (scheduled)"
+																	const createdMatch = leftPart.match(/^(\d+)\s*\((\d+)\)$/);
+																	if (createdMatch) {
+																		postsCreated = parseInt(createdMatch[1]) || 0;
+																		postsScheduled = parseInt(createdMatch[2]) || 0;
+																	}
+																} else {
+																	// Format: "created" (no scheduled count shown)
+																	postsCreated = parseInt(leftPart) || 0;
+																	postsScheduled = postsCreated; // Assume same if not shown separately
+																}
+																
+																const isTargetMet = postsTarget > 0 && postsScheduled >= postsTarget;
 																const isUpdating = updatingStatus[ campaign.id ] || false;
 
 																return (
@@ -324,7 +343,7 @@ export default function Campaigns() {
 																		/>
 																		{ isTargetMet && (
 																			<Tooltip
-																				text={ __( 'Campaign completed - Target posts reached.', 'wp-ai-blogger' ) }
+																				text={ __( 'Campaign completed - All posts have been scheduled.', 'wp-ai-blogger' ) }
 																				delay={ 100 }
 																				className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																			>

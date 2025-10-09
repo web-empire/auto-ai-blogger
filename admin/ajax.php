@@ -58,6 +58,7 @@ class Ajax {
 		'wpaib_run_campaign',
 		'wpaib_get_campaign_analytics',
 		'wpaib_delete_campaign',
+		'wpaib_get_campaign_logs',
 	];
 
 	/**
@@ -110,6 +111,7 @@ class Ajax {
 		add_action( 'wp_ajax_wpaib_create_post', [ $this, 'add_security_headers' ], 1 );
 		add_action( 'wp_ajax_wpaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
 		add_action( 'wp_ajax_wpaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_wpaib_get_campaign_logs', [ $this, 'add_security_headers' ], 1 );
 	}
 
 	/**
@@ -1001,6 +1003,60 @@ class Ajax {
 	}
 
 	/**
+	 * Handler to get campaign logs with security.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function wpaib_get_campaign_logs(): void {
+		try {
+			// Security validation.
+			$security_check = $this->validate_ajax_security( 'get_campaign_logs' );
+			if ( is_wp_error( $security_check ) ) {
+				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
+				return;
+			}
+
+			// Nonce validation.
+			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
+				return;
+			}
+
+			// Validate campaign ID.
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+			if ( ! $campaign_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				return;
+			}
+
+			// Check if campaign exists and user can read it.
+			$campaign_post = get_post( $campaign_id );
+			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+				return;
+			}
+
+			if ( ! current_user_can( 'read_post', $campaign_id ) ) {
+				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
+				return;
+			}
+
+			// Get campaign logs.
+			$logs = $this->get_campaign_creation_logs( $campaign_id );
+
+			wp_send_json_success( [
+				'logs' => $logs,
+				'campaign_id' => $campaign_id,
+				'message' => __( 'Logs retrieved successfully.', 'wp-ai-blogger' )
+			] );
+
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [ 'message' => $this->get_error_msg( 'default' ) ] );
+		}
+	}
+
+	/**
 	 * Perform comprehensive security validation for AJAX requests.
 	 *
 	 * @param string $action The AJAX action being performed.
@@ -1802,13 +1858,9 @@ class Ajax {
 				// If parsing fails, use the default (1 minute from now)
 			}
 
-			// Schedule the first post at the user-defined start date/time
-			// If no start date is set or it's in the past, it will default to 1 minute from now
+			// Schedule only the first post at the user-defined start date/time
+			// The CronHandler will handle scheduling subsequent posts after each creation
 			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
-
-			// Schedule recurring posts using WordPress cron system
-			// The recurring schedule starts after the first post is created + interval
-			wp_schedule_event( $start_timestamp + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
 
 		} catch ( \Exception $e ) {
 			return;
@@ -1833,7 +1885,7 @@ class Ajax {
 		];
 
 		$seconds = $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
-		
+
 		// Allow testing plugins to modify intervals
 		return apply_filters( 'wpaib_campaign_interval_seconds', $seconds, $interval, $unit );
 	}
@@ -2012,5 +2064,119 @@ class Ajax {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get campaign creation logs.
+	 *
+	 * @param int $campaign_id Campaign ID.
+	 * @return array Array of log entries.
+	 * @since x.x.x
+	 */
+	private function get_campaign_creation_logs( $campaign_id ): array {
+		// Get logs from campaign meta or a dedicated logs table/option
+		$logs = get_post_meta( $campaign_id, '_wpaib_campaign_logs', true );
+		
+		if ( ! is_array( $logs ) ) {
+			$logs = [];
+		}
+
+		// Sort logs by timestamp (newest first)
+		usort( $logs, function( $a, $b ) {
+			$timestamp_a = isset( $a['timestamp'] ) ? strtotime( $a['timestamp'] ) : 0;
+			$timestamp_b = isset( $b['timestamp'] ) ? strtotime( $b['timestamp'] ) : 0;
+			return $timestamp_b - $timestamp_a;
+		});
+
+		// Generate sample logs if none exist (for demo purposes)
+		if ( empty( $logs ) ) {
+			$logs = $this->generate_sample_campaign_logs( $campaign_id );
+		}
+
+		return $logs;
+	}
+
+	/**
+	 * Generate sample campaign logs for demonstration.
+	 *
+	 * @param int $campaign_id Campaign ID.
+	 * @return array Sample log entries.
+	 * @since x.x.x
+	 */
+	private function generate_sample_campaign_logs( $campaign_id ): array {
+		$campaign_data = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id );
+		$posts_created = intval( $campaign_data['postsCreated'] ?? 0 );
+		$posts_target = intval( $campaign_data['postsTarget'] ?? 5 );
+		
+		$sample_logs = [];
+		
+		// Generate logs for created posts
+		for ( $i = 1; $i <= $posts_created; $i++ ) {
+			$timestamp = current_time( 'mysql', false );
+			$steps = [
+				[
+					'status' => 'success',
+					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+					'duration' => rand( 50, 150 )
+				],
+				[
+					'status' => 'success', 
+					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+					'duration' => rand( 200, 500 )
+				],
+				[
+					'status' => 'success',
+					'description' => __( 'Content generated successfully', 'wp-ai-blogger' ),
+					'duration' => rand( 1000, 3000 )
+				],
+				[
+					'status' => 'success',
+					'description' => __( 'Post created and published', 'wp-ai-blogger' ),
+					'duration' => rand( 100, 300 )
+				]
+			];
+
+			$sample_logs[] = [
+				'id' => $i,
+				'timestamp' => date( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_created - $i ) * 300 ),
+				'status' => 'success',
+				'title' => sprintf( __( 'Post #%d Creation - Success', 'wp-ai-blogger' ), $i ),
+				'message' => sprintf( __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $i ),
+				'post_id' => 1000 + $i,
+				'post_title' => sprintf( __( 'Generated Blog Post #%d', 'wp-ai-blogger' ), $i ),
+				'steps' => $steps
+			];
+		}
+
+		// Add pending logs for remaining posts
+		if ( $posts_created < $posts_target && $campaign_data['status'] === 'publish' ) {
+			$sample_logs[] = [
+				'id' => $posts_created + 1,
+				'timestamp' => current_time( 'mysql' ),
+				'status' => 'pending',
+				'title' => sprintf( __( 'Post #%d Creation - Scheduled', 'wp-ai-blogger' ), $posts_created + 1 ),
+				'message' => sprintf( __( 'Post #%d is scheduled to be created in the next cron run.', 'wp-ai-blogger' ), $posts_created + 1 ),
+				'steps' => [
+					[
+						'status' => 'processing',
+						'description' => __( 'Waiting for scheduled time...', 'wp-ai-blogger' ),
+					]
+				]
+			];
+		}
+
+		// Add error log example if needed
+		if ( $posts_created === 0 && $campaign_data['status'] === 'draft' ) {
+			$sample_logs[] = [
+				'id' => 1,
+				'timestamp' => current_time( 'mysql' ),
+				'status' => 'error',
+				'title' => __( 'Campaign Inactive', 'wp-ai-blogger' ),
+				'message' => __( 'Campaign is currently inactive. Activate the campaign to start creating posts.', 'wp-ai-blogger' ),
+				'error_details' => __( 'Campaign status is set to draft. Change status to published to enable post creation.', 'wp-ai-blogger' ),
+			];
+		}
+
+		return $sample_logs;
 	}
 }

@@ -107,6 +107,14 @@ class Metadata {
 					'default' => 0,
 					'type'    => 'number',
 				],
+				'postsScheduled'          => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'postsFailed'             => [
+					'default' => 0,
+					'type'    => 'number',
+				],
 				'maxWords'                => [
 					'default' => 1000,
 					'type'    => 'number',
@@ -441,14 +449,21 @@ class Metadata {
 			return false;
 		}
 
-		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
-		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
-		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
+		$meta_posts_created   = absint( $metadata['postsCreated'] ?? 0 );
+		$meta_posts_scheduled = absint( $metadata['postsScheduled'] ?? 0 );
+		$meta_posts_target    = absint( $metadata['postsTarget'] ?? 0 );
+		$meta_frequency       = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
 		if ( ! $plain_metadata ) {
-			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
-			$metadata['postsTarget'] = $meta_posts_target;
+			// Show format: "created (scheduled) / target" 
+			// Example: "3 (5) / 10" means 3 posts created, 5 scheduled, target is 10
+			if ( $meta_posts_scheduled > 0 && $meta_posts_scheduled !== $meta_posts_created ) {
+				$meta_posts_display = $meta_posts_created . ' (' . $meta_posts_scheduled . ') / ' . $meta_posts_target;
+			} else {
+				$meta_posts_display = $meta_posts_created . ' / ' . $meta_posts_target;
+			}
+			$metadata['postsTarget'] = $meta_posts_display;
 
 			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
