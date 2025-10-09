@@ -264,8 +264,16 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
-																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${ campaign.created_at }` }
+															<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer ${ 
+																campaign.startDate && campaign.startDate.trim() !== '' 
+																	? 'text-gray-500 hover:text-indigo-900' 
+																	: 'text-amber-500 hover:text-amber-600' 
+															}` }>
+																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${ 
+																	campaign.startDate && campaign.startDate.trim() !== '' 
+																		? new Date( campaign.startDate ).toLocaleString() 
+																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString() 
+																}` }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
