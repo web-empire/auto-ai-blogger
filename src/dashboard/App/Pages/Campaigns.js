@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn, CalendarArrowUp } from 'lucide-react';
+import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn, CalendarArrowUp, ScrollText } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
 import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
+import CampaignLogsModal from '@Components/CampaignLogsModal';
 import CampaignDeleteModal from '@Components/CampaignDeleteModal';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -19,6 +20,7 @@ export default function Campaigns() {
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
+	const [ logsModal, setLogsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 	const [ deleteModal, setDeleteModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 	const [ updatingStatus, setUpdatingStatus ] = useState( {} ); // Track which campaigns are being updated
 
@@ -82,6 +84,20 @@ export default function Campaigns() {
 
 		// Open analytics modal
 		setAnalyticsModal( {
+			isOpen: true,
+			campaignId,
+			campaignData,
+		} );
+	};
+
+	const openCampaignLogs = ( e, campaignId ) => {
+		e.preventDefault();
+
+		// Get the campaign data
+		const campaignData = campaigns[ campaignId ];
+
+		// Open logs modal
+		setLogsModal( {
 			isOpen: true,
 			campaignId,
 			campaignData,
@@ -219,6 +235,13 @@ export default function Campaigns() {
 					campaignData={ analyticsModal.campaignData }
 				/>
 
+				<CampaignLogsModal
+					isOpen={ logsModal.isOpen }
+					onClose={ () => setLogsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+					campaignId={ logsModal.campaignId }
+					campaignData={ logsModal.campaignData }
+				/>
+
 				<CampaignDeleteModal
 					isOpen={ deleteModal.isOpen }
 					onClose={ () => setDeleteModal( { isOpen: false, campaignId: null, campaignData: null } ) }
@@ -307,16 +330,16 @@ export default function Campaigns() {
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 															{(() => {
-																// Parse posts from postsTarget string 
+																// Parse posts from postsTarget string
 																// Formats: "created / target" or "created (scheduled) / target"
 																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
 																const leftPart = postsTargetParts[0] || '0';
 																const postsTarget = parseInt(postsTargetParts[1]) || 0;
-																
+
 																// Check if there's a scheduled count in parentheses
 																let postsCreated = 0;
 																let postsScheduled = 0;
-																
+
 																if (leftPart.includes('(')) {
 																	// Format: "created (scheduled)"
 																	const createdMatch = leftPart.match(/^(\d+)\s*\((\d+)\)$/);
@@ -329,7 +352,7 @@ export default function Campaigns() {
 																	postsCreated = parseInt(leftPart) || 0;
 																	postsScheduled = postsCreated; // Assume same if not shown separately
 																}
-																
+
 																const isTargetMet = postsTarget > 0 && postsScheduled >= postsTarget;
 																const isUpdating = updatingStatus[ campaign.id ] || false;
 
@@ -441,6 +464,17 @@ export default function Campaigns() {
 															</button>
 
 															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																openCampaignLogs( e, campaign.id );
+															} }>
+																<Tooltip text={ __( 'Logs', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																>
+																	<ScrollText className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																</Tooltip>
+															</button>
+
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																openDeleteModal( e, campaign.id );
 															} }>
 																<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
@@ -474,6 +508,13 @@ export default function Campaigns() {
 				onClose={ () => setAnalyticsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
 				campaignId={ analyticsModal.campaignId }
 				campaignData={ analyticsModal.campaignData }
+			/>
+
+			<CampaignLogsModal
+				isOpen={ logsModal.isOpen }
+				onClose={ () => setLogsModal( { isOpen: false, campaignId: null, campaignData: null } ) }
+				campaignId={ logsModal.campaignId }
+				campaignData={ logsModal.campaignData }
 			/>
 
 			<CampaignDeleteModal

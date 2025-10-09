@@ -74,7 +74,7 @@ class CronHandler {
 				// Increment failed count when post creation fails
 				$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
 				Metadata::update_campaign_meta( $campaign_id, 'postsFailed', intval( $posts_failed ) + 1 );
-				
+
 				// Still schedule next post even if this one failed (continue the campaign)
 				$this->schedule_next_post( $campaign_id );
 			}
@@ -300,7 +300,7 @@ class CronHandler {
 			default:
 				$seconds = $interval * DAY_IN_SECONDS;
 		}
-		
+
 		// Allow testing plugins to modify intervals
 		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
 	}

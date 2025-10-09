@@ -456,7 +456,7 @@ class Metadata {
 		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
 		if ( ! $plain_metadata ) {
-			// Show format: "created (scheduled) / target" 
+			// Show format: "created (scheduled) / target"
 			// Example: "3 (5) / 10" means 3 posts created, 5 scheduled, target is 10
 			if ( $meta_posts_scheduled > 0 && $meta_posts_scheduled !== $meta_posts_created ) {
 				$meta_posts_display = $meta_posts_created . ' (' . $meta_posts_scheduled . ') / ' . $meta_posts_target;

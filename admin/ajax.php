@@ -2076,7 +2076,7 @@ class Ajax {
 	private function get_campaign_creation_logs( $campaign_id ): array {
 		// Get logs from campaign meta or a dedicated logs table/option
 		$logs = get_post_meta( $campaign_id, '_wpaib_campaign_logs', true );
-		
+
 		if ( ! is_array( $logs ) ) {
 			$logs = [];
 		}
@@ -2107,9 +2107,9 @@ class Ajax {
 		$campaign_data = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id );
 		$posts_created = intval( $campaign_data['postsCreated'] ?? 0 );
 		$posts_target = intval( $campaign_data['postsTarget'] ?? 5 );
-		
+
 		$sample_logs = [];
-		
+
 		// Generate logs for created posts
 		for ( $i = 1; $i <= $posts_created; $i++ ) {
 			$timestamp = current_time( 'mysql', false );
@@ -2120,7 +2120,7 @@ class Ajax {
 					'duration' => rand( 50, 150 )
 				],
 				[
-					'status' => 'success', 
+					'status' => 'success',
 					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
 					'duration' => rand( 200, 500 )
 				],
