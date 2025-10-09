@@ -1992,9 +1992,27 @@ class Ajax {
 
 		// Update campaign stats.
 		$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-		update_post_meta( $campaign_id, 'postsCreated', $posts_created + 1 );
+		$new_posts_created = $posts_created + 1;
+		update_post_meta( $campaign_id, 'postsCreated', $new_posts_created );
 		update_post_meta( $campaign_id, 'lastRun', time() );
 		update_post_meta( $campaign_id, 'lastPostID', $post_id );
+
+		// Check if campaign has reached its target and mark as completed
+		$posts_target = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
+		if ( $posts_target > 0 && $new_posts_created >= $posts_target ) {
+			// Update campaign status to completed by changing post status
+			wp_update_post( [
+				'ID' => $campaign_id,
+				'post_status' => 'draft', // Set to draft to indicate completion/inactivity
+			] );
+
+			// Add a completion meta flag
+			update_post_meta( $campaign_id, 'campaignCompleted', true );
+			update_post_meta( $campaign_id, 'completedAt', time() );
+
+			// Clear any scheduled events since campaign is now complete
+			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+		}
 
 		return $post_id;
 	}
@@ -2106,11 +2124,14 @@ class Ajax {
 	private function generate_sample_campaign_logs( $campaign_id ): array {
 		$campaign_data = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id );
 		$posts_created = intval( $campaign_data['postsCreated'] ?? 0 );
+		$posts_failed = intval( $campaign_data['postsFailed'] ?? 0 );
+		$posts_scheduled = intval( $campaign_data['postsScheduled'] ?? 0 );
 		$posts_target = intval( $campaign_data['postsTarget'] ?? 5 );
 
 		$sample_logs = [];
+		$log_counter = 1;
 
-		// Generate logs for created posts
+		// Generate logs for successful posts
 		for ( $i = 1; $i <= $posts_created; $i++ ) {
 			$timestamp = current_time( 'mysql', false );
 			$steps = [
@@ -2137,14 +2158,61 @@ class Ajax {
 			];
 
 			$sample_logs[] = [
-				'id' => $i,
-				'timestamp' => date( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_created - $i ) * 300 ),
+				'id' => $log_counter++,
+				'timestamp' => date( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_created - $i ) * 600 ),
 				'status' => 'success',
 				'title' => sprintf( __( 'Post #%d Creation - Success', 'wp-ai-blogger' ), $i ),
 				'message' => sprintf( __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $i ),
 				'post_id' => 1000 + $i,
 				'post_title' => sprintf( __( 'Generated Blog Post #%d', 'wp-ai-blogger' ), $i ),
 				'steps' => $steps
+			];
+		}
+
+		// Generate logs for failed posts
+		$error_reasons = [
+			__( 'API quota exceeded. Please check your subscription limits.', 'wp-ai-blogger' ),
+			__( 'Network timeout occurred during content generation.', 'wp-ai-blogger' ),
+			__( 'Invalid keywords provided. Content generation failed.', 'wp-ai-blogger' ),
+			__( 'Database connection error while saving post.', 'wp-ai-blogger' ),
+			__( 'Content filtering blocked the generated text.', 'wp-ai-blogger' ),
+		];
+
+		for ( $i = 1; $i <= $posts_failed; $i++ ) {
+			$timestamp = current_time( 'mysql', false );
+			$error_reason = $error_reasons[ array_rand( $error_reasons ) ];
+			
+			$failed_steps = [
+				[
+					'status' => 'success',
+					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+					'duration' => rand( 50, 150 )
+				],
+				[
+					'status' => 'success',
+					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+					'duration' => rand( 200, 500 )
+				],
+				[
+					'status' => 'error',
+					'description' => __( 'Content generation failed', 'wp-ai-blogger' ),
+					'duration' => rand( 100, 300 )
+				],
+				[
+					'status' => 'error',
+					'description' => __( 'Post creation aborted', 'wp-ai-blogger' ),
+					'duration' => 0
+				]
+			];
+
+			$sample_logs[] = [
+				'id' => $log_counter++,
+				'timestamp' => date( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_failed - $i ) * 400 ),
+				'status' => 'error',
+				'title' => sprintf( __( 'Post #%d Creation - Failed', 'wp-ai-blogger' ), $posts_created + $i ),
+				'message' => sprintf( __( 'Post #%d creation failed due to an error.', 'wp-ai-blogger' ), $posts_created + $i ),
+				'error_details' => $error_reason,
+				'steps' => $failed_steps
 			];
 		}
 
@@ -2165,8 +2233,60 @@ class Ajax {
 			];
 		}
 
+		// Add completion log if campaign is completed (check both scheduled and target)
+		if ( $posts_target > 0 && ( $posts_scheduled >= $posts_target || $posts_created >= $posts_target ) ) {
+			$completed_at = $campaign_data['completedAt'] ?? current_time( 'mysql' );
+			
+			// Calculate success rate
+			$total_attempted = $posts_created + $posts_failed;
+			$success_rate = $total_attempted > 0 ? round( ( $posts_created / $total_attempted ) * 100 ) : 100;
+			
+			// Determine completion status and message
+			if ( $posts_failed > 0 ) {
+				$completion_status = $success_rate >= 80 ? 'warning' : 'error';
+				$completion_title = sprintf( __( 'Campaign Completed - %d%% Successful', 'wp-ai-blogger' ), $success_rate );
+				$completion_message = sprintf( 
+					__( 'Campaign completed with %d successful posts out of %d attempts (%d failed). Target of %d posts reached.', 'wp-ai-blogger' ), 
+					$posts_created, 
+					$total_attempted, 
+					$posts_failed, 
+					$posts_target 
+				);
+			} else {
+				$completion_status = 'success';
+				$completion_title = __( 'Campaign Completed Successfully', 'wp-ai-blogger' );
+				$completion_message = sprintf( __( 'Campaign successfully completed with all %d posts created without any failures.', 'wp-ai-blogger' ), $posts_created );
+			}
+
+			$sample_logs[] = [
+				'id' => $log_counter + 100, // High ID to ensure it appears at top
+				'timestamp' => $completed_at,
+				'status' => $completion_status,
+				'title' => $completion_title,
+				'message' => $completion_message,
+				'steps' => [
+					[
+						'status' => $posts_created > 0 ? 'success' : 'warning',
+						'description' => sprintf( __( '%d posts created successfully', 'wp-ai-blogger' ), $posts_created ),
+					],
+					[
+						'status' => $posts_failed > 0 ? 'error' : 'success',
+						'description' => sprintf( __( '%d posts failed', 'wp-ai-blogger' ), $posts_failed ),
+					],
+					[
+						'status' => 'success',
+						'description' => __( 'Campaign marked as completed', 'wp-ai-blogger' ),
+					],
+					[
+						'status' => 'success',
+						'description' => __( 'Scheduled events cleared', 'wp-ai-blogger' ),
+					]
+				]
+			];
+		}
+
 		// Add error log example if needed
-		if ( $posts_created === 0 && $campaign_data['status'] === 'draft' ) {
+		if ( $posts_created === 0 && $campaign_data['status'] === 'draft' && ! ( $campaign_data['campaignCompleted'] ?? false ) ) {
 			$sample_logs[] = [
 				'id' => 1,
 				'timestamp' => current_time( 'mysql' ),

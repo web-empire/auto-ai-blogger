@@ -153,8 +153,26 @@ class CronHandler {
 			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
 			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
-			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
+			$new_posts_created = intval( $posts_created ) + 1;
+			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $new_posts_created );
 			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
+
+			// Check if campaign has reached its target and mark as completed
+			$posts_target = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
+			if ( $posts_target > 0 && $new_posts_created >= intval( $posts_target ) ) {
+				// Mark campaign as completed
+				wp_update_post( [
+					'ID' => $campaign_id,
+					'post_status' => 'draft', // Set to draft to indicate completion/inactivity
+				] );
+
+				// Add completion meta flags
+				Metadata::update_campaign_meta( $campaign_id, 'campaignCompleted', true );
+				Metadata::update_campaign_meta( $campaign_id, 'completedAt', current_time( 'mysql' ) );
+
+				// Clear any scheduled events since campaign is now complete
+				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			}
 
 			return [
 				'success' => true,
@@ -253,12 +271,20 @@ class CronHandler {
 	 */
 	private function schedule_next_post( $campaign_id ): void {
 		try {
+			// Check if campaign is already completed
+			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
+			if ( $campaign_completed ) {
+				return;
+			}
+
 			$repeat_interval  = Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' );
 			$repeat_unit      = Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' );
 			$posts_target     = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 			$posts_scheduled  = Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' );
+			$posts_created    = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 
-			if ( $posts_target > 0 && $posts_scheduled >= $posts_target ) {
+			// Check if target reached by either scheduled or created count
+			if ( $posts_target > 0 && ( $posts_scheduled >= $posts_target || $posts_created >= $posts_target ) ) {
 				return;
 			}
 
