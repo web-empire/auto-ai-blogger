@@ -272,17 +272,25 @@ class CronHandler {
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
 
+		// Production mode: Normal intervals
 		switch ( $unit ) {
 			case 'hour':
-				return $interval * HOUR_IN_SECONDS;
+				$seconds = $interval * HOUR_IN_SECONDS;
+				break;
 			case 'day':
-				return $interval * DAY_IN_SECONDS;
+				$seconds = $interval * DAY_IN_SECONDS;
+				break;
 			case 'week':
-				return $interval * WEEK_IN_SECONDS;
+				$seconds = $interval * WEEK_IN_SECONDS;
+				break;
 			case 'month':
-				return $interval * MONTH_IN_SECONDS;
+				$seconds = $interval * MONTH_IN_SECONDS;
+				break;
 			default:
-				return $interval * DAY_IN_SECONDS;
+				$seconds = $interval * DAY_IN_SECONDS;
 		}
+		
+		// Allow testing plugins to modify intervals
+		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
 	}
 }

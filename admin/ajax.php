@@ -1824,6 +1824,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function calculate_interval_seconds( $interval, $unit ): int {
+		// Production mode: Normal intervals
 		$multipliers = [
 			'day'   => DAY_IN_SECONDS,
 			'week'  => WEEK_IN_SECONDS,
@@ -1831,7 +1832,10 @@ class Ajax {
 			'year'  => 365 * DAY_IN_SECONDS,
 		];
 
-		return $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
+		$seconds = $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
+		
+		// Allow testing plugins to modify intervals
+		return apply_filters( 'wpaib_campaign_interval_seconds', $seconds, $interval, $unit );
 	}
 
 	/**

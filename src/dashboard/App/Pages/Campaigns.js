@@ -10,14 +10,17 @@ import CampaignDeleteModal from '@Components/CampaignDeleteModal';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function Campaigns() {
-	const campaigns = wpaib_localized_data.all_campaigns;
+	const initialCampaigns = wpaib_localized_data.all_campaigns;
 	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
+	const isTestingMode = wpaib_localized_data.campaign_testing_mode || false;
 
+	const [ campaigns, setCampaigns ] = useState( initialCampaigns ); // Make campaigns stateful
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
 	const [ deleteModal, setDeleteModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
+	const [ updatingStatus, setUpdatingStatus ] = useState( {} ); // Track which campaigns are being updated
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -126,6 +129,59 @@ export default function Campaigns() {
 		window.location.reload();
 	};
 
+	const toggleCampaignStatus = async ( campaignId, currentStatus ) => {
+		// Prevent multiple simultaneous requests
+		if ( updatingStatus[ campaignId ] ) {
+			return;
+		}
+
+		setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: true }) );
+
+		try {
+			const newStatus = currentStatus === 'publish' ? 'draft' : 'publish';
+
+			// Get current campaign data
+			const campaignData = campaigns[ campaignId ];
+
+			// Prepare the update data with the new status
+			const updateData = {
+				...campaignData,
+				id: campaignId,
+				status: newStatus,
+				type: 'edit'
+			};
+
+			const formData = new window.FormData();
+			formData.append( 'action', 'wpaib_update_campaign' );
+			formData.append( 'security', wpaib_localized_data.admin_nonce );
+			formData.append( 'value', JSON.stringify( updateData ) );
+
+			const response = await apiFetch( {
+				url: wpaib_localized_data.ajax_url,
+				method: 'POST',
+				body: formData,
+			} );
+
+			if ( response.success ) {
+				// Update the local campaigns state without page refresh
+				setCampaigns( prevCampaigns => ({
+					...prevCampaigns,
+					[ campaignId ]: {
+						...prevCampaigns[ campaignId ],
+						status: newStatus
+					}
+				}) );
+			} else {
+				console.error( 'Failed to update campaign status:', response );
+				// Optionally show an error message to the user
+			}
+		} catch ( error ) {
+			console.error( 'Error updating campaign status:', error );
+		} finally {
+			setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: false }) );
+		}
+	};
+
 	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
 		return (
 			<>
@@ -175,6 +231,20 @@ export default function Campaigns() {
 
 	return (
 		<>
+			{ isTestingMode && (
+				<div className="bg-amber-100 border border-amber-400 text-amber-800 px-4 py-3 rounded-md mx-4 mt-4 mb-2">
+					<div className="flex items-center gap-2">
+						<Info className="w-5 h-5" />
+						<div>
+							<h4 className="font-semibold text-sm m-0">{ __( '🧪 Campaign Testing Mode Active', 'wp-ai-blogger' ) }</h4>
+							<p className="text-xs mt-1 mb-0">
+								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min, Monthly = 5min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
+							</p>
+						</div>
+					</div>
+				</div>
+			) }
+
 			<div className="sm:px-6 lg:px-8 py-8 px-4">
 				<div className="sm:flex sm:items-center">
 					<div className="sm:flex-auto">
@@ -236,10 +306,34 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															<SwitchControl
-																checked={ 'publish' === campaign.status }
-																onChange={ () => {} }
-															/>
+															{(() => {
+																// Parse posts created and target from postsTarget string (format: "created / target")
+																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
+																const postsCreated = parseInt(postsTargetParts[0]) || 0;
+																const postsTarget = parseInt(postsTargetParts[1]) || 0;
+																const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+																const isUpdating = updatingStatus[ campaign.id ] || false;
+
+																return (
+																	<div className="relative">
+																		<SwitchControl
+																			checked={ 'publish' === campaign.status }
+																			onChange={ () => toggleCampaignStatus( campaign.id, campaign.status ) }
+																			disabled={ isUpdating || isTargetMet }
+																			aria-label={ `${ __( 'Toggle campaign status for', 'wp-ai-blogger' ) } ${ campaign.name }` }
+																		/>
+																		{ isTargetMet && (
+																			<Tooltip
+																				text={ __( 'Campaign completed - Target posts reached.', 'wp-ai-blogger' ) }
+																				delay={ 100 }
+																				className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																			>
+																				<div className="absolute inset-0 cursor-help"></div>
+																			</Tooltip>
+																		) }
+																	</div>
+																);
+															})()}
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -264,15 +358,15 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
-															<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer ${ 
-																campaign.startDate && campaign.startDate.trim() !== '' 
-																	? 'text-gray-500 hover:text-indigo-900' 
-																	: 'text-amber-500 hover:text-amber-600' 
+															<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer ${
+																campaign.startDate && campaign.startDate.trim() !== ''
+																	? 'text-gray-500 hover:text-indigo-900'
+																	: 'text-amber-500 hover:text-amber-600'
 															}` }>
-																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${ 
-																	campaign.startDate && campaign.startDate.trim() !== '' 
-																		? new Date( campaign.startDate ).toLocaleString() 
-																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString() 
+																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${
+																	campaign.startDate && campaign.startDate.trim() !== ''
+																		? new Date( campaign.startDate ).toLocaleString()
+																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString()
 																}` }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"

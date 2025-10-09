@@ -268,6 +268,7 @@ class Menu {
 				// System configuration.
 				'blog_name'                     => $blog_name,
 				'security_level'                => 'enhanced',
+				'campaign_testing_mode'         => false, // Will be overridden by testing plugin if active
 			]
 		);
 
