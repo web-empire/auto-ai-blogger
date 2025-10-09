@@ -264,71 +264,71 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
-															<a href="#" className="text-gray-500 hover:text-indigo-900">
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
 																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${ campaign.created_at }` }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<CalendarArrowUp className="w-4 h-4" />
+																	<CalendarArrowUp className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																</Tooltip>
-															</a>
+															</button>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900">
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
 																<Tooltip text={ `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }` }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Info className="w-4 h-4" />
+																	<Info className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																</Tooltip>
-															</a>
+															</button>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																viewCampaignPosts( e, campaign.id );
 															} }>
 																<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<List className="w-4 h-4" />
+																	<List className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																</Tooltip>
-															</a>
+															</button>
 
-															<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
+															<button type="button" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" onClick={ configureCampaign }>
 																<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
 																	{
 																		openingConfigureDrawer ? (
-																			<RotateCw className="w-4 h-4 animate-spin" />
+																			<RotateCw className="w-4 h-4 animate-spin" style={{ outline: 'none' }} tabIndex="-1" />
 																		) : (
-																			<Settings className="w-4 h-4" />
+																			<Settings className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																		)
 																	}
 																</Tooltip>
-															</a>
+															</button>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																openCampaignAnalytics( e, campaign.id );
 															} }>
 																<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<ChartNoAxesColumn className="w-4 h-4" />
+																	<ChartNoAxesColumn className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																</Tooltip>
-															</a>
+															</button>
 
-															<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																openDeleteModal( e, campaign.id );
 															} }>
 																<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Trash2 className="w-4 h-4" />
+																	<Trash2 className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
 																</Tooltip>
-															</a>
+															</button>
 														</td>
 													</tr>
 												) ) }
