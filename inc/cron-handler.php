@@ -136,6 +136,10 @@ class CronHandler {
 				wp_set_post_tags( $post_id, $tag );
 			}
 
+			// Add campaign reference meta to the post
+			add_post_meta( $post_id, 'wp_aib_reference', 1 );
+			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
+
 			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
