@@ -261,7 +261,7 @@ export default function Campaigns() {
 						<div>
 							<h4 className="font-semibold text-sm m-0">{ __( '🧪 Campaign Testing Mode Active', 'wp-ai-blogger' ) }</h4>
 							<p className="text-xs mt-1 mb-0">
-								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min, Monthly = 5min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
+								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
 							</p>
 						</div>
 					</div>
@@ -418,7 +418,30 @@ export default function Campaigns() {
 															</button>
 
 															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
-																<Tooltip text={ `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }` }
+																<Tooltip text={ (() => {
+																	// Parse posts from postsTarget string to check if any posts have been created
+																	const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
+																	const leftPart = postsTargetParts[0] || '0';
+
+																	let postsCreated = 0;
+																	if (leftPart.includes('(')) {
+																		// Format: "created (scheduled)"
+																		const createdMatch = leftPart.match(/^(\d+)\s*\((\d+)\)$/);
+																		if (createdMatch) {
+																			postsCreated = parseInt(createdMatch[1]) || 0;
+																		}
+																	} else {
+																		// Format: "created" (no scheduled count shown)
+																		postsCreated = parseInt(leftPart) || 0;
+																	}
+
+																	// Show appropriate message based on posts created
+																	if (postsCreated === 0) {
+																		return __( 'Not yet started - No posts created', 'wp-ai-blogger' );
+																	} else {
+																		return `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }`;
+																	}
+																})() }
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>

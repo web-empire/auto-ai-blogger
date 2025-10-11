@@ -29,6 +29,21 @@ export default function ConfigureDrawer( props ) {
 	const [ errorMessage, setErrorMessage ] = useState( '' );
 	const [ fieldErrors, setFieldErrors ] = useState( {} );
 
+	// Helper function to check if start date has passed
+	const hasStartDatePassed = ( startDate ) => {
+		if ( ! startDate ) {
+			return false;
+		}
+
+		try {
+			const start = new Date( startDate );
+			const now = new Date();
+			return start < now;
+		} catch ( e ) {
+			return false;
+		}
+	};
+
 	useEffect( () => {
 		setDrawerData( configureData );
 		setHandlingCampaign( false );
@@ -250,7 +265,10 @@ export default function ConfigureDrawer( props ) {
 																<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
 																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
 																	<Tooltip
-																		text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
+																		text={ drawerData.type === 'edit'
+																			? __( 'Post Target can not be updated', 'wp-ai-blogger' )
+																			: __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' )
+																		}
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																	>
@@ -380,10 +398,22 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<label htmlFor="start-date" className={ `block text-sm/6 font-medium mb-2 ${
+															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
 																fieldErrors['start-date'] ? 'text-red-700' : 'text-gray-900'
 															}` }>
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
+																{ ( drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) ) && (
+																	<Tooltip
+																		text={ __( 'Start Date can not be updated', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																	>
+																		<QuestionMarkCircleIcon
+																			aria-hidden="true"
+																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																		/>
+																	</Tooltip>
+																) }
 															</label>
 															<DateTimeField
 																id="start-date"
@@ -391,6 +421,7 @@ export default function ConfigureDrawer( props ) {
 																value={ drawerData.startDate }
 																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
 																readOnly={ isViewMode }
+																disabled={ drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) }
 																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
 																error={ fieldErrors['start-date'] }
 															/>
