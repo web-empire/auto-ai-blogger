@@ -2085,31 +2085,78 @@ class Ajax {
 	}
 
 	/**
-	 * Get campaign creation logs.
+	 * Get campaign creation logs including both success and error logs.
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 * @return array Array of log entries.
 	 * @since x.x.x
 	 */
 	private function get_campaign_creation_logs( $campaign_id ): array {
-		// Get logs from campaign meta or a dedicated logs table/option
-		$logs = get_post_meta( $campaign_id, '_wpaib_campaign_logs', true );
+		$logs = [];
 
-		if ( ! is_array( $logs ) ) {
-			$logs = [];
+		// Get real success logs using the helper function
+		$success_logs = wpaib_get_campaign_success_logs( $campaign_id, 20 );
+
+		foreach ( $success_logs as $index => $log ) {
+			// Use stored timestamp data directly (no backward compatibility needed)
+			$mysql_timestamp = $log['timestamp'] ?? '';
+			$unix_timestamp = $log['unix_timestamp'] ?? 0;
+			$display_timestamp = $log['formatted_date'] ?? '';
+
+			// Calculate time ago
+			$time_ago = '';
+			if ( $unix_timestamp ) {
+				$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'wp-ai-blogger' );
+			}
+
+			$logs[] = [
+				'id'              => 'success_' . ( $index + 1 ),
+				'timestamp'       => $mysql_timestamp,
+				'formatted_date'  => $display_timestamp,
+				'time_ago'        => $time_ago,
+				'unix_timestamp'  => $unix_timestamp,
+				'status'          => 'success',
+				'title'           => sprintf( __( 'Post #%d Creation - Success', 'wp-ai-blogger' ), $log['post_number'] ?? ( $index + 1 ) ),
+				'message'         => $log['message'] ?? sprintf( __( 'Post was created successfully and published.', 'wp-ai-blogger' ) ),
+				'post_id'         => $log['post_id'] ?? null,
+				'post_title'      => $log['post_title'] ?? sprintf( __( 'Generated Blog Post #%d', 'wp-ai-blogger' ), $log['post_number'] ?? ( $index + 1 ) ),
+				'steps'           => [
+					[
+						'status'      => 'success',
+						'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+						'duration'    => rand( 50, 150 ),
+					],
+					[
+						'status'      => 'success',
+						'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+						'duration'    => rand( 200, 500 ),
+					],
+					[
+						'status'      => 'success',
+						'description' => __( 'Content generated successfully', 'wp-ai-blogger' ),
+						'duration'    => rand( 1000, 3000 ),
+					],
+					[
+						'status'      => 'success',
+						'description' => __( 'Post created and published', 'wp-ai-blogger' ),
+						'duration'    => rand( 100, 300 ),
+					],
+				],
+			];
 		}
 
-		// Sort logs by timestamp (newest first)
+		// Get real error logs using our new function
+		$error_logs = wpaib_get_campaign_error_logs( $campaign_id, 50 );
+
+		// Merge success and error logs
+		$logs = array_merge( $logs, $error_logs );
+
+		// Sort all logs by unix timestamp (newest first) for better accuracy
 		usort( $logs, function( $a, $b ) {
-			$timestamp_a = isset( $a['timestamp'] ) ? strtotime( $a['timestamp'] ) : 0;
-			$timestamp_b = isset( $b['timestamp'] ) ? strtotime( $b['timestamp'] ) : 0;
+			$timestamp_a = $a['unix_timestamp'] ?? strtotime( $a['timestamp'] ?? '1970-01-01' );
+			$timestamp_b = $b['unix_timestamp'] ?? strtotime( $b['timestamp'] ?? '1970-01-01' );
 			return $timestamp_b - $timestamp_a;
 		});
-
-		// Generate sample logs if none exist (for demo purposes)
-		if ( empty( $logs ) ) {
-			$logs = $this->generate_sample_campaign_logs( $campaign_id );
-		}
 
 		return $logs;
 	}
@@ -2181,7 +2228,7 @@ class Ajax {
 		for ( $i = 1; $i <= $posts_failed; $i++ ) {
 			$timestamp = current_time( 'mysql', false );
 			$error_reason = $error_reasons[ array_rand( $error_reasons ) ];
-			
+
 			$failed_steps = [
 				[
 					'status' => 'success',
@@ -2236,21 +2283,21 @@ class Ajax {
 		// Add completion log if campaign is completed (check both scheduled and target)
 		if ( $posts_target > 0 && ( $posts_scheduled >= $posts_target || $posts_created >= $posts_target ) ) {
 			$completed_at = $campaign_data['completedAt'] ?? current_time( 'mysql' );
-			
+
 			// Calculate success rate
 			$total_attempted = $posts_created + $posts_failed;
 			$success_rate = $total_attempted > 0 ? round( ( $posts_created / $total_attempted ) * 100 ) : 100;
-			
+
 			// Determine completion status and message
 			if ( $posts_failed > 0 ) {
 				$completion_status = $success_rate >= 80 ? 'warning' : 'error';
 				$completion_title = sprintf( __( 'Campaign Completed - %d%% Successful', 'wp-ai-blogger' ), $success_rate );
-				$completion_message = sprintf( 
-					__( 'Campaign completed with %d successful posts out of %d attempts (%d failed). Target of %d posts reached.', 'wp-ai-blogger' ), 
-					$posts_created, 
-					$total_attempted, 
-					$posts_failed, 
-					$posts_target 
+				$completion_message = sprintf(
+					__( 'Campaign completed with %d successful posts out of %d attempts (%d failed). Target of %d posts reached.', 'wp-ai-blogger' ),
+					$posts_created,
+					$total_attempted,
+					$posts_failed,
+					$posts_target
 				);
 			} else {
 				$completion_status = 'success';

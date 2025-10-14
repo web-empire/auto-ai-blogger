@@ -61,19 +61,74 @@ class CronHandler {
 				return;
 			}
 
+			// Get current campaign statistics
+			$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
+			$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
+			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
+
+			// Calculate which post number we're trying to create (next post after created ones)
+			$target_post_number = $posts_created + 1;
+
+			// Calculate attempt number for this specific post
+			// Attempt = (total_scheduled - posts_created) - failed_attempts_for_previous_posts + 1
+			// Since we're about to increment scheduled, current attempt = (scheduled - created) + 1
+			$current_attempt = ( $posts_scheduled - $posts_created ) + 1;
+
 			// Update scheduled count at the beginning of attempt (regardless of success/failure)
-			$posts_scheduled = Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' );
-			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', intval( $posts_scheduled ) + 1 );
+			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', $posts_scheduled + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
 
-			$result = $this->generate_post_from_campaign( $campaign_id );
+			$result = $this->generate_post_from_campaign( $campaign_id, $target_post_number, $current_attempt );
 
 			if ( $result['success'] ) {
+				// Log success with post and attempt information
+				wpaib_log_campaign_success(
+					$campaign_id,
+					$result['post_id'] ?? null,
+					[
+						'post_number'      => $target_post_number,
+						'attempt_number'   => $current_attempt,
+						'campaign_id'      => $campaign_id,
+						'posts_created'    => $posts_created + 1, // Will be incremented after this
+						'posts_scheduled'  => $posts_scheduled + 1,
+						'post_title'       => $result['post_title'] ?? null,
+						'execution_time'   => current_time( 'mysql' ),
+						'message'          => sprintf(
+							__( 'Post #%d Created Successfully - Attempt #%d', 'wp-ai-blogger' ),
+							$target_post_number,
+							$current_attempt
+						),
+					]
+				);
+
 				$this->schedule_next_post( $campaign_id );
 			} else {
-				// Increment failed count when post creation fails
-				$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
-				Metadata::update_campaign_meta( $campaign_id, 'postsFailed', intval( $posts_failed ) + 1 );
+				// Log detailed error information with post and attempt numbers
+				$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
+				$context = [
+					'post_number'      => $target_post_number,
+					'attempt_number'   => $current_attempt,
+					'campaign_id'      => $campaign_id,
+					'posts_created'    => $posts_created,
+					'posts_scheduled'  => $posts_scheduled + 1,
+					'posts_failed'     => $posts_failed + 1, // Will be incremented after this
+					'keywords'         => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
+					'execution_time'   => current_time( 'mysql' ),
+				];
+
+				$error_message = sprintf(
+					__( 'Post #%d Creation Failed - Attempt #%d: %s', 'wp-ai-blogger' ),
+					$target_post_number,
+					$current_attempt,
+					$result['message'] ?? __( 'Unknown error occurred during post creation', 'wp-ai-blogger' )
+				);
+
+				wpaib_log_campaign_error(
+					$campaign_id,
+					$error_type,
+					$error_message,
+					$context
+				);
 
 				// Still schedule next post even if this one failed (continue the campaign)
 				$this->schedule_next_post( $campaign_id );
@@ -87,10 +142,12 @@ class CronHandler {
 	 * Generate a post from campaign data.
 	 *
 	 * @param int $campaign_id The ID of the campaign.
+	 * @param int $target_post_number The post number being attempted.
+	 * @param int $current_attempt The attempt number for this post.
 	 * @return array An array containing the success status and message.
 	 * @since x.x.x
 	 */
-	public function generate_post_from_campaign( $campaign_id ): array {
+	public function generate_post_from_campaign( $campaign_id, $target_post_number = 0, $current_attempt = 0 ): array {
 		try {
 			$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
 			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
@@ -106,6 +163,7 @@ class CronHandler {
 				return [
 					'success' => false,
 					'message' => __( 'No keywords found for campaign', 'wp-ai-blogger' ),
+					'error_type' => 'validation_error',
 				];
 			}
 
@@ -115,6 +173,7 @@ class CronHandler {
 				return [
 					'success' => false,
 					'message' => 'API call failed: ' . $api_response['message'],
+					'error_type' => 'api_error',
 				];
 			}
 
@@ -135,9 +194,11 @@ class CronHandler {
 			$post_id = wp_insert_post( $post_data );
 
 			if ( is_wp_error( $post_id ) || ! $post_id ) {
+				$wp_error_message = is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Unknown database error';
 				return [
 					'success' => false,
-					'message' => 'Failed to create WordPress post: ' . ( is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Unknown error' ),
+					'message' => 'Failed to create WordPress post: ' . $wp_error_message,
+					'error_type' => 'database_error',
 				];
 			}
 
@@ -157,33 +218,28 @@ class CronHandler {
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $new_posts_created );
 			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
 
+			// Success logging is handled in the main method to avoid duplicates
+
 			// Check if campaign has reached its target and mark as completed
 			$posts_target = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 			if ( $posts_target > 0 && $new_posts_created >= intval( $posts_target ) ) {
-				// Mark campaign as completed
-				wp_update_post( [
-					'ID' => $campaign_id,
-					'post_status' => 'draft', // Set to draft to indicate completion/inactivity
-				] );
-
-				// Add completion meta flags
-				Metadata::update_campaign_meta( $campaign_id, 'campaignCompleted', true );
-				Metadata::update_campaign_meta( $campaign_id, 'completedAt', current_time( 'mysql' ) );
-
-				// Clear any scheduled events since campaign is now complete
-				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+				$this->mark_campaign_completed( $campaign_id, 'target_reached' );
 			}
 
 			return [
 				'success' => true,
-				'message' => "Post created successfully with ID: {$post_id}",
+				'message' => sprintf( __( 'Post #%d created successfully with ID: %s', 'wp-ai-blogger' ), $target_post_number, $post_id ),
 				'post_id' => $post_id,
+				'post_title' => $post_data['post_title'] ?? '',
+				'post_number' => $target_post_number,
+				'attempt_number' => $current_attempt,
 			];
 
 		} catch ( \Exception $e ) {
 			return [
 				'success' => false,
 				'message' => 'Exception: ' . $e->getMessage(),
+				'error_type' => 'unknown_error',
 			];
 		}
 	}
@@ -243,9 +299,29 @@ class CronHandler {
 			}
 
 			if ( is_wp_error( $response ) ) {
+				$error_code = $response->get_error_code();
+				$error_message = $response->get_error_message();
+
+				// Enhance error message with more context
+				$detailed_message = sprintf(
+					__( 'API Error (%s): %s', 'wp-ai-blogger' ),
+					$error_code,
+					$error_message
+				);
+
+				// Add retry attempt information
+				if ( $attempt > 1 ) {
+					$detailed_message .= sprintf(
+						__( ' (Failed after %d attempts)', 'wp-ai-blogger' ),
+						$attempt
+					);
+				}
+
 				return [
 					'success' => false,
-					'message' => $response->get_error_message(),
+					'message' => $detailed_message,
+					'error_code' => $error_code,
+					'attempts' => $attempt,
 				];
 			}
 
@@ -282,9 +358,18 @@ class CronHandler {
 			$posts_target     = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 			$posts_scheduled  = Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' );
 			$posts_created    = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+			$posts_failed     = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
+			$max_failures     = Metadata::get_campaign_meta( $campaign_id, 'maxFailures' );
 
-			// Check if target reached by either scheduled or created count
-			if ( $posts_target > 0 && ( $posts_scheduled >= $posts_target || $posts_created >= $posts_target ) ) {
+			// Check if target reached by created count only (not scheduled attempts)
+			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
+				$this->mark_campaign_completed( $campaign_id, 'target_reached' );
+				return;
+			}
+
+			// Check if failure threshold exceeded
+			if ( $max_failures > 0 && $posts_failed >= $max_failures ) {
+				$this->mark_campaign_completed( $campaign_id, 'max_failures_exceeded' );
 				return;
 			}
 
@@ -329,5 +414,111 @@ class CronHandler {
 
 		// Allow testing plugins to modify intervals
 		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
+	}
+
+	/**
+	 * Determine error type based on error message for better categorization.
+	 *
+	 * @param string $error_message The error message.
+	 * @return string The error type.
+	 * @since x.x.x
+	 */
+	private function determine_error_type( $error_message ): string {
+		$error_message = strtolower( $error_message );
+
+		// Network/connectivity errors
+		if ( strpos( $error_message, 'timeout' ) !== false ||
+			 strpos( $error_message, 'network' ) !== false ||
+			 strpos( $error_message, 'connection' ) !== false ||
+			 strpos( $error_message, 'failed to connect' ) !== false ) {
+			return 'network_error';
+		}
+
+		// API quota/subscription errors
+		if ( strpos( $error_message, 'quota' ) !== false ||
+			 strpos( $error_message, 'subscription' ) !== false ||
+			 strpos( $error_message, 'limit' ) !== false ||
+			 strpos( $error_message, 'exceeded' ) !== false ) {
+			return 'quota_error';
+		}
+
+		// Content filtering errors
+		if ( strpos( $error_message, 'content filtering' ) !== false ||
+			 strpos( $error_message, 'blocked' ) !== false ||
+			 strpos( $error_message, 'safety' ) !== false ) {
+			return 'content_filter_error';
+		}
+
+		// Validation errors
+		if ( strpos( $error_message, 'invalid' ) !== false ||
+			 strpos( $error_message, 'keywords' ) !== false ||
+			 strpos( $error_message, 'validation' ) !== false ) {
+			return 'validation_error';
+		}
+
+		// License/authentication errors
+		if ( strpos( $error_message, 'license' ) !== false ||
+			 strpos( $error_message, 'token' ) !== false ||
+			 strpos( $error_message, 'authentication' ) !== false ||
+			 strpos( $error_message, 'unauthorized' ) !== false ) {
+			return 'auth_error';
+		}
+
+		// API response errors
+		if ( strpos( $error_message, 'api' ) !== false ||
+			 strpos( $error_message, 'status code' ) !== false ||
+			 strpos( $error_message, 'response' ) !== false ) {
+			return 'api_error';
+		}
+
+		// Database errors
+		if ( strpos( $error_message, 'database' ) !== false ||
+			 strpos( $error_message, 'insert' ) !== false ||
+			 strpos( $error_message, 'wp_error' ) !== false ) {
+			return 'database_error';
+		}
+
+		return 'unknown_error';
+	}
+
+	/**
+	 * Mark campaign as completed and log the reason.
+	 *
+	 * @param int    $campaign_id Campaign ID.
+	 * @param string $reason Completion reason.
+	 * @return void
+	 * @since x.x.x
+	 */
+	private function mark_campaign_completed( $campaign_id, $reason ): void {
+		// Mark campaign as completed
+		wp_update_post( [
+			'ID' => $campaign_id,
+			'post_status' => 'draft', // Set to draft to indicate completion/inactivity
+		] );
+
+		// Add completion meta flags
+		Metadata::update_campaign_meta( $campaign_id, 'campaignCompleted', true );
+		Metadata::update_campaign_meta( $campaign_id, 'completedAt', current_time( 'mysql' ) );
+		Metadata::update_campaign_meta( $campaign_id, 'completionReason', $reason );
+
+		// Log completion
+		if ( $reason === 'max_failures_exceeded' ) {
+			$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
+			$max_failures = Metadata::get_campaign_meta( $campaign_id, 'maxFailures' );
+
+			wpaib_log_campaign_error(
+				$campaign_id,
+				'campaign_terminated',
+				sprintf(
+					__( 'Campaign terminated: Maximum failures reached (%d/%d). Please check your settings and try again.', 'wp-ai-blogger' ),
+					$posts_failed,
+					$max_failures
+				),
+				[ 'termination_reason' => $reason, 'posts_failed' => $posts_failed, 'max_failures' => $max_failures ]
+			);
+		}
+
+		// Clear any scheduled events since campaign is now complete
+		wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 	}
 }

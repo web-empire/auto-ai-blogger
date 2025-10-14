@@ -77,27 +77,29 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 		}
 	};
 
-	const formatTimestamp = ( timestamp ) => {
+	const formatTimestamp = ( log ) => {
+		// If we have a pre-formatted date from backend, use it
+		if ( log?.formatted_date ) {
+			return log.formatted_date;
+		}
+
+		// Fallback to timestamp processing for backward compatibility
+		const timestamp = log?.timestamp || log;
 		if ( ! timestamp ) return '';
 
 		try {
 			const date = new Date( timestamp );
 			const now = new Date();
 			const diffMs = now - date;
-			const diffMins = Math.floor( diffMs / 60000 );
-			const diffHours = Math.floor( diffMs / 3600000 );
 			const diffDays = Math.floor( diffMs / 86400000 );
 
-			if ( diffMins < 1 ) {
-				return __( 'Just now', 'wp-ai-blogger' );
-			} else if ( diffMins < 60 ) {
-				return sprintf( __( '%d minutes ago', 'wp-ai-blogger' ), diffMins );
-			} else if ( diffHours < 24 ) {
-				return sprintf( __( '%d hours ago', 'wp-ai-blogger' ), diffHours );
-			} else if ( diffDays < 7 ) {
-				return sprintf( __( '%d days ago', 'wp-ai-blogger' ), diffDays );
-			} else {
+			// For recent events (less than 7 days), show actual date/time
+			// For older events, always show full date/time
+			if ( diffDays >= 1 ) {
 				return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+			} else {
+				// For today's events, show time with "today" indicator
+				return __( 'Today', 'wp-ai-blogger' ) + ' ' + date.toLocaleTimeString();
 			}
 		} catch ( e ) {
 			return timestamp;
@@ -257,7 +259,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 											<div className="flex items-center">
 												<XCircle className="w-5 h-5 text-red-600 mr-2" />
 												<div>
-													<p className="text-sm text-red-600 m-0">{ __( 'Failed', 'wp-ai-blogger' ) }</p>
+													<p className="text-sm text-red-600 m-0">{ __( 'Failed Attempts', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-red-900 m-0">
 														{ campaignData?.postsFailed || 0 }
 													</p>
@@ -423,10 +425,17 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																				<p className="text-xs text-gray-600 mt-1 m-0">{ log.message }</p>
 																			) }
 																		</div>
-																		<div className="flex items-center space-x-2">
-																			<span className="text-xs text-gray-500">
-																				{ formatTimestamp( log.timestamp ) }
+																		<div className="flex flex-col items-end space-y-1">
+																			<span className="text-xs text-gray-700 font-medium">
+																				{ formatTimestamp( log ) }
 																			</span>
+																			{ log.time_ago && (
+																				<span className="text-xs text-gray-500">
+																					{ log.time_ago }
+																				</span>
+																			) }
+																		</div>
+																		<div className="flex items-center space-x-2 ml-3">
 																			{ hasSteps && (
 																				<button
 																					onClick={ () => toggleLogExpansion( logId ) }
@@ -455,7 +464,21 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																			{ log.post_title && (
 																				<span className="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 rounded-full">
 																					<ScrollText className="w-3 h-3 mr-1" />
-																					{ log.post_title.length > 40 ? log.post_title.substring(0, 40) + '...' : log.post_title }
+																					{ log.post_id && log.status === 'success' ? (
+																						<a
+																							href={ `${ wpaib_localized_data.admin_url || '/wp-admin/' }post.php?post=${ log.post_id }&action=edit` }
+																							target="_blank"
+																							rel="noopener noreferrer"
+																							className="text-green-700 no-underline hover:cursor-pointer"
+																							title={ __( 'Edit Post', 'wp-ai-blogger' ) }
+																						>
+																							{ log.post_title.length > 40 ? log.post_title.substring(0, 40) + '...' : log.post_title }
+																						</a>
+																					) : (
+																						<span>
+																							{ log.post_title.length > 40 ? log.post_title.substring(0, 40) + '...' : log.post_title }
+																						</span>
+																					) }
 																				</span>
 																			) }
 																		</div>

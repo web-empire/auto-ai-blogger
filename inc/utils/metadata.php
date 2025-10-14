@@ -115,6 +115,38 @@ class Metadata {
 					'default' => 0,
 					'type'    => 'number',
 				],
+				'maxFailures'             => [
+					'default' => 20,
+					'type'    => 'number',
+				],
+				'errorLogs'               => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'successLogs'             => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'lastError'               => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorType'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorTime'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'completionReason'        => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'campaignCompleted'       => [
+					'default' => false,
+					'type'    => 'boolean',
+				],
 				'maxWords'                => [
 					'default' => 1000,
 					'type'    => 'number',

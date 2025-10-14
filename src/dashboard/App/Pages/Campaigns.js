@@ -50,6 +50,7 @@ export default function Campaigns() {
 
 	const configureCampaign = ( e ) => {
 		e.preventDefault();
+		e.stopPropagation();
 		setOpeningConfigureDrawer( true );
 
 		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
@@ -78,6 +79,7 @@ export default function Campaigns() {
 
 	const openCampaignAnalytics = ( e, campaignId ) => {
 		e.preventDefault();
+		e.stopPropagation();
 
 		// Get the campaign data
 		const campaignData = campaigns[ campaignId ];
@@ -92,6 +94,7 @@ export default function Campaigns() {
 
 	const openCampaignLogs = ( e, campaignId ) => {
 		e.preventDefault();
+		e.stopPropagation();
 
 		// Get the campaign data
 		const campaignData = campaigns[ campaignId ];
@@ -106,6 +109,7 @@ export default function Campaigns() {
 
 	const viewCampaignPosts = ( e, campaignId ) => {
 		e.preventDefault();
+		e.stopPropagation();
 
 		// Get the campaign data to determine the post type
 		const campaignData = campaigns[ campaignId ];
@@ -127,6 +131,7 @@ export default function Campaigns() {
 
 	const openDeleteModal = ( e, campaignId ) => {
 		e.preventDefault();
+		e.stopPropagation();
 
 		// Get the campaign data
 		const campaignData = campaigns[ campaignId ];
@@ -307,7 +312,7 @@ export default function Campaigns() {
 														{ __( 'Status', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-														{ __( 'Created (Scheduled)/Target', 'wp-ai-blogger' ) }
+														{ __( 'Results', 'wp-ai-blogger' ) }
 													</th>
 													<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
 														{ __( 'Latest Post', 'wp-ai-blogger' ) }
@@ -330,8 +335,8 @@ export default function Campaigns() {
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 															{(() => {
-																// Parse posts from postsTarget string
-																// Formats: "created / target" or "created (scheduled) / target"
+																// Parse campaign statistics
+																// Display: Success count, Failed attempts, and Target
 																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
 																const leftPart = postsTargetParts[0] || '0';
 																const postsTarget = parseInt(postsTargetParts[1]) || 0;
@@ -353,7 +358,12 @@ export default function Campaigns() {
 																	postsScheduled = postsCreated; // Assume same if not shown separately
 																}
 
-																const isTargetMet = postsTarget > 0 && postsScheduled >= postsTarget;
+																// Two conditions for campaign completion:
+																// 1. Successfully created all target posts (e.g., 20 of 20)
+																// 2. All attempts completed but target not fully met (e.g., 15 of 20 with all attempts exhausted)
+																const isTargetFullyMet = postsTarget > 0 && postsCreated >= postsTarget;
+																const isAllAttemptsCompleted = campaign.campaignCompleted === true;
+																const isTargetMet = isTargetFullyMet || isAllAttemptsCompleted;
 																const isUpdating = updatingStatus[ campaign.id ] || false;
 
 																return (
@@ -366,7 +376,11 @@ export default function Campaigns() {
 																		/>
 																		{ isTargetMet && (
 																			<Tooltip
-																				text={ __( 'Campaign completed - All posts have been scheduled.', 'wp-ai-blogger' ) }
+																				text={
+																					isTargetFullyMet
+																						? __( 'Campaign completed - All target posts have been successfully created.', 'wp-ai-blogger' )
+																						: __( 'Campaign completed - All attempts have been exhausted. Some posts could not be created due to failures.', 'wp-ai-blogger' )
+																				}
 																				delay={ 100 }
 																				className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																			>
@@ -378,8 +392,55 @@ export default function Campaigns() {
 															})()}
 														</td>
 
-														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{ campaign.postsTarget }
+														<td className="whitespace-nowrap px-3 py-4 text-sm">
+															{(() => {
+																// Parse campaign statistics for clean display
+																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
+																const leftPart = postsTargetParts[0] || '0';
+																const postsTarget = parseInt(postsTargetParts[1]) || 0;
+
+																// Parse success and remaining counts
+																let postsCreated = 0;
+																let postsRemaining = 0;
+
+																if (leftPart.includes('(')) {
+																	// Format: "created (scheduled)" - extract created count
+																	const createdMatch = leftPart.match(/^(\d+)\s*\((\d+)\)$/);
+																	if (createdMatch) {
+																		postsCreated = parseInt(createdMatch[1]) || 0;
+																	}
+																} else {
+																	// Format: "created" only
+																	postsCreated = parseInt(leftPart) || 0;
+																}
+
+																// Calculate remaining posts that couldn't be generated
+																// Remaining = Target - Successfully Created
+																postsRemaining = Math.max(0, postsTarget - postsCreated);
+
+																// Check if campaign is completed (inactive, target met, or all attempts exhausted)
+																const isCompleted = campaign.status === 'draft' ||
+																	(postsTarget > 0 && postsCreated >= postsTarget) ||
+																	campaign.campaignCompleted === true;
+
+																return (
+																	<div className="flex flex-col gap-1">
+																		<div className="flex items-center gap-2">
+																			<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+																				Success: { postsCreated }
+																			</span>
+																			{ postsRemaining > 0 && isCompleted && (
+																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+																					Undelivered: { postsRemaining }
+																				</span>
+																			) }
+																			<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+																				Target: { postsTarget }
+																			</span>
+																		</div>
+																	</div>
+																);
+															})()}
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -486,16 +547,64 @@ export default function Campaigns() {
 																</Tooltip>
 															</button>
 
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																openCampaignLogs( e, campaign.id );
-															} }>
-																<Tooltip text={ __( 'Logs', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<ScrollText className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
-																</Tooltip>
-															</button>
+															{(() => {
+																// Check if campaign is completed to enable/disable logs
+																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
+																const leftPart = postsTargetParts[0] || '0';
+																const postsTarget = parseInt(postsTargetParts[1]) || 0;
+
+																// Parse success count
+																let postsCreated = 0;
+																let postsScheduled = 0;
+
+																if (leftPart.includes('(')) {
+																	// Format: "created (scheduled)"
+																	const createdMatch = leftPart.match(/^(\d+)\s*\((\d+)\)$/);
+																	if (createdMatch) {
+																		postsCreated = parseInt(createdMatch[1]) || 0;
+																		postsScheduled = parseInt(createdMatch[2]) || 0;
+																	}
+																} else {
+																	// Format: "created" only
+																	postsCreated = parseInt(leftPart) || 0;
+																	postsScheduled = postsCreated;
+																}
+
+																// Campaign is completed if:
+																// 1. Status is draft (inactive), OR
+																// 2. Target is fully met (created >= target), OR
+																// 3. All attempts completed (campaignCompleted flag is true)
+																const isCompleted = campaign.status === 'draft' ||
+																	(postsTarget > 0 && postsCreated >= postsTarget) ||
+																	campaign.campaignCompleted === true;																const logsTooltipText = isCompleted
+																	? __( 'View Campaign Logs', 'wp-ai-blogger' )
+																	: __( 'Logs will be available after campaign execution is complete', 'wp-ai-blogger' );
+
+																return (
+																	<button
+																		type="button"
+																		className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 ${
+																			isCompleted
+																				? 'text-gray-500 hover:text-indigo-900 cursor-pointer'
+																				: 'text-gray-300 cursor-not-allowed'
+																		}` }
+																		data-campaign_id={ campaign.id }
+																		onClick={ isCompleted ? ( e ) => {
+																			e.preventDefault();
+																			e.stopPropagation();
+																			openCampaignLogs( e, campaign.id );
+																		} : undefined }
+																		disabled={ !isCompleted }
+																	>
+																		<Tooltip text={ logsTooltipText }
+																			delay={ 100 }
+																			className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																		>
+																			<ScrollText className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																		</Tooltip>
+																	</button>
+																);
+															})()}
 
 															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																openDeleteModal( e, campaign.id );
