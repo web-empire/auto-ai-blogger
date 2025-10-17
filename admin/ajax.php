@@ -2169,7 +2169,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function generate_sample_campaign_logs( $campaign_id ): array {
-		$campaign_data = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id );
+		$campaign_data = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );
 		$posts_created = intval( $campaign_data['postsCreated'] ?? 0 );
 		$posts_failed = intval( $campaign_data['postsFailed'] ?? 0 );
 		$posts_scheduled = intval( $campaign_data['postsScheduled'] ?? 0 );

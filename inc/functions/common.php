@@ -115,7 +115,7 @@ function wpaib_get_all_campaigns() {
 					continue;
 				}
 
-				$campaign_data = Metadata::get_campaign_data( $campaign->ID );
+				$campaign_data = Metadata::get_campaign_data( $campaign->ID, true );
 
 				// Sanitize campaign data.
 				if ( is_array( $campaign_data ) && ! empty( $campaign_data ) ) {
@@ -820,7 +820,8 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
 		'type'             => $error_type,
 		'message'          => $error_message,
 		'context'          => array_map( 'sanitize_text_field', (array) $context ),
-		'attempt'          => count( $existing_logs ) + 1,
+		'post_number'      => $context['post_number'] ?? 1,
+		'attempt_number'   => $context['attempt'] ?? 1,
 	] );	// Add to existing logs (keep only last 50 entries).
 	$existing_logs[] = $error_log_entry;
 	if ( count( $existing_logs ) > 50 ) {
@@ -885,8 +886,6 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
 		'context'        => array_map( 'sanitize_text_field', (array) $context ),
 		'post_number'    => $context['post_number'] ?? ( count( $existing_logs ) + 1 ),
 		'attempt_number' => $context['attempt_number'] ?? 1,
-		// Keep old field for backward compatibility
-		'attempt'        => $context['post_number'] ?? ( count( $existing_logs ) + 1 ),
 	] );
 
 	// Add to existing logs (keep only last 50 entries)

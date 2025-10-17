@@ -213,20 +213,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-blue-600 m-0">{ __( 'Scheduled', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-blue-900 m-0">
-														{ (() => {
-															// Parse postsScheduled from campaign data
-															if (campaignData?.postsScheduled !== undefined) {
-																return campaignData.postsScheduled;
-															}
-															// Fallback: try to parse from postsTarget display
-															const postsTargetParts = campaignData?.postsTarget ? campaignData.postsTarget.toString().split(' / ') : ['0', '0'];
-															const leftPart = postsTargetParts[0] || '0';
-															if (leftPart.includes('(')) {
-																const match = leftPart.match(/\((\d+)\)/);
-																return match ? parseInt(match[1]) || 0 : 0;
-															}
-															return parseInt(leftPart) || 0;
-														})() }
+														{ parseInt(campaignData?.postsScheduled) || 0 }
 													</p>
 												</div>
 											</div>
@@ -237,20 +224,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-green-600 m-0">{ __( 'Successful', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-green-900 m-0">
-														{ (() => {
-															// Parse postsCreated from campaign data
-															if (campaignData?.postsCreated !== undefined) {
-																return campaignData.postsCreated;
-															}
-															// Fallback: try to parse from postsTarget display
-															const postsTargetParts = campaignData?.postsTarget ? campaignData.postsTarget.toString().split(' / ') : ['0', '0'];
-															const leftPart = postsTargetParts[0] || '0';
-															if (leftPart.includes('(')) {
-																const match = leftPart.match(/^(\d+)/);
-																return match ? parseInt(match[1]) || 0 : 0;
-															}
-															return parseInt(leftPart) || 0;
-														})() }
+														{ parseInt(campaignData?.postsCreated) || 0 }
 													</p>
 												</div>
 											</div>
@@ -272,111 +246,128 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-gray-600 m-0">{ __( 'Target', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-gray-900 m-0">
-														{ (() => {
-															// Parse target from postsTarget display
-															const postsTargetParts = campaignData?.postsTarget ? campaignData.postsTarget.toString().split(' / ') : ['0', '0'];
-															return parseInt(postsTargetParts[1]) || 0;
-														})() }
+														{ parseInt(campaignData?.postsTarget) || 0 }
 													</p>
 												</div>
 											</div>
 										</div>
 									</div>
 
-									{/* Campaign Info Bar */}
-									<div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-										<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-											<div>
-												<span className="font-medium text-gray-700">{ __( 'Campaign Status:', 'wp-ai-blogger' ) }</span>
-												<span className={ (() => {
-													// Check if campaign is explicitly marked as completed
-													if (campaignData?.campaignCompleted) {
-														return 'ml-2 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
-													}
-
-													// Parse campaign numbers
-													const postsCreated = campaignData?.postsCreated || 0;
-													const postsScheduled = (() => {
-														if (campaignData?.postsScheduled !== undefined) {
-															return campaignData.postsScheduled;
-														}
-														// Fallback: parse from postsTarget display
-														const postsTargetParts = campaignData?.postsTarget ? campaignData.postsTarget.toString().split(' / ') : ['0', '0'];
-														const leftPart = postsTargetParts[0] || '0';
-														if (leftPart.includes('(')) {
-															const match = leftPart.match(/\((\d+)\)/);
-															return match ? parseInt(match[1]) || 0 : 0;
-														}
-														return parseInt(leftPart) || 0;
-													})();
-													const postsTarget = (() => {
-														if (campaignData?.postsTarget !== undefined) {
-															const targetStr = campaignData.postsTarget.toString();
-															// Handle "created (scheduled) / target" format
-															const targetMatch = targetStr.match(/\/\s*(\d+)$/);
-															return targetMatch ? parseInt(targetMatch[1]) : parseInt(targetStr) || 0;
-														}
-														return 0;
-													})();
-
-													// Check if completed (scheduled >= target OR created >= target)
-													if (postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget)) {
-														return 'ml-2 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
-													} else if (campaignData?.status === 'publish') {
-														return 'ml-2 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
-													} else {
-														return 'ml-2 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
-													}
-												})() }>
-													{ (() => {
-														// Check if campaign is explicitly marked as completed
-														if (campaignData?.campaignCompleted) {
-															return __( 'Completed', 'wp-ai-blogger' );
-														}
-
-														// Parse campaign numbers
-														const postsCreated = campaignData?.postsCreated || 0;
-														const postsScheduled = (() => {
-															if (campaignData?.postsScheduled !== undefined) {
-																return campaignData.postsScheduled;
+									{/* Campaign Info Cards */}
+									<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+										{/* Start Date Card */}
+										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+											<div className="flex items-center justify-between">
+												<div className="flex-1">
+													<p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+														{ __( 'Start Date', 'wp-ai-blogger' ) }
+													</p>
+													<p className="text-sm font-medium text-gray-900">
+														{ (() => {
+															if (campaignData?.startDate && campaignData.startDate.trim() !== '') {
+																// Parse the lastRun format to match it exactly
+																const startDate = new Date(campaignData.startDate);
+																const formattedDate = startDate.toLocaleDateString('en-US', {
+																	month: 'long',
+																	day: 'numeric',
+																	year: 'numeric'
+																});
+																const formattedTime = startDate.toLocaleTimeString('en-US', {
+																	hour: 'numeric',
+																	minute: '2-digit',
+																	hour12: true
+																}).toLowerCase();
+																return `${formattedDate} ${formattedTime}`;
+															} else if (campaignData?.created_at) {
+																const createdDate = new Date(campaignData.created_at);
+																const formattedDate = createdDate.toLocaleDateString('en-US', {
+																	month: 'long',
+																	day: 'numeric',
+																	year: 'numeric'
+																});
+																const formattedTime = createdDate.toLocaleTimeString('en-US', {
+																	hour: 'numeric',
+																	minute: '2-digit',
+																	hour12: true
+																}).toLowerCase();
+																return `${formattedDate} ${formattedTime}`;
+															} else {
+																return __( 'Not set', 'wp-ai-blogger' );
 															}
-															// Fallback: parse from postsTarget display
-															const postsTargetParts = campaignData?.postsTarget ? campaignData.postsTarget.toString().split(' / ') : ['0', '0'];
-															const leftPart = postsTargetParts[0] || '0';
-															if (leftPart.includes('(')) {
-																const match = leftPart.match(/\((\d+)\)/);
-																return match ? parseInt(match[1]) || 0 : 0;
-															}
-															return parseInt(leftPart) || 0;
-														})();
-														const postsTarget = (() => {
-															if (campaignData?.postsTarget !== undefined) {
-																const targetStr = campaignData.postsTarget.toString();
-																// Handle "created (scheduled) / target" format
-																const targetMatch = targetStr.match(/\/\s*(\d+)$/);
-																return targetMatch ? parseInt(targetMatch[1]) : parseInt(targetStr) || 0;
-															}
-															return 0;
-														})();
-
-														// Check if completed (scheduled >= target OR created >= target)
-														if (postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget)) {
-															return __( 'Completed', 'wp-ai-blogger' );
-														} else if (campaignData?.status === 'publish') {
-															return __( 'Active', 'wp-ai-blogger' );
-														} else {
-															return __( 'Inactive', 'wp-ai-blogger' );
-														}
-													})() }
-												</span>
+														})() }
+													</p>
+												</div>
 											</div>
-											<div>
-												<span className="font-medium text-gray-700">{ __( 'Last Run:', 'wp-ai-blogger' ) }</span>
-												<span className="ml-2 text-gray-600">{ campaignData?.lastRun || __( 'Never', 'wp-ai-blogger' ) }</span>
+										</div>
+
+										{/* End Date Card */}
+										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+											<div className="flex items-center justify-between">
+												<div className="flex-1">
+													<p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+														{ __( 'End Date', 'wp-ai-blogger' ) }
+													</p>
+													<p className="text-sm font-medium text-gray-900">
+														{ (() => {
+															// Check if campaign is completed
+															const postsCreated = parseInt(campaignData?.postsCreated) || 0;
+															const postsScheduled = parseInt(campaignData?.postsScheduled) || 0;
+															const postsTarget = parseInt(campaignData?.postsTarget) || 0;
+															const isCompleted = campaignData?.campaignCompleted ||
+																(postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget));
+
+															if (isCompleted) {
+																// If completed, show the last run date as end date
+																if (campaignData?.lastRun && campaignData.lastRun !== 'Not Started Yet.') {
+																	return campaignData.lastRun;
+																} else {
+																	return __( 'Recently completed', 'wp-ai-blogger' );
+																}
+															} else if (campaignData?.status === 'publish') {
+																return __( 'In progress', 'wp-ai-blogger' );
+															} else {
+																return __( 'Not started', 'wp-ai-blogger' );
+															}
+														})() }
+													</p>
+												</div>
 											</div>
-											<div>
-												<span className="font-medium text-gray-700">{ __( 'Frequency:', 'wp-ai-blogger' ) }</span>
-												<span className="ml-2 text-gray-600">{ campaignData?.frequency || __( 'Not set', 'wp-ai-blogger' ) }</span>
+										</div>
+
+										{/* Frequency Card */}
+										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+											<div className="flex items-center justify-between">
+												<div className="flex-1">
+													<p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+														{ __( 'Frequency', 'wp-ai-blogger' ) }
+													</p>
+													<p className="text-sm font-medium text-gray-900 truncate">
+														{ (() => {
+															// Check if campaign is completed
+															const postsCreated = parseInt(campaignData?.postsCreated) || 0;
+															const postsScheduled = parseInt(campaignData?.postsScheduled) || 0;
+															const postsTarget = parseInt(campaignData?.postsTarget) || 0;
+															const isCompleted = campaignData?.campaignCompleted ||
+																(postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget));
+
+															if (isCompleted) {
+																// For completed campaigns, show "Daily once" or similar
+																const freq = campaignData?.frequency || '';
+																if (freq.toLowerCase().includes('daily') || freq.includes('1') || freq.includes('day')) {
+																	return __( 'Daily once', 'wp-ai-blogger' );
+																} else if (freq.toLowerCase().includes('weekly') || freq.includes('week')) {
+																	return __( 'Weekly once', 'wp-ai-blogger' );
+																} else if (freq.toLowerCase().includes('hourly') || freq.includes('hour')) {
+																	return __( 'Hourly once', 'wp-ai-blogger' );
+																} else {
+																	return freq || __( 'Daily once', 'wp-ai-blogger' );
+																}
+															} else {
+																return campaignData?.frequency || __( 'Not set', 'wp-ai-blogger' );
+															}
+														})() }
+													</p>
+												</div>
 											</div>
 										</div>
 									</div>

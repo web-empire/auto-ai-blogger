@@ -84,54 +84,48 @@ class CronHandler {
 				// Log success with post and attempt information
 				wpaib_log_campaign_success(
 					$campaign_id,
-					$result['post_id'] ?? null,
+					$result['post_id'],
 					[
-						'post_number'      => $target_post_number,
-						'attempt_number'   => $current_attempt,
-						'campaign_id'      => $campaign_id,
-						'posts_created'    => $posts_created + 1, // Will be incremented after this
-						'posts_scheduled'  => $posts_scheduled + 1,
-						'post_title'       => $result['post_title'] ?? null,
-						'execution_time'   => current_time( 'mysql' ),
-						'message'          => sprintf(
-							__( 'Post #%d Created Successfully - Attempt #%d', 'wp-ai-blogger' ),
+						'post_title'     => $result['post_title'],
+						'post_number'    => $target_post_number,
+						'attempt_number' => $current_attempt,
+						'message'        => sprintf(
+							'Post #%d created successfully on attempt #%d',
 							$target_post_number,
 							$current_attempt
 						),
 					]
 				);
 
-				$this->schedule_next_post( $campaign_id );
+				// Schedule next post with normal frequency after success
+				$this->schedule_next_post( $campaign_id, false );
 			} else {
 				// Log detailed error information with post and attempt numbers
 				$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
 				$context = [
-					'post_number'      => $target_post_number,
-					'attempt_number'   => $current_attempt,
-					'campaign_id'      => $campaign_id,
-					'posts_created'    => $posts_created,
-					'posts_scheduled'  => $posts_scheduled + 1,
-					'posts_failed'     => $posts_failed + 1, // Will be incremented after this
-					'keywords'         => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
-					'execution_time'   => current_time( 'mysql' ),
+					'post_number' => $target_post_number,
+					'attempt_number' => $current_attempt,
+					'error_type'  => $error_type,
+					'posts_created' => $posts_created,
+					'posts_scheduled' => $posts_scheduled + 1, // Include the current attempt
+					'posts_failed' => $posts_failed + 1,
 				];
 
 				$error_message = sprintf(
-					__( 'Post #%d Creation Failed - Attempt #%d: %s', 'wp-ai-blogger' ),
+					'Post #%d creation failed on attempt #%d: %s',
 					$target_post_number,
 					$current_attempt,
-					$result['message'] ?? __( 'Unknown error occurred during post creation', 'wp-ai-blogger' )
+					$result['message'] ?? 'Unknown error'
 				);
 
 				wpaib_log_campaign_error(
 					$campaign_id,
-					$error_type,
 					$error_message,
 					$context
 				);
 
-				// Still schedule next post even if this one failed (continue the campaign)
-				$this->schedule_next_post( $campaign_id );
+				// Schedule retry with short interval after failure
+				$this->schedule_next_post( $campaign_id, true );
 			}
 		} catch ( \Exception $e ) {
 			return;
@@ -341,11 +335,12 @@ class CronHandler {
 	/**
 	 * Schedule the next post for this campaign.
 	 *
-	 * @param int $campaign_id Campaign ID.
+	 * @param int  $campaign_id Campaign ID.
+	 * @param bool $is_retry Whether this is a retry after failure.
 	 * @return void
 	 * @since x.x.x
 	 */
-	private function schedule_next_post( $campaign_id ): void {
+	private function schedule_next_post( $campaign_id, $is_retry = false ): void {
 		try {
 			// Check if campaign is already completed
 			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
@@ -373,8 +368,16 @@ class CronHandler {
 				return;
 			}
 
-			$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
-			$next_run         = time() + $interval_seconds;
+			// Determine scheduling interval
+			if ( $is_retry ) {
+				// For retries after failures, use a short interval (2 minutes)
+				$interval_seconds = apply_filters( 'wpaib_retry_interval_seconds', 120 ); // 2 minutes default
+			} else {
+				// For successful posts, use normal campaign frequency
+				$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+			}
+
+			$next_run = time() + $interval_seconds;
 
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 
