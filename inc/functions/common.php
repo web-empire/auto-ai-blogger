@@ -821,7 +821,7 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
 		'message'          => $error_message,
 		'context'          => array_map( 'sanitize_text_field', (array) $context ),
 		'post_number'      => $context['post_number'] ?? 1,
-		'attempt_number'   => $context['attempt'] ?? 1,
+		'attempt_number'   => $context['attempt_number'] ?? $context['attempt'] ?? 1,
 	] );	// Add to existing logs (keep only last 50 entries).
 	$existing_logs[] = $error_log_entry;
 	if ( count( $existing_logs ) > 50 ) {
@@ -834,9 +834,7 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
 	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'lastErrorType', $error_type );
 	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'lastErrorTime', $timestamp_data['timestamp'] );
 
-	// Increment failed posts counter.
-	$posts_failed = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'postsFailed', intval( $posts_failed ) + 1 );
+	// Note: Failed posts counter is now incremented in the cron handler to avoid double counting
 }
 
 /**

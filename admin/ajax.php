@@ -1788,7 +1788,6 @@ class Ajax {
 		try {
 			// Only schedule if campaign is active and has valid scheduling data.
 			if ( empty( $meta_input['repeatInterval'] ) || empty( $meta_input['repeatUnit'] ) ) {
-
 				return;
 			}
 
@@ -1808,30 +1807,23 @@ class Ajax {
 				return;
 			}
 
-			// If campaign status is draft, try to update it to publish if user intended it to be active.
+			// Only schedule if campaign is published.
 			if ( $campaign_post->post_status !== 'publish' ) {
-				// Check if user set status to publish in the form.
-				$intended_status = $meta_input['status'] ?? null;
+				return;
+			}
 
-				if ( $intended_status === 'publish' ) {
-					// User wants the campaign to be active, update the post status.
-					wp_update_post(
-						[
-							'ID'          => $campaign_id,
-							'post_status' => 'publish',
-						]
-					);
-				} else {
-					return;
-				}
+			// Check if campaign is already completed
+			$campaign_completed = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
+			if ( $campaign_completed ) {
+				return;
 			}
 
 			// Calculate interval in seconds.
 			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
 
-			// Get the start date from campaign metadata
+			// Default start time
+			$start_timestamp = time() + 60; // 1 minute from now
 			$start_date = $meta_input['startDate'] ?? '';
-			$start_timestamp = time() + 60; // Default fallback: 1 minute from now
 
 			if ( ! empty( $start_date ) ) {
 				// Convert datetime-local format to timestamp
@@ -1854,9 +1846,9 @@ class Ajax {
 						// If the start date is in the past, start in 1 minute
 						$start_timestamp = time() + 60;
 					}
+					}
+					// If parsing fails, use the default (1 minute from now)
 				}
-				// If parsing fails, use the default (1 minute from now)
-			}
 
 			// Schedule only the first post at the user-defined start date/time
 			// The CronHandler will handle scheduling subsequent posts after each creation

@@ -53,28 +53,29 @@ class CronHandler {
 				return;
 			}
 
-			$wp_status   = $campaign->post_status;
-			$meta_status = Metadata::get_campaign_meta( $campaign_id, 'status' );
-			$is_active   = ( $meta_status === 'publish' || $wp_status === 'publish' );
+			$wp_status = $campaign->post_status;
+			$is_active = ( $wp_status === 'publish' );
 
 			if ( ! $is_active ) {
 				return;
 			}
 
-			// Get current campaign statistics
-			$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
-			$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
-			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
+		// Get current campaign statistics
+		$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
+		$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
+		$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
 
-			// Calculate which post number we're trying to create (next post after created ones)
-			$target_post_number = $posts_created + 1;
+		// Calculate which post number we're trying to create
+		// Post number = posts already created + 1 (next post to create)
+		$target_post_number = $posts_created + 1;
 
-			// Calculate attempt number for this specific post
-			// Attempt = (total_scheduled - posts_created) - failed_attempts_for_previous_posts + 1
-			// Since we're about to increment scheduled, current attempt = (scheduled - created) + 1
-			$current_attempt = ( $posts_scheduled - $posts_created ) + 1;
-
-			// Update scheduled count at the beginning of attempt (regardless of success/failure)
+		// Calculate attempt number for this specific post
+		// For the current post being attempted:
+		// - If this is the first attempt: attempt = 1
+		// - If retries: attempt = (total_scheduled - posts_created - posts_failed) + 1
+		// This ensures we count attempts correctly per post
+		$pending_attempts = $posts_scheduled - $posts_created;
+		$current_attempt = $pending_attempts + 1;			// Update scheduled count at the beginning of attempt (regardless of success/failure)
 			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', $posts_scheduled + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
 
@@ -100,31 +101,36 @@ class CronHandler {
 				// Schedule next post with normal frequency after success
 				$this->schedule_next_post( $campaign_id, false );
 			} else {
-				// Log detailed error information with post and attempt numbers
-				$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
-				$context = [
-					'post_number' => $target_post_number,
-					'attempt_number' => $current_attempt,
-					'error_type'  => $error_type,
-					'posts_created' => $posts_created,
-					'posts_scheduled' => $posts_scheduled + 1, // Include the current attempt
-					'posts_failed' => $posts_failed + 1,
-				];
+			// Log detailed error information with post and attempt numbers
+			$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
 
-				$error_message = sprintf(
-					'Post #%d creation failed on attempt #%d: %s',
-					$target_post_number,
-					$current_attempt,
-					$result['message'] ?? 'Unknown error'
-				);
+			// Increment failed counter before logging
+			$posts_failed = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
+			$new_posts_failed = $posts_failed + 1;
+			Metadata::update_campaign_meta( $campaign_id, 'postsFailed', $new_posts_failed );
 
-				wpaib_log_campaign_error(
-					$campaign_id,
-					$error_message,
-					$context
-				);
+			$context = [
+				'post_number' => $target_post_number,
+				'attempt_number' => $current_attempt,
+				'error_type'  => $error_type,
+				'posts_created' => $posts_created,
+				'posts_scheduled' => $posts_scheduled + 1, // Include the current attempt
+				'posts_failed' => $new_posts_failed,
+			];
 
-				// Schedule retry with short interval after failure
+			$error_message = sprintf(
+				'Post #%d creation failed on attempt #%d: %s',
+				$target_post_number,
+				$current_attempt,
+				$result['message'] ?? 'Unknown error'
+			);
+
+			wpaib_log_campaign_error(
+				$campaign_id,
+				$error_type,
+				$error_message,
+				$context
+			);				// Schedule retry with short interval after failure
 				$this->schedule_next_post( $campaign_id, true );
 			}
 		} catch ( \Exception $e ) {
