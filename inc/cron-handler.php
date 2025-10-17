@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
-class CronHandler {
+class Cron_Handler {
 	use Get_Instance;
 
 	/**
@@ -136,7 +136,7 @@ class CronHandler {
 				wp_set_post_tags( $post_id, $tag );
 			}
 
-			// Add campaign reference meta to the post
+			// Add campaign reference meta to the post.
 			add_post_meta( $post_id, 'wp_aib_reference', 1 );
 			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
@@ -272,7 +272,7 @@ class CronHandler {
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
 
-		// Production mode: Normal intervals
+		// Production mode: Normal intervals.
 		switch ( $unit ) {
 			case 'hour':
 				$seconds = $interval * HOUR_IN_SECONDS;
@@ -289,8 +289,8 @@ class CronHandler {
 			default:
 				$seconds = $interval * DAY_IN_SECONDS;
 		}
-		
-		// Allow testing plugins to modify intervals
+
+		// Allow testing plugins to modify intervals.
 		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
 	}
 }

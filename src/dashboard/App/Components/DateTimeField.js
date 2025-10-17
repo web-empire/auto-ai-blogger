@@ -18,7 +18,7 @@ const DateTimeField = forwardRef( ( {
 	error = '',
 	helperText = '',
 	className = '',
-	placeholder = '',
+	placeholder = '', // eslint-disable-line
 	'aria-label': ariaLabel,
 	'aria-describedby': ariaDescribedBy,
 	...props
@@ -51,7 +51,7 @@ const DateTimeField = forwardRef( ( {
 				const displayTime = new Date( `1970-01-01T${ timeValue }` ).toLocaleTimeString( [], {
 					hour: '2-digit',
 					minute: '2-digit',
-					hour12: true
+					hour12: true,
 				} );
 				options.push( { value: timeValue, label: displayTime } );
 			}
@@ -110,7 +110,7 @@ const DateTimeField = forwardRef( ( {
 
 			return {
 				date: `${ year }-${ month }-${ day }`,
-				time: `${ hours }:${ minutes }`
+				time: `${ hours }:${ minutes }`,
 			};
 		} catch ( e ) {
 			return { date: '', time: '' };
@@ -198,7 +198,7 @@ const DateTimeField = forwardRef( ( {
 			return []; // No valid times for today
 		}
 
-		return allOptions.filter( option => option.value >= minTime );
+		return allOptions.filter( ( option ) => option.value >= minTime );
 	}, [ selectedDate, generateTimeOptions, getMinDate, getMinTimeForToday ] );
 
 	// Enhanced focus handlers
@@ -238,7 +238,7 @@ const DateTimeField = forwardRef( ( {
 	return (
 		<div className={ `datetime-field-wrapper ${ className }` }>
 			<div className="grid grid-cols-2 gap-3">
-				{/* Date Input */}
+				{ /* Date Input */ }
 				<div>
 					<label htmlFor={ `${ inputId }-date` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
 						{ __( 'Date', 'wp-ai-blogger' ) }
@@ -260,7 +260,7 @@ const DateTimeField = forwardRef( ( {
 					/>
 				</div>
 
-				{/* Time Select */}
+				{ /* Time Select */ }
 				<div>
 					<label htmlFor={ `${ inputId }-time` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
 						{ __( 'Time', 'wp-ai-blogger' ) }
@@ -311,7 +311,7 @@ const DateTimeField = forwardRef( ( {
 				</p>
 			) }
 
-			{/* Hidden input for form compatibility */}
+			{ /* Hidden input for form compatibility */ }
 			<input
 				ref={ ref }
 				type="hidden"

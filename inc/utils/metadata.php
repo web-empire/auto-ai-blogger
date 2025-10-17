@@ -160,7 +160,7 @@ class Metadata {
 			return self::get_default_option( $key );
 		}
 
-		// Validate key format (allow alphanumeric and camelCase)
+		// Validate key format (allow alphanumeric and camelCase).
 		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return self::get_default_option( $key );
 		}
@@ -215,7 +215,7 @@ class Metadata {
 			return false;
 		}
 
-		// Validate key format (allow alphanumeric and camelCase)
+		// Validate key format (allow alphanumeric and camelCase).
 		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return false;
 		}

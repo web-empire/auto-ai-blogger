@@ -135,7 +135,7 @@ export default function Campaigns() {
 			return;
 		}
 
-		setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: true }) );
+		setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: true } ) );
 
 		try {
 			const newStatus = currentStatus === 'publish' ? 'draft' : 'publish';
@@ -148,7 +148,7 @@ export default function Campaigns() {
 				...campaignData,
 				id: campaignId,
 				status: newStatus,
-				type: 'edit'
+				type: 'edit',
 			};
 
 			const formData = new window.FormData();
@@ -164,13 +164,13 @@ export default function Campaigns() {
 
 			if ( response.success ) {
 				// Update the local campaigns state without page refresh
-				setCampaigns( prevCampaigns => ({
+				setCampaigns( ( prevCampaigns ) => ( {
 					...prevCampaigns,
 					[ campaignId ]: {
 						...prevCampaigns[ campaignId ],
-						status: newStatus
-					}
-				}) );
+						status: newStatus,
+					},
+				} ) );
 			} else {
 				console.error( 'Failed to update campaign status:', response );
 				// Optionally show an error message to the user
@@ -178,7 +178,7 @@ export default function Campaigns() {
 		} catch ( error ) {
 			console.error( 'Error updating campaign status:', error );
 		} finally {
-			setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: false }) );
+			setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: false } ) );
 		}
 	};
 
@@ -306,11 +306,11 @@ export default function Campaigns() {
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{(() => {
+															{ ( () => {
 																// Parse posts created and target from postsTarget string (format: "created / target")
-																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split(' / ') : ['0', '0'];
-																const postsCreated = parseInt(postsTargetParts[0]) || 0;
-																const postsTarget = parseInt(postsTargetParts[1]) || 0;
+																const postsTargetParts = campaign.postsTarget ? campaign.postsTarget.toString().split( ' / ' ) : [ '0', '0' ];
+																const postsCreated = parseInt( postsTargetParts[ 0 ] ) || 0;
+																const postsTarget = parseInt( postsTargetParts[ 1 ] ) || 0;
 																const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
 																const isUpdating = updatingStatus[ campaign.id ] || false;
 
@@ -333,7 +333,7 @@ export default function Campaigns() {
 																		) }
 																	</div>
 																);
-															})()}
+															} )() }
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -368,10 +368,10 @@ export default function Campaigns() {
 																		? new Date( campaign.startDate ).toLocaleString()
 																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString()
 																}` }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																delay={ 100 }
+																className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<CalendarArrowUp className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<CalendarArrowUp className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -380,7 +380,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Info className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<Info className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -391,7 +391,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<List className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<List className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -402,9 +402,9 @@ export default function Campaigns() {
 																>
 																	{
 																		openingConfigureDrawer ? (
-																			<RotateCw className="w-4 h-4 animate-spin" style={{ outline: 'none' }} tabIndex="-1" />
+																			<RotateCw className="w-4 h-4 animate-spin" style={ { outline: 'none' } } tabIndex="-1" />
 																		) : (
-																			<Settings className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																			<Settings className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																		)
 																	}
 																</Tooltip>
@@ -417,7 +417,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<ChartNoAxesColumn className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<ChartNoAxesColumn className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -428,7 +428,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Trash2 className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<Trash2 className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 														</td>
