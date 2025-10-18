@@ -173,3 +173,6 @@ strtotime
 typenow
 userdata
 whatsapp
+datetime
+DDTHH
+gmdate

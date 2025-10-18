@@ -1,17 +1,32 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Call to an undefined method object\\:\\:generate_post_from_campaign\\(\\)\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Call to function is_wp_error\\(\\) with 0 will always evaluate to false\\.$#"
 			count: 4
 			path: admin/ajax.php
 
 		-
 			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
-			count: 4
+			count: 5
 			path: admin/ajax.php
 
 		-
 			message: "#^Cannot access offset 'metadata' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'post_content' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -21,12 +36,27 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Cannot access offset 'post_title' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Cannot access offset 'post_type' on mixed\\.$#"
 			count: 1
 			path: admin/ajax.php
 
 		-
+			message: "#^Cannot access offset 'status' on array\\|bool\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
 			message: "#^Cannot access offset 'status' on mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'summary' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -38,6 +68,51 @@ parameters:
 		-
 			message: "#^Cannot cast mixed to string\\.$#"
 			count: 15
+			path: admin/ajax.php
+
+		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) should return array\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) should return array\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns mixed\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_post_from_campaign\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_post_from_campaign\\(\\) should return int\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_sample_campaign_logs\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:schedule_campaign_posts\\(\\) has parameter \\$meta_input with no value type specified in iterable type array\\.$#"
+			count: 1
 			path: admin/ajax.php
 
 		-
@@ -61,13 +136,28 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Parameter \\#1 \\$keywords of method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 7
+			count: 12
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: mixed, post_status\\: mixed, post_author\\: mixed, post_category\\?\\: array\\{int\\}, tags_input\\?\\: array\\{string\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
+			count: 1
 			path: admin/ajax.php
 
 		-
 			message: "#^Parameter \\#1 \\$postdata of static method WPAIBlogger\\\\Inc\\\\Utils\\\\Metadata\\:\\:format_data\\(\\) expects array, mixed given\\.$#"
 			count: 2
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
+			count: 1
 			path: admin/ajax.php
 
 		-
@@ -77,6 +167,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 30, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'WP\\-AI\\-Blogger/0\\.0\\.1'\\}, body\\: non\\-empty\\-string\\|false\\} given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -107,7 +202,12 @@ parameters:
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 51
+			count: 56
+			path: admin/ajax.php
+
+		-
+			message: "#^is_wp_error\\(array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\) will always evaluate to false\\.$#"
+			count: 1
 			path: admin/ajax.php
 
 		-
@@ -117,7 +217,7 @@ parameters:
 
 		-
 			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
-			count: 4
+			count: 5
 			path: admin/ajax.php
 
 		-
@@ -341,49 +441,99 @@ parameters:
 			path: core/maintenance.php
 
 		-
-			message: "#^Action callback returns int\\|string\\|void\\|WPAIBlogger\\\\Core\\\\WP_Error but should not return anything\\.$#"
+			message: "#^Call to function is_wp_error\\(\\) with 0 will always evaluate to false\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:create_blog_post\\(\\) has invalid return type WPAIBlogger\\\\Core\\\\WP_Error\\.$#"
+			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:create_blog_post\\(\\) should return int\\|string\\|void\\|WPAIBlogger\\\\Core\\\\WP_Error but returns WP_Error\\.$#"
-			count: 4
-			path: core/scheduler.php
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:create_blog_post\\(\\) should return int\\|string\\|void\\|WPAIBlogger\\\\Core\\\\WP_Error but returns int\\|WP_Error\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:generate_post_from_campaign\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) has parameter \\$schedules with no value type specified in iterable type array\\.$#"
+			message: "#^Offset 'post_title' on array\\{post_title\\: string, post_content\\: string, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:custom_cron_schedules\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Parameter \\#1 \\$interval of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects int, mixed given\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:get_schedule_interval_seconds\\(\\) has parameter \\$schedule_data with no value type specified in iterable type array\\.$#"
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: string, post_content\\: string, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} given\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Core\\\\Scheduler\\:\\:get_schedule_name\\(\\) has parameter \\$schedule_data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: core/scheduler.php
+			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 6
+			path: inc/cron-handler.php
 
 		-
-			message: "#^Property WPAIBlogger\\\\Core\\\\Scheduler\\:\\:\\$schedules type has no value type specified in iterable type array\\.$#"
+			message: "#^Parameter \\#2 \\$keywords of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects string, mixed given\\.$#"
 			count: 1
-			path: core/scheduler.php
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#2 \\$post_categories of function wp_set_post_categories expects array\\<int\\>\\|int, array\\<int, mixed\\> given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#2 \\$tags of function wp_set_post_tags expects array\\|string, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#2 \\$unit of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#3 \\$max_words of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#3 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#4 \\$max_title_words of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^is_wp_error\\(int\\) will always evaluate to false\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
+			count: 1
+			path: inc/functions/common.php
 
 		-
 			message: "#^Call to function is_wp_error\\(\\) with array will always evaluate to false\\.$#"
@@ -401,12 +551,7 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Cannot access offset int\\<1, max\\> on mixed\\.$#"
+			message: "#^Function wpaib_create_timestamp_data\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -422,6 +567,16 @@ parameters:
 
 		-
 			message: "#^Function wpaib_get_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_campaign_error_logs\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_campaign_success_logs\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -461,17 +616,22 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Function wpaib_get_schedules\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^Function wpaib_get_site_persona_details\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
 		-
 			message: "#^Function wpaib_get_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_log_campaign_error\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_log_campaign_success\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -496,18 +656,8 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#1 \\$keywords of function wpaib_get_post_creation_api_response expects string, mixed given\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 4
-			path: inc/functions/common.php
-
-		-
-			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: mixed, post_status\\: mixed, post_author\\: mixed, post_category\\?\\: array\\{mixed\\}, tags_input\\?\\: array\\{mixed\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
-			count: 1
+			count: 3
 			path: inc/functions/common.php
 
 		-
@@ -526,16 +676,6 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#2 \\$max_title_words of function wpaib_get_post_creation_api_response expects int, mixed given\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^Parameter \\#3 \\$max_content_words of function wpaib_get_post_creation_api_response expects int, mixed given\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
 			message: "#^is_wp_error\\(array\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
@@ -547,11 +687,6 @@ parameters:
 
 		-
 			message: "#^is_wp_error\\(array\\<int, WP_Term\\>\\) will always evaluate to false\\.$#"
-			count: 1
-			path: inc/functions/common.php
-
-		-
-			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -1072,7 +1207,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 3
+			count: 2
 			path: inc/utils/metadata.php
 
 		-

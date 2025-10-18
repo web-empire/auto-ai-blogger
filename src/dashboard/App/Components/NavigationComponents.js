@@ -161,7 +161,7 @@ export const TokenDisplayAndRefresh = () => {
 	const tokenStatus = getTokenStatus();
 
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex items-center gap-2 pl-4">
 			<div className="flex flex-col gap-1">
 				<p className={ `text-sm m-0 p-0 ${
 					isError ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-500'
@@ -194,7 +194,7 @@ export const TokenDisplayAndRefresh = () => {
 					text-indigo-700
 					bg-indigo-50
 					border border-indigo-200
-					rounded-md px-2 py-1
+					rounded-md p-1 mr-2
 					flex items-center justify-center
 					font-medium
 					focus:outline-none focus:ring-0
@@ -207,11 +207,13 @@ export const TokenDisplayAndRefresh = () => {
 				aria-label={ __( 'Refresh token data', 'wp-ai-blogger' ) }
 			>
 				<Tooltip text={ __( 'Refresh', 'wp-ai-blogger' ) } delay={ 100 } className="z-[99999] bg-black text-xs text-white shadow-md p-2 rounded-md">
-					<div className="relative">
+					<div className="relative flex">
 						<RefreshCw className={ `w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
 					</div>
 				</Tooltip>
 			</button>
+
+			<span className="wpaib-vertical-divider" />
 		</div>
 	);
 };

@@ -1,9 +1,9 @@
 import React, { memo } from 'react';
-import { Gift } from 'lucide-react';
+import { Gift, MoveRight } from 'lucide-react';
 
 /**
- * Reusable Dynamic Card component
- * Used for promotional content, informational cards, and call-to-action sections
+ * Reusable Dynamic Card component.
+ * Used for promotional content, informational cards, and call-to-action sections.
  */
 const DynamicCard = memo( ( {
 	// Content props
@@ -135,40 +135,45 @@ const DynamicCard = memo( ( {
 				target={ openInNewTab ? '_blank' : undefined }
 				rel={ openInNewTab ? 'noopener noreferrer' : undefined }
 				onClick={ handleLinkClick }
+				style={ { textDecoration: 'none' } }
 				className={ `block outline-1 focus:outline-1 hover:outline-1 outline-solid outline-blue-500 rounded duration-200 hover:outline-blue-700 focus:outline-blue-700 transition-all` }
 				aria-label={ ariaLabel || ( openInNewTab ? `${ linkText } - opens in new tab` : linkText ) }
 			>
 				<div className={ `mt-6 ${ currentSize.container } ${ currentColor.background } border ${ currentColor.border } ${ className }` }>
 					{ /* Header section with icon and text */ }
 					{ ( Icon || heading || subHeading ) && (
-						<div className={ `flex items-center ${ currentSize.gap }` }>
-							{ Icon && (
-								<div className={ `${ currentSize.iconContainer } ${ currentColor.iconBg } rounded-sm flex` }>
-									<Icon className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } aria-hidden="true" />
-								</div>
-							) }
-							{ ( heading || subHeading ) && (
-								<div className="flex flex-col gap-1">
-									{ heading && (
-										<h3 className={ `${ currentSize.heading } m-0 p-0` }>
-											{ heading }
-										</h3>
-									) }
+						<div className={ `flex items-center justify-between ${ currentSize.gap }` }>
+							<div className={ `flex items-center ${ currentSize.gap }` }>
+								{ Icon && (
+									<div className={ `${ currentSize.iconContainer } ${ currentColor.iconBg } rounded-sm flex` }>
+										<Icon className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } aria-hidden="true" />
+									</div>
+								) }
+								{ ( heading || subHeading ) && (
+									<div className="flex flex-col gap-1">
+										{ heading && (
+											<h3 className={ `${ currentSize.heading } m-0 p-0` }>
+												{ heading }
+											</h3>
+										) }
 
-									{ subHeading && (
-										<p className={ `${ currentSize.subHeading } text-gray-600` }>
-											{ subHeading }
-										</p>
-									) }
+										{ subHeading && (
+											<p className={ `${ currentSize.subHeading } text-gray-600` }>
+												{ subHeading }
+											</p>
+										) }
 
-									{ /* Additional info section */ }
-									{ additionalInfo && (
-										<div className={ `${ currentSize.additionalInfo } text-gray-600 ${ linkText ? currentSize.marginBottom : '' }` }>
-											{ additionalInfo }
-										</div>
-									) }
-								</div>
-							) }
+										{ /* Additional info section */ }
+										{ additionalInfo && (
+											<div className={ `${ currentSize.additionalInfo } text-gray-600 ${ linkText ? currentSize.marginBottom : '' }` }>
+												{ additionalInfo }
+											</div>
+										) }
+									</div>
+								) }
+							</div>
+
+							<MoveRight className={ `${ currentSize.iconSize } ${ currentColor.iconColor }` } />
 						</div>
 					) }
 				</div>

@@ -52,7 +52,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'postsTarget'             => [
-					'default' => '',
+					'default' => 1,
 					'type'    => 'number',
 				],
 				'repeatInterval'          => [
@@ -63,9 +63,13 @@ class Metadata {
 					'default' => 'day',
 					'type'    => 'string',
 				],
-				'repeatOn'                => [
+				'repeatWeeklyOn'          => [
 					'default' => [],
 					'type'    => 'array',
+				],
+				'startDate'               => [
+					'default' => '',
+					'type'    => 'string',
 				],
 				'postType'                => [
 					'default' => 'post',
@@ -102,6 +106,46 @@ class Metadata {
 				'postsCreated'            => [
 					'default' => 0,
 					'type'    => 'number',
+				],
+				'postsScheduled'          => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'postsFailed'             => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'maxFailures'             => [
+					'default' => 20,
+					'type'    => 'number',
+				],
+				'errorLogs'               => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'successLogs'             => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'lastError'               => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorType'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorTime'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'completionReason'        => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'campaignCompleted'       => [
+					'default' => false,
+					'type'    => 'boolean',
 				],
 				'maxWords'                => [
 					'default' => 1000,
@@ -156,9 +200,8 @@ class Metadata {
 			return self::get_default_option( $key );
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
+		// Validate key format (allow alphanumeric and camelCase).
+		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return self::get_default_option( $key );
 		}
 
@@ -174,8 +217,8 @@ class Metadata {
 			return self::get_default_option( $key );
 		}
 
-		// Check user permissions.
-		if ( ! current_user_can( 'read_post', $campaign_id ) ) {
+		// Check user permissions (skip during cron execution).
+		if ( ! wp_doing_cron() && ! current_user_can( 'read_post', $campaign_id ) ) {
 			return self::get_default_option( $key );
 		}
 
@@ -212,9 +255,8 @@ class Metadata {
 			return false;
 		}
 
-		// Sanitize key.
-		$key = sanitize_key( $key );
-		if ( empty( $key ) ) {
+		// Validate key format (allow alphanumeric and camelCase).
+		if ( ! preg_match( '/^[a-zA-Z][a-zA-Z0-9]*$/', $key ) ) {
 			return false;
 		}
 
@@ -230,8 +272,8 @@ class Metadata {
 			return false;
 		}
 
-		// Check user permissions.
-		if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
+		// Check user permissions (skip during cron execution).
+		if ( ! wp_doing_cron() && ! current_user_can( 'edit_post', $campaign_id ) ) {
 			return false;
 		}
 
@@ -342,7 +384,7 @@ class Metadata {
 
 			case 'int':
 			case 'number':
-				$output = ! empty( $value ) ? absint( $value ) : '';
+				$output = isset( $value ) && is_numeric( $value ) ? absint( $value ) : 0;
 				break;
 
 			case 'url':
@@ -439,15 +481,21 @@ class Metadata {
 			return false;
 		}
 
-		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
-		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
-		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
+		$meta_posts_created   = absint( $metadata['postsCreated'] ?? 0 );
+		$meta_posts_scheduled = absint( $metadata['postsScheduled'] ?? 0 );
+		$meta_posts_failed    = absint( $metadata['postsFailed'] ?? 0 );
+		$meta_posts_target    = absint( $metadata['postsTarget'] ?? 0 );
+		$meta_frequency       = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
+		// Always use raw numeric values for the frontend.
+		$metadata['postsCreated']   = $meta_posts_created;
+		$metadata['postsScheduled'] = $meta_posts_scheduled;
+		$metadata['postsFailed']    = $meta_posts_failed;
+		$metadata['postsTarget']    = $meta_posts_target;
+
+		// Format frequency for display.
 		if ( ! $plain_metadata ) {
-			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
-			$metadata['postsTarget'] = $meta_posts_target;
-
 			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
 		}
@@ -455,7 +503,7 @@ class Metadata {
 		if ( ! empty( $metadata['lastRun'] ) ) {
 			$metadata['lastRun'] = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $metadata['lastRun'] ) );
 		} else {
-			$metadata['lastRun'] = __( 'Never', 'wp-ai-blogger' );
+			$metadata['lastRun'] = __( 'Not Started Yet.', 'wp-ai-blogger' );
 		}
 
 		return array_merge(

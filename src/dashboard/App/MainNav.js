@@ -151,11 +151,7 @@ export default function MainNav() {
 
 						{ ! proAvailable && <span className="wpaib-vertical-divider" /> }
 
-						<div className="px-4">
-							<TokenDisplayAndRefresh />
-						</div>
-
-						<span className="wpaib-vertical-divider" />
+						<TokenDisplayAndRefresh />
 
 						<div
 							className="flex items-center text-[0.625rem] sm:text-sm font-medium leading-[1.375rem] text-slate-400 gap-2 pl-4"

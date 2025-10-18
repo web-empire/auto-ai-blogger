@@ -366,7 +366,7 @@ const LicenseStep = memo( () => {
 
 							<DynamicCard
 								heading={ __( 'No License Key?', 'wp-ai-blogger' ) }
-								subHeading={ __( 'Get started with free credits today.', 'wp-ai-blogger' ) }
+								subHeading={ __( 'Get started with free credits today..', 'wp-ai-blogger' ) }
 								linkText={ __( 'Claim Free Credits', 'wp-ai-blogger' ) }
 								linkUrl={ upgradeLink }
 								colorScheme="blue"

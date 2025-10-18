@@ -8,8 +8,9 @@ import SwitchControl from '@Components/SwitchControl';
 import SettingField from '@Components/SettingField';
 import SettingLabel from '@Components/SettingLabel';
 import SettingInput from '@Components/SettingInput';
+import DateTimeField from '@Components/DateTimeField';
 import { Tooltip } from '@wordpress/components';
-import { TriangleAlert } from 'lucide-react';
+import DynamicCard from '@Components/DynamicCard';
 
 export default function ConfigureDrawer( props ) {
 	const abortControllerRef = useRef( {} );
@@ -25,11 +26,30 @@ export default function ConfigureDrawer( props ) {
 	const categories = wpaib_localized_data?.categories || {};
 	const tags = wpaib_localized_data?.tags || {};
 	const isViewMode = mode === 'view';
+	const [ errorMessage, setErrorMessage ] = useState( '' );
+	const [ fieldErrors, setFieldErrors ] = useState( {} );
+
+	// Helper function to check if start date has passed.
+	const hasStartDatePassed = ( startDate ) => {
+		if ( ! startDate ) {
+			return false;
+		}
+
+		try {
+			const start = new Date( startDate );
+			const now = new Date();
+			return start < now;
+		} catch ( e ) {
+			return false;
+		}
+	};
 
 	useEffect( () => {
 		setDrawerData( configureData );
 		setHandlingCampaign( false );
 		setOpen( openDrawer );
+		setFieldErrors( {} );
+		setErrorMessage( '' );
 	}, [ openDrawer ] );
 
 	const closePopup = () => {
@@ -37,10 +57,83 @@ export default function ConfigureDrawer( props ) {
 		setOpenDrawer( false );
 	};
 
+	// Helper function to scroll to and highlight field with error
+	const showFieldError = ( fieldId, fieldErrorMessage, tabName = 'campaign' ) => {
+		// Switch to correct tab if needed
+		if ( activeTab !== tabName ) {
+			setActiveTab( tabName );
+		}
+
+		// Set field error.
+		setFieldErrors( { [ fieldId ]: fieldErrorMessage } );
+		setErrorMessage( fieldErrorMessage );
+
+		// Scroll to field after a small delay to ensure tab switch is complete
+		setTimeout( () => {
+			const field = document.getElementById( fieldId );
+			if ( field ) {
+				field.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				field.focus();
+			}
+		}, tabName !== activeTab ? 300 : 100 );
+
+		// Clear errors after 4 seconds
+		setTimeout( () => {
+			setFieldErrors( {} );
+			setErrorMessage( '' );
+		}, 4000 );
+	};
+
 	const handleCampaign = ( e ) => {
 		e.preventDefault();
+
+		// Reset errors
+		setFieldErrors( {} );
+		setErrorMessage( '' );
+
+		if ( ! drawerData.title ) {
+			showFieldError( 'project-name', __( 'Name should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			return;
+		}
+		if ( ! drawerData.keywords ) {
+			showFieldError( 'campaign-keywords', __( 'Keywords should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			return;
+		}
+		if ( ! drawerData.postsTarget ) {
+			showFieldError( 'campaign-target', __( 'Posts Target should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			return;
+		}
+		if ( ! drawerData.startDate ) {
+			showFieldError( 'start-date', __( 'Start Date should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			return;
+		}
+		if ( 'week' === drawerData.repeatUnit && drawerData.repeatWeeklyOn.length === 0 ) {
+			setErrorMessage( __( 'Week days should not be empty.', 'wp-ai-blogger' ) );
+			setFieldErrors( { 'weekly-days': __( 'Week days should not be empty.', 'wp-ai-blogger' ) } );
+			setTimeout( () => {
+				setFieldErrors( {} );
+				setErrorMessage( '' );
+			}, 4000 );
+			return;
+		}
+
+		setErrorMessage( '' );
+		setFieldErrors( {} );
 		setHandlingCampaign( true );
-		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef );
+
+		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef )
+			.then( ( response ) => {
+				console.log( 'Campaign operation completed successfully:', response );
+				// The ApiData.js handles the reload, so we don't need to do anything here
+			} )
+			.catch( ( error ) => {
+				console.error( 'Campaign operation failed:', error );
+				setHandlingCampaign( false );
+				setErrorMessage( error.message || 'An error occurred while saving the campaign.' );
+				setTimeout( () => {
+					setErrorMessage( '' );
+				}, 5000 );
+			} );
 	};
 
 	return (
@@ -121,8 +214,20 @@ export default function ConfigureDrawer( props ) {
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, title: e.target.value } ) }
 																	type="text"
 																	readOnly={ isViewMode }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'project-name' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																	}` }
+																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
+																{ fieldErrors[ 'project-name' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'project-name' ] }
+																	</p>
+																) }
 															</div>
 														</div>
 
@@ -135,11 +240,23 @@ export default function ConfigureDrawer( props ) {
 																	id="campaign-keywords"
 																	name="campaign-keywords"
 																	rows={ 3 }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'campaign-keywords' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																	}` }
 																	defaultValue={ drawerData.keywords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
 																	readOnly={ isViewMode }
+																	placeholder={ __( 'Yoga, Fitness, Health', 'wp-ai-blogger' ) }
 																/>
+																{ fieldErrors[ 'campaign-keywords' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'campaign-keywords' ] }
+																	</p>
+																) }
 															</div>
 														</div>
 
@@ -148,7 +265,10 @@ export default function ConfigureDrawer( props ) {
 																<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
 																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
 																	<Tooltip
-																		text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
+																		text={ drawerData.type === 'edit'
+																			? __( 'Post Target can not be updated.', 'wp-ai-blogger' )
+																			: __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' )
+																		}
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																	>
@@ -158,21 +278,36 @@ export default function ConfigureDrawer( props ) {
 																		/>
 																	</Tooltip>
 																</label>
-																<div className="mt-2 flex items-center gap-1">
-																	<input
-																		id="campaign-target"
-																		name="campaign-target"
-																		defaultValue={ drawerData.postsTarget }
-																		onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
-																		type="number"
-																		readOnly={ isViewMode }
-																		disabled={ drawerData.type === 'edit' }
-																		className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
-																	/>
+																<div className="mt-2">
+																	<div className="flex items-center gap-1">
+																		<input
+																			id="campaign-target"
+																			name="campaign-target"
+																			defaultValue={ drawerData.postsTarget }
+																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
+																			onWheel={ ( e ) => e.target.blur() }
+																			type="number"
+																			min="1"
+																			readOnly={ isViewMode }
+																			disabled={ drawerData.type === 'edit' }
+																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																				fieldErrors[ 'campaign-target' ]
+																					? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																					: isViewMode
+																						? 'bg-gray-50 outline-gray-200'
+																						: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																			}` }
+																		/>
+																	</div>
+																	{ fieldErrors[ 'campaign-target' ] && (
+																		<p className="mt-1 text-sm text-red-600">
+																			{ fieldErrors[ 'campaign-target' ] }
+																		</p>
+																	) }
 																</div>
 															</div>
 															{ drawerData.type === 'new' && (
-																<div className="text-xs text-gray-500 text-right">
+																<div className="text-xs text-gray-500">
 																	{ __( 'Once set, campaign targets are unchangeable.', 'wp-ai-blogger' ) }
 																</div>
 															) }
@@ -199,6 +334,7 @@ export default function ConfigureDrawer( props ) {
 																	name="campaign-repeat-after"
 																	defaultValue={ drawerData.repeatInterval || 1 }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, repeatInterval: parseInt( e.target.value ) || 1 } ) }
+																	onWheel={ ( e ) => e.target.blur() }
 																	type="number"
 																	min="1"
 																	max="365"
@@ -213,42 +349,87 @@ export default function ConfigureDrawer( props ) {
 																>
 																	<option value="day">{ __( 'Day(s)', 'wp-ai-blogger' ) }</option>
 																	<option value="week">{ __( 'Week(s)', 'wp-ai-blogger' ) }</option>
-																	<option value="month">{ __( 'Month(s)', 'wp-ai-blogger' ) }</option>
-																	<option value="year">{ __( 'Year(s)', 'wp-ai-blogger' ) }</option>
 																</select>
 															</div>
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
-															<div className="flex items-center justify-between ">
-																<label className="text-sm/6 font-medium text-gray-900">
-																	{ __( 'Repeat On', 'wp-ai-blogger' ) }
+															<div className="flex items-center justify-between">
+																<label className={ `text-sm/6 font-medium ${ fieldErrors[ 'weekly-days' ] ? 'text-red-700' : 'text-gray-900' }` }> {/* eslint-disable-line */}
+																	{ __( 'On Days', 'wp-ai-blogger' ) }
 																</label>
-																<div className="flex flex-wrap gap-2 justify-end">
-																	{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
-																		<button
-																			key={ day }
-																			type="button"
-																			onClick={ () => {
-																				if ( isViewMode ) return;
-																				const repeatOn = drawerData.repeatOn || [];
-																				const newRepeatOn = repeatOn.includes( day )
-																					? repeatOn.filter( ( d ) => d !== day )
-																					: [ ...repeatOn, day ];
-																				setDrawerData( { ...drawerData, repeatOn: newRepeatOn } );
-																			} }
-																			className={ `capitalize text-xs p-2 rounded-full border ${
-																				( drawerData.repeatOn || [] ).includes( day )
-																					? 'bg-indigo-600 text-white border-indigo-600'
-																					: 'bg-white text-gray-900 border-gray-300'
-																			} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
-																			disabled={ isViewMode }
-																		>
-																			{ day }
-																		</button>
-																	) ) }
+																<div>
+																	<div className="flex flex-wrap gap-2 justify-end">
+																		{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
+																			<button
+																				key={ day }
+																				type="button"
+																				onClick={ () => {
+																					if ( isViewMode ) {
+																						return;
+																					}
+																					const repeatWeeklyOn = drawerData.repeatWeeklyOn || [];
+																					const newRepeatOn = repeatWeeklyOn.includes( day )
+																						? repeatWeeklyOn.filter( ( d ) => d !== day )
+																						: [ ...repeatWeeklyOn, day ];
+																					setDrawerData( { ...drawerData, repeatWeeklyOn: newRepeatOn } );
+																				} }
+																				className={ `capitalize text-xs p-2 rounded-full border transition-colors duration-200 ${
+																					( drawerData.repeatWeeklyOn || [] ).includes( day )
+																						? fieldErrors[ 'weekly-days' ]
+																							? 'bg-red-600 text-white border-red-600'
+																							: 'bg-indigo-600 text-white border-indigo-600'
+																						: fieldErrors[ 'weekly-days' ]
+																							? 'bg-red-50 text-red-900 border-red-300'
+																							: 'bg-white text-gray-900 border-gray-300'
+																				} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
+																				disabled={ isViewMode }
+																			>
+																				{ day }
+																			</button>
+																		) ) }
+																	</div>
+																	{ fieldErrors[ 'weekly-days' ] && (
+																		<p className="mt-1 text-sm text-red-600 text-right">
+																			{ fieldErrors[ 'weekly-days' ] }
+																		</p>
+																	) }
 																</div>
 															</div>
 														) }
+
+														<div>
+															<div className="flex items-center justify-between mb-2">
+																<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium ${
+																	fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
+																}` }>
+																	{ __( 'Start Date', 'wp-ai-blogger' ) }
+																	<Tooltip
+																		text={ __( 'Start Date can not be update later.', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																	>
+																		<QuestionMarkCircleIcon
+																			aria-hidden="true"
+																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																		/>
+																	</Tooltip>
+																</label>
+
+																<div className="text-xs text-gray-500">
+																	{ __( 'Only future date-time is allowed.', 'wp-ai-blogger' ) }
+																</div>
+															</div>
+															<DateTimeField
+																id="start-date"
+																name="start-date"
+																value={ drawerData.startDate }
+																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
+																readOnly={ isViewMode }
+																disabled={ drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) }
+																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
+																error={ fieldErrors[ 'start-date' ] }
+															/>
+														</div>
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="use-summary-as-excerpt" className="block text-sm/6 font-medium text-gray-900">
@@ -272,10 +453,10 @@ export default function ConfigureDrawer( props ) {
 																	<div className="absolute flex h-6 mt-1 items-center">
 																		<input
 																			defaultValue="public"
-																			defaultChecked
 																			id="privacy-public"
 																			name="privacy"
 																			type="radio"
+																			checked={ drawerData.status === 'publish' }
 																			aria-describedby="privacy-public-description"
 																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																			onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'publish' } ) }
@@ -301,6 +482,7 @@ export default function ConfigureDrawer( props ) {
 																				id="privacy-private-to-project"
 																				name="privacy"
 																				type="radio"
+																				checked={ drawerData.status === 'draft' }
 																				aria-describedby="privacy-private-to-project-description"
 																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																				onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'draft' } ) }
@@ -466,7 +648,9 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.maxTitleWords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
 																	type="number"
+																	min="1"
 																	readOnly={ isViewMode }
+																	disabled={ wpaib_localized_data.pro_available ? false : true }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
@@ -484,7 +668,9 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.maxWords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
 																	type="number"
+																	min="1"
 																	readOnly={ isViewMode }
+																	disabled={ wpaib_localized_data.pro_available ? false : true }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
 																/>
 															</div>
@@ -554,6 +740,18 @@ export default function ConfigureDrawer( props ) {
 																</a>
 															</div>
 														</div>
+
+														{ ! wpaib_localized_data.pro_available &&
+															<DynamicCard
+																heading={ __( 'Unlock Premium Features', 'wp-ai-blogger' ) }
+																subHeading={ __( 'Upgrade to Pro for more features and benefits.', 'wp-ai-blogger' ) }
+																linkText={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+																linkUrl={ wpaib_localized_data.pro_purchase_url }
+																colorScheme="blue"
+																size="medium"
+																ariaLabel={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+															/>
+														}
 													</div>
 												</div>
 											</div>
@@ -561,24 +759,82 @@ export default function ConfigureDrawer( props ) {
 									}
 								</div>
 
-								<div className="flex shrink-0 justify-end px-4 py-4">
-									<button
-										type="button"
-										onClick={ closePopup }
-										className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-									>
-										{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
-									</button>
-
-									{ ! isViewMode && (
-										<button
-											onClick={ handleCampaign }
-											disabled={ handlingCampaign }
-											className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
-										>
-											{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
-										</button>
+								<div className="flex shrink-0 justify-between items-center px-4 py-4">
+									{ errorMessage && (
+										<div className="flex items-center px-2 py-1 rounded bg-red-50 border border-red-200">
+											<svg className="w-3 h-3 text-red-500 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs text-red-700 font-medium">
+												{ errorMessage }
+											</span>
+										</div>
 									) }
+
+									<div className={ `flex items-center space-x-2 ${ ! errorMessage ? 'ml-auto' : '' }` }>
+										<button
+											type="button"
+											onClick={ closePopup }
+											className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+										>
+											{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
+										</button>
+
+										{ ! isViewMode && (
+											<button
+												onClick={ handleCampaign }
+												disabled={ handlingCampaign || ( () => {
+												// Check if campaign is completed to disable update button
+													if ( drawerData.type === 'new' ) {
+														return false;
+													} // Allow creation of new campaigns
+
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+
+													// Campaign is completed if:
+													// 1. Status is draft (inactive), OR
+													// 2. Target is met (created >= target), OR
+													// 3. All attempts completed (campaignCompleted flag is true), OR
+													// 4. All attempts have been made AND undelivered posts are showing
+													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+
+													return isCompletedBase || isAllAttemptsMadeWithFailures;
+												} )() }
+												className={ `ml-4 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+													handlingCampaign || ( drawerData.type === 'edit' && ( () => {
+														const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+														const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+														const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+														const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+														const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+														const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+														const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+														return isCompletedBase || isAllAttemptsMadeWithFailures;
+													} )() )
+														? 'cursor-not-allowed opacity-50 bg-gray-400 text-gray-200 focus-visible:outline-gray-400'
+														: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600'
+												}` }
+												title={ drawerData.type === 'edit' && ( () => {
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+													return isCompletedBase || isAllAttemptsMadeWithFailures;
+												} )() ? __( 'Campaign completed - Updates disabled', 'wp-ai-blogger' ) : '' }
+											>
+												{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+											</button>
+										) }
+									</div>
+
 								</div>
 							</form>
 						</DialogPanel>
