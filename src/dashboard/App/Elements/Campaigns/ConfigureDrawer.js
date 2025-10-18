@@ -29,7 +29,7 @@ export default function ConfigureDrawer( props ) {
 	const [ errorMessage, setErrorMessage ] = useState( '' );
 	const [ fieldErrors, setFieldErrors ] = useState( {} );
 
-	// Helper function to check if start date has passed
+	// Helper function to check if start date has passed.
 	const hasStartDatePassed = ( startDate ) => {
 		if ( ! startDate ) {
 			return false;
@@ -58,15 +58,15 @@ export default function ConfigureDrawer( props ) {
 	};
 
 	// Helper function to scroll to and highlight field with error
-	const showFieldError = ( fieldId, errorMessage, tabName = 'campaign' ) => {
+	const showFieldError = ( fieldId, fieldErrorMessage, tabName = 'campaign' ) => {
 		// Switch to correct tab if needed
 		if ( activeTab !== tabName ) {
 			setActiveTab( tabName );
 		}
 
-		// Set field error
-		setFieldErrors( { [fieldId]: errorMessage } );
-		setErrorMessage( errorMessage );
+		// Set field error.
+		setFieldErrors( { [ fieldId ]: fieldErrorMessage } );
+		setErrorMessage( fieldErrorMessage );
 
 		// Scroll to field after a small delay to ensure tab switch is complete
 		setTimeout( () => {
@@ -215,7 +215,7 @@ export default function ConfigureDrawer( props ) {
 																	type="text"
 																	readOnly={ isViewMode }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
-																		fieldErrors['project-name']
+																		fieldErrors[ 'project-name' ]
 																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																			: isViewMode
 																				? 'bg-gray-50 outline-gray-200'
@@ -223,9 +223,9 @@ export default function ConfigureDrawer( props ) {
 																	}` }
 																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
-																{ fieldErrors['project-name'] && (
+																{ fieldErrors[ 'project-name' ] && (
 																	<p className="mt-1 text-sm text-red-600">
-																		{ fieldErrors['project-name'] }
+																		{ fieldErrors[ 'project-name' ] }
 																	</p>
 																) }
 															</div>
@@ -241,7 +241,7 @@ export default function ConfigureDrawer( props ) {
 																	name="campaign-keywords"
 																	rows={ 3 }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
-																		fieldErrors['campaign-keywords']
+																		fieldErrors[ 'campaign-keywords' ]
 																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																			: isViewMode
 																				? 'bg-gray-50 outline-gray-200'
@@ -252,9 +252,9 @@ export default function ConfigureDrawer( props ) {
 																	readOnly={ isViewMode }
 																	placeholder={ __( 'Yoga, Fitness, Health', 'wp-ai-blogger' ) }
 																/>
-																{ fieldErrors['campaign-keywords'] && (
+																{ fieldErrors[ 'campaign-keywords' ] && (
 																	<p className="mt-1 text-sm text-red-600">
-																		{ fieldErrors['campaign-keywords'] }
+																		{ fieldErrors[ 'campaign-keywords' ] }
 																	</p>
 																) }
 															</div>
@@ -291,7 +291,7 @@ export default function ConfigureDrawer( props ) {
 																			readOnly={ isViewMode }
 																			disabled={ drawerData.type === 'edit' }
 																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
-																				fieldErrors['campaign-target']
+																				fieldErrors[ 'campaign-target' ]
 																					? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																					: isViewMode
 																						? 'bg-gray-50 outline-gray-200'
@@ -299,9 +299,9 @@ export default function ConfigureDrawer( props ) {
 																			}` }
 																		/>
 																	</div>
-																	{ fieldErrors['campaign-target'] && (
+																	{ fieldErrors[ 'campaign-target' ] && (
 																		<p className="mt-1 text-sm text-red-600">
-																			{ fieldErrors['campaign-target'] }
+																			{ fieldErrors[ 'campaign-target' ] }
 																		</p>
 																	) }
 																</div>
@@ -354,9 +354,7 @@ export default function ConfigureDrawer( props ) {
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
 															<div className="flex items-center justify-between">
-																<label className={ `text-sm/6 font-medium ${
-																	fieldErrors['weekly-days'] ? 'text-red-700' : 'text-gray-900'
-																}` }>  {/* eslint-disable-line */}
+																<label className={ `text-sm/6 font-medium ${ fieldErrors[ 'weekly-days' ] ? 'text-red-700' : 'text-gray-900' }` }> {/* eslint-disable-line */}
 																	{ __( 'On Days', 'wp-ai-blogger' ) }
 																</label>
 																<div>
@@ -377,10 +375,10 @@ export default function ConfigureDrawer( props ) {
 																				} }
 																				className={ `capitalize text-xs p-2 rounded-full border transition-colors duration-200 ${
 																					( drawerData.repeatWeeklyOn || [] ).includes( day )
-																						? fieldErrors['weekly-days']
+																						? fieldErrors[ 'weekly-days' ]
 																							? 'bg-red-600 text-white border-red-600'
 																							: 'bg-indigo-600 text-white border-indigo-600'
-																						: fieldErrors['weekly-days']
+																						: fieldErrors[ 'weekly-days' ]
 																							? 'bg-red-50 text-red-900 border-red-300'
 																							: 'bg-white text-gray-900 border-gray-300'
 																				} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
@@ -390,9 +388,9 @@ export default function ConfigureDrawer( props ) {
 																			</button>
 																		) ) }
 																	</div>
-																	{ fieldErrors['weekly-days'] && (
+																	{ fieldErrors[ 'weekly-days' ] && (
 																		<p className="mt-1 text-sm text-red-600 text-right">
-																			{ fieldErrors['weekly-days'] }
+																			{ fieldErrors[ 'weekly-days' ] }
 																		</p>
 																	) }
 																</div>
@@ -400,8 +398,8 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
-																fieldErrors['start-date'] ? 'text-red-700' : 'text-gray-900'
+															<label htmlFor="start-date" className={ `block text-sm/6 font-medium mb-2 ${
+																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
 															}` }>
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
 																{ ( drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) ) && (
@@ -769,7 +767,7 @@ export default function ConfigureDrawer( props ) {
 										</div>
 									) }
 
-									<div className={ `flex items-center space-x-2 ${!errorMessage ? 'ml-auto' : ''}` }>
+									<div className={ `flex items-center space-x-2 ${ ! errorMessage ? 'ml-auto' : '' }` }>
 										<button
 											type="button"
 											onClick={ closePopup }

@@ -301,7 +301,7 @@ export default function Campaigns() {
 			return;
 		}
 
-		setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: true }) );
+		setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: true } ) );
 
 		try {
 			const newStatus = currentStatus === 'publish' ? 'draft' : 'publish';
@@ -314,7 +314,7 @@ export default function Campaigns() {
 				...campaignData,
 				id: campaignId,
 				status: newStatus,
-				type: 'edit'
+				type: 'edit',
 			};
 
 			const formData = new window.FormData();
@@ -330,13 +330,13 @@ export default function Campaigns() {
 
 			if ( response.success ) {
 				// Update the local campaigns state without page refresh
-				setCampaigns( prevCampaigns => ({
+				setCampaigns( ( prevCampaigns ) => ( {
 					...prevCampaigns,
 					[ campaignId ]: {
 						...prevCampaigns[ campaignId ],
-						status: newStatus
-					}
-				}) );
+						status: newStatus,
+					},
+				} ) );
 			} else {
 				console.error( 'Failed to update campaign status:', response );
 				// Optionally show an error message to the user
@@ -344,7 +344,7 @@ export default function Campaigns() {
 		} catch ( error ) {
 			console.error( 'Error updating campaign status:', error );
 		} finally {
-			setUpdatingStatus( prev => ({ ...prev, [ campaignId ]: false }) );
+			setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: false } ) );
 		}
 	};
 
@@ -411,7 +411,7 @@ export default function Campaigns() {
 						<div>
 							<h4 className="font-semibold text-sm m-0">{ __( '🧪 Campaign Testing Mode Active', 'wp-ai-blogger' ) }</h4>
 							<p className="text-xs mt-1 mb-0">
-								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
+								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min, Monthly = 5min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
 							</p>
 						</div>
 					</div>
@@ -590,7 +590,7 @@ export default function Campaigns() {
 																		) }
 																	</div>
 																);
-															})()}
+															} )() }
 														</td>
 
 														<td className="whitespace-nowrap px-3 py-4 text-sm">
@@ -657,10 +657,10 @@ export default function Campaigns() {
 																		? new Date( campaign.startDate ).toLocaleString()
 																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString()
 																}` }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																delay={ 100 }
+																className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<CalendarArrowUp className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<CalendarArrowUp className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -690,7 +690,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<List className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<List className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 
@@ -701,9 +701,9 @@ export default function Campaigns() {
 																>
 																	{
 																		openingConfigureDrawer ? (
-																			<RotateCw className="w-4 h-4 animate-spin" style={{ outline: 'none' }} tabIndex="-1" />
+																			<RotateCw className="w-4 h-4 animate-spin" style={ { outline: 'none' } } tabIndex="-1" />
 																		) : (
-																			<Settings className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																			<Settings className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																		)
 																	}
 																</Tooltip>
@@ -776,7 +776,7 @@ export default function Campaigns() {
 																	delay={ 100 }
 																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																>
-																	<Trash2 className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
+																	<Trash2 className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																</Tooltip>
 															</button>
 														</td>

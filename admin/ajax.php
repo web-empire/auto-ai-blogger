@@ -14,6 +14,7 @@
 
 namespace WPAIBlogger\Admin;
 
+use WPAIBlogger\Inc\Cron_Handler;
 use WPAIBlogger\Inc\Traits\Get_Instance;
 use WPAIBlogger\Inc\Utils\Helper;
 use WPAIBlogger\Inc\Utils\Metadata;
@@ -732,9 +733,8 @@ class Ajax {
 				return;
 			}
 
-			// Run the campaign using CronHandler.
-			$cron_handler = \WPAIBlogger\Inc\CronHandler::get_instance();
-			$result       = $cron_handler->generate_post_from_campaign( $campaign_id );
+			// Run the campaign using Cron_Handler.
+			$result = Cron_Handler::get_instance()->generate_post_from_campaign( $campaign_id );
 
 			if ( ! $result['success'] ) {
 				wp_send_json_error(
@@ -1821,38 +1821,42 @@ class Ajax {
 			// Calculate interval in seconds.
 			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
 
-			// Default start time
-			$start_timestamp = time() + 60; // 1 minute from now
-			$start_date = $meta_input['startDate'] ?? '';
+			// Get the start date from campaign metadata.
+			$start_date      = $meta_input['startDate'] ?? '';
+			$start_timestamp = time() + 60; // Default fallback: 1 minute from now.
 
 			if ( ! empty( $start_date ) ) {
-				// Convert datetime-local format to timestamp
-				// The datetime-local input returns format: YYYY-MM-DDTHH:MM
-				// Convert it to WordPress timezone-aware timestamp
+				// Convert datetime-local format to timestamp.
+				// The datetime-local input returns format: YYYY-MM-DDTHH:MM.
+				// Convert it to WordPress timezone-aware timestamp.
 				$parsed_timestamp = strtotime( $start_date );
 
-				// Validate the parsed timestamp
+				// Validate the parsed timestamp.
 				if ( $parsed_timestamp !== false ) {
-					// Convert to WordPress timezone if needed
-					// WordPress stores times in UTC, so we need to account for site timezone
-					$wp_timezone = wp_timezone();
-					$local_time = new \DateTime( $start_date, $wp_timezone );
+					// Convert to WordPress timezone if needed.
+					// WordPress stores times in UTC, so we need to account for site timezone.
+					$wp_timezone   = wp_timezone();
+					$local_time    = new \DateTime( $start_date, $wp_timezone );
 					$utc_timestamp = $local_time->getTimestamp();
 
-					// If the start date is in the future, use it
+					// If the start date is in the future, use it.
 					if ( $utc_timestamp > time() ) {
 						$start_timestamp = $utc_timestamp;
 					} else {
-						// If the start date is in the past, start in 1 minute
+						// If the start date is in the past, start in 1 minute.
 						$start_timestamp = time() + 60;
 					}
-					}
-					// If parsing fails, use the default (1 minute from now)
 				}
+				// If parsing fails, use the default (1 minute from now).
+			}
 
-			// Schedule only the first post at the user-defined start date/time
-			// The CronHandler will handle scheduling subsequent posts after each creation
+			// Schedule the first post at the user-defined start date/time.
+			// If no start date is set or it's in the past, it will default to 1 minute from now.
 			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
+
+			// Schedule recurring posts using WordPress cron system.
+			// The recurring schedule starts after the first post is created + interval.
+			wp_schedule_event( $start_timestamp + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
 
 		} catch ( \Exception $e ) {
 			return;
@@ -1868,7 +1872,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function calculate_interval_seconds( $interval, $unit ): int {
-		// Production mode: Normal intervals
+		// Production mode: Normal intervals.
 		$multipliers = [
 			'day'   => DAY_IN_SECONDS,
 			'week'  => WEEK_IN_SECONDS,
@@ -1878,7 +1882,7 @@ class Ajax {
 
 		$seconds = $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
 
-		// Allow testing plugins to modify intervals
+		// Allow testing plugins to modify intervals.
 		return apply_filters( 'wpaib_campaign_interval_seconds', $seconds, $interval, $unit );
 	}
 

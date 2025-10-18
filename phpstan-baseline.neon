@@ -1,7 +1,7 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method object\\:\\:create_single_post_from_campaign\\(\\)\\.$#"
+			message: "#^Call to an undefined method object\\:\\:generate_post_from_campaign\\(\\)\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -446,17 +446,17 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:generate_post_from_campaign\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:generate_post_from_campaign\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#1 \\$interval of method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:get_interval_seconds\\(\\) expects int, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$interval of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -471,7 +471,7 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#2 \\$keywords of method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:call_post_creation_api\\(\\) expects string, mixed given\\.$#"
+			message: "#^Parameter \\#2 \\$keywords of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects string, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -486,17 +486,17 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#2 \\$unit of method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:get_interval_seconds\\(\\) expects string, mixed given\\.$#"
+			message: "#^Parameter \\#2 \\$unit of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects string, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#3 \\$max_words of method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
+			message: "#^Parameter \\#3 \\$max_words of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#4 \\$max_title_words of method WPAIBlogger\\\\Inc\\\\CronHandler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
+			message: "#^Parameter \\#4 \\$max_title_words of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -1162,7 +1162,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 3
+			count: 2
 			path: inc/utils/metadata.php
 
 		-

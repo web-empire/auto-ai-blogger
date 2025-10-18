@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
-class CronHandler {
+class Cron_Handler {
 	use Get_Instance;
 
 	/**
@@ -209,7 +209,7 @@ class CronHandler {
 				wp_set_post_tags( $post_id, $tag );
 			}
 
-			// Add campaign reference meta to the post
+			// Add campaign reference meta to the post.
 			add_post_meta( $post_id, 'wp_aib_reference', 1 );
 			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
@@ -403,7 +403,7 @@ class CronHandler {
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
 
-		// Production mode: Normal intervals
+		// Production mode: Normal intervals.
 		switch ( $unit ) {
 			case 'hour':
 				$seconds = $interval * HOUR_IN_SECONDS;
@@ -435,7 +435,7 @@ class CronHandler {
 	private function determine_error_type( $error_message ): string {
 		$error_message = strtolower( $error_message );
 
-		// Network/connectivity errors
+		// Network/connectivity errors.
 		if ( strpos( $error_message, 'timeout' ) !== false ||
 			 strpos( $error_message, 'network' ) !== false ||
 			 strpos( $error_message, 'connection' ) !== false ||
@@ -443,7 +443,7 @@ class CronHandler {
 			return 'network_error';
 		}
 
-		// API quota/subscription errors
+		// API quota/subscription errors.
 		if ( strpos( $error_message, 'quota' ) !== false ||
 			 strpos( $error_message, 'subscription' ) !== false ||
 			 strpos( $error_message, 'limit' ) !== false ||
@@ -451,21 +451,21 @@ class CronHandler {
 			return 'quota_error';
 		}
 
-		// Content filtering errors
+		// Content filtering errors.
 		if ( strpos( $error_message, 'content filtering' ) !== false ||
 			 strpos( $error_message, 'blocked' ) !== false ||
 			 strpos( $error_message, 'safety' ) !== false ) {
 			return 'content_filter_error';
 		}
 
-		// Validation errors
+		// Validation errors.
 		if ( strpos( $error_message, 'invalid' ) !== false ||
 			 strpos( $error_message, 'keywords' ) !== false ||
 			 strpos( $error_message, 'validation' ) !== false ) {
 			return 'validation_error';
 		}
 
-		// License/authentication errors
+		// License/authentication errors.
 		if ( strpos( $error_message, 'license' ) !== false ||
 			 strpos( $error_message, 'token' ) !== false ||
 			 strpos( $error_message, 'authentication' ) !== false ||
@@ -473,14 +473,14 @@ class CronHandler {
 			return 'auth_error';
 		}
 
-		// API response errors
+		// API response errors.
 		if ( strpos( $error_message, 'api' ) !== false ||
 			 strpos( $error_message, 'status code' ) !== false ||
 			 strpos( $error_message, 'response' ) !== false ) {
 			return 'api_error';
 		}
 
-		// Database errors
+		// Database errors.
 		if ( strpos( $error_message, 'database' ) !== false ||
 			 strpos( $error_message, 'insert' ) !== false ||
 			 strpos( $error_message, 'wp_error' ) !== false ) {
@@ -499,18 +499,18 @@ class CronHandler {
 	 * @since x.x.x
 	 */
 	private function mark_campaign_completed( $campaign_id, $reason ): void {
-		// Mark campaign as completed
+		// Mark campaign as completed.
 		wp_update_post( [
 			'ID' => $campaign_id,
-			'post_status' => 'draft', // Set to draft to indicate completion/inactivity
+			'post_status' => 'draft', // Set to draft to indicate completion/inactivity.
 		] );
 
-		// Add completion meta flags
+		// Add completion meta flags.
 		Metadata::update_campaign_meta( $campaign_id, 'campaignCompleted', true );
 		Metadata::update_campaign_meta( $campaign_id, 'completedAt', current_time( 'mysql' ) );
 		Metadata::update_campaign_meta( $campaign_id, 'completionReason', $reason );
 
-		// Log completion
+		// Log completion.
 		if ( $reason === 'max_failures_exceeded' ) {
 			$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
 			$max_failures = Metadata::get_campaign_meta( $campaign_id, 'maxFailures' );
@@ -527,7 +527,7 @@ class CronHandler {
 			);
 		}
 
-		// Clear any scheduled events since campaign is now complete
+		// Clear any scheduled events since campaign is now complete.
 		wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 	}
 }
