@@ -240,7 +240,7 @@ const DateTimeField = forwardRef( ( {
 			<div className="grid grid-cols-2 gap-3">
 				{ /* Date Input */ }
 				<div>
-					<label htmlFor={ `${ inputId }-date` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+					<label htmlFor={ `${ inputId }-date` } className="block text-sm font-normal text-gray-600 mb-1 whitespace-nowrap">
 						{ __( 'Date', 'wp-ai-blogger' ) }
 					</label>
 					<input
@@ -262,7 +262,7 @@ const DateTimeField = forwardRef( ( {
 
 				{ /* Time Select */ }
 				<div>
-					<label htmlFor={ `${ inputId }-time` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+					<label htmlFor={ `${ inputId }-time` } className="block text-sm font-normal text-gray-600 mb-1 whitespace-nowrap">
 						{ __( 'Time', 'wp-ai-blogger' ) }
 					</label>
 					<select
@@ -295,10 +295,6 @@ const DateTimeField = forwardRef( ( {
 					{ helperText }
 				</p>
 			) }
-
-			<p className="mt-1 text-xs text-gray-400">
-				{ __( 'Past dates/times cannot be selected.', 'wp-ai-blogger' ) }
-			</p>
 
 			{ error && (
 				<p

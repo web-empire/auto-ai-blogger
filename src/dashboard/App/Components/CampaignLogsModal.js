@@ -161,7 +161,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 						{ /* Header */ }
 						<div className="flex items-center justify-between bg-gray-50 px-6 py-4 border-b border-gray-200">
 							<div className="flex items-center space-x-3">
-								<div className="p-2 bg-blue-100 rounded-lg">
+								<div className="p-2 bg-blue-100 rounded-lg flex">
 									<ScrollText className="w-5 h-5 text-blue-600" />
 								</div>
 								<div>
@@ -178,7 +178,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 								onClick={ closeModal }
 								className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-2"
 							>
-								<XMarkIcon className="h-6 w-6" />
+								<XMarkIcon className="h-6 w-6 flex" />
 							</button>
 						</div>
 
@@ -205,47 +205,47 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 									{ /* Summary Stats */ }
 									<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 										<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-											<div className="flex items-center">
-												<Clock className="w-5 h-5 text-blue-600 mr-2" />
-												<div>
+											<div className="flex items-center justify-between">
+												<div className="flex flex-col gap-2">
 													<p className="text-sm text-blue-600 m-0">{ __( 'Scheduled', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-blue-900 m-0">
 														{ parseInt( campaignData?.postsScheduled ) || 0 }
 													</p>
 												</div>
+												<Clock className="w-5 h-5 text-blue-600" />
 											</div>
 										</div>
 										<div className="bg-green-50 border border-green-200 rounded-lg p-4">
-											<div className="flex items-center">
-												<CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-												<div>
+											<div className="flex items-center justify-between">
+												<div className="flex flex-col gap-2">
 													<p className="text-sm text-green-600 m-0">{ __( 'Successful', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-green-900 m-0">
 														{ parseInt( campaignData?.postsCreated ) || 0 }
 													</p>
 												</div>
+												<CheckCircle className="w-5 h-5 text-green-600" />
 											</div>
 										</div>
 										<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-											<div className="flex items-center">
-												<XCircle className="w-5 h-5 text-red-600 mr-2" />
-												<div>
+											<div className="flex items-center justify-between">
+												<div className="flex flex-col gap-2">
 													<p className="text-sm text-red-600 m-0">{ __( 'Failed Attempts', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-red-900 m-0">
 														{ campaignData?.postsFailed || 0 }
 													</p>
 												</div>
+												<XCircle className="w-5 h-5 text-red-600" />
 											</div>
 										</div>
 										<div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-											<div className="flex items-center">
-												<Activity className="w-5 h-5 text-gray-600 mr-2" />
-												<div>
+											<div className="flex items-center justify-between">
+												<div className="flex flex-col gap-2">
 													<p className="text-sm text-gray-600 m-0">{ __( 'Target', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-gray-900 m-0">
 														{ parseInt( campaignData?.postsTarget ) || 0 }
 													</p>
 												</div>
+												<Activity className="w-5 h-5 text-gray-600" />
 											</div>
 										</div>
 									</div>
@@ -371,7 +371,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<h4 className="text-base font-medium text-gray-900 m-0">{ __( 'Activity Timeline', 'wp-ai-blogger' ) }</h4>
 												<button
 													onClick={ fetchLogsData }
-													className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+													className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 p-1 rounded-md"
 													disabled={ loading }
 												>
 													<Activity className={ `w-3 h-3 ${ loading ? 'animate-spin' : '' }` } />
@@ -389,7 +389,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 													return (
 														<div key={ logId } className="px-4 py-3 hover:bg-gray-50 transition-colors">
 															<div className="flex items-start space-x-3">
-																<div className="flex-shrink-0 mt-0.5">
+																<div className="flex-shrink-0 mt-1">
 																	{ getStatusIcon( log.status ) }
 																</div>
 																<div className="flex-1 min-w-0">
@@ -478,8 +478,8 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																	{ /* Collapsible Steps/Process details */ }
 																	{ hasSteps && isExpanded && (
 																		<div className="mt-3 border border-gray-200 rounded-md p-3 bg-gray-50">
-																			<p className="text-xs font-medium text-gray-700 mb-2 m-0">{ __( 'Process Steps:', 'wp-ai-blogger' ) }</p>
-																			<div className="space-y-2">
+																			<p className="text-xs font-medium text-gray-700 m-0">{ __( 'Process Steps:', 'wp-ai-blogger' ) }</p>
+																			<div className="space-y-2 mt-2">
 																				{ log.steps.map( ( step, stepIndex ) => (
 																					<div key={ stepIndex } className="flex items-center justify-between">
 																						<div className="flex items-center space-x-2">

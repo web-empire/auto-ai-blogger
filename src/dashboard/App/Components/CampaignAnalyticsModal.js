@@ -4,16 +4,12 @@ import { Dialog, DialogPanel } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
 	TrendingUp,
-	Activity,
-	Calendar,
-	User,
 	MessageSquare,
 	Trophy,
 	Crown,
 	Zap,
 	BarChart3,
 	CheckCircle,
-	CalendarCheck,
 } from 'lucide-react';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -89,36 +85,34 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 				<div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 					<DialogPanel
 						transition
-						className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-6xl sm:max-h-[800px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+						className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-4xl data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
 					>
-						<div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 h-full flex flex-col">
-							{ /* Header */ }
-							<div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6 flex-shrink-0">
-								<div className="flex items-center space-x-3">
-									<div className="p-2 bg-indigo-100 rounded-lg flex">
-										<BarChart3 className="w-6 h-6 text-indigo-600" />
-									</div>
-									<div>
-										<h3 className="text-lg font-semibold text-gray-900 m-0">
-											{ __( 'Campaign Analytics', 'wp-ai-blogger' ) }
-										</h3>
-										<p className="text-sm text-gray-500 m-0">
-											{ campaignData?.name || __( 'Campaign', 'wp-ai-blogger' ) }
-										</p>
-									</div>
+						{ /* Header */ }
+						<div className="flex items-center justify-between bg-gray-50 px-6 py-4 border-b border-gray-200">
+							<div className="flex items-center space-x-3">
+								<div className="p-2 bg-blue-100 rounded-lg flex">
+									<BarChart3 className="w-5 h-5 text-blue-600" />
 								</div>
-
-								<button
-									type="button"
-									onClick={ closeModal }
-									className="text-gray-400 hover:text-gray-500 focus:outline-none rounded flex"
-								>
-									<span className="sr-only">Close</span>
-									<XMarkIcon className="h-5 w-5 flex" />
-								</button>
+								<div>
+									<h3 className="text-lg font-semibold text-gray-900 m-0">
+										{ __( 'Campaign Analytics', 'wp-ai-blogger' ) }
+									</h3>
+									<p className="text-sm text-gray-600 m-0">
+										{ campaignData?.name || __( 'Campaign', 'wp-ai-blogger' ) }
+									</p>
+								</div>
 							</div>
+							<button
+								type="button"
+								onClick={ closeModal }
+								className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-2"
+							>
+								<XMarkIcon className="h-6 w-6 flex" />
+							</button>
+						</div>
 
-							{ /* Content */ }
+						{ /* Content */ }
+						<div className="px-6 py-4">
 							<div className="flex-1 overflow-y-auto">
 								{ loading ? (
 									<div className="flex items-center justify-center py-12">
@@ -169,40 +163,6 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 														<p className="text-2xl font-bold text-purple-900 m-0">{ formatNumber( analyticsData?.totalComments || 0 ) }</p>
 													</div>
 													<MessageSquare className="w-6 h-6 text-purple-500" />
-												</div>
-											</div>
-										</div>
-
-										{ /* Campaign Health */ }
-										<div className="bg-white border border-gray-200 rounded-lg p-4">
-											<div className="flex items-center mb-3">
-												<Activity className="w-4 h-4 text-gray-600 mr-2" />
-												<h4 className="text-base font-semibold text-gray-900 m-0">{ __( 'Campaign Health', 'wp-ai-blogger' ) }</h4>
-											</div>
-
-											<div className="grid grid-cols-3 lg:grid-cols-3 gap-3">
-												<div className="text-center p-3 bg-gray-50 rounded-lg">
-													<div className="flex items-center justify-center">
-														<CalendarCheck className="w-4 h-4 text-gray-500 mr-1" />
-														<span className="text-sm font-medium text-gray-900">{ campaignData?.lastRun }</span>
-													</div>
-													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Last Post Run', 'wp-ai-blogger' ) }</p>
-												</div>
-
-												<div className="text-center p-3 bg-gray-50 rounded-lg">
-													<div className="flex items-center justify-center">
-														<Calendar className="w-4 h-4 text-gray-500 mr-1" />
-														<span className="text-sm font-medium text-gray-900">{ analyticsData?.daysActive || 0 }</span>
-													</div>
-													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Days Active', 'wp-ai-blogger' ) }</p>
-												</div>
-
-												<div className="text-center p-3 bg-gray-50 rounded-lg">
-													<div className="flex items-center justify-center">
-														<User className="w-4 h-4 text-gray-500 mr-1" />
-														<span className="text-sm font-medium text-gray-900">{ analyticsData?.authorName || __( 'Unknown', 'wp-ai-blogger' ) }</span>
-													</div>
-													<p className="text-xs text-gray-500 wpaib-force-mt-2 m-0">{ __( 'Author', 'wp-ai-blogger' ) }</p>
 												</div>
 											</div>
 										</div>
