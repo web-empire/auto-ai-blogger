@@ -29,6 +29,21 @@ export default function ConfigureDrawer( props ) {
 	const [ errorMessage, setErrorMessage ] = useState( '' );
 	const [ fieldErrors, setFieldErrors ] = useState( {} );
 
+	// Helper function to check if start date has passed.
+	const hasStartDatePassed = ( startDate ) => {
+		if ( ! startDate ) {
+			return false;
+		}
+
+		try {
+			const start = new Date( startDate );
+			const now = new Date();
+			return start < now;
+		} catch ( e ) {
+			return false;
+		}
+	};
+
 	useEffect( () => {
 		setDrawerData( configureData );
 		setHandlingCampaign( false );
@@ -49,7 +64,7 @@ export default function ConfigureDrawer( props ) {
 			setActiveTab( tabName );
 		}
 
-		// Set field error
+		// Set field error.
 		setFieldErrors( { [ fieldId ]: fieldErrorMessage } );
 		setErrorMessage( fieldErrorMessage );
 
@@ -250,7 +265,10 @@ export default function ConfigureDrawer( props ) {
 																<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
 																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
 																	<Tooltip
-																		text={ __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' ) }
+																		text={ drawerData.type === 'edit'
+																			? __( 'Post Target can not be updated.', 'wp-ai-blogger' )
+																			: __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' )
+																		}
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																	>
@@ -267,6 +285,7 @@ export default function ConfigureDrawer( props ) {
 																			name="campaign-target"
 																			defaultValue={ drawerData.postsTarget }
 																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
+																			onWheel={ ( e ) => e.target.blur() }
 																			type="number"
 																			min="1"
 																			readOnly={ isViewMode }
@@ -315,6 +334,7 @@ export default function ConfigureDrawer( props ) {
 																	name="campaign-repeat-after"
 																	defaultValue={ drawerData.repeatInterval || 1 }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, repeatInterval: parseInt( e.target.value ) || 1 } ) }
+																	onWheel={ ( e ) => e.target.blur() }
 																	type="number"
 																	min="1"
 																	max="365"
@@ -378,10 +398,22 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<label htmlFor="start-date" className={ `block text-sm/6 font-medium mb-2 ${
+															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
 																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
 															}` }>
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
+																{ ( drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) ) && (
+																	<Tooltip
+																		text={ __( 'Start Date can not be updated.', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																	>
+																		<QuestionMarkCircleIcon
+																			aria-hidden="true"
+																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																		/>
+																	</Tooltip>
+																) }
 															</label>
 															<DateTimeField
 																id="start-date"
@@ -389,6 +421,7 @@ export default function ConfigureDrawer( props ) {
 																value={ drawerData.startDate }
 																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
 																readOnly={ isViewMode }
+																disabled={ drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) }
 																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
 																error={ fieldErrors[ 'start-date' ] }
 															/>
@@ -746,8 +779,52 @@ export default function ConfigureDrawer( props ) {
 										{ ! isViewMode && (
 											<button
 												onClick={ handleCampaign }
-												disabled={ handlingCampaign }
-												className={ `ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${ handlingCampaign ? 'cursor-not-allowed opacity-50' : '' }` }
+												disabled={ handlingCampaign || ( () => {
+												// Check if campaign is completed to disable update button
+													if ( drawerData.type === 'new' ) {
+														return false;
+													} // Allow creation of new campaigns
+
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+
+													// Campaign is completed if:
+													// 1. Status is draft (inactive), OR
+													// 2. Target is met (created >= target), OR
+													// 3. All attempts completed (campaignCompleted flag is true), OR
+													// 4. All attempts have been made AND undelivered posts are showing
+													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+
+													return isCompletedBase || isAllAttemptsMadeWithFailures;
+												} )() }
+												className={ `ml-4 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+													handlingCampaign || ( drawerData.type === 'edit' && ( () => {
+														const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+														const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+														const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+														const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+														const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+														const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+														const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+														return isCompletedBase || isAllAttemptsMadeWithFailures;
+													} )() )
+														? 'cursor-not-allowed opacity-50 bg-gray-400 text-gray-200 focus-visible:outline-gray-400'
+														: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600'
+												}` }
+												title={ drawerData.type === 'edit' && ( () => {
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+													return isCompletedBase || isAllAttemptsMadeWithFailures;
+												} )() ? __( 'Campaign completed - Updates disabled', 'wp-ai-blogger' ) : '' }
 											>
 												{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
 											</button>

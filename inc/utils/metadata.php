@@ -107,6 +107,46 @@ class Metadata {
 					'default' => 0,
 					'type'    => 'number',
 				],
+				'postsScheduled'          => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'postsFailed'             => [
+					'default' => 0,
+					'type'    => 'number',
+				],
+				'maxFailures'             => [
+					'default' => 20,
+					'type'    => 'number',
+				],
+				'errorLogs'               => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'successLogs'             => [
+					'default' => [],
+					'type'    => 'array',
+				],
+				'lastError'               => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorType'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'lastErrorTime'           => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'completionReason'        => [
+					'default' => '',
+					'type'    => 'string',
+				],
+				'campaignCompleted'       => [
+					'default' => false,
+					'type'    => 'boolean',
+				],
 				'maxWords'                => [
 					'default' => 1000,
 					'type'    => 'number',
@@ -441,15 +481,21 @@ class Metadata {
 			return false;
 		}
 
-		$meta_posts_created = absint( $metadata['postsCreated'] ?? 0 );
-		$meta_posts_target  = absint( $metadata['postsTarget'] ?? 0 );
-		$meta_frequency     = absint( $metadata['repeatInterval'] ?? 0 );
-		$repeat_unit        = $metadata['repeatUnit'] ?? 'day';
+		$meta_posts_created   = absint( $metadata['postsCreated'] ?? 0 );
+		$meta_posts_scheduled = absint( $metadata['postsScheduled'] ?? 0 );
+		$meta_posts_failed    = absint( $metadata['postsFailed'] ?? 0 );
+		$meta_posts_target    = absint( $metadata['postsTarget'] ?? 0 );
+		$meta_frequency       = absint( $metadata['repeatInterval'] ?? 0 );
+		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
+		// Always use raw numeric values for the frontend.
+		$metadata['postsCreated']   = $meta_posts_created;
+		$metadata['postsScheduled'] = $meta_posts_scheduled;
+		$metadata['postsFailed']    = $meta_posts_failed;
+		$metadata['postsTarget']    = $meta_posts_target;
+
+		// Format frequency for display.
 		if ( ! $plain_metadata ) {
-			$meta_posts_target       = $meta_posts_created . ' / ' . $meta_posts_target;
-			$metadata['postsTarget'] = $meta_posts_target;
-
 			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
 		}

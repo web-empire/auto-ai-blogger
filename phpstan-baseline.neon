@@ -46,6 +46,11 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Cannot access offset 'status' on array\\|bool\\.$#"
+			count: 2
+			path: admin/ajax.php
+
+		-
 			message: "#^Cannot access offset 'status' on mixed\\.$#"
 			count: 1
 			path: admin/ajax.php
@@ -76,11 +81,6 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) has parameter \\$site_persona with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: admin/ajax.php
@@ -102,6 +102,11 @@ parameters:
 
 		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_post_from_campaign\\(\\) should return int\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_sample_campaign_logs\\(\\) is unused\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -137,7 +142,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 11
+			count: 12
 			path: admin/ajax.php
 
 		-
@@ -197,7 +202,7 @@ parameters:
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 51
+			count: 56
 			path: admin/ajax.php
 
 		-
@@ -456,6 +461,11 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
+			message: "#^Offset 'post_title' on array\\{post_title\\: string, post_content\\: string, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
 			message: "#^Parameter \\#1 \\$interval of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
@@ -467,7 +477,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 1
+			count: 6
 			path: inc/cron-handler.php
 
 		-
@@ -491,7 +501,17 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
 			message: "#^Parameter \\#3 \\$max_words of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:call_post_creation_api\\(\\) expects int, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#3 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, mixed given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -531,6 +551,11 @@ parameters:
 			path: inc/functions/common.php
 
 		-
+			message: "#^Function wpaib_create_timestamp_data\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
 			message: "#^Function wpaib_get_all_campaigns\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
@@ -542,6 +567,16 @@ parameters:
 
 		-
 			message: "#^Function wpaib_get_authors\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_campaign_error_logs\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_get_campaign_success_logs\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -587,6 +622,16 @@ parameters:
 
 		-
 			message: "#^Function wpaib_get_tags\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_log_campaign_error\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_log_campaign_success\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
