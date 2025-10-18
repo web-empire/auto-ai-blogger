@@ -119,7 +119,7 @@ export default function SettingsSavedNotification() {
 		<div
 			aria-live="assertive"
 			aria-atomic="true"
-			className="fixed flex px-2 py-2 pointer-events-none sm:py-3 sm:items-start top-[10px] right-0 w-full z-[1000001]"
+			className="fixed flex px-2 py-2 pointer-events-none sm:py-3 sm:items-start top-[32px] right-[20px] w-full z-[1000001]"
 			role="region"
 			aria-label="Notifications"
 		>
