@@ -27,11 +27,14 @@ export default function ConfigureDrawer( props ) {
 	const tags = wpaib_localized_data?.tags || {};
 	const isViewMode = mode === 'view';
 	const [ errorMessage, setErrorMessage ] = useState( '' );
+	const [ fieldErrors, setFieldErrors ] = useState( {} );
 
 	useEffect( () => {
 		setDrawerData( configureData );
 		setHandlingCampaign( false );
 		setOpen( openDrawer );
+		setFieldErrors( {} );
+		setErrorMessage( '' );
 	}, [ openDrawer ] );
 
 	const closePopup = () => {
@@ -39,46 +42,68 @@ export default function ConfigureDrawer( props ) {
 		setOpenDrawer( false );
 	};
 
+	// Helper function to scroll to and highlight field with error
+	const showFieldError = ( fieldId, fieldErrorMessage, tabName = 'campaign' ) => {
+		// Switch to correct tab if needed
+		if ( activeTab !== tabName ) {
+			setActiveTab( tabName );
+		}
+
+		// Set field error
+		setFieldErrors( { [ fieldId ]: fieldErrorMessage } );
+		setErrorMessage( fieldErrorMessage );
+
+		// Scroll to field after a small delay to ensure tab switch is complete
+		setTimeout( () => {
+			const field = document.getElementById( fieldId );
+			if ( field ) {
+				field.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				field.focus();
+			}
+		}, tabName !== activeTab ? 300 : 100 );
+
+		// Clear errors after 4 seconds
+		setTimeout( () => {
+			setFieldErrors( {} );
+			setErrorMessage( '' );
+		}, 4000 );
+	};
+
 	const handleCampaign = ( e ) => {
 		e.preventDefault();
 
+		// Reset errors
+		setFieldErrors( {} );
+		setErrorMessage( '' );
+
 		if ( ! drawerData.title ) {
-			setErrorMessage( __( 'Name should not be empty.', 'wp-ai-blogger' ) );
-			setTimeout( () => {
-				setErrorMessage( '' );
-			}, 2000 );
+			showFieldError( 'project-name', __( 'Name should not be empty.', 'wp-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.keywords ) {
-			setErrorMessage( __( 'Keywords should not be empty.', 'wp-ai-blogger' ) );
-			setTimeout( () => {
-				setErrorMessage( '' );
-			}, 2000 );
+			showFieldError( 'campaign-keywords', __( 'Keywords should not be empty.', 'wp-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.postsTarget ) {
-			setErrorMessage( __( 'Posts Target should not be empty.', 'wp-ai-blogger' ) );
-			setTimeout( () => {
-				setErrorMessage( '' );
-			}, 2000 );
+			showFieldError( 'campaign-target', __( 'Posts Target should not be empty.', 'wp-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.startDate ) {
-			setErrorMessage( __( 'Start Date should not be empty.', 'wp-ai-blogger' ) );
-			setTimeout( () => {
-				setErrorMessage( '' );
-			}, 2000 );
+			showFieldError( 'start-date', __( 'Start Date should not be empty.', 'wp-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( 'week' === drawerData.repeatUnit && drawerData.repeatWeeklyOn.length === 0 ) {
 			setErrorMessage( __( 'Week days should not be empty.', 'wp-ai-blogger' ) );
+			setFieldErrors( { 'weekly-days': __( 'Week days should not be empty.', 'wp-ai-blogger' ) } );
 			setTimeout( () => {
+				setFieldErrors( {} );
 				setErrorMessage( '' );
-			}, 2000 );
+			}, 4000 );
 			return;
 		}
 
 		setErrorMessage( '' );
+		setFieldErrors( {} );
 		setHandlingCampaign( true );
 
 		updateCampaign( drawerData, drawerData.type === 'new', abortControllerRef )
@@ -174,9 +199,20 @@ export default function ConfigureDrawer( props ) {
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, title: e.target.value } ) }
 																	type="text"
 																	readOnly={ isViewMode }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'project-name' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																	}` }
 																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
+																{ fieldErrors[ 'project-name' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'project-name' ] }
+																	</p>
+																) }
 															</div>
 														</div>
 
@@ -189,12 +225,23 @@ export default function ConfigureDrawer( props ) {
 																	id="campaign-keywords"
 																	name="campaign-keywords"
 																	rows={ 3 }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'campaign-keywords' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																	}` }
 																	defaultValue={ drawerData.keywords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
 																	readOnly={ isViewMode }
 																	placeholder={ __( 'Yoga, Fitness, Health', 'wp-ai-blogger' ) }
 																/>
+																{ fieldErrors[ 'campaign-keywords' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'campaign-keywords' ] }
+																	</p>
+																) }
 															</div>
 														</div>
 
@@ -213,18 +260,31 @@ export default function ConfigureDrawer( props ) {
 																		/>
 																	</Tooltip>
 																</label>
-																<div className="mt-2 flex items-center gap-1">
-																	<input
-																		id="campaign-target"
-																		name="campaign-target"
-																		defaultValue={ drawerData.postsTarget }
-																		onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
-																		type="number"
-																		min="1"
-																		readOnly={ isViewMode }
-																		disabled={ drawerData.type === 'edit' }
-																		className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
-																	/>
+																<div className="mt-2">
+																	<div className="flex items-center gap-1">
+																		<input
+																			id="campaign-target"
+																			name="campaign-target"
+																			defaultValue={ drawerData.postsTarget }
+																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postsTarget: e.target.value } ) }
+																			type="number"
+																			min="1"
+																			readOnly={ isViewMode }
+																			disabled={ drawerData.type === 'edit' }
+																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																				fieldErrors[ 'campaign-target' ]
+																					? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																					: isViewMode
+																						? 'bg-gray-50 outline-gray-200'
+																						: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																			}` }
+																		/>
+																	</div>
+																	{ fieldErrors[ 'campaign-target' ] && (
+																		<p className="mt-1 text-sm text-red-600">
+																			{ fieldErrors[ 'campaign-target' ] }
+																		</p>
+																	) }
 																</div>
 															</div>
 															{ drawerData.type === 'new' && (
@@ -273,53 +333,65 @@ export default function ConfigureDrawer( props ) {
 															</div>
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
-															<div className="flex items-center justify-between ">
-																<label className="text-sm/6 font-medium text-gray-900">  {/* eslint-disable-line */}
+															<div className="flex items-center justify-between">
+																<label className={ `text-sm/6 font-medium ${ fieldErrors[ 'weekly-days' ] ? 'text-red-700' : 'text-gray-900' }` }> {/* eslint-disable-line */}
 																	{ __( 'On Days', 'wp-ai-blogger' ) }
 																</label>
-																<div className="flex flex-wrap gap-2 justify-end">
-																	{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
-																		<button
-																			key={ day }
-																			type="button"
-																			onClick={ () => {
-																				if ( isViewMode ) {
-																					return;
-																				}
-																				const repeatWeeklyOn = drawerData.repeatWeeklyOn || [];
-																				const newRepeatOn = repeatWeeklyOn.includes( day )
-																					? repeatWeeklyOn.filter( ( d ) => d !== day )
-																					: [ ...repeatWeeklyOn, day ];
-																				setDrawerData( { ...drawerData, repeatWeeklyOn: newRepeatOn } );
-																			} }
-																			className={ `capitalize text-xs p-2 rounded-full border ${
-																				( drawerData.repeatWeeklyOn || [] ).includes( day )
-																					? 'bg-indigo-600 text-white border-indigo-600'
-																					: 'bg-white text-gray-900 border-gray-300'
-																			} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
-																			disabled={ isViewMode }
-																		>
-																			{ day }
-																		</button>
-																	) ) }
+																<div>
+																	<div className="flex flex-wrap gap-2 justify-end">
+																		{ [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ].map( ( day ) => (
+																			<button
+																				key={ day }
+																				type="button"
+																				onClick={ () => {
+																					if ( isViewMode ) {
+																						return;
+																					}
+																					const repeatWeeklyOn = drawerData.repeatWeeklyOn || [];
+																					const newRepeatOn = repeatWeeklyOn.includes( day )
+																						? repeatWeeklyOn.filter( ( d ) => d !== day )
+																						: [ ...repeatWeeklyOn, day ];
+																					setDrawerData( { ...drawerData, repeatWeeklyOn: newRepeatOn } );
+																				} }
+																				className={ `capitalize text-xs p-2 rounded-full border transition-colors duration-200 ${
+																					( drawerData.repeatWeeklyOn || [] ).includes( day )
+																						? fieldErrors[ 'weekly-days' ]
+																							? 'bg-red-600 text-white border-red-600'
+																							: 'bg-indigo-600 text-white border-indigo-600'
+																						: fieldErrors[ 'weekly-days' ]
+																							? 'bg-red-50 text-red-900 border-red-300'
+																							: 'bg-white text-gray-900 border-gray-300'
+																				} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
+																				disabled={ isViewMode }
+																			>
+																				{ day }
+																			</button>
+																		) ) }
+																	</div>
+																	{ fieldErrors[ 'weekly-days' ] && (
+																		<p className="mt-1 text-sm text-red-600 text-right">
+																			{ fieldErrors[ 'weekly-days' ] }
+																		</p>
+																	) }
 																</div>
 															</div>
 														) }
 
-														<div className="flex items-center justify-between">
-															<label htmlFor="start-date" className="block text-sm/6 font-medium text-gray-900">
+														<div>
+															<label htmlFor="start-date" className={ `block text-sm/6 font-medium mb-2 ${
+																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
+															}` }>
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
 															</label>
-															<div className="mt-2">
-																<DateTimeField
-																	id="start-date"
-																	name="start-date"
-																	value={ drawerData.startDate }
-																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
-																	readOnly={ isViewMode }
-																	placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
-																/>
-															</div>
+															<DateTimeField
+																id="start-date"
+																name="start-date"
+																value={ drawerData.startDate }
+																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
+																readOnly={ isViewMode }
+																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
+																error={ fieldErrors[ 'start-date' ] }
+															/>
 														</div>
 
 														<div className="flex items-center justify-between">
@@ -651,11 +723,18 @@ export default function ConfigureDrawer( props ) {
 								</div>
 
 								<div className="flex shrink-0 justify-between items-center px-4 py-4">
-									<em className="text-red-600">
-										{ errorMessage }
-									</em>
+									{ errorMessage && (
+										<div className="flex items-center px-2 py-1 rounded bg-red-50 border border-red-200">
+											<svg className="w-3 h-3 text-red-500 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+											</svg>
+											<span className="text-xs text-red-700 font-medium">
+												{ errorMessage }
+											</span>
+										</div>
+									) }
 
-									<div className="flex items-center space-x-2">
+									<div className={ `flex items-center space-x-2 ${ ! errorMessage ? 'ml-auto' : '' }` }>
 										<button
 											type="button"
 											onClick={ closePopup }

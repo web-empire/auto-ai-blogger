@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
-class CronHandler {
+class Cron_Handler {
 	use Get_Instance;
 
 	/**
@@ -135,6 +135,10 @@ class CronHandler {
 			if ( ! empty( $tag ) ) {
 				wp_set_post_tags( $post_id, $tag );
 			}
+
+			// Add campaign reference meta to the post.
+			add_post_meta( $post_id, 'wp_aib_reference', 1 );
+			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
 
 			$posts_created = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', intval( $posts_created ) + 1 );
@@ -268,17 +272,25 @@ class CronHandler {
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
 
+		// Production mode: Normal intervals.
 		switch ( $unit ) {
 			case 'hour':
-				return $interval * HOUR_IN_SECONDS;
+				$seconds = $interval * HOUR_IN_SECONDS;
+				break;
 			case 'day':
-				return $interval * DAY_IN_SECONDS;
+				$seconds = $interval * DAY_IN_SECONDS;
+				break;
 			case 'week':
-				return $interval * WEEK_IN_SECONDS;
+				$seconds = $interval * WEEK_IN_SECONDS;
+				break;
 			case 'month':
-				return $interval * MONTH_IN_SECONDS;
+				$seconds = $interval * MONTH_IN_SECONDS;
+				break;
 			default:
-				return $interval * DAY_IN_SECONDS;
+				$seconds = $interval * DAY_IN_SECONDS;
 		}
+
+		// Allow testing plugins to modify intervals.
+		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
 	}
 }

@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useState, useId } from 'react';
 import { __ } from '@wordpress/i18n';
 
 /**
- * DateTimeField component for campaign start date selection
+ * DateTimeField component for campaign start date selection with custom 15-minute intervals
  */
 const DateTimeField = forwardRef( ( {
 	id,
@@ -18,7 +18,7 @@ const DateTimeField = forwardRef( ( {
 	error = '',
 	helperText = '',
 	className = '',
-	placeholder = '',
+	placeholder = '', // eslint-disable-line
 	'aria-label': ariaLabel,
 	'aria-describedby': ariaDescribedBy,
 	...props
@@ -26,6 +26,8 @@ const DateTimeField = forwardRef( ( {
 	const autoId = useId();
 	const inputId = id || autoId;
 	const [ isFocused, setIsFocused ] = useState( false );
+	const [ selectedDate, setSelectedDate ] = useState( '' );
+	const [ selectedTime, setSelectedTime ] = useState( '' );
 
 	// Helper text ID for ARIA
 	const helperTextId = helperText ? `${ inputId }-helper` : undefined;
@@ -38,70 +40,166 @@ const DateTimeField = forwardRef( ( {
 		errorTextId,
 	].filter( Boolean ).join( ' ' ) || undefined;
 
-	/**
-	 * Format date string for datetime-local input
-	 * Accepts various date formats and converts to YYYY-MM-DDTHH:mm format
-	 */
-	const formatDateTimeLocal = useCallback( ( dateValue ) => {
-		if ( ! dateValue ) {
-			return '';
+	// Generate time options in 5-minute intervals
+	const generateTimeOptions = useCallback( () => {
+		const options = [];
+		for ( let hour = 0; hour < 24; hour++ ) {
+			for ( let minute = 0; minute < 60; minute += 5 ) {
+				const hourStr = String( hour ).padStart( 2, '0' );
+				const minuteStr = String( minute ).padStart( 2, '0' );
+				const timeValue = `${ hourStr }:${ minuteStr }`;
+				const displayTime = new Date( `1970-01-01T${ timeValue }` ).toLocaleTimeString( [], {
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: true,
+				} );
+				options.push( { value: timeValue, label: displayTime } );
+			}
+		}
+		return options;
+	}, [] );
+
+	// Get minimum date (today)
+	const getMinDate = useCallback( () => {
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = String( today.getMonth() + 1 ).padStart( 2, '0' );
+		const day = String( today.getDate() ).padStart( 2, '0' );
+		return `${ year }-${ month }-${ day }`;
+	}, [] );
+
+	// Get minimum time for today
+	const getMinTimeForToday = useCallback( () => {
+		const now = new Date();
+		const currentHour = now.getHours();
+		const currentMinutes = now.getMinutes();
+
+		// Round up to next 5-minute interval
+		let nextInterval = Math.ceil( currentMinutes / 5 ) * 5;
+		let hour = currentHour;
+
+		if ( nextInterval >= 60 ) {
+			nextInterval = 0;
+			hour += 1;
+		}
+
+		if ( hour >= 24 ) {
+			return null; // No valid time today
+		}
+
+		return `${ String( hour ).padStart( 2, '0' ) }:${ String( nextInterval ).padStart( 2, '0' ) }`;
+	}, [] );
+
+	// Parse initial value
+	const parseInitialValue = useCallback( ( val ) => {
+		if ( ! val ) {
+			return { date: '', time: '' };
 		}
 
 		try {
-			const date = new Date( dateValue );
-			if ( isNaN( date.getTime() ) ) {
-				return '';
+			const dateObj = new Date( val );
+			if ( isNaN( dateObj.getTime() ) ) {
+				return { date: '', time: '' };
 			}
 
-			// Format to YYYY-MM-DDTHH:mm (required for datetime-local input)
-			const year = date.getFullYear();
-			const month = String( date.getMonth() + 1 ).padStart( 2, '0' );
-			const day = String( date.getDate() ).padStart( 2, '0' );
-			const hours = String( date.getHours() ).padStart( 2, '0' );
-			const minutes = String( date.getMinutes() ).padStart( 2, '0' );
+			const year = dateObj.getFullYear();
+			const month = String( dateObj.getMonth() + 1 ).padStart( 2, '0' );
+			const day = String( dateObj.getDate() ).padStart( 2, '0' );
+			const hours = String( dateObj.getHours() ).padStart( 2, '0' );
+			const minutes = String( dateObj.getMinutes() ).padStart( 2, '0' );
 
-			return `${ year }-${ month }-${ day }T${ hours }:${ minutes }`;
+			return {
+				date: `${ year }-${ month }-${ day }`,
+				time: `${ hours }:${ minutes }`,
+			};
 		} catch ( e ) {
-			return '';
+			return { date: '', time: '' };
 		}
 	}, [] );
 
-	/**
-	 * Convert datetime-local value to ISO string for consistency
-	 */
-	const formatOutputDate = useCallback( ( dateTimeLocalValue ) => {
-		if ( ! dateTimeLocalValue ) {
-			return '';
-		}
+	// Initialize state from value
+	const initialParsed = parseInitialValue( value || defaultValue );
+	if ( ! selectedDate && ! selectedTime && ( initialParsed.date || initialParsed.time ) ) {
+		setSelectedDate( initialParsed.date );
+		setSelectedTime( initialParsed.time );
+	}
 
-		try {
-			const date = new Date( dateTimeLocalValue );
-			if ( isNaN( date.getTime() ) ) {
-				return '';
+	// Handle date change
+	const handleDateChange = useCallback( ( event ) => {
+		const newDate = event.target.value;
+		setSelectedDate( newDate );
+
+		// If selecting today, validate the current time
+		const today = getMinDate();
+		if ( newDate === today && selectedTime ) {
+			const minTime = getMinTimeForToday();
+			if ( minTime && selectedTime < minTime ) {
+				setSelectedTime( minTime );
 			}
-
-			return date.toISOString();
-		} catch ( e ) {
-			return '';
 		}
-	}, [] );
 
-	// Enhanced change handler
-	const handleChange = useCallback( ( event ) => {
-		const newValue = event.target.value;
-		const formattedDate = formatOutputDate( newValue );
+		// Combine date and time and notify parent
+		if ( newDate && selectedTime ) {
+			const combinedDateTime = `${ newDate }T${ selectedTime }`;
+			const isoString = new Date( combinedDateTime ).toISOString();
 
-		// Create a custom event object with the formatted date
-		const customEvent = {
-			...event,
-			target: {
-				...event.target,
-				value: formattedDate,
-			},
-		};
+			const customEvent = {
+				target: {
+					name: name || inputId,
+					value: isoString,
+				},
+			};
+			onChange?.( customEvent );
+		}
+	}, [ selectedTime, getMinDate, getMinTimeForToday, name, inputId, onChange ] );
 
-		onChange?.( customEvent );
-	}, [ onChange, formatOutputDate ] );
+	// Handle time change
+	const handleTimeChange = useCallback( ( event ) => {
+		const newTime = event.target.value;
+
+		// Validate time if selecting today
+		const today = getMinDate();
+		if ( selectedDate === today ) {
+			const minTime = getMinTimeForToday();
+			if ( minTime && newTime < minTime ) {
+				return; // Don't allow past times for today
+			}
+		}
+
+		setSelectedTime( newTime );
+
+		// Combine date and time and notify parent
+		if ( selectedDate && newTime ) {
+			const combinedDateTime = `${ selectedDate }T${ newTime }`;
+			const isoString = new Date( combinedDateTime ).toISOString();
+
+			const customEvent = {
+				target: {
+					name: name || inputId,
+					value: isoString,
+				},
+			};
+			onChange?.( customEvent );
+		}
+	}, [ selectedDate, getMinDate, getMinTimeForToday, name, inputId, onChange ] );
+
+	// Get available time options based on selected date
+	const getAvailableTimeOptions = useCallback( () => {
+		const allOptions = generateTimeOptions();
+		const today = getMinDate();
+
+		if ( selectedDate !== today ) {
+			return allOptions;
+		}
+
+		// For today, filter out past times
+		const minTime = getMinTimeForToday();
+		if ( ! minTime ) {
+			return []; // No valid times for today
+		}
+
+		return allOptions.filter( ( option ) => option.value >= minTime );
+	}, [ selectedDate, generateTimeOptions, getMinDate, getMinTimeForToday ] );
 
 	// Enhanced focus handlers
 	const handleFocus = useCallback( ( event ) => {
@@ -114,9 +212,6 @@ const DateTimeField = forwardRef( ( {
 		onBlur?.( event );
 	}, [ onBlur ] );
 
-	// Get current value formatted for datetime-local input
-	const formattedValue = formatDateTimeLocal( value || defaultValue );
-
 	// State-based styles
 	const getStateStyles = () => {
 		if ( error ) {
@@ -125,8 +220,8 @@ const DateTimeField = forwardRef( ( {
 		return '';
 	};
 
-	// Combine classes following the same pattern as other inputs in ConfigureDrawer
-	const inputClasses = `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+	// Base input classes with consistent height
+	const inputClasses = `block w-full h-10 rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
 		readOnly
 			? 'bg-gray-50 outline-gray-200 cursor-default'
 			: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
@@ -138,48 +233,92 @@ const DateTimeField = forwardRef( ( {
 		isFocused && ! readOnly ? 'ring-2 ring-indigo-500 ring-opacity-20' : ''
 	}`;
 
+	const timeOptions = getAvailableTimeOptions();
+
 	return (
 		<div className={ `datetime-field-wrapper ${ className }` }>
-			<input
-				ref={ ref }
-				id={ inputId }
-				name={ name || inputId }
-				type="datetime-local"
-				value={ formattedValue }
-				placeholder={ placeholder || __( 'Select date and time', 'wp-ai-blogger' ) }
-				disabled={ disabled }
-				required={ required }
-				readOnly={ readOnly }
-				className={ inputClasses }
-				onChange={ handleChange }
-				onFocus={ handleFocus }
-				onBlur={ handleBlur }
-				aria-label={ ariaLabel || __( 'Select campaign start date and time', 'wp-ai-blogger' ) }
-				aria-describedby={ describedBy }
-				aria-invalid={ Boolean( error ) }
-				aria-required={ required }
-				{ ...props }
-			/>
+			<div className="grid grid-cols-2 gap-3">
+				{ /* Date Input */ }
+				<div>
+					<label htmlFor={ `${ inputId }-date` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+						{ __( 'Date', 'wp-ai-blogger' ) }
+					</label>
+					<input
+						id={ `${ inputId }-date` }
+						type="date"
+						value={ selectedDate }
+						min={ getMinDate() }
+						onChange={ handleDateChange }
+						onFocus={ handleFocus }
+						onBlur={ handleBlur }
+						disabled={ disabled }
+						required={ required }
+						readOnly={ readOnly }
+						className={ inputClasses }
+						aria-describedby={ describedBy }
+						aria-invalid={ Boolean( error ) }
+					/>
+				</div>
+
+				{ /* Time Select */ }
+				<div>
+					<label htmlFor={ `${ inputId }-time` } className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+						{ __( 'Time', 'wp-ai-blogger' ) }
+					</label>
+					<select
+						id={ `${ inputId }-time` }
+						value={ selectedTime }
+						onChange={ handleTimeChange }
+						onFocus={ handleFocus }
+						onBlur={ handleBlur }
+						disabled={ disabled || ! selectedDate || timeOptions.length === 0 }
+						required={ required }
+						className={ inputClasses }
+						aria-describedby={ describedBy }
+						aria-invalid={ Boolean( error ) }
+					>
+						<option value="">{ __( 'Select time', 'wp-ai-blogger' ) }</option>
+						{ timeOptions.map( ( option ) => (
+							<option key={ option.value } value={ option.value }>
+								{ option.label }
+							</option>
+						) ) }
+					</select>
+				</div>
+			</div>
 
 			{ helperText && (
 				<p
 					id={ helperTextId }
-					className="mt-1 text-sm text-gray-600"
+					className="mt-2 text-sm text-gray-600"
 				>
 					{ helperText }
 				</p>
 			) }
 
+			<p className="mt-1 text-xs text-gray-400">
+				{ __( 'Past dates/times cannot be selected.', 'wp-ai-blogger' ) }
+			</p>
+
 			{ error && (
 				<p
 					id={ errorTextId }
-					className="mt-1 text-sm text-red-600"
+					className="mt-2 text-sm text-red-600"
 					role="alert"
 					aria-live="polite"
 				>
 					{ error }
 				</p>
 			) }
+
+			{ /* Hidden input for form compatibility */ }
+			<input
+				ref={ ref }
+				type="hidden"
+				name={ name || inputId }
+				value={ selectedDate && selectedTime ? new Date( `${ selectedDate }T${ selectedTime }` ).toISOString() : '' }
+				{ ...props }
+			/>
 		</div>
 	);
 } );
