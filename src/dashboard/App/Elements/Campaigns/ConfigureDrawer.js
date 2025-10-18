@@ -266,7 +266,7 @@ export default function ConfigureDrawer( props ) {
 																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
 																	<Tooltip
 																		text={ drawerData.type === 'edit'
-																			? __( 'Post Target can not be updated', 'wp-ai-blogger' )
+																			? __( 'Post Target can not be updated.', 'wp-ai-blogger' )
 																			: __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' )
 																		}
 																		delay={ 100 }
@@ -398,13 +398,13 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<label htmlFor="start-date" className={ `block text-sm/6 font-medium mb-2 ${
+															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
 																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
 															}` }>
 																{ __( 'Start Date', 'wp-ai-blogger' ) }
 																{ ( drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) ) && (
 																	<Tooltip
-																		text={ __( 'Start Date can not be updated', 'wp-ai-blogger' ) }
+																		text={ __( 'Start Date can not be updated.', 'wp-ai-blogger' ) }
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																	>
