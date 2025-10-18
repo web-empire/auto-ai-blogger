@@ -423,7 +423,7 @@ export default function ConfigureDrawer( props ) {
 																readOnly={ isViewMode }
 																disabled={ drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) }
 																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
-																error={ fieldErrors['start-date'] }
+																error={ fieldErrors[ 'start-date' ] }
 															/>
 														</div>
 
@@ -776,57 +776,59 @@ export default function ConfigureDrawer( props ) {
 											{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
 										</button>
 
-									{ ! isViewMode && (
-										<button
-											onClick={ handleCampaign }
-											disabled={ handlingCampaign || (() => {
+										{ ! isViewMode && (
+											<button
+												onClick={ handleCampaign }
+												disabled={ handlingCampaign || ( () => {
 												// Check if campaign is completed to disable update button
-												if (drawerData.type === 'new') return false; // Allow creation of new campaigns
+													if ( drawerData.type === 'new' ) {
+														return false;
+													} // Allow creation of new campaigns
 
-												const postsCreated = parseInt(drawerData.postsCreated) || 0;
-												const postsTarget = parseInt(drawerData.postsTarget) || 0;
-												const postsRemaining = Math.max(0, postsTarget - postsCreated);
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
 
-												// Campaign is completed if:
-												// 1. Status is draft (inactive), OR
-												// 2. Target is met (created >= target), OR
-												// 3. All attempts completed (campaignCompleted flag is true), OR
-												// 4. All attempts have been made AND undelivered posts are showing
-												const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-												const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
-												const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
-												const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && (postsCreated + postsRemaining) >= postsTarget;
-
-												return isCompletedBase || isAllAttemptsMadeWithFailures;
-											})() }
-											className={ `ml-4 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-												handlingCampaign || (drawerData.type === 'edit' && (() => {
-													const postsCreated = parseInt(drawerData.postsCreated) || 0;
-													const postsTarget = parseInt(drawerData.postsTarget) || 0;
-													const postsRemaining = Math.max(0, postsTarget - postsCreated);
+													// Campaign is completed if:
+													// 1. Status is draft (inactive), OR
+													// 2. Target is met (created >= target), OR
+													// 3. All attempts completed (campaignCompleted flag is true), OR
+													// 4. All attempts have been made AND undelivered posts are showing
 													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
 													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
 													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
-													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && (postsCreated + postsRemaining) >= postsTarget;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+
 													return isCompletedBase || isAllAttemptsMadeWithFailures;
-												})())
-													? 'cursor-not-allowed opacity-50 bg-gray-400 text-gray-200 focus-visible:outline-gray-400'
-													: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600'
-											}` }
-											title={ drawerData.type === 'edit' && (() => {
-												const postsCreated = parseInt(drawerData.postsCreated) || 0;
-												const postsTarget = parseInt(drawerData.postsTarget) || 0;
-												const postsRemaining = Math.max(0, postsTarget - postsCreated);
-												const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-												const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
-												const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
-												const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && (postsCreated + postsRemaining) >= postsTarget;
-												return isCompletedBase || isAllAttemptsMadeWithFailures;
-											})() ? __( 'Campaign completed - Updates disabled', 'wp-ai-blogger' ) : '' }
-										>
-											{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
-										</button>
-									) }
+												} )() }
+												className={ `ml-4 inline-flex justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+													handlingCampaign || ( drawerData.type === 'edit' && ( () => {
+														const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+														const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+														const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+														const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+														const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+														const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+														const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+														return isCompletedBase || isAllAttemptsMadeWithFailures;
+													} )() )
+														? 'cursor-not-allowed opacity-50 bg-gray-400 text-gray-200 focus-visible:outline-gray-400'
+														: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600'
+												}` }
+												title={ drawerData.type === 'edit' && ( () => {
+													const postsCreated = parseInt( drawerData.postsCreated ) || 0;
+													const postsTarget = parseInt( drawerData.postsTarget ) || 0;
+													const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+													const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+													const isAllAttemptsCompleted = drawerData.campaignCompleted === true;
+													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+													return isCompletedBase || isAllAttemptsMadeWithFailures;
+												} )() ? __( 'Campaign completed - Updates disabled', 'wp-ai-blogger' ) : '' }
+											>
+												{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+											</button>
+										) }
 									</div>
 
 								</div>

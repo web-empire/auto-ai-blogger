@@ -44,13 +44,17 @@ export default function Campaigns() {
 
 	// Sort campaigns based on selected criteria
 	const sortedCampaigns = useMemo( () => {
-		if ( ! campaigns ) return [];
+		if ( ! campaigns ) {
+			return [];
+		}
 
 		const campaignsArray = Object.values( campaigns );
 
 		// First filter by search term
-		const filteredCampaigns = campaignsArray.filter( campaign => {
-			if ( ! searchTerm ) return true;
+		const filteredCampaigns = campaignsArray.filter( ( campaign ) => {
+			if ( ! searchTerm ) {
+				return true;
+			}
 
 			const searchLower = searchTerm.toLowerCase();
 			return (
@@ -65,14 +69,22 @@ export default function Campaigns() {
 			switch ( sortBy ) {
 				case 'active':
 					// Active campaigns first (publish status)
-					if ( a.status === 'publish' && b.status !== 'publish' ) return -1;
-					if ( a.status !== 'publish' && b.status === 'publish' ) return 1;
+					if ( a.status === 'publish' && b.status !== 'publish' ) {
+						return -1;
+					}
+					if ( a.status !== 'publish' && b.status === 'publish' ) {
+						return 1;
+					}
 					return 0;
 
 				case 'inactive':
 					// Inactive campaigns first (draft status)
-					if ( a.status === 'draft' && b.status !== 'draft' ) return -1;
-					if ( a.status !== 'draft' && b.status === 'draft' ) return 1;
+					if ( a.status === 'draft' && b.status !== 'draft' ) {
+						return -1;
+					}
+					if ( a.status !== 'draft' && b.status === 'draft' ) {
+						return 1;
+					}
 					return 0;
 
 				case 'name-asc':
@@ -120,7 +132,7 @@ export default function Campaigns() {
 					{ __( 'Name', 'wp-ai-blogger' ) }
 					<ArrowUp className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 		{
 			value: 'name-desc',
@@ -129,7 +141,7 @@ export default function Campaigns() {
 					{ __( 'Name', 'wp-ai-blogger' ) }
 					<ArrowDown className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 		{
 			value: 'start-date-asc',
@@ -138,7 +150,7 @@ export default function Campaigns() {
 					{ __( 'Start Date', 'wp-ai-blogger' ) }
 					<ArrowUp className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 		{
 			value: 'start-date-desc',
@@ -147,7 +159,7 @@ export default function Campaigns() {
 					{ __( 'Start Date', 'wp-ai-blogger' ) }
 					<ArrowDown className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 		{
 			value: 'end-date-asc',
@@ -156,7 +168,7 @@ export default function Campaigns() {
 					{ __( 'Last Run', 'wp-ai-blogger' ) }
 					<ArrowUp className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 		{
 			value: 'end-date-desc',
@@ -165,7 +177,7 @@ export default function Campaigns() {
 					{ __( 'Last Run', 'wp-ai-blogger' ) }
 					<ArrowDown className="w-3 h-3" />
 				</span>
-			)
+			),
 		},
 	];
 
@@ -427,15 +439,15 @@ export default function Campaigns() {
 					</div>
 
 					<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-3">
-						{/* Sort Dropdown */}
+						{ /* Sort Dropdown */ }
 						<div className="relative" ref={ sortDropdownRef }>
 							<button
 								type="button"
 								onClick={ () => setShowSortDropdown( ! showSortDropdown ) }
 								className="flex items-center gap-2 rounded-md bg-white px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
-								style={{ height: '38px' }}
+								style={ { height: '38px' } }
 							>
-								{ sortOptions.find( option => option.value === sortBy )?.label || __( 'Sort', 'wp-ai-blogger' ) }
+								{ sortOptions.find( ( option ) => option.value === sortBy )?.label || __( 'Sort', 'wp-ai-blogger' ) }
 								<ChevronDown className={ `w-4 h-4 transition-transform duration-200 ${ showSortDropdown ? 'rotate-180' : '' }` } />
 							</button>
 
@@ -463,29 +475,29 @@ export default function Campaigns() {
 							) }
 						</div>
 
-						{/* Search Input */}
+						{ /* Search Input */ }
 						<div className="relative min-w-[240px]">
-							<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px' }}>
+							<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={ { paddingLeft: '12px' } }>
 								<Search className="h-4 w-4 text-gray-400" />
 							</div>
 							<input
 								type="text"
 								value={ searchTerm }
 								onChange={ ( e ) => setSearchTerm( e.target.value ) }
-								placeholder={ __( 'Search campaigns...', 'wp-ai-blogger' ) }
+								placeholder={ __( 'Search campaigns…', 'wp-ai-blogger' ) }
 								className="block w-full text-sm rounded-md bg-white placeholder-gray-400 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 outline-none transition-all duration-200"
-								style={{
+								style={ {
 									height: '38px',
 									paddingLeft: '40px',
-									paddingRight: searchTerm ? '40px' : '12px'
-								}}
+									paddingRight: searchTerm ? '40px' : '12px',
+								} }
 							/>
 							{ searchTerm && (
 								<button
 									type="button"
 									onClick={ () => setSearchTerm( '' ) }
 									className="absolute inset-y-0 right-0 flex items-center cursor-pointer border-none bg-transparent text-gray-400 hover:text-gray-600 transition-colors duration-200"
-									style={{ paddingRight: '12px' }}
+									style={ { paddingRight: '12px' } }
 								>
 									<X className="h-4 w-4" />
 								</button>
@@ -495,7 +507,7 @@ export default function Campaigns() {
 						<button
 							type="button"
 							className="flex items-center justify-center rounded-md bg-indigo-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
-							style={{ height: '38px' }}
+							style={ { height: '38px' } }
 							onClick={ ( e ) => {
 								e.preventDefault();
 								setConfigureData( defaultMetaDefaults );
@@ -545,243 +557,240 @@ export default function Campaigns() {
 																{ campaign.name }
 															</td>
 
-														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{(() => {
+															<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+																{ ( () => {
 																// Use direct metadata fields instead of parsing
-																const postsCreated = parseInt(campaign.postsCreated) || 0;
-																const postsTarget = parseInt(campaign.postsTarget) || 0;
-																const postsFailed = parseInt(campaign.postsFailed) || 0;
+																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
+																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
 
-																// Calculate remaining posts that couldn't be generated
-																const postsRemaining = Math.max(0, postsTarget - postsCreated);
+																	// Calculate remaining posts that couldn't be generated
+																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
 
-																// Check if campaign is completed to show undelivered
-																const isCompleted = campaign.status === 'draft' ||
-																	(postsTarget > 0 && postsCreated >= postsTarget) ||
+																	// Check if campaign is completed to show undelivered
+																	const isCompleted = campaign.status === 'draft' ||
+																	( postsTarget > 0 && postsCreated >= postsTarget ) ||
 																	campaign.campaignCompleted === true;
 
-																// Campaign should be disabled when:
-																// 1. Success posts meet or exceed target, OR
-																// 2. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures), OR
-																// 3. Campaign completion flag is set
-																const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-																const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompleted && (postsCreated + postsRemaining) >= postsTarget;
-																const isAllAttemptsCompleted = campaign.campaignCompleted === true;
-																const shouldDisableSwitch = isTargetMet || isAllAttemptsMadeWithFailures || isAllAttemptsCompleted;
-																const isUpdating = updatingStatus[ campaign.id ] || false;
+																	// Campaign should be disabled when:
+																	// 1. Success posts meet or exceed target, OR
+																	// 2. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures), OR
+																	// 3. Campaign completion flag is set
+																	const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+																	const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompleted && ( postsCreated + postsRemaining ) >= postsTarget;
+																	const isAllAttemptsCompleted = campaign.campaignCompleted === true;
+																	const shouldDisableSwitch = isTargetMet || isAllAttemptsMadeWithFailures || isAllAttemptsCompleted;
+																	const isUpdating = updatingStatus[ campaign.id ] || false;
 
-																return (
-																	<div className="relative">
-																		<SwitchControl
-																			checked={ 'publish' === campaign.status }
-																			onChange={ () => toggleCampaignStatus( campaign.id, campaign.status ) }
-																			disabled={ isUpdating || shouldDisableSwitch }
-																			aria-label={ `${ __( 'Toggle campaign status for', 'wp-ai-blogger' ) } ${ campaign.name }` }
-																		/>
-																		{ shouldDisableSwitch && (
-																			<Tooltip
-																				text={__( 'Campaign completed.', 'wp-ai-blogger' )
-																				}
+																	return (
+																		<div className="relative">
+																			<SwitchControl
+																				checked={ 'publish' === campaign.status }
+																				onChange={ () => toggleCampaignStatus( campaign.id, campaign.status ) }
+																				disabled={ isUpdating || shouldDisableSwitch }
+																				aria-label={ `${ __( 'Toggle campaign status for', 'wp-ai-blogger' ) } ${ campaign.name }` }
+																			/>
+																			{ shouldDisableSwitch && (
+																				<Tooltip
+																					text={ __( 'Campaign completed.', 'wp-ai-blogger' )
+																					}
+																					delay={ 100 }
+																					className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																				>
+																					<div className="absolute inset-0 cursor-help"></div>
+																				</Tooltip>
+																			) }
+																		</div>
+																	);
+																} )() }
+															</td>
+
+															<td className="whitespace-nowrap px-3 py-4 text-sm">
+																{ ( () => {
+																// Use direct metadata fields for clean display
+																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
+																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
+
+																	// Calculate remaining posts that couldn't be generated
+																	// Remaining = Target - Successfully Created
+																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+
+																	// Check if campaign is completed (inactive, target met, or all attempts exhausted)
+																	const isCompleted = campaign.status === 'draft' ||
+																	( postsTarget > 0 && postsCreated >= postsTarget ) ||
+																	campaign.campaignCompleted === true;
+
+																	return (
+																		<div className="flex flex-col gap-1">
+																			<div className="flex items-center gap-2">
+																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+																				Success: { postsCreated }
+																				</span>
+																				{ postsRemaining > 0 && isCompleted && (
+																					<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+																					Undelivered: { postsRemaining }
+																					</span>
+																				) }
+																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+																				Target: { postsTarget }
+																				</span>
+																			</div>
+																		</div>
+																	);
+																} )() }
+															</td>
+
+															<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+																{ campaign.last_post_title && campaign.last_post_title.length > 0 ? (
+																	<Tooltip text={ campaign.last_post_title }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<TrimWordsContent content={ campaign.last_post_title } count={ 5 } />
+																	</Tooltip>
+																) : (
+																	<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>
+																) }
+															</td>
+
+															<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+																{ campaign.frequency }
+															</td>
+
+															<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
+																<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer ${
+																	campaign.startDate && campaign.startDate.trim() !== ''
+																		? 'text-gray-500 hover:text-indigo-900'
+																		: 'text-amber-500 hover:text-amber-600'
+																}` }>
+																	<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${
+																		campaign.startDate && campaign.startDate.trim() !== ''
+																			? new Date( campaign.startDate ).toLocaleString()
+																			: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString()
+																	}` }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<CalendarArrowUp className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																	</Tooltip>
+																</button>
+
+																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
+																	<Tooltip text={ ( () => {
+																	// Use direct metadata field to check if any posts have been created
+																		const postsCreated = parseInt( campaign.postsCreated ) || 0;
+
+																		// Show appropriate message based on posts created
+																		if ( postsCreated === 0 ) {
+																			return __( 'Not yet started - No posts created', 'wp-ai-blogger' );
+																		}
+																		return `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }`;
+																	} )() }
+																	delay={ 100 }
+																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<Info className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																	</Tooltip>
+																</button>
+
+																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																	viewCampaignPosts( e, campaign.id );
+																} }>
+																	<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<List className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																	</Tooltip>
+																</button>
+
+																<button type="button" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" onClick={ configureCampaign }>
+																	<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		{
+																			openingConfigureDrawer ? (
+																				<RotateCw className="w-4 h-4 animate-spin" style={ { outline: 'none' } } tabIndex="-1" />
+																			) : (
+																				<Settings className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																			)
+																		}
+																	</Tooltip>
+																</button>
+
+																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																	openCampaignAnalytics( e, campaign.id );
+																} }>
+																	<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<ChartNoAxesColumn className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																	</Tooltip>
+																</button>
+
+																{ ( () => {
+																// Check if campaign is completed to enable/disable logs using direct metadata fields
+																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
+																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
+
+																	// Calculate remaining posts that couldn't be generated
+																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+
+																	// Campaign is completed if:
+																	// 1. Status is draft (inactive), OR
+																	// 2. Target is met (created >= target), OR
+																	// 3. All attempts completed (campaignCompleted flag is true), OR
+																	// 4. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures)
+																	const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+																	const isAllAttemptsCompleted = campaign.campaignCompleted === true;
+																	const isCompletedBase = campaign.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
+																	const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
+																	const isCompleted = isCompletedBase || isAllAttemptsMadeWithFailures;
+
+																	const logsTooltipText = isCompleted
+																		? __( 'View logs', 'wp-ai-blogger' )
+																		: __( 'Logs available after campaign completion', 'wp-ai-blogger' );
+
+																	return (
+																		<button
+																			type="button"
+																			className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 ${
+																				isCompleted
+																					? 'text-gray-500 hover:text-indigo-900 cursor-pointer'
+																					: 'text-gray-300 cursor-not-allowed'
+																			}` }
+																			data-campaign_id={ campaign.id }
+																			onClick={ isCompleted ? ( e ) => {
+																				e.preventDefault();
+																				e.stopPropagation();
+																				openCampaignLogs( e, campaign.id );
+																			} : undefined }
+																			disabled={ ! isCompleted }
+																		>
+																			<Tooltip text={ logsTooltipText }
 																				delay={ 100 }
 																				className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																			>
-																				<div className="absolute inset-0 cursor-help"></div>
+																				<ScrollText className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
 																			</Tooltip>
-																		) }
-																	</div>
-																);
-															} )() }
-														</td>
+																		</button>
+																	);
+																} )() }
 
-														<td className="whitespace-nowrap px-3 py-4 text-sm">
-															{(() => {
-																// Use direct metadata fields for clean display
-																const postsCreated = parseInt(campaign.postsCreated) || 0;
-																const postsTarget = parseInt(campaign.postsTarget) || 0;
-																const postsFailed = parseInt(campaign.postsFailed) || 0;
-
-																// Calculate remaining posts that couldn't be generated
-																// Remaining = Target - Successfully Created
-																const postsRemaining = Math.max(0, postsTarget - postsCreated);
-
-																// Check if campaign is completed (inactive, target met, or all attempts exhausted)
-																const isCompleted = campaign.status === 'draft' ||
-																	(postsTarget > 0 && postsCreated >= postsTarget) ||
-																	campaign.campaignCompleted === true;
-
-																return (
-																	<div className="flex flex-col gap-1">
-																		<div className="flex items-center gap-2">
-																			<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-																				Success: { postsCreated }
-																			</span>
-																			{ postsRemaining > 0 && isCompleted && (
-																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-																					Undelivered: { postsRemaining }
-																				</span>
-																			) }
-																			<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-																				Target: { postsTarget }
-																			</span>
-																		</div>
-																	</div>
-																);
-															})()}
-														</td>
-
-														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{ campaign.last_post_title && campaign.last_post_title.length > 0 ? (
-																<Tooltip text={ campaign.last_post_title }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<TrimWordsContent content={ campaign.last_post_title } count={ 5 } />
-																</Tooltip>
-															) : (
-																<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>
-															) }
-														</td>
-
-														<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-															{ campaign.frequency }
-														</td>
-
-														<td className="whitespace-nowrap py-4 pl-3 pr-4 sm:pr-6 flex gap-x-4 items-center">
-															<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer ${
-																campaign.startDate && campaign.startDate.trim() !== ''
-																	? 'text-gray-500 hover:text-indigo-900'
-																	: 'text-amber-500 hover:text-amber-600'
-															}` }>
-																<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${
-																	campaign.startDate && campaign.startDate.trim() !== ''
-																		? new Date( campaign.startDate ).toLocaleString()
-																		: __( 'Not configured - Click Configure to set start date. Currently using creation date', 'wp-ai-blogger' ) + ': ' + new Date( campaign.created_at ).toLocaleString()
-																}` }
-																delay={ 100 }
-																className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<CalendarArrowUp className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
-																</Tooltip>
-															</button>
-
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer">
-																<Tooltip text={ (() => {
-																	// Use direct metadata field to check if any posts have been created
-																	const postsCreated = parseInt(campaign.postsCreated) || 0;
-
-																	// Show appropriate message based on posts created
-																	if (postsCreated === 0) {
-																		return __( 'Not yet started - No posts created', 'wp-ai-blogger' );
-																	} else {
-																		return `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }`;
-																	}
-																})() }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<Info className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
-																</Tooltip>
-															</button>
-
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																viewCampaignPosts( e, campaign.id );
-															} }>
-																<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<List className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
-																</Tooltip>
-															</button>
-
-															<button type="button" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" onClick={ configureCampaign }>
-																<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	{
-																		openingConfigureDrawer ? (
-																			<RotateCw className="w-4 h-4 animate-spin" style={ { outline: 'none' } } tabIndex="-1" />
-																		) : (
-																			<Settings className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
-																		)
-																	}
-																</Tooltip>
-															</button>
-
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																openCampaignAnalytics( e, campaign.id );
-															} }>
-																<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<ChartNoAxesColumn className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
-																</Tooltip>
-															</button>
-
-															{(() => {
-																// Check if campaign is completed to enable/disable logs using direct metadata fields
-																const postsCreated = parseInt(campaign.postsCreated) || 0;
-																const postsTarget = parseInt(campaign.postsTarget) || 0;
-
-																// Calculate remaining posts that couldn't be generated
-																const postsRemaining = Math.max(0, postsTarget - postsCreated);
-
-																// Campaign is completed if:
-																// 1. Status is draft (inactive), OR
-																// 2. Target is met (created >= target), OR
-																// 3. All attempts completed (campaignCompleted flag is true), OR
-																// 4. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures)
-																const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-																const isAllAttemptsCompleted = campaign.campaignCompleted === true;
-																const isCompletedBase = campaign.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
-																const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && (postsCreated + postsRemaining) >= postsTarget;
-																const isCompleted = isCompletedBase || isAllAttemptsMadeWithFailures;
-
-																const logsTooltipText = isCompleted
-																	? __( 'View logs', 'wp-ai-blogger' )
-																	: __( 'Logs available after campaign completion', 'wp-ai-blogger' );
-
-																return (
-																	<button
-																		type="button"
-																		className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 ${
-																			isCompleted
-																				? 'text-gray-500 hover:text-indigo-900 cursor-pointer'
-																				: 'text-gray-300 cursor-not-allowed'
-																		}` }
-																		data-campaign_id={ campaign.id }
-																		onClick={ isCompleted ? ( e ) => {
-																			e.preventDefault();
-																			e.stopPropagation();
-																			openCampaignLogs( e, campaign.id );
-																		} : undefined }
-																		disabled={ !isCompleted }
+																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																	openDeleteModal( e, campaign.id );
+																} }>
+																	<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																	>
-																		<Tooltip text={ logsTooltipText }
-																			delay={ 100 }
-																			className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																		>
-																			<ScrollText className="w-4 h-4" style={{ outline: 'none' }} tabIndex="-1" />
-																		</Tooltip>
-																	</button>
-																);
-															})()}
-
-															<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
-																openDeleteModal( e, campaign.id );
-															} }>
-																<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
-																	delay={ 100 }
-																	className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																>
-																	<Trash2 className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
-																</Tooltip>
-															</button>
-														</td>
-													</tr>
-												) )
+																		<Trash2 className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																	</Tooltip>
+																</button>
+															</td>
+														</tr>
+													) )
 												) : (
 													<tr>
 														<td colSpan="6" className="py-12 text-center">
@@ -795,7 +804,7 @@ export default function Campaigns() {
 																</h3>
 																<p className="text-sm text-gray-500 max-w-sm">
 																	{ searchTerm
-																		? sprintf( __( 'No campaigns match "%s".', 'wp-ai-blogger' ), searchTerm )
+																		? sprintf( /* translators: %s: search term */ __( 'No campaigns match "%s".', 'wp-ai-blogger' ), searchTerm )
 																		: __( 'Try different search terms or clear your search to see all campaigns.', 'wp-ai-blogger' )
 																	}
 																</p>

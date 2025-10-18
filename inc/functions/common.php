@@ -804,37 +804,42 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
 	}
 
 	// Sanitize inputs.
-	$error_type = sanitize_text_field( $error_type );
-	$error_message = sanitize_textarea_field( $error_message );
+	$error_type     = sanitize_text_field( $error_type );
+	$error_message  = sanitize_textarea_field( $error_message );
 	$timestamp_data = wpaib_create_timestamp_data();
 
 	// Get existing error logs (limit to last 50 entries to prevent bloat).
-	$existing_logs = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'errorLogs' );
+	$existing_logs = Metadata::get_campaign_meta( $campaign_id, 'errorLogs' );
 	if ( ! is_array( $existing_logs ) ) {
 		$existing_logs = [];
 	}
 
-	// Create new error log entry using standardized timestamp data
-	$error_log_entry = array_merge( $timestamp_data, [
-		'log_type'         => 'error',
-		'type'             => $error_type,
-		'message'          => $error_message,
-		'context'          => array_map( 'sanitize_text_field', (array) $context ),
-		'post_number'      => $context['post_number'] ?? 1,
-		'attempt_number'   => $context['attempt_number'] ?? $context['attempt'] ?? 1,
-	] );	// Add to existing logs (keep only last 50 entries).
+	// Create new error log entry using standardized timestamp data.
+	$error_log_entry = array_merge(
+		$timestamp_data,
+		[
+			'log_type'       => 'error',
+			'type'           => $error_type,
+			'message'        => $error_message,
+			'context'        => array_map( 'sanitize_text_field', (array) $context ),
+			'post_number'    => $context['post_number'] ?? 1,
+			'attempt_number' => $context['attempt_number'] ?? $context['attempt'] ?? 1,
+		]
+	);
+
+	// Add to existing logs (keep only last 50 entries).
 	$existing_logs[] = $error_log_entry;
 	if ( count( $existing_logs ) > 50 ) {
 		$existing_logs = array_slice( $existing_logs, -50 );
 	}
 
 	// Update campaign metadata.
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'errorLogs', $existing_logs );
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'lastError', $error_message );
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'lastErrorType', $error_type );
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'lastErrorTime', $timestamp_data['timestamp'] );
+	Metadata::update_campaign_meta( $campaign_id, 'errorLogs', $existing_logs );
+	Metadata::update_campaign_meta( $campaign_id, 'lastError', $error_message );
+	Metadata::update_campaign_meta( $campaign_id, 'lastErrorType', $error_type );
+	Metadata::update_campaign_meta( $campaign_id, 'lastErrorTime', $timestamp_data['timestamp'] );
 
-	// Note: Failed posts counter is now incremented in the cron handler to avoid double counting
+	// Note: Failed posts counter is now incremented in the cron handler to avoid double counting.
 }
 
 /**
@@ -847,53 +852,56 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
  * @since x.x.x
  */
 function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): void {
-	// Validate inputs
+	// Validate inputs.
 	$campaign_id = absint( $campaign_id );
-	$post_id = absint( $post_id );
+	$post_id     = absint( $post_id );
 
 	if ( $campaign_id <= 0 || $post_id <= 0 ) {
 		return;
 	}
 
-	// Verify campaign exists
+	// Verify campaign exists.
 	$campaign = get_post( $campaign_id );
 	if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 		return;
 	}
 
-	// Get timestamp data
+	// Get timestamp data.
 	$timestamp_data = wpaib_create_timestamp_data();
 
-	// Get existing success logs (limit to last 50 entries)
-	$existing_logs = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'successLogs' );
+	// Get existing success logs (limit to last 50 entries).
+	$existing_logs = Metadata::get_campaign_meta( $campaign_id, 'successLogs' );
 	if ( ! is_array( $existing_logs ) ) {
 		$existing_logs = [];
 	}
 
-	// Get post details
+	// Get post details.
 	$created_post = get_post( $post_id );
-	$post_title = $created_post ? $created_post->post_title : ( $context['post_title'] ?? __( 'Generated Post', 'wp-ai-blogger' ) );
+	$post_title   = $created_post ? $created_post->post_title : ( $context['post_title'] ?? __( 'Generated Post', 'wp-ai-blogger' ) );
 
-	// Create success log entry
-	$success_log_entry = array_merge( $timestamp_data, [
-		'log_type'       => 'success',
-		'type'           => 'success',
-		'post_id'        => $post_id,
-		'post_title'     => sanitize_text_field( $post_title ),
-		'message'        => $context['message'] ?? sprintf( __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $context['post_number'] ?? ( count( $existing_logs ) + 1 ) ),
-		'context'        => array_map( 'sanitize_text_field', (array) $context ),
-		'post_number'    => $context['post_number'] ?? ( count( $existing_logs ) + 1 ),
-		'attempt_number' => $context['attempt_number'] ?? 1,
-	] );
+	// Create success log entry.
+	$success_log_entry = array_merge(
+		$timestamp_data,
+		[
+			'log_type'       => 'success',
+			'type'           => 'success',
+			'post_id'        => $post_id,
+			'post_title'     => sanitize_text_field( $post_title ),
+			'message'        => $context['message'] ?? sprintf( /* translators: %d: Post number. */ __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $context['post_number'] ?? count( $existing_logs ) + 1 ),
+			'context'        => array_map( 'sanitize_text_field', (array) $context ),
+			'post_number'    => $context['post_number'] ?? count( $existing_logs ) + 1,
+			'attempt_number' => $context['attempt_number'] ?? 1,
+		]
+	);
 
-	// Add to existing logs (keep only last 50 entries)
+	// Add to existing logs (keep only last 50 entries).
 	$existing_logs[] = $success_log_entry;
 	if ( count( $existing_logs ) > 50 ) {
 		$existing_logs = array_slice( $existing_logs, -50 );
 	}
 
-	// Update campaign metadata
-	\WPAIBlogger\Inc\Utils\Metadata::update_campaign_meta( $campaign_id, 'successLogs', $existing_logs );
+	// Update campaign metadata.
+	Metadata::update_campaign_meta( $campaign_id, 'successLogs', $existing_logs );
 }
 
 /**
@@ -910,15 +918,13 @@ function wpaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
 		return [];
 	}
 
-	$success_logs = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'successLogs' );
+	$success_logs = Metadata::get_campaign_meta( $campaign_id, 'successLogs' );
 	if ( ! is_array( $success_logs ) ) {
 		return [];
 	}
 
-	// Sort by timestamp (newest first) and limit results
-	$success_logs = array_reverse( array_slice( $success_logs, -$limit ) );
-
-	return $success_logs;
+	// Sort by timestamp (newest first) and limit results.
+	return array_reverse( array_slice( $success_logs, -$limit ) );
 }
 
 /**
@@ -935,7 +941,7 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 		return [];
 	}
 
-	$error_logs = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'errorLogs' );
+	$error_logs = Metadata::get_campaign_meta( $campaign_id, 'errorLogs' );
 	if ( ! is_array( $error_logs ) ) {
 		return [];
 	}
@@ -946,49 +952,49 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 	// Format for display.
 	$formatted_logs = [];
 	foreach ( $error_logs as $index => $log ) {
-		$error_type = $log['type'] ?? 'unknown';
+		$error_type            = $log['type'] ?? 'unknown';
 		$user_friendly_message = wpaib_get_user_friendly_error_message( $error_type, $log['message'] ?? '' );
-		$error_solution = wpaib_get_error_solution_suggestion( $error_type );
+		$error_solution        = wpaib_get_error_solution_suggestion( $error_type );
 
-		// Use stored timestamp data directly (no backward compatibility needed)
-		$mysql_timestamp = $log['timestamp'] ?? '';
-		$unix_timestamp = $log['unix_timestamp'] ?? 0;
+		// Use stored timestamp data directly (no backward compatibility needed).
+		$mysql_timestamp   = $log['timestamp'] ?? '';
+		$unix_timestamp    = $log['unix_timestamp'] ?? 0;
 		$display_timestamp = $log['formatted_date'] ?? '';
 
-		// Calculate time ago
+		// Calculate time ago.
 		$time_ago = '';
 		if ( $unix_timestamp ) {
-			$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'wp-ai-blogger' );
+			$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'wp-ai-blogger' ); // phpcs:ignore.
 		}
 
 		$formatted_logs[] = [
-			'id'              => 'error_' . ( $index + 1 ),
-			'timestamp'       => $mysql_timestamp,
-			'formatted_date'  => $display_timestamp,
-			'time_ago'        => $time_ago,
-			'unix_timestamp'  => $unix_timestamp,
-			'status'          => 'error',
-			'title'           => sprintf( __( 'Post #%d Creation Failed - Attempt #%d', 'wp-ai-blogger' ), $log['post_number'] ?? 1, $log['attempt_number'] ?? 1 ),
-			'message'         => $user_friendly_message,
-			'error_type'      => $error_type,
-			'solution'        => $error_solution,
-			'context'         => $log['context'] ?? [],
-			'raw_message'     => $log['message'] ?? '',
-			'steps'        => [
+			'id'             => 'error_' . ( $index + 1 ),
+			'timestamp'      => $mysql_timestamp,
+			'formatted_date' => $display_timestamp,
+			'time_ago'       => $time_ago,
+			'unix_timestamp' => $unix_timestamp,
+			'status'         => 'error',
+			'title'          => sprintf( /* translators: %1$d: Post number, %2$d: Attempt number. */ __( 'Post #%1$d Creation Failed - Attempt #%2$d', 'wp-ai-blogger' ), $log['post_number'] ?? 1, $log['attempt_number'] ?? 1 ),
+			'message'        => $user_friendly_message,
+			'error_type'     => $error_type,
+			'solution'       => $error_solution,
+			'context'        => $log['context'] ?? [],
+			'raw_message'    => $log['message'] ?? '',
+			'steps'          => [
 				[
 					'status'      => 'success',
 					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
-					'duration'    => rand( 50, 150 ),
+					'duration'    => wp_rand( 50, 150 ),
 				],
 				[
 					'status'      => 'success',
 					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
-					'duration'    => rand( 200, 500 ),
+					'duration'    => wp_rand( 200, 500 ),
 				],
 				[
 					'status'      => 'error',
 					'description' => $user_friendly_message,
-					'duration'    => rand( 100, 1000 ),
+					'duration'    => wp_rand( 100, 1000 ),
 				],
 			],
 		];
@@ -1033,7 +1039,11 @@ function wpaib_get_user_friendly_error_message( $error_type, $original_message )
 
 		case 'unknown_error':
 		default:
-			return sprintf( __( 'An unexpected error occurred: %s', 'wp-ai-blogger' ), $original_message );
+			return sprintf(
+				/* translators: %s: Original error message. */
+				__( 'An unexpected error occurred: %s', 'wp-ai-blogger' ),
+				$original_message
+			);
 	}
 }
 
@@ -1083,9 +1093,9 @@ function wpaib_get_error_solution_suggestion( $error_type ): string {
  * @since x.x.x
  */
 function wpaib_create_timestamp_data(): array {
-	$unix_timestamp = current_time( 'timestamp' );
+	$unix_timestamp  = current_time( 'timestamp' ); // phpcs:ignore -- It is safe.
 	$mysql_timestamp = current_time( 'mysql' );
-	$formatted_date = current_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+	$formatted_date  = current_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 
 	return [
 		'timestamp'      => $mysql_timestamp,

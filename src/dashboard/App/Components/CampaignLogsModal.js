@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
 	ScrollText,
-	Calendar,
 	CheckCircle,
 	XCircle,
 	Clock,
-	AlertCircle,
 	AlertTriangle,
 	Activity,
 	Info,
-	BarChart3,
-	Target,
 	ChevronDown,
 	ChevronRight,
 } from 'lucide-react';
@@ -85,7 +81,9 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 
 		// Fallback to timestamp processing for backward compatibility
 		const timestamp = log?.timestamp || log;
-		if ( ! timestamp ) return '';
+		if ( ! timestamp ) {
+			return '';
+		}
 
 		try {
 			const date = new Date( timestamp );
@@ -97,10 +95,9 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 			// For older events, always show full date/time
 			if ( diffDays >= 1 ) {
 				return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-			} else {
-				// For today's events, show time with "today" indicator
-				return __( 'Today', 'wp-ai-blogger' ) + ' ' + date.toLocaleTimeString();
 			}
+			// For today's events, show time with "today" indicator
+			return __( 'Today', 'wp-ai-blogger' ) + ' ' + date.toLocaleTimeString();
 		} catch ( e ) {
 			return timestamp;
 		}
@@ -132,28 +129,28 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 	};
 
 	const getStatusBadge = ( status ) => {
-		const baseClasses = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium";
+		const baseClasses = 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium';
 		switch ( status?.toLowerCase() ) {
 			case 'success':
 			case 'completed':
 			case 'published':
-				return `${baseClasses} bg-green-100 text-green-800`;
+				return `${ baseClasses } bg-green-100 text-green-800`;
 			case 'error':
 			case 'failed':
 			case 'failure':
-				return `${baseClasses} bg-red-100 text-red-800`;
+				return `${ baseClasses } bg-red-100 text-red-800`;
 			case 'warning':
 			case 'partial':
-				return `${baseClasses} bg-yellow-100 text-yellow-800`;
+				return `${ baseClasses } bg-yellow-100 text-yellow-800`;
 			case 'scheduled':
 			case 'pending':
-				return `${baseClasses} bg-blue-100 text-blue-800`;
+				return `${ baseClasses } bg-blue-100 text-blue-800`;
 			case 'running':
 			case 'processing':
-				return `${baseClasses} bg-indigo-100 text-indigo-800`;
+				return `${ baseClasses } bg-indigo-100 text-indigo-800`;
 			case 'info':
 			default:
-				return `${baseClasses} bg-gray-100 text-gray-800`;
+				return `${ baseClasses } bg-gray-100 text-gray-800`;
 		}
 	};	return (
 		<Dialog open={ open } onClose={ closeModal } className="relative z-999999">
@@ -161,7 +158,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 			<div className="fixed inset-0 z-999999 w-screen overflow-y-auto">
 				<div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 					<DialogPanel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
-						{/* Header */}
+						{ /* Header */ }
 						<div className="flex items-center justify-between bg-gray-50 px-6 py-4 border-b border-gray-200">
 							<div className="flex items-center space-x-3">
 								<div className="p-2 bg-blue-100 rounded-lg">
@@ -172,7 +169,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 										{ __( 'Campaign Logs', 'wp-ai-blogger' ) }
 									</h3>
 									<p className="text-sm text-gray-600 m-0">
-										{ campaignData?.name && `${campaignData.name} - ` }{ __( 'Post creation history and scheduling logs', 'wp-ai-blogger' ) }
+										{ campaignData?.name && `${ campaignData.name } - ` }{ __( 'Post creation history and scheduling logs', 'wp-ai-blogger' ) }
 									</p>
 								</div>
 							</div>
@@ -185,12 +182,12 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 							</button>
 						</div>
 
-						{/* Content */}
+						{ /* Content */ }
 						<div className="px-6 py-4">
 							{ loading ? (
 								<div className="flex items-center justify-center py-8">
 									<Activity className="w-6 h-6 text-gray-400 animate-spin mr-2" />
-									<span className="text-gray-600">{ __( 'Loading logs...', 'wp-ai-blogger' ) }</span>
+									<span className="text-gray-600">{ __( 'Loading logs…', 'wp-ai-blogger' ) }</span>
 								</div>
 							) : error ? (
 								<div className="text-center py-8">
@@ -205,7 +202,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 								</div>
 							) : (
 								<div className="space-y-4">
-									{/* Summary Stats */}
+									{ /* Summary Stats */ }
 									<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 										<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
 											<div className="flex items-center">
@@ -213,7 +210,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-blue-600 m-0">{ __( 'Scheduled', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-blue-900 m-0">
-														{ parseInt(campaignData?.postsScheduled) || 0 }
+														{ parseInt( campaignData?.postsScheduled ) || 0 }
 													</p>
 												</div>
 											</div>
@@ -224,7 +221,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-green-600 m-0">{ __( 'Successful', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-green-900 m-0">
-														{ parseInt(campaignData?.postsCreated) || 0 }
+														{ parseInt( campaignData?.postsCreated ) || 0 }
 													</p>
 												</div>
 											</div>
@@ -246,16 +243,16 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div>
 													<p className="text-sm text-gray-600 m-0">{ __( 'Target', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-gray-900 m-0">
-														{ parseInt(campaignData?.postsTarget) || 0 }
+														{ parseInt( campaignData?.postsTarget ) || 0 }
 													</p>
 												</div>
 											</div>
 										</div>
 									</div>
 
-									{/* Campaign Info Cards */}
+									{ /* Campaign Info Cards */ }
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-										{/* Start Date Card */}
+										{ /* Start Date Card */ }
 										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
 											<div className="flex items-center justify-between">
 												<div className="flex-1">
@@ -263,44 +260,43 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 														{ __( 'Start Date', 'wp-ai-blogger' ) }
 													</p>
 													<p className="text-sm font-medium text-gray-900">
-														{ (() => {
-															if (campaignData?.startDate && campaignData.startDate.trim() !== '') {
+														{ ( () => {
+															if ( campaignData?.startDate && campaignData.startDate.trim() !== '' ) {
 																// Parse the lastRun format to match it exactly
-																const startDate = new Date(campaignData.startDate);
-																const formattedDate = startDate.toLocaleDateString('en-US', {
+																const startDate = new Date( campaignData.startDate );
+																const formattedDate = startDate.toLocaleDateString( 'en-US', {
 																	month: 'long',
 																	day: 'numeric',
-																	year: 'numeric'
-																});
-																const formattedTime = startDate.toLocaleTimeString('en-US', {
+																	year: 'numeric',
+																} );
+																const formattedTime = startDate.toLocaleTimeString( 'en-US', {
 																	hour: 'numeric',
 																	minute: '2-digit',
-																	hour12: true
-																}).toLowerCase();
-																return `${formattedDate} ${formattedTime}`;
-															} else if (campaignData?.created_at) {
-																const createdDate = new Date(campaignData.created_at);
-																const formattedDate = createdDate.toLocaleDateString('en-US', {
+																	hour12: true,
+																} ).toLowerCase();
+																return `${ formattedDate } ${ formattedTime }`;
+															} else if ( campaignData?.created_at ) {
+																const createdDate = new Date( campaignData.created_at );
+																const formattedDate = createdDate.toLocaleDateString( 'en-US', {
 																	month: 'long',
 																	day: 'numeric',
-																	year: 'numeric'
-																});
-																const formattedTime = createdDate.toLocaleTimeString('en-US', {
+																	year: 'numeric',
+																} );
+																const formattedTime = createdDate.toLocaleTimeString( 'en-US', {
 																	hour: 'numeric',
 																	minute: '2-digit',
-																	hour12: true
-																}).toLowerCase();
-																return `${formattedDate} ${formattedTime}`;
-															} else {
-																return __( 'Not set', 'wp-ai-blogger' );
+																	hour12: true,
+																} ).toLowerCase();
+																return `${ formattedDate } ${ formattedTime }`;
 															}
-														})() }
+															return __( 'Not set', 'wp-ai-blogger' );
+														} )() }
 													</p>
 												</div>
 											</div>
 										</div>
 
-										{/* End Date Card */}
+										{ /* End Date Card */ }
 										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
 											<div className="flex items-center justify-between">
 												<div className="flex-1">
@@ -308,33 +304,31 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 														{ __( 'End Date', 'wp-ai-blogger' ) }
 													</p>
 													<p className="text-sm font-medium text-gray-900">
-														{ (() => {
+														{ ( () => {
 															// Check if campaign is completed
-															const postsCreated = parseInt(campaignData?.postsCreated) || 0;
-															const postsScheduled = parseInt(campaignData?.postsScheduled) || 0;
-															const postsTarget = parseInt(campaignData?.postsTarget) || 0;
+															const postsCreated = parseInt( campaignData?.postsCreated ) || 0;
+															const postsScheduled = parseInt( campaignData?.postsScheduled ) || 0;
+															const postsTarget = parseInt( campaignData?.postsTarget ) || 0;
 															const isCompleted = campaignData?.campaignCompleted ||
-																(postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget));
+																( postsTarget > 0 && ( postsScheduled >= postsTarget || postsCreated >= postsTarget ) );
 
-															if (isCompleted) {
+															if ( isCompleted ) {
 																// If completed, show the last run date as end date
-																if (campaignData?.lastRun && campaignData.lastRun !== 'Not Started Yet.') {
+																if ( campaignData?.lastRun && campaignData.lastRun !== 'Not Started Yet.' ) {
 																	return campaignData.lastRun;
-																} else {
-																	return __( 'Recently completed', 'wp-ai-blogger' );
 																}
-															} else if (campaignData?.status === 'publish') {
+																return __( 'Recently completed', 'wp-ai-blogger' );
+															} else if ( campaignData?.status === 'publish' ) {
 																return __( 'In progress', 'wp-ai-blogger' );
-															} else {
-																return __( 'Not started', 'wp-ai-blogger' );
 															}
-														})() }
+															return __( 'Not started', 'wp-ai-blogger' );
+														} )() }
 													</p>
 												</div>
 											</div>
 										</div>
 
-										{/* Frequency Card */}
+										{ /* Frequency Card */ }
 										<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
 											<div className="flex items-center justify-between">
 												<div className="flex-1">
@@ -342,37 +336,35 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 														{ __( 'Frequency', 'wp-ai-blogger' ) }
 													</p>
 													<p className="text-sm font-medium text-gray-900 truncate">
-														{ (() => {
+														{ ( () => {
 															// Check if campaign is completed
-															const postsCreated = parseInt(campaignData?.postsCreated) || 0;
-															const postsScheduled = parseInt(campaignData?.postsScheduled) || 0;
-															const postsTarget = parseInt(campaignData?.postsTarget) || 0;
+															const postsCreated = parseInt( campaignData?.postsCreated ) || 0;
+															const postsScheduled = parseInt( campaignData?.postsScheduled ) || 0;
+															const postsTarget = parseInt( campaignData?.postsTarget ) || 0;
 															const isCompleted = campaignData?.campaignCompleted ||
-																(postsTarget > 0 && (postsScheduled >= postsTarget || postsCreated >= postsTarget));
+																( postsTarget > 0 && ( postsScheduled >= postsTarget || postsCreated >= postsTarget ) );
 
-															if (isCompleted) {
+															if ( isCompleted ) {
 																// For completed campaigns, show "Daily once" or similar
 																const freq = campaignData?.frequency || '';
-																if (freq.toLowerCase().includes('daily') || freq.includes('1') || freq.includes('day')) {
+																if ( freq.toLowerCase().includes( 'daily' ) || freq.includes( '1' ) || freq.includes( 'day' ) ) {
 																	return __( 'Daily once', 'wp-ai-blogger' );
-																} else if (freq.toLowerCase().includes('weekly') || freq.includes('week')) {
+																} else if ( freq.toLowerCase().includes( 'weekly' ) || freq.includes( 'week' ) ) {
 																	return __( 'Weekly once', 'wp-ai-blogger' );
-																} else if (freq.toLowerCase().includes('hourly') || freq.includes('hour')) {
+																} else if ( freq.toLowerCase().includes( 'hourly' ) || freq.includes( 'hour' ) ) {
 																	return __( 'Hourly once', 'wp-ai-blogger' );
-																} else {
-																	return freq || __( 'Daily once', 'wp-ai-blogger' );
 																}
-															} else {
-																return campaignData?.frequency || __( 'Not set', 'wp-ai-blogger' );
+																return freq || __( 'Daily once', 'wp-ai-blogger' );
 															}
-														})() }
+															return campaignData?.frequency || __( 'Not set', 'wp-ai-blogger' );
+														} )() }
 													</p>
 												</div>
 											</div>
 										</div>
 									</div>
 
-									{/* Activity Timeline */}
+									{ /* Activity Timeline */ }
 									<div className="bg-white border border-gray-200 rounded-lg">
 										<div className="px-4 py-3 border-b border-gray-200">
 											<div className="flex items-center justify-between">
@@ -401,7 +393,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																	{ getStatusIcon( log.status ) }
 																</div>
 																<div className="flex-1 min-w-0">
-																	{/* Main log header */}
+																	{ /* Main log header */ }
 																	<div className="flex items-center justify-between">
 																		<div className="flex-1">
 																			<div className="flex items-center space-x-2">
@@ -409,7 +401,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																					{ log.title || log.action || __( 'Campaign Activity', 'wp-ai-blogger' ) }
 																				</h4>
 																				<span className={ getStatusBadge( log.status ) }>
-																					{ log.status?.charAt(0).toUpperCase() + log.status?.slice(1) || 'Unknown' }
+																					{ log.status?.charAt( 0 ).toUpperCase() + log.status?.slice( 1 ) || 'Unknown' }
 																				</span>
 																			</div>
 																			{ log.message && (
@@ -443,7 +435,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																		</div>
 																	</div>
 
-																	{/* Post details - always visible */}
+																	{ /* Post details - always visible */ }
 																	{ ( log.post_id || log.post_title ) && (
 																		<div className="flex items-center gap-2 text-xs mt-2">
 																			{ log.post_id && (
@@ -463,11 +455,11 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																							className="text-green-700 no-underline hover:cursor-pointer"
 																							title={ __( 'Edit Post', 'wp-ai-blogger' ) }
 																						>
-																							{ log.post_title.length > 40 ? log.post_title.substring(0, 40) + '...' : log.post_title }
+																							{ log.post_title.length > 40 ? log.post_title.substring( 0, 40 ) + '...' : log.post_title }
 																						</a>
 																					) : (
 																						<span>
-																							{ log.post_title.length > 40 ? log.post_title.substring(0, 40) + '...' : log.post_title }
+																							{ log.post_title.length > 40 ? log.post_title.substring( 0, 40 ) + '...' : log.post_title }
 																						</span>
 																					) }
 																				</span>
@@ -475,7 +467,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																		</div>
 																	) }
 
-																	{/* Error details - always visible if present */}
+																	{ /* Error details - always visible if present */ }
 																	{ log.error_details && (
 																		<div className="bg-red-50 border border-red-200 rounded-md p-2 mt-2">
 																			<p className="text-xs text-red-800 m-0 font-medium">{ __( 'Error Details:', 'wp-ai-blogger' ) }</p>
@@ -483,7 +475,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																		</div>
 																	) }
 
-																	{/* Collapsible Steps/Process details */}
+																	{ /* Collapsible Steps/Process details */ }
 																	{ hasSteps && isExpanded && (
 																		<div className="mt-3 border border-gray-200 rounded-md p-3 bg-gray-50">
 																			<p className="text-xs font-medium text-gray-700 mb-2 m-0">{ __( 'Process Steps:', 'wp-ai-blogger' ) }</p>
@@ -531,7 +523,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 							) }
 						</div>
 
-						{/* Footer */}
+						{ /* Footer */ }
 						<div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
 							<div className="flex items-center justify-between">
 								<p className="text-xs text-gray-500 m-0">

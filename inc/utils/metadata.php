@@ -488,13 +488,13 @@ class Metadata {
 		$meta_frequency       = absint( $metadata['repeatInterval'] ?? 0 );
 		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
-		// Always use raw numeric values for the frontend
-		$metadata['postsCreated'] = $meta_posts_created;
+		// Always use raw numeric values for the frontend.
+		$metadata['postsCreated']   = $meta_posts_created;
 		$metadata['postsScheduled'] = $meta_posts_scheduled;
-		$metadata['postsFailed'] = $meta_posts_failed;
-		$metadata['postsTarget'] = $meta_posts_target;
+		$metadata['postsFailed']    = $meta_posts_failed;
+		$metadata['postsTarget']    = $meta_posts_target;
 
-		// Format frequency for display
+		// Format frequency for display.
 		if ( ! $plain_metadata ) {
 			$meta_frequency        = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 			$metadata['frequency'] = $meta_frequency;
