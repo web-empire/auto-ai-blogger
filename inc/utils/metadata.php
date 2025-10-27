@@ -119,6 +119,10 @@ class Metadata {
 					'default' => 20,
 					'type'    => 'number',
 				],
+				'retryTracking'           => [
+					'default' => [],
+					'type'    => 'array',
+				],
 				'errorLogs'               => [
 					'default' => [],
 					'type'    => 'array',
@@ -146,6 +150,14 @@ class Metadata {
 				'campaignCompleted'       => [
 					'default' => false,
 					'type'    => 'boolean',
+				],
+				'isPaused'                => [
+					'default' => false,
+					'type'    => 'boolean',
+				],
+				'pausedAt'                => [
+					'default' => '',
+					'type'    => 'string',
 				],
 				'maxWords'                => [
 					'default' => 1000,

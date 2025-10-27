@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useState, useId } from 'react';
+import { forwardRef, useCallback, useState, useId, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -105,24 +105,34 @@ const DateTimeField = forwardRef( ( {
 			const year = dateObj.getFullYear();
 			const month = String( dateObj.getMonth() + 1 ).padStart( 2, '0' );
 			const day = String( dateObj.getDate() ).padStart( 2, '0' );
-			const hours = String( dateObj.getHours() ).padStart( 2, '0' );
-			const minutes = String( dateObj.getMinutes() ).padStart( 2, '0' );
+			const hours = dateObj.getHours();
+			const minutes = dateObj.getMinutes();
+
+			// Round minutes to nearest 5-minute interval
+			const roundedMinutes = Math.round( minutes / 5 ) * 5;
+			const finalHours = roundedMinutes === 60 ? hours + 1 : hours;
+			const finalMinutes = roundedMinutes === 60 ? 0 : roundedMinutes;
+
+			const hoursStr = String( finalHours ).padStart( 2, '0' );
+			const minutesStr = String( finalMinutes ).padStart( 2, '0' );
 
 			return {
 				date: `${ year }-${ month }-${ day }`,
-				time: `${ hours }:${ minutes }`,
+				time: `${ hoursStr }:${ minutesStr }`,
 			};
 		} catch ( e ) {
 			return { date: '', time: '' };
 		}
 	}, [] );
 
-	// Initialize state from value
-	const initialParsed = parseInitialValue( value || defaultValue );
-	if ( ! selectedDate && ! selectedTime && ( initialParsed.date || initialParsed.time ) ) {
-		setSelectedDate( initialParsed.date );
-		setSelectedTime( initialParsed.time );
-	}
+	// Initialize and sync state from value prop
+	useEffect( () => {
+		const parsed = parseInitialValue( value || defaultValue );
+		if ( parsed.date || parsed.time ) {
+			setSelectedDate( parsed.date );
+			setSelectedTime( parsed.time );
+		}
+	}, [ value, defaultValue, parseInitialValue ] );
 
 	// Handle date change
 	const handleDateChange = useCallback( ( event ) => {
@@ -188,18 +198,19 @@ const DateTimeField = forwardRef( ( {
 		const allOptions = generateTimeOptions();
 		const today = getMinDate();
 
-		if ( selectedDate !== today ) {
+		// If disabled (view mode) or not today, show all options
+		if ( disabled || selectedDate !== today ) {
 			return allOptions;
 		}
 
-		// For today, filter out past times
+		// For today in edit mode, filter out past times
 		const minTime = getMinTimeForToday();
 		if ( ! minTime ) {
 			return []; // No valid times for today
 		}
 
 		return allOptions.filter( ( option ) => option.value >= minTime );
-	}, [ selectedDate, generateTimeOptions, getMinDate, getMinTimeForToday ] );
+	}, [ selectedDate, generateTimeOptions, getMinDate, getMinTimeForToday, disabled ] );
 
 	// Enhanced focus handlers
 	const handleFocus = useCallback( ( event ) => {

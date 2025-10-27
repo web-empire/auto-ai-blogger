@@ -1,13 +1,13 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
-import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn, CalendarArrowUp, ScrollText, ChevronDown, ArrowUp, ArrowDown, Search, X } from 'lucide-react';
+import { Settings, Trash2, Info, FolderPlus, RotateCw, List, ChartNoAxesColumn, CalendarArrowUp, ScrollText, Search } from 'lucide-react';
 import { Tooltip } from '@wordpress/components';
-import SwitchControl from '@Components/SwitchControl';
 import { ConfigureDrawer } from '@Elements/Campaigns';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import CampaignAnalyticsModal from '@Components/CampaignAnalyticsModal';
 import CampaignLogsModal from '@Components/CampaignLogsModal';
 import CampaignDeleteModal from '@Components/CampaignDeleteModal';
+import CampaignFilters from '@Components/CampaignFilters';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function Campaigns() {
@@ -26,20 +26,11 @@ export default function Campaigns() {
 	const [ sortBy, setSortBy ] = useState( 'latest' ); // Default sort by latest
 	const [ showSortDropdown, setShowSortDropdown ] = useState( false );
 	const [ searchTerm, setSearchTerm ] = useState( '' ); // Search functionality
-	const sortDropdownRef = useRef( null );
 
-	// Close dropdown when clicking outside
-	useEffect( () => {
-		const handleClickOutside = ( event ) => {
-			if ( sortDropdownRef.current && ! sortDropdownRef.current.contains( event.target ) ) {
-				setShowSortDropdown( false );
-			}
-		};
-
-		document.addEventListener( 'mousedown', handleClickOutside );
-		return () => {
-			document.removeEventListener( 'mousedown', handleClickOutside );
-		};
+	// Check if debug logs should be shown via URL parameter
+	const shouldShowDebugLogs = useMemo( () => {
+		const urlParams = new URLSearchParams( window.location.search );
+		return urlParams.get( 'debugLogs' ) === 'true';
 	}, [] );
 
 	// Sort campaigns based on selected criteria
@@ -49,6 +40,28 @@ export default function Campaigns() {
 		}
 
 		const campaignsArray = Object.values( campaigns );
+
+		// Helper function to determine campaign state
+		const getCampaignState = ( campaign ) => {
+			const postsCreated = parseInt( campaign.postsCreated ) || 0;
+			const postsTarget = parseInt( campaign.postsTarget ) || 0;
+			const postsFailed = parseInt( campaign.postsFailed ) || 0;
+			const isPaused = campaign.isPaused || false;
+			const campaignCompleted = campaign.campaignCompleted || false;
+
+			// Check if completed
+			const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+			const allAttemptsMade = postsTarget > 0 && ( postsCreated + postsFailed ) >= postsTarget;
+			const isCompleted = campaign.status === 'draft' || isTargetMet || allAttemptsMade || campaignCompleted;
+
+			if ( isCompleted ) {
+				return 'completed';
+			}
+			if ( isPaused ) {
+				return 'paused';
+			}
+			return 'active';
+		};
 
 		// First filter by search term
 		const filteredCampaigns = campaignsArray.filter( ( campaign ) => {
@@ -67,25 +80,39 @@ export default function Campaigns() {
 		// Then sort the filtered results
 		return filteredCampaigns.sort( ( a, b ) => {
 			switch ( sortBy ) {
-				case 'active':
-					// Active campaigns first (publish status)
-					if ( a.status === 'publish' && b.status !== 'publish' ) {
-						return -1;
-					}
-					if ( a.status !== 'publish' && b.status === 'publish' ) {
-						return 1;
-					}
-					return 0;
+				case 'active': {
+					// Active first, then paused, then completed
+					const stateA = getCampaignState( a );
+					const stateB = getCampaignState( b );
+					const stateOrder = { active: 0, paused: 1, completed: 2 };
 
-				case 'inactive':
-					// Inactive campaigns first (draft status)
-					if ( a.status === 'draft' && b.status !== 'draft' ) {
-						return -1;
+					const orderA = stateOrder[ stateA ] ?? 3;
+					const orderB = stateOrder[ stateB ] ?? 3;
+
+					if ( orderA !== orderB ) {
+						return orderA - orderB;
 					}
-					if ( a.status !== 'draft' && b.status === 'draft' ) {
-						return 1;
+
+					// If same state, sort by creation date (latest first)
+					return new Date( b.created_at ) - new Date( a.created_at );
+				}
+
+				case 'inactive': {
+					// Completed first, then paused, then active
+					const stateA = getCampaignState( a );
+					const stateB = getCampaignState( b );
+					const stateOrder = { completed: 0, paused: 1, active: 2 };
+
+					const orderA = stateOrder[ stateA ] ?? 3;
+					const orderB = stateOrder[ stateB ] ?? 3;
+
+					if ( orderA !== orderB ) {
+						return orderA - orderB;
 					}
-					return 0;
+
+					// If same state, sort by creation date (latest first)
+					return new Date( b.created_at ) - new Date( a.created_at );
+				}
 
 				case 'name-asc':
 					return ( a.name || '' ).localeCompare( b.name || '' );
@@ -120,66 +147,6 @@ export default function Campaigns() {
 			}
 		} );
 	}, [ campaigns, sortBy, searchTerm ] );
-
-	const sortOptions = [
-		{ value: 'latest', label: __( 'Default', 'wp-ai-blogger' ) },
-		{ value: 'active', label: __( 'Active First', 'wp-ai-blogger' ) },
-		{ value: 'inactive', label: __( 'Inactive First', 'wp-ai-blogger' ) },
-		{
-			value: 'name-asc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Name', 'wp-ai-blogger' ) }
-					<ArrowUp className="w-3 h-3" />
-				</span>
-			),
-		},
-		{
-			value: 'name-desc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Name', 'wp-ai-blogger' ) }
-					<ArrowDown className="w-3 h-3" />
-				</span>
-			),
-		},
-		{
-			value: 'start-date-asc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Start Date', 'wp-ai-blogger' ) }
-					<ArrowUp className="w-3 h-3" />
-				</span>
-			),
-		},
-		{
-			value: 'start-date-desc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Start Date', 'wp-ai-blogger' ) }
-					<ArrowDown className="w-3 h-3" />
-				</span>
-			),
-		},
-		{
-			value: 'end-date-asc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Last Run', 'wp-ai-blogger' ) }
-					<ArrowUp className="w-3 h-3" />
-				</span>
-			),
-		},
-		{
-			value: 'end-date-desc',
-			label: (
-				<span className="flex items-center gap-2">
-					{ __( 'Last Run', 'wp-ai-blogger' ) }
-					<ArrowDown className="w-3 h-3" />
-				</span>
-			),
-		},
-	];
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -308,7 +275,7 @@ export default function Campaigns() {
 	};
 
 	const toggleCampaignStatus = async ( campaignId, currentStatus ) => {
-		// Prevent multiple simultaneous requests
+		// Prevent multiple simultaneous requests.
 		if ( updatingStatus[ campaignId ] ) {
 			return;
 		}
@@ -316,23 +283,17 @@ export default function Campaigns() {
 		setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: true } ) );
 
 		try {
-			const newStatus = currentStatus === 'publish' ? 'draft' : 'publish';
-
-			// Get current campaign data
+			// Get current campaign data.
 			const campaignData = campaigns[ campaignId ];
+			const isPaused = campaignData.isPaused || false;
 
-			// Prepare the update data with the new status
-			const updateData = {
-				...campaignData,
-				id: campaignId,
-				status: newStatus,
-				type: 'edit',
-			};
+			// Determine action: pause or resume.
+			const action = isPaused ? 'wpaib_resume_campaign' : 'wpaib_pause_campaign';
 
 			const formData = new window.FormData();
-			formData.append( 'action', 'wpaib_update_campaign' );
+			formData.append( 'action', action );
 			formData.append( 'security', wpaib_localized_data.admin_nonce );
-			formData.append( 'value', JSON.stringify( updateData ) );
+			formData.append( 'campaign_id', campaignId );
 
 			const response = await apiFetch( {
 				url: wpaib_localized_data.ajax_url,
@@ -341,26 +302,24 @@ export default function Campaigns() {
 			} );
 
 			if ( response.success ) {
-				// Update the local campaigns state without page refresh
+				// Update the local campaigns state without page refresh.
 				setCampaigns( ( prevCampaigns ) => ( {
 					...prevCampaigns,
 					[ campaignId ]: {
 						...prevCampaigns[ campaignId ],
-						status: newStatus,
+						isPaused: response.data.isPaused,
 					},
 				} ) );
 			} else {
-				console.error( 'Failed to update campaign status:', response );
-				// Optionally show an error message to the user
+				console.error( 'Failed to toggle campaign status:', response );
+				// Optionally show an error message to the user.
 			}
 		} catch ( error ) {
-			console.error( 'Error updating campaign status:', error );
+			console.error( 'Error toggling campaign status:', error );
 		} finally {
 			setUpdatingStatus( ( prev ) => ( { ...prev, [ campaignId ]: false } ) );
 		}
-	};
-
-	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
+	};	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
 		return (
 			<>
 				<div className="flex flex-col items-center justify-center gap-y-3 border border-dashed border-gray-300 rounded-md p-6 max-w-lg mx-auto mt-20">
@@ -439,70 +398,15 @@ export default function Campaigns() {
 					</div>
 
 					<div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-3">
-						{ /* Sort Dropdown */ }
-						<div className="relative" ref={ sortDropdownRef }>
-							<button
-								type="button"
-								onClick={ () => setShowSortDropdown( ! showSortDropdown ) }
-								className="flex items-center gap-2 rounded-md bg-white px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
-								style={ { height: '38px' } }
-							>
-								{ sortOptions.find( ( option ) => option.value === sortBy )?.label || __( 'Sort', 'wp-ai-blogger' ) }
-								<ChevronDown className={ `w-4 h-4 transition-transform duration-200 ${ showSortDropdown ? 'rotate-180' : '' }` } />
-							</button>
-
-							{ showSortDropdown && (
-								<div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-									<div className="py-1">
-										{ sortOptions.map( ( option ) => (
-											<button
-												key={ option.value }
-												onClick={ () => {
-													setSortBy( option.value );
-													setShowSortDropdown( false );
-												} }
-												className={ `block w-full text-left px-4 py-2 text-sm transition-colors duration-200 border-none bg-transparent cursor-pointer ${
-													sortBy === option.value
-														? 'bg-indigo-50 text-indigo-700 font-medium'
-														: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-												}` }
-											>
-												{ option.label }
-											</button>
-										) ) }
-									</div>
-								</div>
-							) }
-						</div>
-
-						{ /* Search Input */ }
-						<div className="relative min-w-[240px]">
-							<div className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={ { paddingLeft: '12px' } }>
-								<Search className="h-4 w-4 text-gray-400" />
-							</div>
-							<input
-								type="text"
-								value={ searchTerm }
-								onChange={ ( e ) => setSearchTerm( e.target.value ) }
-								placeholder={ __( 'Search campaigns…', 'wp-ai-blogger' ) }
-								className="block w-full text-sm rounded-md bg-white placeholder-gray-400 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 outline-none transition-all duration-200"
-								style={ {
-									height: '38px',
-									paddingLeft: '40px',
-									paddingRight: searchTerm ? '40px' : '12px',
-								} }
-							/>
-							{ searchTerm && (
-								<button
-									type="button"
-									onClick={ () => setSearchTerm( '' ) }
-									className="absolute inset-y-0 right-0 flex items-center cursor-pointer border-none bg-transparent text-gray-400 hover:text-gray-600 transition-colors duration-200"
-									style={ { paddingRight: '12px' } }
-								>
-									<X className="h-4 w-4" />
-								</button>
-							) }
-						</div>
+						{ /* Campaign Filters Component */ }
+						<CampaignFilters
+							sortBy={ sortBy }
+							onSortChange={ setSortBy }
+							searchTerm={ searchTerm }
+							onSearchChange={ setSearchTerm }
+							showSortDropdown={ showSortDropdown }
+							onToggleSortDropdown={ setShowSortDropdown }
+						/>
 
 						<button
 							type="button"
@@ -554,52 +458,76 @@ export default function Campaigns() {
 													sortedCampaigns.map( ( campaign ) => (
 														<tr key={ campaign.id } className="even:bg-gray-50">
 															<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6">
-																{ campaign.name }
+																{ campaign.name && campaign.name.length > 0 ? (
+																	<Tooltip text={ campaign.name }
+																		delay={ 100 }
+																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																	>
+																		<TrimWordsContent content={ campaign.name } count={ 8 } />
+																	</Tooltip>
+																) : (
+																	<span className="text-gray-500">{ __( 'Untitled Campaign', 'wp-ai-blogger' ) }</span>
+																) }
 															</td>
 
 															<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
 																{ ( () => {
-																// Use direct metadata fields instead of parsing
+																	// Use direct metadata fields
 																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
 																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
+																	const postsFailed = parseInt( campaign.postsFailed ) || 0;
+																	const isPaused = campaign.isPaused || false;
+																	const campaignCompleted = campaign.campaignCompleted || false;
 
-																	// Calculate remaining posts that couldn't be generated
-																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
-
-																	// Check if campaign is completed to show undelivered
-																	const isCompleted = campaign.status === 'draft' ||
-																	( postsTarget > 0 && postsCreated >= postsTarget ) ||
-																	campaign.campaignCompleted === true;
-
-																	// Campaign should be disabled when:
-																	// 1. Success posts meet or exceed target, OR
-																	// 2. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures), OR
-																	// 3. Campaign completion flag is set
+																	// Check if campaign target is reached or all attempts completed
+																	// Disable when:
+																	// 1. Success >= Target (target met successfully)
+																	// 2. Success + Failed >= Target (all attempts made, some failed)
 																	const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-																	const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompleted && ( postsCreated + postsRemaining ) >= postsTarget;
-																	const isAllAttemptsCompleted = campaign.campaignCompleted === true;
-																	const shouldDisableSwitch = isTargetMet || isAllAttemptsMadeWithFailures || isAllAttemptsCompleted;
+																	const allAttemptsMade = postsTarget > 0 && ( postsCreated + postsFailed ) >= postsTarget;
+																	const shouldDisableSwitch = isTargetMet || allAttemptsMade || campaignCompleted;
 																	const isUpdating = updatingStatus[ campaign.id ] || false;
 
+																	// Determine tooltip text
+																	let tooltipText = '';
+																	if ( shouldDisableSwitch ) {
+																		tooltipText = __( 'Completed', 'wp-ai-blogger' );
+																	} else if ( isPaused ) {
+																		tooltipText = __( 'Paused', 'wp-ai-blogger' );
+																	} else {
+																		tooltipText = __( 'Active', 'wp-ai-blogger' );
+																	}
+
 																	return (
-																		<div className="relative">
-																			<SwitchControl
-																				checked={ 'publish' === campaign.status }
-																				onChange={ () => toggleCampaignStatus( campaign.id, campaign.status ) }
-																				disabled={ isUpdating || shouldDisableSwitch }
-																				aria-label={ `${ __( 'Toggle campaign status for', 'wp-ai-blogger' ) } ${ campaign.name }` }
-																			/>
-																			{ shouldDisableSwitch && (
-																				<Tooltip
-																					text={ __( 'Campaign completed.', 'wp-ai-blogger' )
-																					}
-																					delay={ 100 }
-																					className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																		<Tooltip
+																			text={ tooltipText }
+																			delay={ 100 }
+																			className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
+																		>
+																			<span className="inline-block">
+																				<button
+																					type="button"
+																					onClick={ shouldDisableSwitch ? undefined : () => toggleCampaignStatus( campaign.id, campaign.status ) }
+																					disabled={ isUpdating || shouldDisableSwitch }
+																					aria-label={ `${ __( 'Toggle campaign status for', 'wp-ai-blogger' ) } ${ campaign.name }` }
+																					className={ `relative inline-flex h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ease-in-out border-none p-0 ${
+																						isUpdating || shouldDisableSwitch
+																							? 'opacity-50 cursor-default bg-gray-300 focus:outline-none'
+																							: isPaused
+																								? 'focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:outline-none cursor-pointer'
+																								: 'bg-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:outline-none cursor-pointer'
+																					}` }
+																					style={ isPaused && ! isUpdating && ! shouldDisableSwitch ? { backgroundColor: '#9eaff6' } : {} }
 																				>
-																					<div className="absolute inset-0 cursor-help"></div>
-																				</Tooltip>
-																			) }
-																		</div>
+																					<span
+																						className={ `inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${
+																							! isPaused && ! shouldDisableSwitch ? 'translate-x-5' : 'translate-x-0'
+																						}` }
+																						style={ { margin: '2px' } }
+																					/>
+																				</button>
+																			</span>
+																		</Tooltip>
 																	);
 																} )() }
 															</td>
@@ -609,14 +537,12 @@ export default function Campaigns() {
 																// Use direct metadata fields for clean display
 																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
 																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
-
-																	// Calculate remaining posts that couldn't be generated
-																	// Remaining = Target - Successfully Created
-																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
+																	const postsFailed = parseInt( campaign.postsFailed ) || 0;
 
 																	// Check if campaign is completed (inactive, target met, or all attempts exhausted)
 																	const isCompleted = campaign.status === 'draft' ||
 																	( postsTarget > 0 && postsCreated >= postsTarget ) ||
+																	( postsTarget > 0 && ( postsCreated + postsFailed ) >= postsTarget ) ||
 																	campaign.campaignCompleted === true;
 
 																	return (
@@ -625,9 +551,9 @@ export default function Campaigns() {
 																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
 																				Success: { postsCreated }
 																				</span>
-																				{ postsRemaining > 0 && isCompleted && (
+																				{ postsFailed > 0 && isCompleted && (
 																					<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-																					Undelivered: { postsRemaining }
+																					Undelivered: { postsFailed }
 																					</span>
 																				) }
 																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -729,54 +655,25 @@ export default function Campaigns() {
 																	</Tooltip>
 																</button>
 
-																{ ( () => {
-																// Check if campaign is completed to enable/disable logs using direct metadata fields
-																	const postsCreated = parseInt( campaign.postsCreated ) || 0;
-																	const postsTarget = parseInt( campaign.postsTarget ) || 0;
-
-																	// Calculate remaining posts that couldn't be generated
-																	const postsRemaining = Math.max( 0, postsTarget - postsCreated );
-
-																	// Campaign is completed if:
-																	// 1. Status is draft (inactive), OR
-																	// 2. Target is met (created >= target), OR
-																	// 3. All attempts completed (campaignCompleted flag is true), OR
-																	// 4. All attempts have been made AND undelivered posts are showing (meaning campaign is completed with failures)
-																	const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
-																	const isAllAttemptsCompleted = campaign.campaignCompleted === true;
-																	const isCompletedBase = campaign.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
-																	const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
-																	const isCompleted = isCompletedBase || isAllAttemptsMadeWithFailures;
-
-																	const logsTooltipText = isCompleted
-																		? __( 'View logs', 'wp-ai-blogger' )
-																		: __( 'Logs available after campaign completion', 'wp-ai-blogger' );
-
-																	return (
-																		<button
-																			type="button"
-																			className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 ${
-																				isCompleted
-																					? 'text-gray-500 hover:text-indigo-900 cursor-pointer'
-																					: 'text-gray-300 cursor-not-allowed'
-																			}` }
-																			data-campaign_id={ campaign.id }
-																			onClick={ isCompleted ? ( e ) => {
-																				e.preventDefault();
-																				e.stopPropagation();
-																				openCampaignLogs( e, campaign.id );
-																			} : undefined }
-																			disabled={ ! isCompleted }
+																{ shouldShowDebugLogs && (
+																	<button
+																		type="button"
+																		className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer"
+																		data-campaign_id={ campaign.id }
+																		onClick={ ( e ) => {
+																			e.preventDefault();
+																			e.stopPropagation();
+																			openCampaignLogs( e, campaign.id );
+																		} }
+																	>
+																		<Tooltip text={ __( 'View logs', 'wp-ai-blogger' ) }
+																			delay={ 100 }
+																			className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 																		>
-																			<Tooltip text={ logsTooltipText }
-																				delay={ 100 }
-																				className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
-																			>
-																				<ScrollText className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
-																			</Tooltip>
-																		</button>
-																	);
-																} )() }
+																			<ScrollText className="w-4 h-4" style={ { outline: 'none' } } tabIndex="-1" />
+																		</Tooltip>
+																	</button>
+																) }
 
 																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																	openDeleteModal( e, campaign.id );

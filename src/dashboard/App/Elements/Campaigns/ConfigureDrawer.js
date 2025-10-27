@@ -398,27 +398,21 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<div className="flex items-center justify-between mb-2">
-																<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium ${
-																	fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
-																}` }>
-																	{ __( 'Start Date', 'wp-ai-blogger' ) }
-																	<Tooltip
-																		text={ __( 'Start Date can not be update later.', 'wp-ai-blogger' ) }
-																		delay={ 100 }
-																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
-																	>
-																		<QuestionMarkCircleIcon
-																			aria-hidden="true"
-																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
-																		/>
-																	</Tooltip>
-																</label>
-
-																<div className="text-xs text-gray-500">
-																	{ __( 'Only future date-time is allowed.', 'wp-ai-blogger' ) }
-																</div>
-															</div>
+															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
+																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
+															}` }>
+																{ __( 'Start Date', 'wp-ai-blogger' ) }
+																<Tooltip
+																	text={ __( 'Start Date can not be updated later.', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																>
+																	<QuestionMarkCircleIcon
+																		aria-hidden="true"
+																		className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																	/>
+																</Tooltip>
+															</label>
 															<DateTimeField
 																id="start-date"
 																name="start-date"

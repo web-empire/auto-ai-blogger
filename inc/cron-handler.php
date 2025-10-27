@@ -60,28 +60,40 @@ class Cron_Handler {
 				return;
 			}
 
+			// Check if campaign is paused.
+			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
+			if ( $is_paused ) {
+				return;
+			}
+
 			// Get current campaign statistics.
 			$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
 			$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
 			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
+			$max_failures    = intval( Metadata::get_campaign_meta( $campaign_id, 'maxFailures' ) ) ?: 20;
 
 			// Calculate which post number we're trying to create.
-			// Post number = posts already created + 1 (next post to create).
 			$target_post_number = $posts_created + 1;
 
-			// Calculate attempt number for this specific post.
-			// For the current post being attempted:.
-			// - If this is the first attempt: attempt = 1.
-			// - If retries: attempt = (total_scheduled - posts_created - posts_failed) + 1.
-			// This ensures we count attempts correctly per post.
-			$pending_attempts = $posts_scheduled - $posts_created;
-			$current_attempt  = $pending_attempts + 1;           // Update scheduled count at the beginning of attempt (regardless of success/failure).
+			// Get or initialize retry tracking for current post.
+			$retry_tracking = Metadata::get_campaign_meta( $campaign_id, 'retryTracking' ) ?: [];
+			$post_key = 'post_' . $target_post_number;
+			$current_attempt = isset( $retry_tracking[ $post_key ] ) ? intval( $retry_tracking[ $post_key ] ) + 1 : 1;
+
+			// Update scheduled count and retry tracking.
 			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', $posts_scheduled + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
+
+			$retry_tracking[ $post_key ] = $current_attempt;
+			Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
 
 			$result = $this->generate_post_from_campaign( $campaign_id, $target_post_number, $current_attempt );
 
 			if ( $result['success'] ) {
+				// Clear retry tracking for this post on success.
+				unset( $retry_tracking[ $post_key ] );
+				Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
+
 				// Log success with post and attempt information.
 				wpaib_log_campaign_success(
 					$campaign_id,
@@ -104,24 +116,21 @@ class Cron_Handler {
 				// Log detailed error information with post and attempt numbers.
 				$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
 
-				// Increment failed counter before logging.
-				$posts_failed     = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
-				$new_posts_failed = $posts_failed + 1;
-				Metadata::update_campaign_meta( $campaign_id, 'postsFailed', $new_posts_failed );
-
 				$context = [
 					'post_number'     => $target_post_number,
 					'attempt_number'  => $current_attempt,
+					'max_retries'     => $max_failures,
 					'error_type'      => $error_type,
 					'posts_created'   => $posts_created,
-					'posts_scheduled' => $posts_scheduled + 1, // Include the current attempt.
-					'posts_failed'    => $new_posts_failed,
+					'posts_scheduled' => $posts_scheduled + 1,
+					'posts_failed'    => $posts_failed,
 				];
 
 				$error_message = sprintf(
-					'Post #%d creation failed on attempt #%d: %s',
+					'Post #%d creation failed on attempt #%d/%d: %s',
 					$target_post_number,
 					$current_attempt,
+					$max_failures,
 					$result['message'] ?? 'Unknown error'
 				);
 
@@ -130,8 +139,40 @@ class Cron_Handler {
 					$error_type,
 					$error_message,
 					$context
-				);              // Schedule retry with short interval after failure.
-				$this->schedule_next_post( $campaign_id, true );
+				);
+
+				// Check if we've exhausted all retries for this post.
+				if ( $current_attempt >= $max_failures ) {
+					// All retries exhausted - mark this post as failed.
+					$new_posts_failed = $posts_failed + 1;
+					Metadata::update_campaign_meta( $campaign_id, 'postsFailed', $new_posts_failed );
+
+					// Clear retry tracking for this post.
+					unset( $retry_tracking[ $post_key ] );
+					Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
+
+					// Log that we're giving up on this post.
+					wpaib_log_campaign_error(
+						$campaign_id,
+						'post_abandoned',
+						sprintf(
+							'Post #%d abandoned after %d failed attempts. Moving to next post.',
+							$target_post_number,
+							$max_failures
+						),
+						[
+							'post_number'    => $target_post_number,
+							'total_attempts' => $max_failures,
+							'posts_failed'   => $new_posts_failed,
+						]
+					);
+
+					// Schedule next post (moving on to the next post number).
+					$this->schedule_next_post( $campaign_id, false );
+				} else {
+					// Still have retries left - schedule retry with short interval.
+					$this->schedule_next_post( $campaign_id, true );
+				}
 			}
 		} catch ( \Exception $e ) {
 			return;
