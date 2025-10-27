@@ -231,7 +231,17 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<div className="flex flex-col gap-2">
 													<p className="text-sm text-red-600 m-0">{ __( 'Failed Attempts', 'wp-ai-blogger' ) }</p>
 													<p className="text-lg font-semibold text-red-900 m-0">
-														{ campaignData?.postsFailed || 0 }
+														{ ( () => {
+															// Calculate actual failed attempts from error logs
+															// Count all error logs (including retries that eventually succeeded)
+															const errorLogs = logsData?.logs?.filter( log =>
+																log.status?.toLowerCase() === 'error' ||
+																log.status?.toLowerCase() === 'failed' ||
+																log.status?.toLowerCase() === 'failure'
+															) || [];
+
+															return errorLogs.length;
+														} )() }
 													</p>
 												</div>
 												<XCircle className="w-5 h-5 text-red-600" />
