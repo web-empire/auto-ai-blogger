@@ -382,7 +382,7 @@ export default function Campaigns() {
 						<div>
 							<h4 className="font-semibold text-sm m-0">{ __( '🧪 Campaign Testing Mode Active', 'wp-ai-blogger' ) }</h4>
 							<p className="text-xs mt-1 mb-0">
-								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min, Monthly = 5min. Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
+								{ __( 'Intervals are accelerated for testing: Daily = 1min, Weekly = 2min, Weekday Selection = 2min per day gap (Mon→Thu = 6min). Remember to disable testing mode in production!', 'wp-ai-blogger' ) }
 							</p>
 						</div>
 					</div>

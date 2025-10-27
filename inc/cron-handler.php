@@ -425,12 +425,26 @@ class Cron_Handler {
 			if ( $is_retry ) {
 				// For retries after failures, use a short interval (2 minutes).
 				$interval_seconds = apply_filters( 'wpaib_retry_interval_seconds', 120 ); // 2 minutes default.
+				$next_run = time() + $interval_seconds;
 			} else {
-				// For successful posts, use normal campaign frequency.
-				$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+				// Check if this is a weekly campaign with specific days selected.
+				if ( 'week' === $repeat_unit ) {
+					$repeat_weekly_on = Metadata::get_campaign_meta( $campaign_id, 'repeatWeeklyOn' );
+					
+					// If specific weekdays are selected, use weekday scheduling.
+					if ( ! empty( $repeat_weekly_on ) && is_array( $repeat_weekly_on ) ) {
+						$next_run = $this->calculate_next_weekday( $repeat_weekly_on, $campaign_id );
+					} else {
+						// No specific days selected, use normal weekly interval.
+						$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+						$next_run = time() + $interval_seconds;
+					}
+				} else {
+					// For non-weekly campaigns, use normal interval.
+					$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+					$next_run = time() + $interval_seconds;
+				}
 			}
-
-			$next_run = time() + $interval_seconds;
 
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 
@@ -470,6 +484,86 @@ class Cron_Handler {
 
 		// Allow testing plugins to modify intervals.
 		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
+	}
+
+	/**
+	 * Calculate the next occurrence of selected weekdays.
+	 *
+	 * @param array $selected_days Array of selected weekday abbreviations (e.g., ['mon', 'wed', 'fri']).
+	 * @param int   $campaign_id Campaign ID for filter context.
+	 * @return int Timestamp of next occurrence.
+	 * @since x.x.x
+	 */
+	private function calculate_next_weekday( $selected_days, $campaign_id ): int {
+		if ( empty( $selected_days ) || ! is_array( $selected_days ) ) {
+			// Fallback to 1 week if no days selected.
+			return time() + WEEK_IN_SECONDS;
+		}
+
+		// Map weekday abbreviations to PHP day numbers (1 = Monday, 7 = Sunday).
+		$day_map = [
+			'mon' => 1,
+			'tue' => 2,
+			'wed' => 3,
+			'thu' => 4,
+			'fri' => 5,
+			'sat' => 6,
+			'sun' => 7,
+		];
+
+		// Get current day number (1-7).
+		$current_day = (int) date( 'N' );
+		$current_time = time();
+
+		// Convert selected days to numeric format and sort.
+		$selected_day_numbers = [];
+		foreach ( $selected_days as $day ) {
+			$day = strtolower( trim( $day ) );
+			if ( isset( $day_map[ $day ] ) ) {
+				$selected_day_numbers[] = $day_map[ $day ];
+			}
+		}
+
+		if ( empty( $selected_day_numbers ) ) {
+			// Fallback if no valid days.
+			return time() + WEEK_IN_SECONDS;
+		}
+
+		sort( $selected_day_numbers );
+
+		// Find the next occurrence.
+		$next_day = null;
+		$days_to_add = 0;
+
+		// Check for next occurrence in current week.
+		foreach ( $selected_day_numbers as $day_number ) {
+			if ( $day_number > $current_day ) {
+				$next_day = $day_number;
+				$days_to_add = $next_day - $current_day;
+				break;
+			}
+		}
+
+		// If no day found in current week, use the first day of next week.
+		if ( $next_day === null ) {
+			$next_day = $selected_day_numbers[0];
+			$days_to_add = ( 7 - $current_day ) + $next_day;
+		}
+
+		// Calculate next timestamp.
+		$next_timestamp = $current_time + ( $days_to_add * DAY_IN_SECONDS );
+
+		// Allow testing plugins to modify the weekday interval.
+		// Pass the days_to_add for context (testing plugins can use this).
+		$next_timestamp = apply_filters( 
+			'wpaib_weekday_next_occurrence', 
+			$next_timestamp, 
+			$selected_days, 
+			$days_to_add, 
+			$campaign_id 
+		);
+
+		return $next_timestamp;
 	}
 
 	/**
