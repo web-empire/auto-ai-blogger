@@ -509,7 +509,7 @@ class Metadata {
 		// Format frequency for display.
 		if ( ! $plain_metadata ) {
 			$meta_frequency = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
-			
+
 			// Add weekday selection info if it's a weekly campaign with specific days.
 			if ( 'week' === $repeat_unit && ! empty( $metadata['repeatWeeklyOn'] ) && is_array( $metadata['repeatWeeklyOn'] ) ) {
 				$day_names = [
@@ -521,7 +521,7 @@ class Metadata {
 					'sat' => __( 'Sat', 'wp-ai-blogger' ),
 					'sun' => __( 'Sun', 'wp-ai-blogger' ),
 				];
-				
+
 				$selected_day_names = [];
 				foreach ( $metadata['repeatWeeklyOn'] as $day ) {
 					$day = strtolower( trim( $day ) );
@@ -529,12 +529,12 @@ class Metadata {
 						$selected_day_names[] = $day_names[ $day ];
 					}
 				}
-				
+
 				if ( ! empty( $selected_day_names ) ) {
 					$meta_frequency .= ' (' . implode( ', ', $selected_day_names ) . ')';
 				}
 			}
-			
+
 			$metadata['frequency'] = $meta_frequency;
 		}
 
