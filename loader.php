@@ -18,6 +18,7 @@ use WPAIBlogger\Core\Editor;
 use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Inc\Cron_Handler;
+use WPAIBlogger\Inc\Notifications\Notification_Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -78,6 +79,9 @@ class Loader {
 
 		/* Cron Handler init (always loaded for cron functionality) */
 		Cron_Handler::get_instance();
+
+		/* Notification Helper init (handles all notification hooks) */
+		Notification_Helper::get_instance();
 
 		/* Register custom cron schedules */
 		add_filter( 'cron_schedules', [ $this, 'register_custom_cron_schedules' ] );

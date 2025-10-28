@@ -72,6 +72,24 @@ class Cron_Handler {
 			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
 			$max_failures    = intval( Metadata::get_campaign_meta( $campaign_id, 'maxFailures' ) ) ?: 20;
 
+			// Trigger "Campaign Started" notification only once on the first post attempt.
+			$started_notification_sent = Metadata::get_campaign_meta( $campaign_id, 'startedNotificationSent' );
+			if ( ! $started_notification_sent && $posts_created === 0 && $posts_scheduled === 0 ) {
+				do_action(
+					'wpaib_campaign_started',
+					$campaign_id,
+					[
+						'postsTarget'     => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+						'repeatInterval'  => Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' ),
+						'repeatUnit'      => Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' ),
+						'keywords'        => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
+					]
+				);
+				
+				// Mark that we've sent the started notification.
+				Metadata::update_campaign_meta( $campaign_id, 'startedNotificationSent', true );
+			}
+
 			// Calculate which post number we're trying to create.
 			$target_post_number = $posts_created + 1;
 
@@ -107,6 +125,18 @@ class Cron_Handler {
 							$target_post_number,
 							$current_attempt
 						),
+					]
+				);
+
+				// Trigger notification: Post Created Successfully.
+				do_action(
+					'wpaib_post_created_successfully',
+					$campaign_id,
+					$result['post_id'],
+					[
+						'post_number'   => $target_post_number,
+						'posts_created' => $posts_created + 1,
+						'posts_target'  => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
 					]
 				);
 
@@ -265,6 +295,17 @@ class Cron_Handler {
 			$posts_target = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 			if ( $posts_target > 0 && $new_posts_created >= intval( $posts_target ) ) {
 				$this->mark_campaign_completed( $campaign_id, 'target_reached' );
+
+				// Trigger notification: Campaign Completed.
+				do_action(
+					'wpaib_campaign_completed',
+					$campaign_id,
+					'target_reached',
+					[
+						'posts_created' => $new_posts_created,
+						'posts_target'  => $posts_target,
+					]
+				);
 			}
 
 			return [
@@ -430,7 +471,7 @@ class Cron_Handler {
 				// Check if this is a weekly campaign with specific days selected.
 				if ( 'week' === $repeat_unit ) {
 					$repeat_weekly_on = Metadata::get_campaign_meta( $campaign_id, 'repeatWeeklyOn' );
-					
+
 					// If specific weekdays are selected, use weekday scheduling.
 					if ( ! empty( $repeat_weekly_on ) && is_array( $repeat_weekly_on ) ) {
 						$next_run = $this->calculate_next_weekday( $repeat_weekly_on, $campaign_id );
@@ -555,12 +596,12 @@ class Cron_Handler {
 
 		// Allow testing plugins to modify the weekday interval.
 		// Pass the days_to_add for context (testing plugins can use this).
-		$next_timestamp = apply_filters( 
-			'wpaib_weekday_next_occurrence', 
-			$next_timestamp, 
-			$selected_days, 
-			$days_to_add, 
-			$campaign_id 
+		$next_timestamp = apply_filters(
+			'wpaib_weekday_next_occurrence',
+			$next_timestamp,
+			$selected_days,
+			$days_to_add,
+			$campaign_id
 		);
 
 		return $next_timestamp;
@@ -671,6 +712,23 @@ class Cron_Handler {
 					'termination_reason' => $reason,
 					'posts_failed'       => $posts_failed,
 					'max_failures'       => $max_failures,
+				]
+			);
+
+			// Trigger notification: Campaign Failed/Terminated.
+			do_action(
+				'wpaib_campaign_failed',
+				$campaign_id,
+				sprintf(
+					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
+					__( 'Maximum failures reached (%1$d/%2$d)', 'wp-ai-blogger' ),
+					$posts_failed,
+					$max_failures
+				),
+				[
+					'posts_created' => Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ),
+					'posts_target'  => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+					'posts_failed'  => $posts_failed,
 				]
 			);
 		}

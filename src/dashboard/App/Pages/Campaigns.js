@@ -26,12 +26,41 @@ export default function Campaigns() {
 	const [ sortBy, setSortBy ] = useState( 'latest' ); // Default sort by latest
 	const [ showSortDropdown, setShowSortDropdown ] = useState( false );
 	const [ searchTerm, setSearchTerm ] = useState( '' ); // Search functionality
+	const [ highlightedCampaignId, setHighlightedCampaignId ] = useState( null );
 
 	// Check if debug logs should be shown via URL parameter
 	const shouldShowDebugLogs = useMemo( () => {
 		const urlParams = new URLSearchParams( window.location.search );
 		return urlParams.get( 'debugLogs' ) === 'true';
 	}, [] );
+
+	// Handle campaign ID from URL parameter and scroll to it
+	useEffect( () => {
+		const urlParams = new URLSearchParams( window.location.search );
+		const campaignId = urlParams.get( 'id' );
+
+		if ( campaignId && campaigns && campaigns[ campaignId ] ) {
+			// Small delay to ensure table is rendered
+			setTimeout( () => {
+				const campaignRow = document.querySelector( `tr[data-campaign-id="${ campaignId }"]` );
+				if ( campaignRow ) {
+					// Scroll to the campaign row with smooth behavior
+					campaignRow.scrollIntoView( {
+						behavior: 'smooth',
+						block: 'center',
+					} );
+
+					// Highlight the campaign row
+					setHighlightedCampaignId( campaignId );
+
+					// Remove highlight after 3 seconds
+					setTimeout( () => {
+						setHighlightedCampaignId( null );
+					}, 3000 );
+				}
+			}, 300 );
+		}
+	}, [ campaigns ] );
 
 	// Sort campaigns based on selected criteria
 	const sortedCampaigns = useMemo( () => {
@@ -456,7 +485,13 @@ export default function Campaigns() {
 											<tbody className="divide-y divide-gray-200 bg-white">
 												{ sortedCampaigns && sortedCampaigns.length > 0 ? (
 													sortedCampaigns.map( ( campaign ) => (
-														<tr key={ campaign.id } className="even:bg-gray-50">
+														<tr 
+															key={ campaign.id } 
+															data-campaign-id={ campaign.id }
+															className={ `even:bg-gray-50 transition-colors duration-500 ${ 
+																highlightedCampaignId === campaign.id.toString() ? 'bg-indigo-50 ring-2 ring-indigo-500 ring-inset' : '' 
+															}` }
+														>
 															<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6">
 																{ campaign.name && campaign.name.length > 0 ? (
 																	<Tooltip text={ campaign.name }

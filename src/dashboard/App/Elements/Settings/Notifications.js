@@ -5,6 +5,7 @@ import { Mail, MessageCircle, Bell, AlertCircle, CheckCircle2 } from 'lucide-rea
 import SwitchControl from '@Components/SwitchControl';
 import SettingsContainer from '@Components/SettingsContainer';
 import InfoCard from '@Components/InfoCard';
+import { updateApiData } from '@Utils/ApiData';
 
 // Enhanced notification type component.
 const NotificationCard = memo( ( {
@@ -185,6 +186,10 @@ const Notifications = memo( () => {
 	const whatsappNotificationEnabled = useSelector( ( state ) => state.whatsappNotificationEnabled ) ?? false;
 	const whatsappNotificationValue = useSelector( ( state ) => state.whatsappNotificationValue ) ?? '';
 
+	// Get Redux config for API calls
+	const adminNonce = useSelector( ( state ) => state.adminNonce );
+	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
+
 	// Local state for notifications - initialized from Redux
 	const [ notifications, setNotifications ] = useState( {
 		email: {
@@ -223,7 +228,19 @@ const Notifications = memo( () => {
 	[]
 	);
 
-	// Toggle handlers - update both local state and Redux
+	// Helper to save setting to database
+	const saveSetting = useCallback( async ( key, value ) => {
+		try {
+			await updateApiData( key, value, dispatch, {
+				ajaxUrl,
+				security: adminNonce,
+			} );
+		} catch ( error ) {
+			console.error( `Failed to save ${ key }:`, error );
+		}
+	}, [ dispatch, ajaxUrl, adminNonce ] );
+
+	// Toggle handlers - update both local state, Redux, and database
 	const toggleEmail = useCallback( () => {
 		const newEnabled = ! notifications.email.enabled;
 		setNotifications( ( prev ) => ( {
@@ -232,7 +249,9 @@ const Notifications = memo( () => {
 		} ) );
 		// Update Redux store
 		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_ENABLED', payload: newEnabled } );
-	}, [ dispatch, notifications.email.enabled ] );
+		// Save to database
+		saveSetting( 'emailNotificationEnabled', newEnabled );
+	}, [ dispatch, notifications.email.enabled, saveSetting ] );
 
 	const toggleWhatsApp = useCallback( () => {
 		const newEnabled = ! notifications.whatsapp.enabled;
@@ -242,9 +261,11 @@ const Notifications = memo( () => {
 		} ) );
 		// Update Redux store
 		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_ENABLED', payload: newEnabled } );
-	}, [ dispatch, notifications.whatsapp.enabled ] );
+		// Save to database
+		saveSetting( 'whatsappNotificationEnabled', newEnabled );
+	}, [ dispatch, notifications.whatsapp.enabled, saveSetting ] );
 
-	// Input change handlers - update both local state and Redux
+	// Input change handlers - update both local state, Redux, and database
 	const updateEmail = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
 			...prev,
@@ -252,7 +273,9 @@ const Notifications = memo( () => {
 		} ) );
 		// Update Redux store
 		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_VALUE', payload: value } );
-	}, [ dispatch ] );
+		// Save to database (debounced in real implementation)
+		saveSetting( 'emailNotificationValue', value );
+	}, [ dispatch, saveSetting ] );
 
 	const updateWhatsApp = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
@@ -261,7 +284,9 @@ const Notifications = memo( () => {
 		} ) );
 		// Update Redux store
 		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_VALUE', payload: value } );
-	}, [ dispatch ] );
+		// Save to database (debounced in real implementation)
+		saveSetting( 'whatsappNotificationValue', value );
+	}, [ dispatch, saveSetting ] );
 
 	return (
 		<div className="space-y-6">

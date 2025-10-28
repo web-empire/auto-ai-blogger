@@ -47,6 +47,7 @@ MetricCard.displayName = 'CampaignMetricCard';
 
 // Enhanced campaign card component with better UX.
 const CampaignCard = memo( ( { campaign } ) => {
+	const navigate = useNavigate();
 	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
 	const campaigns = useSelector( ( state ) => state.allCampaigns ) || {};
@@ -205,11 +206,20 @@ const CampaignCard = memo( ( { campaign } ) => {
 			</div>
 
 			{ /* Enhanced footer with action */ }
-			<div className="bg-gray-50 p-4 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-all duration-200" onClick={ viewCampaignConfiguration }>
-				<TrimWordsContent
-					content={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
-					count={ 5 }
-				/>
+			<div className="bg-gray-50 p-4 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium rounded-md transition-all duration-200">
+				<a
+					href={ `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` }
+					className="text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-colors duration-200 no-underline"
+					onClick={ ( e ) => {
+						e.preventDefault();
+						navigate( `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` );
+					} }
+				>
+					<TrimWordsContent
+						content={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
+						count={ 5 }
+					/>
+				</a>
 
 				<div className="flex items-center gap-x-3">
 					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
