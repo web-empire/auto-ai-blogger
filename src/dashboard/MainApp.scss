@@ -5,10 +5,9 @@
 
 @import url( "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" );
 
-* {
+#wp-ai-blogger-main-page--wrapper *,
+.ai-blogger-container * {
 	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
 }
 
 #wp-ai-blogger-main-page--wrapper,
@@ -26,11 +25,6 @@
 	background: #fff;
 }
 
-.posts_page_wp-ai-blogger #wpbody-content {
-	padding: 0;
-	height: 100vh;
-}
-
 .wpaib-vertical-divider {
 	width: 1px;
 	height: 24px;
@@ -38,11 +32,16 @@
 	border-right: 1px solid #e5e7eb;
 }
 
-.posts_page_wp-ai-blogger .clear {
+#wp-ai-blogger-main-page--wrapper .clear {
 	display: none;
 }
+
+.posts_page_wp-ai-blogger #wpcontent {
+	padding-left: 0;
+}
+
 #wp-ai-blogger-main-page--wrapper {
-	height: 100%;
+	min-height: 100vh;
 }
 #headlessui-portal-root button,
 #wp-ai-blogger-main-page--wrapper button {
@@ -164,8 +163,9 @@
 	background: #f1f1f1;
 }
 
-.posts_page_wp-ai-blogger #wpcontent {
+.posts_page_wp-ai-blogger #wpbody-content {
 	padding-left: 0;
+	padding-right: 0;
 }
 
 .posts_page_wp-ai-blogger a:active,
