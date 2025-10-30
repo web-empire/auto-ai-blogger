@@ -504,7 +504,7 @@ function CampaignsInsights( { onError } ) {
 				{ canScrollLeft && (
 					<button
 						onClick={ scrollLeft }
-						className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
+						className="absolute left-2 top-1/2 -translate-y-1/2 pb-1 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
 						aria-label={ __( 'Scroll left', 'wp-ai-blogger' ) }
 					>
 						<ChevronLeft className="w-5 h-5 text-brand" />
@@ -515,7 +515,7 @@ function CampaignsInsights( { onError } ) {
 				{ canScrollRight && (
 					<button
 						onClick={ scrollRight }
-						className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
+						className="absolute right-2 top-1/2 -translate-y-1/2 pb-1 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
 						aria-label={ __( 'Scroll right', 'wp-ai-blogger' ) }
 					>
 						<ChevronRight className="w-5 h-5 text-brand" />
