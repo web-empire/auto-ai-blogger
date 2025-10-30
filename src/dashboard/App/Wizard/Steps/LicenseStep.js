@@ -369,7 +369,7 @@ const LicenseStep = memo( () => {
 								subHeading={ __( 'Get started with free credits today..', 'wp-ai-blogger' ) }
 								linkText={ __( 'Claim Free Credits', 'wp-ai-blogger' ) }
 								linkUrl={ upgradeLink }
-								colorScheme="blue"
+								colorScheme="brand"
 								size="medium"
 								ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
 							/>
