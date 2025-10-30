@@ -175,6 +175,7 @@ class Menu {
 		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
 		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
 		$post_ideas        = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
+		$created_post_ideas = sanitize_textarea_field( Helper::get_option( 'createdPostIdeas', '' ) );
 		$token_total       = absint( Helper::get_option( 'tokenTotal', 0 ) );
 		$token_remaining   = absint( Helper::get_option( 'tokenRemaining', 0 ) );
 		$license_status    = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
@@ -239,6 +240,7 @@ class Menu {
 				'license'                       => $license,
 				'license_status'                => $license_status,
 				'postIdeas'                     => $post_ideas,
+				'createdPostIdeas'              => $created_post_ideas,
 				'temperature'                   => $temperature,
 				'harassment'                    => $harassment,
 				'hate'                          => $hate,

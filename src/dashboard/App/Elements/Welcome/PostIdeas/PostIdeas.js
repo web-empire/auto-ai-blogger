@@ -10,6 +10,7 @@ import apiFetch from '@wordpress/api-fetch';
 import ProButton from '@Components/ProButton';
 
 const UPDATE_POST_IDEAS = 'UPDATE_POST_IDEAS';
+const ADD_CREATED_POST_IDEA = 'ADD_CREATED_POST_IDEA';
 
 export default function PostIdeas() {
 	const dispatch = useDispatch();
@@ -34,6 +35,7 @@ export default function PostIdeas() {
 	const homeSlug = useSelector( ( state ) => state.homeSlug );
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl );
+	const createdPostIdeasFromRedux = useSelector( ( state ) => state.createdPostIdeas || {} );
 
 	const [ postIdeas, setPostIdeas ] = useState( postIdeasFromRedux );
 	const [ postIdeasArr, setPostIdeasArr ] = useState( [] );
@@ -41,7 +43,8 @@ export default function PostIdeas() {
 	const [ error, setError ] = useState( null );
 	const [ isApiError, setIsApiError ] = useState( false );
 	const [ creatingPosts, setCreatingPosts ] = useState( new Set() ); // Track which posts are being created
-	const [ createdPosts, setCreatedPosts ] = useState( new Map() ); // Track which posts have been created (title -> editUrl)
+	// Use Redux state for createdPosts instead of local component state
+	const createdPosts = createdPostIdeasFromRedux;
 
 	const licenseEnabled = licenseStatus === 'licensed';
 
@@ -395,8 +398,21 @@ export default function PostIdeas() {
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
 
-				// Store the created post information
-				setCreatedPosts( ( prev ) => new Map( prev ).set( title, editUrl ) );
+				// Store the created post information in Redux and persist to database
+				dispatch( {
+					type: ADD_CREATED_POST_IDEA,
+					payload: {
+						title,
+						editUrl,
+					},
+				} );
+
+				// Persist to database
+				const updatedCreatedPosts = {
+					...createdPosts,
+					[ title ]: editUrl,
+				};
+				await updateApiData( 'createdPostIdeas', JSON.stringify( updatedCreatedPosts ), dispatch, abortControllerRef );
 
 				// Handle token data if present (update Redux state only, database already updated)
 				if ( response.data.token_data &&
@@ -532,12 +548,17 @@ export default function PostIdeas() {
 														</div>
 													</td>
 													<td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm text-right sm:pr-6">
-														{ createdPosts.has( postTitle ) ? (
+														{ createdPosts[ postTitle ] ? (
 															// Show "Open Post" for created posts
 															<a
 																target="_blank"
-																href={ createdPosts.get( postTitle ) }
-																className="text-green-600 hover:text-green-900 flex items-center gap-x-1 cursor-pointer font-semibold justify-end"
+																href={ createdPosts[ postTitle ] }
+																className="flex items-center gap-x-1 cursor-pointer font-semibold justify-end"
+																style={ { color: 'rgb(22, 163, 74)' } }
+																onMouseEnter={ ( e ) => e.currentTarget.style.color = 'rgb(22, 163, 74)' }
+																onMouseLeave={ ( e ) => e.currentTarget.style.color = 'rgb(22, 163, 74)' }
+																onFocus={ ( e ) => e.currentTarget.style.color = 'rgb(22, 163, 74)' }
+																onBlur={ ( e ) => e.currentTarget.style.color = 'rgb(22, 163, 74)' }
 																onClick={ ( e ) => {
 																	// Let the default link behavior handle opening the post
 																	e.stopPropagation();
@@ -555,13 +576,34 @@ export default function PostIdeas() {
 																className={ `flex items-center gap-x-1 cursor-pointer justify-end ${
 																	creatingPosts.size > 0
 																		? ( creatingPosts.has( postTitle )
-																			? 'text-green-600 hover:text-green-900'
+																			? ''
 																			: 'text-gray-400 cursor-not-allowed' )
 																		: 'text-brand-600 hover:text-brand-900'
 																}` }
 																data-type="create"
 																style={ {
 																	pointerEvents: creatingPosts.size > 0 && ! creatingPosts.has( postTitle ) ? 'none' : 'auto',
+																	...( creatingPosts.has( postTitle ) && { color: 'rgb(22, 163, 74)' } ),
+																} }
+																onMouseEnter={ ( e ) => {
+																	if ( creatingPosts.has( postTitle ) ) {
+																		e.currentTarget.style.color = 'rgb(22, 163, 74)';
+																	}
+																} }
+																onMouseLeave={ ( e ) => {
+																	if ( creatingPosts.has( postTitle ) ) {
+																		e.currentTarget.style.color = 'rgb(22, 163, 74)';
+																	}
+																} }
+																onFocus={ ( e ) => {
+																	if ( creatingPosts.has( postTitle ) ) {
+																		e.currentTarget.style.color = 'rgb(22, 163, 74)';
+																	}
+																} }
+																onBlur={ ( e ) => {
+																	if ( creatingPosts.has( postTitle ) ) {
+																		e.currentTarget.style.color = 'rgb(22, 163, 74)';
+																	}
 																} }
 															>
 																{ creatingPosts.has( postTitle ) ? (

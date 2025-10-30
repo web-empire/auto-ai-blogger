@@ -109,6 +109,28 @@ const globalDataReducer = ( state = {}, action ) => {
 
 			return { ...state, postIdeas: stringValue };
 		},
+		UPDATE_CREATED_POST_IDEAS: () => {
+			// Store created post ideas as an object mapping title to edit URL
+			// Payload should be an object like { title: editUrl, ... }
+			const createdPosts = action.payload && typeof action.payload === 'object' ? action.payload : {};
+			return { ...state, createdPostIdeas: createdPosts };
+		},
+		ADD_CREATED_POST_IDEA: () => {
+			// Add a single created post idea
+			// Payload should be { title: string, editUrl: string }
+			if ( ! action.payload || ! action.payload.title || ! action.payload.editUrl ) {
+				console.warn( 'ADD_CREATED_POST_IDEA: Invalid payload', action.payload );
+				return state;
+			}
+			const currentCreatedPosts = state.createdPostIdeas || {};
+			return {
+				...state,
+				createdPostIdeas: {
+					...currentCreatedPosts,
+					[ action.payload.title ]: action.payload.editUrl,
+				},
+			};
+		},
 		UPDATE_TOKEN_TOTAL: () => ( { ...state, tokenTotal: Number( action.payload ) || 0 } ),
 		UPDATE_TOKEN_REMAINING: () => ( { ...state, tokenRemaining: Number( action.payload ) || 0 } ),
 		UPDATE_LICENSE_STATUS: () => ( { ...state, license_status: String( action.payload || 'inactive' ) } ),
