@@ -51,23 +51,23 @@ const NavigationItem = memo( ( {
 				disabled={ isLoading }
 				className={ aiClassNames(
 					isActive
-						? 'bg-gray-50 text-indigo-600 border-indigo-200'
-						: 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600 border-transparent',
+						? 'bg-gray-50 text-brand border-brand'
+						: 'text-gray-700 hover:bg-gray-50 hover:text-brand border-transparent',
 					'group flex items-center justify-between gap-x-3 rounded-md py-3 pl-3 pr-4 text-sm font-semibold cursor-pointer w-full text-left border transition-all duration-200',
 					isLoading && 'opacity-50 cursor-not-allowed',
-					'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+					'focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2'
 				) }
 				aria-current={ isActive ? 'page' : undefined }
 				aria-describedby={ showLicenseWarning || showGeneralWarning ? `${ item.slug }-warning` : undefined }
 			>
 				<span className="flex items-center gap-3">
 					{ isLoading && currentTab === item.slug ? (
-						<Loader2 className="size-5 animate-spin text-indigo-600" aria-hidden="true" />
+						<Loader2 className="size-5 animate-spin text-brand" aria-hidden="true" />
 					) : (
 						<item.icon
 							aria-hidden="true"
 							className={ aiClassNames(
-								isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600',
+								isActive ? 'text-brand' : 'text-gray-400 group-hover:text-brand',
 								'size-5 shrink-0 transition-colors'
 							) }
 						/>
@@ -97,7 +97,7 @@ const NavigationItem = memo( ( {
 					<ChevronRight
 						className={ aiClassNames(
 							'w-4 h-4 transition-transform',
-							isActive ? 'rotate-90 text-indigo-600' : 'text-gray-400'
+							isActive ? 'rotate-90 text-brand' : 'text-gray-400'
 						) }
 						aria-hidden="true"
 					/>
@@ -346,7 +346,7 @@ function Settings() {
 										className="flex items-center justify-center py-12"
 										aria-label={ __( 'Loading settings…', 'wp-ai-blogger' ) }
 									>
-										<Loader2 className="w-8 h-8 animate-spin text-indigo-600" aria-hidden="true" />
+										<Loader2 className="w-8 h-8 animate-spin text-brand" aria-hidden="true" />
 										<span className="ml-2 text-gray-600">
 											{ __( 'Loading…', 'wp-ai-blogger' ) }
 										</span>

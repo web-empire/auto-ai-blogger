@@ -11,13 +11,13 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Enhanced metric card component with animations and accessibility.
 const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, className = '', getOnlyDetails = false } ) => (
-	<div className={ `${ getOnlyDetails ? '' : 'bg-white rounded-lg p-4 border border-solid border-gray-200 hover:border-indigo-300 transition-all duration-200 shadow-sm hover:shadow-lg' } ${ className }` }>
+	<div className={ `${ getOnlyDetails ? '' : 'bg-white rounded-lg p-4 border border-solid border-gray-200 hover:border-brand transition-all duration-200 shadow-sm hover:shadow-lg' } ${ className }` }>
 		<div className="flex items-center justify-between">
 			<div className="flex items-center gap-2">
 				{
 					! getOnlyDetails && (
-						<div className={ `${ getOnlyDetails ? '' : 'p-2 bg-indigo-50 rounded-lg' }` }>
-							<Icon className="w-4 h-4 text-indigo-600 flex" aria-hidden="true" />
+						<div className={ `${ getOnlyDetails ? '' : 'p-2 bg-brand-50 rounded-lg' }` }>
+							<Icon className="w-4 h-4 text-brand flex" aria-hidden="true" />
 						</div>
 					)
 				}
@@ -193,7 +193,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 	};
 
 	return (
-		<div className="relative overflow-hidden rounded-lg bg-white shadow-sm border border-solid border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all duration-200 flex flex-col h-full">
+		<div className="relative overflow-hidden rounded-lg bg-white shadow-sm border border-solid border-gray-200 hover:shadow-md hover:border-brand transition-all duration-200 flex flex-col h-full">
 			{ /* Performance indicator */ }
 			{ isPerformant && (
 				<div className="absolute top-2 right-2 bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full font-medium z-10">
@@ -230,7 +230,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 			<div className="bg-gray-50 px-3 py-2.5 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium transition-all duration-200 min-h-[52px]">
 				<a
 					href={ `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` }
-					className="text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-colors duration-200 no-underline truncate flex-1 min-w-0 mr-2"
+					className="text-brand hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 rounded-md transition-colors duration-200 no-underline truncate flex-1 min-w-0 mr-2"
 					onClick={ ( e ) => {
 						e.preventDefault();
 						navigate( `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` );
@@ -244,38 +244,38 @@ const CampaignCard = memo( ( { campaign } ) => {
 				</a>
 
 				<div className="flex items-center gap-x-1.5 flex-shrink-0">
-					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+					<a href="#" className="text-gray-500 hover:text-brand-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 						viewCampaignPosts( e, campaign.id );
 					} }>
 						<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<List className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-700" />
+							<List className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
 						</Tooltip>
 					</a>
 
-					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+					<a href="#" className="text-gray-500 hover:text-brand-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 						openCampaignAnalytics( e, campaign.id );
 					} }>
 						<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<ChartNoAxesColumn className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-700" />
+							<ChartNoAxesColumn className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
 						</Tooltip>
 					</a>
 
-					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
+					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-brand-900" onClick={ configureCampaign }>
 						<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
 							{
 								openingConfigureDrawer ? (
-									<RotateCw className="w-3.5 h-3.5 animate-spin text-indigo-600 hover:text-indigo-700" />
+									<RotateCw className="w-3.5 h-3.5 animate-spin text-brand hover:text-brand-700" />
 								) : (
-									<Settings className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-700" />
+									<Settings className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
 								)
 							}
 						</Tooltip>
@@ -491,7 +491,7 @@ function CampaignsInsights( { onError } ) {
 						e.preventDefault();
 						navigate( `?page=${ homeSlug }&path=campaigns` );
 					} }
-					className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 no-underline transition-colors"
+					className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-700 no-underline transition-colors"
 				>
 					{ __( 'View All', 'wp-ai-blogger' ) }
 					<ExternalLink className="w-3.5 h-3.5" />
@@ -504,10 +504,10 @@ function CampaignsInsights( { onError } ) {
 				{ canScrollLeft && (
 					<button
 						onClick={ scrollLeft }
-						className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-indigo-600 rounded-full p-2 shadow-lg transition-all duration-200"
+						className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
 						aria-label={ __( 'Scroll left', 'wp-ai-blogger' ) }
 					>
-						<ChevronLeft className="w-5 h-5 text-indigo-600" />
+						<ChevronLeft className="w-5 h-5 text-brand" />
 					</button>
 				) }
 
@@ -515,10 +515,10 @@ function CampaignsInsights( { onError } ) {
 				{ canScrollRight && (
 					<button
 						onClick={ scrollRight }
-						className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-indigo-600 rounded-full p-2 shadow-lg transition-all duration-200"
+						className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
 						aria-label={ __( 'Scroll right', 'wp-ai-blogger' ) }
 					>
-						<ChevronRight className="w-5 h-5 text-indigo-600" />
+						<ChevronRight className="w-5 h-5 text-brand" />
 					</button>
 				) }
 

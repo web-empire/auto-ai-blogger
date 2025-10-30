@@ -89,21 +89,21 @@ const NotificationCard = memo( ( {
 	}, [ enabled, inputValue, validateInput ] );
 
 	return (
-		<div className={ `border rounded-lg transition-all duration-200 p-4 ${ enabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-gray-50' }` }>
+		<div className={ `border rounded-lg transition-all duration-200 p-4 ${ enabled ? 'border-brand-200 bg-brand-50' : 'border-gray-200 bg-gray-50' }` }>
 			{ /* Header */ }
 			<div className="flex items-center justify-between">
 				<div className="flex items-start gap-3">
-					<div className={ `flex p-2 rounded-lg ${ enabled ? 'bg-indigo-100' : 'bg-gray-100' }` }>
+					<div className={ `flex p-2 rounded-lg ${ enabled ? 'bg-brand-100' : 'bg-gray-100' }` }>
 						{ React.cloneElement( icon, {
-							className: `flex w-5 h-5 ${ enabled ? 'text-indigo-600' : 'text-gray-400' }`,
+							className: `flex w-5 h-5 ${ enabled ? 'text-brand' : 'text-gray-400' }`,
 						} ) }
 					</div>
 
 					<div className="flex flex-col gap-1">
-						<h3 className={ `text-lg font-semibold p-0 m-0 ${ enabled ? 'text-indigo-900' : 'text-gray-900' }` }>
+						<h3 className={ `text-lg font-semibold p-0 m-0 ${ enabled ? 'text-brand-900' : 'text-gray-900' }` }>
 							{ title }
 						</h3>
-						<p className={ `text-sm ${ enabled ? 'text-indigo-700' : 'text-gray-600' }` }>
+						<p className={ `text-sm ${ enabled ? 'text-brand-700' : 'text-gray-600' }` }>
 							{ description }
 						</p>
 					</div>
@@ -131,7 +131,7 @@ const NotificationCard = memo( ( {
 							className={ `
 								block w-full px-3 py-2 text-sm border rounded-lg
 								bg-white text-gray-900 placeholder:text-gray-400
-								focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+								focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand
 								transition-colors duration-200
 								${ ! isValid ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300' }
 								${ disabled ? 'bg-gray-50 cursor-not-allowed' : '' }

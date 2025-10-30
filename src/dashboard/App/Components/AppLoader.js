@@ -48,7 +48,7 @@ const AppLoader = ( {
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
-						className={ `${ sizeClasses[ size ] } text-blue-600 animate-spin` }
+						className={ `${ sizeClasses[ size ] } text-brand-600 animate-spin` }
 						aria-hidden="true"
 					>
 						<path d="M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0" />
@@ -58,7 +58,7 @@ const AppLoader = ( {
 					</svg>
 
 					{ /* Pulse animation overlay */ }
-					<div className={ `absolute inset-0 ${ sizeClasses[ size ] } bg-blue-600 rounded-full opacity-75 animate-ping` }></div>
+					<div className={ `absolute inset-0 ${ sizeClasses[ size ] } bg-brand-600 rounded-full opacity-75 animate-ping` }></div>
 				</div>
 
 				{ /* Loading text */ }
@@ -67,9 +67,9 @@ const AppLoader = ( {
 						{ loaderMessage }
 					</p>
 					<div className="flex justify-center space-x-1 mt-2">
-						<div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-						<div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-100"></div>
-						<div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-200"></div>
+						<div className="w-2 h-2 bg-brand-600 rounded-full animate-bounce"></div>
+						<div className="w-2 h-2 bg-brand-600 rounded-full animate-bounce delay-100"></div>
+						<div className="w-2 h-2 bg-brand-600 rounded-full animate-bounce delay-200"></div>
 					</div>
 				</div>
 			</div>

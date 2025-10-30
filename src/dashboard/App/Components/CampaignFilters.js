@@ -116,7 +116,7 @@ const CampaignFilters = ( {
 				<button
 					type="button"
 					onClick={ () => onToggleSortDropdown( ! showSortDropdown ) }
-					className="flex items-center gap-2 rounded-md bg-white px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
+					className="flex items-center gap-2 rounded-md bg-white px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-brand-600 border-none cursor-pointer outline-none transition-all duration-200"
 					style={ { height: '38px' } }
 				>
 					{ sortOptions.find( ( option ) => option.value === sortBy )?.label || __( 'Sort', 'wp-ai-blogger' ) }
@@ -132,7 +132,7 @@ const CampaignFilters = ( {
 									onClick={ () => handleSortOptionClick( option.value ) }
 									className={ `block w-full text-left px-4 py-2 text-sm transition-colors duration-200 border-none bg-transparent cursor-pointer ${
 										sortBy === option.value
-											? 'bg-indigo-50 text-indigo-700 font-medium'
+											? 'bg-brand-50 text-brand-700 font-medium'
 											: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
 									}` }
 								>
@@ -154,7 +154,7 @@ const CampaignFilters = ( {
 					value={ searchTerm }
 					onChange={ ( e ) => onSearchChange( e.target.value ) }
 					placeholder={ __( 'Search campaigns…', 'wp-ai-blogger' ) }
-					className="block w-full text-sm rounded-md bg-white placeholder-gray-400 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 outline-none transition-all duration-200"
+					className="block w-full text-sm rounded-md bg-white placeholder-gray-400 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-brand-600 outline-none transition-all duration-200"
 					style={ {
 						height: '38px',
 						paddingLeft: '40px',

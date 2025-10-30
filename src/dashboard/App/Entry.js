@@ -12,7 +12,7 @@ const Dashboard = React.lazy( () => import( './Dashboard' ) );
  */
 const RouteLoader = () => (
 	<div
-		className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100"
+		className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-indigo-100"
 		aria-live="polite"
 		aria-label={ __( 'Loading application', 'wp-ai-blogger' ) }
 	>
@@ -21,9 +21,9 @@ const RouteLoader = () => (
 			<div className="relative">
 				<div className="w-16 h-16 relative">
 					{ /* Outer rotating ring */ }
-					<div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin"></div>
+					<div className="absolute inset-0 rounded-full border-4 border-brand-200 animate-spin"></div>
 					{ /* Inner pulsing circle */ }
-					<div className="absolute inset-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 animate-pulse flex items-center justify-center">
+					<div className="absolute inset-2 rounded-full bg-gradient-to-r from-brand-500 to-purple-600 animate-pulse flex items-center justify-center">
 						{ /* AI Brain/Chip Icon */ }
 						<svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
 							<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
@@ -31,10 +31,10 @@ const RouteLoader = () => (
 					</div>
 				</div>
 				{ /* Floating particles */ }
-				<div className="absolute -top-2 -left-2 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={ { animationDelay: '0s' } }></div>
+				<div className="absolute -top-2 -left-2 w-2 h-2 bg-brand-400 rounded-full animate-bounce" style={ { animationDelay: '0s' } }></div>
 				<div className="absolute -top-1 -right-3 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={ { animationDelay: '0.2s' } }></div>
 				<div className="absolute -bottom-2 -right-1 w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={ { animationDelay: '0.4s' } }></div>
-				<div className="absolute -bottom-1 -left-3 w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={ { animationDelay: '0.6s' } }></div>
+				<div className="absolute -bottom-1 -left-3 w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style={ { animationDelay: '0.6s' } }></div>
 			</div>
 
 			{ /* Loading text with typing effect */ }
@@ -51,7 +51,7 @@ const RouteLoader = () => (
 
 			{ /* Progress bar */ }
 			<div className="w-64 h-1 bg-gray-200 rounded-full overflow-hidden">
-				<div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
+				<div className="h-full bg-gradient-to-r from-brand-500 to-purple-600 rounded-full animate-pulse"></div>
 			</div>
 		</div>
 	</div>
@@ -147,7 +147,7 @@ const Entry = () => {
 						<div className="space-y-3">
 							<button
 								onClick={ handleErrorRecovery }
-								className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+								className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors duration-200"
 								type="button"
 							>
 								{ __( 'Try Again', 'wp-ai-blogger' ) }

@@ -121,7 +121,7 @@ const CallToActionSection = memo( () => {
 				</div>
 
 				{ /* Enhanced CTA button */ }
-				<ProButton url={ proPurchaseUrl } variant="large" />
+				<ProButton url={ proPurchaseUrl } />
 
 				{ /* Additional trust signals */ }
 				<p className="force-mt-4 text-xs text-gray-500">

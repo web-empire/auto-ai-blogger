@@ -85,14 +85,14 @@ class ErrorBoundary extends React.Component {
 						<div className="space-y-3 mt-4">
 							<button
 								onClick={ this.handleRetry }
-								className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+								className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors duration-200"
 								type="button"
 							>
 								{ __( 'Try Again', 'wp-ai-blogger' ) }
 							</button>
 							<button
 								onClick={ () => window.location.reload() }
-								className="w-full inline-flex justify-center items-center px-6 py-3 border border-slate-300 text-base font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+								className="w-full inline-flex justify-center items-center px-6 py-3 border border-slate-300 text-base font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors duration-200"
 								type="button"
 							>
 								{ __( 'Reload Page', 'wp-ai-blogger' ) }

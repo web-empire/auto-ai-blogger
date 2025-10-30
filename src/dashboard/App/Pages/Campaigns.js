@@ -361,7 +361,7 @@ export default function Campaigns() {
 					</p>
 					<button
 						type="button"
-						className="rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-none cursor-pointer m-2 flex gap-x-2 items-center"
+						className="rounded-md bg-brand-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 border-none cursor-pointer m-2 flex gap-x-2 items-center"
 						onClick={ ( e ) => {
 							e.preventDefault();
 							setConfigureData( defaultMetaDefaults );
@@ -439,7 +439,7 @@ export default function Campaigns() {
 
 						<button
 							type="button"
-							className="flex items-center justify-center rounded-md bg-indigo-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
+							className="flex items-center justify-center rounded-md bg-brand-500 px-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 focus:ring-2 focus:ring-inset focus:ring-brand-600 border-none cursor-pointer outline-none transition-all duration-200"
 							style={ { height: '38px' } }
 							onClick={ ( e ) => {
 								e.preventDefault();
@@ -487,7 +487,7 @@ export default function Campaigns() {
 															key={ campaign.id }
 															data-campaign-id={ campaign.id }
 															className={ `even:bg-gray-50 transition-colors duration-500 ${
-																highlightedCampaignId === campaign.id.toString() ? 'bg-indigo-50 ring-2 ring-indigo-500 ring-inset' : ''
+																highlightedCampaignId === campaign.id.toString() ? 'bg-brand-50 ring-2 ring-brand-500 ring-inset' : ''
 															}` }
 														>
 															<td className="py-4 pl-4 pr-3 text-sm text-gray-600 sm:pl-6 overflow-hidden" style={ { maxWidth: '200px' } }>
@@ -549,10 +549,9 @@ export default function Campaigns() {
 																						isUpdating || shouldDisableSwitch
 																							? 'opacity-50 cursor-default bg-gray-300 focus:outline-none'
 																							: isPaused
-																								? 'focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:outline-none cursor-pointer'
-																								: 'bg-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:outline-none cursor-pointer'
+																								? 'bg-brand-200 focus:ring-2 focus:ring-brand-300 focus:ring-offset-2 focus:outline-none cursor-pointer'
+																								: 'bg-brand-500 focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 focus:outline-none cursor-pointer'
 																					}` }
-																					style={ isPaused && ! isUpdating && ! shouldDisableSwitch ? { backgroundColor: '#9eaff6' } : {} }
 																				>
 																					<span
 																						className={ `inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${
@@ -591,7 +590,7 @@ export default function Campaigns() {
 																					Undelivered: { postsFailed }
 																					</span>
 																				) }
-																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+																				<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-brand-100 text-brand-800">
 																				Target: { postsTarget }
 																				</span>
 																			</div>
@@ -625,7 +624,7 @@ export default function Campaigns() {
 																<div className="flex gap-x-3 items-center flex-nowrap">
 																	<button type="button" className={ `focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0 ${
 																		campaign.startDate && campaign.startDate.trim() !== ''
-																			? 'text-gray-500 hover:text-indigo-900'
+																			? 'text-gray-500 hover:text-brand-900'
 																			: 'text-amber-500 hover:text-amber-600'
 																	}` }>
 																	<Tooltip text={ `${ __( 'Start Date', 'wp-ai-blogger' ) }: ${
@@ -640,7 +639,7 @@ export default function Campaigns() {
 																	</Tooltip>
 																</button>
 
-																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0">
+																<button type="button" className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0">
 																	<Tooltip text={ ( () => {
 																	// Use direct metadata field to check if any posts have been created
 																		const postsCreated = parseInt( campaign.postsCreated ) || 0;
@@ -658,7 +657,7 @@ export default function Campaigns() {
 																	</Tooltip>
 																</button>
 
-																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																<button type="button" className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																	viewCampaignPosts( e, campaign.id );
 																} }>
 																	<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
@@ -669,7 +668,7 @@ export default function Campaigns() {
 																	</Tooltip>
 																</button>
 
-																<button type="button" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" onClick={ configureCampaign }>
+																<button type="button" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" onClick={ configureCampaign }>
 																	<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 																		delay={ 100 }
 																		className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
@@ -684,7 +683,7 @@ export default function Campaigns() {
 																	</Tooltip>
 																</button>
 
-																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																<button type="button" className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																	openCampaignAnalytics( e, campaign.id );
 																} }>
 																	<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
@@ -698,7 +697,7 @@ export default function Campaigns() {
 																{ shouldShowDebugLogs && (
 																	<button
 																		type="button"
-																		className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0"
+																		className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0"
 																		data-campaign_id={ campaign.id }
 																		onClick={ ( e ) => {
 																			e.preventDefault();
@@ -715,7 +714,7 @@ export default function Campaigns() {
 																	</button>
 																) }
 
-																<button type="button" className="text-gray-500 hover:text-indigo-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+																<button type="button" className="text-gray-500 hover:text-brand-900 focus:outline-none focus:ring-0 border-none bg-transparent p-0 m-0 cursor-pointer flex-shrink-0" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 																	openDeleteModal( e, campaign.id );
 																} }>
 																	<Tooltip text={ __( 'Delete', 'wp-ai-blogger' ) }
@@ -750,7 +749,7 @@ export default function Campaigns() {
 																	<button
 																		type="button"
 																		onClick={ () => setSearchTerm( '' ) }
-																		className="mt-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-indigo-600 border-none cursor-pointer outline-none transition-all duration-200"
+																		className="mt-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-brand-600 border-none cursor-pointer outline-none transition-all duration-200"
 																	>
 																		{ __( 'Clear search', 'wp-ai-blogger' ) }
 																	</button>

@@ -252,7 +252,7 @@ export default function PostIdeas() {
 					<a
 						href="#"
 						onClick={ handlePersonaClick }
-						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 gap-1"
+						className="cursor-pointer inline-flex justify-center rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 mt-5 gap-1"
 						style={ { color: 'white' } } // Inline style to ensure white color.
 					>
 						{ buttonText }
@@ -275,7 +275,7 @@ export default function PostIdeas() {
 							event.preventDefault();
 							navigate( `?page=${ homeSlug }&path=settings&tab=license` );
 						} }
-						className="cursor-pointer inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-5 gap-1"
+						className="cursor-pointer inline-flex justify-center rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 mt-5 gap-1"
 						style={ { color: 'white' } } // Inline style to ensure white color.
 					>
 						{ buttonText }
@@ -291,7 +291,7 @@ export default function PostIdeas() {
 				{ isApiError && (
 					<button
 						onClick={ handleRefresh }
-						className="mt-4 flex items-center gap-2 bg-indigo-600 text-white rounded px-4 py-2"
+						className="mt-4 flex items-center gap-2 bg-brand-600 text-white rounded px-4 py-2 hover:bg-brand-500"
 					>
 						<RotateCw className="h-4 w-4" />
 						{ __( 'Retry', 'wp-ai-blogger' ) }
@@ -464,7 +464,6 @@ export default function PostIdeas() {
 						variant="primary"
 						size="default"
 						icon={ <Crown className="w-4 h-4" /> }
-						className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
 						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 Suggestions, Upgrade to Pro', 'wp-ai-blogger' ) }
@@ -558,7 +557,7 @@ export default function PostIdeas() {
 																		? ( creatingPosts.has( postTitle )
 																			? 'text-green-600 hover:text-green-900'
 																			: 'text-gray-400 cursor-not-allowed' )
-																		: 'text-indigo-600 hover:text-indigo-900'
+																		: 'text-brand-600 hover:text-brand-900'
 																}` }
 																data-type="create"
 																style={ {
@@ -600,7 +599,6 @@ export default function PostIdeas() {
 																variant="primary"
 																size="small"
 																icon={ <MoveRight className="w-4 h-4" /> }
-																className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md"
 															>
 																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
 															</ProButton>
@@ -628,7 +626,6 @@ export default function PostIdeas() {
 														variant="primary"
 														size="default"
 														icon={ <MoveRight className="w-5 h-5" /> }
-														className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg"
 													>
 														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
 													</ProButton>

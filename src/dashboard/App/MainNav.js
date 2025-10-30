@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import BrandIcon from '@AppImages/crown.svg';
+import BrandIcon from '@AppImages/brand-logo.svg';
 import { CoreVersion, TokenDisplayAndRefresh } from '@Components/NavigationComponents';
 import { useSelector } from 'react-redux';
 import { Crown } from 'lucide-react';
@@ -93,7 +93,7 @@ export default function MainNav() {
 					<div className="lg:flex-1 flex items-center justify-start">
 						<span className="flex-shrink-0">
 							<img
-								className="block h-6 w-auto"
+								className="block h-[30px] w-[30px]"
 								src={ BrandIcon }
 								alt="WP AI Blogger"
 								loading="lazy"
@@ -105,13 +105,13 @@ export default function MainNav() {
 							className="h-full ml-4 sm:ml-8 sm:flex gap-y-4 gap-x-8"
 							aria-label="Primary navigation"
 						>
-							{ navMenus.map( ( menu ) => {
-								const isActive = activePage === menu.slug && activePath === menu.path;
-								const linkClasses = isActive
-									? 'mb-4 sm:mb-0 border-blogapp text-blogapp active:text-blogapp focus:text-blogapp focus-visible:text-blogapp-hover hover:text-blogapp-hover inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
-									: 'mb-4 sm:mb-0 border-transparent text-slate-600 active:text-blogapp focus-visible:border-slate-300 focus-visible:text-slate-800 hover:border-slate-300 hover:text-slate-800 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu';
+						{ navMenus.map( ( menu ) => {
+							const isActive = activePage === menu.slug && activePath === menu.path;
+							const linkClasses = isActive
+								? 'mb-4 sm:mb-0 border-brand text-brand hover:text-brand hover:border-brand inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
+								: 'mb-4 sm:mb-0 border-slate-600 text-slate-600 hover:border-slate-500 hover:text-slate-500 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu';
 
-								return (
+							return (
 									<Fragment key={ `${ menu.slug }-${ menu.path || 'home' }` }>
 										<Link
 											to={ {
@@ -139,7 +139,7 @@ export default function MainNav() {
 							<div className="text-sm font-medium text-slate-600 hover:text-[#1E293B] hover:svg-hover-color pr-4">
 								<button
 									onClick={ handleProPurchase }
-									className="inline-flex items-center cursor-pointer text-[#046BD2] hover:text-[#1E293B] focus-visible:text-[#1E293B] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded px-3 py-2 transition-colors duration-200 gap-2"
+									className="inline-flex items-center cursor-pointer text-[#9138c8] hover:text-[#7c2fb0] focus-visible:text-[#7c2fb0] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded px-3 py-2 transition-colors duration-200 gap-2"
 									aria-label={ __( 'Unlock Pro Features - Opens in new tab', 'wp-ai-blogger' ) }
 									type="button"
 								>

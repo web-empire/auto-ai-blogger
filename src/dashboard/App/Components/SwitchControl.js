@@ -12,7 +12,7 @@ const SwitchControl = forwardRef( ( {
 	id,
 	disabled = false,
 	size = 'default',
-	color = 'indigo',
+	color = 'brand',
 	label,
 	description,
 	error,
@@ -47,6 +47,10 @@ const SwitchControl = forwardRef( ( {
 
 	// Color variants
 	const colors = {
+		brand: {
+			active: 'bg-brand focus:ring-brand',
+			inactive: 'bg-slate-200',
+		},
 		indigo: {
 			active: 'bg-indigo-600 focus:ring-indigo-600',
 			inactive: 'bg-slate-200',
@@ -66,7 +70,7 @@ const SwitchControl = forwardRef( ( {
 	};
 
 	const sizeConfig = sizes[ size ] || sizes.default;
-	const colorConfig = colors[ color ] || colors.indigo;
+	const colorConfig = colors[ color ] || colors.brand;
 
 	// Build aria-describedby
 	const describedBy = [
