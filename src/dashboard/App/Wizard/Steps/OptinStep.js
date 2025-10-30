@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { ArrowRight, User, Mail, Star, TrendingUp, CheckCircle2, AlertCircle, Loader2, Heart } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Enhanced input field component
 const FormField = memo( ( {
@@ -24,12 +24,12 @@ const FormField = memo( ( {
 	const handleBlur = useCallback( () => setIsFocused( false ), [] );
 
 	return (
-		<div className="space-y-2">
+		<div className="space-y-1.5">
 			<label
 				htmlFor={ id }
-				className="flex items-center text-sm font-semibold text-gray-900 relative"
+				className="flex items-center text-[13px] font-semibold text-gray-900 relative"
 			>
-				{ Icon && <Icon className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" /> }
+				{ Icon && <Icon className="w-3.5 h-3.5 text-gray-600 mr-1.5" aria-hidden="true" /> }
 				{ label }
 				{ required && <span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
 			</label>
@@ -45,7 +45,7 @@ const FormField = memo( ( {
 					disabled={ disabled }
 					placeholder={ placeholder }
 					className={ `
-						w-full pl-4 pr-10 py-3 text-sm border rounded-lg transition-all duration-200
+						w-full pl-3.5 pr-9 py-2.5 text-[13px] border rounded-lg transition-all duration-200
 						${ error
 			? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
 			: 'border-gray-300 bg-white focus:border-indigo-500 focus:ring-indigo-500'
@@ -60,18 +60,18 @@ const FormField = memo( ( {
 				/>
 
 				{ /* Status indicator */ }
-				<div className="absolute right-3 top-3">
+				<div className="absolute right-2.5 top-2.5">
 					{ error ? (
-						<AlertCircle className="w-4 h-4 text-red-500" aria-hidden="true" />
+						<AlertCircle className="w-3.5 h-3.5 text-red-500" aria-hidden="true" />
 					) : value && ! error ? (
-						<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+						<CheckCircle2 className="w-3.5 h-3.5 text-green-500" aria-hidden="true" />
 					) : null }
 				</div>
 			</div>
 
 			{ error && (
-				<p id={ `${ id }-error` } className="text-xs text-red-600 flex items-center gap-1">
-					<AlertCircle className="w-3 h-3" />
+				<p id={ `${ id }-error` } className="text-[11px] text-red-600 flex items-center gap-1">
+					<AlertCircle className="w-2.5 h-2.5" />
 					{ error }
 				</p>
 			) }
@@ -83,24 +83,24 @@ FormField.displayName = 'OptinFormField';
 
 // Enhanced benefit card component
 const BenefitCard = memo( ( { icon: Icon, title, description, highlight = false } ) => (
-	<div className={ `p-4 rounded-xl border transition-all duration-200 hover:shadow-md
+	<div className={ `p-3.5 rounded-xl border transition-all duration-200 hover:shadow-md
 		${ highlight
-		? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200'
+		? 'bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border-indigo-600/20'
 		: 'bg-gray-50 border-gray-200'
 	}
 	` }>
-		<div className="flex items-start gap-3">
+		<div className="flex items-start gap-2.5">
 			<div className={ `
-				p-2 rounded-lg shrink-0 flex
-				${ highlight ? 'bg-indigo-100' : 'bg-gray-100' }
+				p-1.5 rounded-lg shrink-0 flex
+				${ highlight ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20' : 'bg-gray-100' }
 			` }>
-				<Icon className={ `w-5 h-5 ${ highlight ? 'text-indigo-600' : 'text-gray-600' }` } aria-hidden="true" />
+				<Icon className={ `w-4.5 h-4.5 ${ highlight ? 'text-indigo-600' : 'text-gray-600' }` } aria-hidden="true" />
 			</div>
 			<div>
-				<h3 className="text-sm font-semibold text-gray-900 mb-1 mt-0">
+				<h3 className={ `text-[13px] font-semibold mb-0.5 mt-0 ${ highlight ? 'text-indigo-900' : 'text-gray-900' }` }>
 					{ title }
 				</h3>
-				<p className="text-xs text-gray-600 leading-relaxed">
+				<p className={ `text-[11px] leading-relaxed ${ highlight ? 'text-gray-700' : 'text-gray-600' }` }>
 					{ description }
 				</p>
 			</div>
@@ -125,9 +125,9 @@ const SubmitButton = memo( ( { onClick, disabled, loading, children } ) => {
 			onClick={ handleClick }
 			disabled={ disabled || loading }
 			className="
-				group inline-flex items-center gap-3 px-8 py-4
+				group inline-flex items-center gap-2.5 px-7 py-3.5
 				bg-gradient-to-r from-indigo-600 to-purple-600
-				text-white font-semibold rounded-xl shadow-lg
+				text-white font-semibold rounded-xl shadow-lg text-[13px]
 				hover:from-indigo-700 hover:to-purple-700
 				focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
 				transform transition-all duration-200 hover:scale-105 hover:shadow-xl
@@ -136,12 +136,12 @@ const SubmitButton = memo( ( { onClick, disabled, loading, children } ) => {
 			aria-label={ __( 'Save preferences and continue to final step', 'wp-ai-blogger' ) }
 		>
 			{ loading ? (
-				<Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+				<Loader2 className="w-4.5 h-4.5 animate-spin" aria-hidden="true" />
 			) : (
 				<span>{ children }</span>
 			) }
 			{ ! loading && (
-				<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+				<ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
 			) }
 		</button>
 	);
@@ -153,10 +153,12 @@ const OptinStep = memo( () => {
 	const abortControllerRef = useRef( {} );
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	// Redux state
 	const userName = useSelector( ( state ) => state.userName );
 	const userEmail = useSelector( ( state ) => state.userEmail );
+	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
 
 	// Component state
 	const [ name, setName ] = useState( userName || '' );
@@ -219,8 +221,22 @@ const OptinStep = memo( () => {
 
 	// Handle step redirection
 	const handleStepRedirection = useCallback( ( stepToRedirect ) => {
-		navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepToRedirect }` );
-	}, [ navigate ] );
+		// Scroll to top before navigating
+		window.scrollTo( { top: 0, behavior: 'smooth' } );
+
+		// Get current URL parameters from react-router location
+		const currentParams = new URLSearchParams( location.search );
+
+		// Ensure page parameter is set
+		if ( ! currentParams.has( 'page' ) ) {
+			currentParams.set( 'page', homeSlug );
+		}
+
+		// Update step parameter
+		currentParams.set( 'step', stepToRedirect );
+
+		navigate( `?${ currentParams.toString() }` );
+	}, [ navigate, location.search, homeSlug ] );
 
 	// Enhanced form submission
 	const submitOptinForm = useCallback( async ( e ) => {
@@ -261,8 +277,8 @@ const OptinStep = memo( () => {
 	const benefits = [
 		{
 			icon: TrendingUp,
-			title: __( 'Trending Topic Insights', 'wp-ai-blogger' ),
-			description: __( 'Get weekly reports on trending topics in your niche to stay ahead of the curve.', 'wp-ai-blogger' ),
+			title: __( 'Weekly AI Writing Tips', 'wp-ai-blogger' ),
+			description: __( 'Master AI-powered content creation with expert tips and techniques delivered every week.', 'wp-ai-blogger' ),
 			highlight: true,
 		},
 		{
@@ -279,38 +295,36 @@ const OptinStep = memo( () => {
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4"
+			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex justify-center p-5"
 			role="main"
 			aria-labelledby="optin-heading"
 		>
 			<div className="w-full max-w-4xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-					{ /* Header */ }
-					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
-						<div className="mb-4">
-							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
-								<Star className="w-4 h-4 mr-2" aria-hidden="true" />
-								{ __( 'Step 4 of 5', 'wp-ai-blogger' ) }
-							</span>
-						</div>
-						<h1 id="optin-heading" className="text-3xl font-bold text-white mb-2">
-							{ __( 'Almost There!', 'wp-ai-blogger' ) }
-						</h1>
-						<h2 className="text-xl font-semibold text-indigo-100 mb-2">
-							{ __( 'Get personalized growth insights', 'wp-ai-blogger' ) }
-						</h2>
+				{ /* Header */ }
+				<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-center">
+					<div className="mb-2.5">
+						<span className="inline-flex items-center px-3.5 py-1.5 bg-white bg-opacity-20 text-white text-[13px] font-medium rounded-full tracking-wide uppercase">
+							<Star className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+							{ __( 'Step 4 of 5', 'wp-ai-blogger' ) }
+						</span>
 					</div>
-
-					<div className="p-8">
-						<div className="grid lg:grid-cols-2 gap-8">
+					<h1 id="optin-heading" className="text-[27px] font-bold text-white mb-3.5">
+						{ __( 'Almost There!', 'wp-ai-blogger' ) }
+					</h1>
+					<h2 className="text-[17px] font-semibold text-indigo-100 mb-3.5">
+						{ __( 'Get personalized growth insights', 'wp-ai-blogger' ) }
+					</h2>
+				</div>					<div className="p-5 md:p-7">
+						<div className="grid lg:grid-cols-2 gap-5">
 							{ /* Form Section */ }
 							<div>
-								<h3 className="text-xl font-semibold text-gray-900 mb-6">
+								<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
 									{ __( 'Your Information', 'wp-ai-blogger' ) }
-								</h3>
+							</h3>
 
-								<form className="space-y-6" onSubmit={ submitOptinForm }>
-									<FormField
+							<form className="space-y-5" onSubmit={ submitOptinForm }>
+								<FormField
 										id="wpaib-user-name"
 										label={ __( 'First Name', 'wp-ai-blogger' ) }
 										type="text"
@@ -336,16 +350,16 @@ const OptinStep = memo( () => {
 
 									{ /* General error */ }
 									{ errors.general && (
-										<div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-											<div className="flex items-center gap-2">
-												<AlertCircle className="w-5 h-5 text-red-600" aria-hidden="true" />
-												<p className="text-red-800">{ errors.general }</p>
+										<div className="p-3.5 bg-red-50 border border-red-200 rounded-lg">
+											<div className="flex items-center gap-1.5">
+												<AlertCircle className="w-4.5 h-4.5 text-red-600" aria-hidden="true" />
+												<p className="text-red-800 text-[13px]">{ errors.general }</p>
 											</div>
 										</div>
 									) }
 
 									{ /* Submit button */ }
-									<div className="flex justify-center pt-4">
+									<div className="flex justify-center pt-3.5">
 										<SubmitButton
 											onClick={ submitOptinForm }
 											disabled={ ! name.trim() || ! email.trim() }
@@ -359,28 +373,28 @@ const OptinStep = memo( () => {
 									</div>
 
 									{ /* Trust indicator */ }
-									<div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-										<div className="flex items-start gap-2">
-											<CheckCircle2 className="w-5 h-5 text-green-600" aria-hidden="true" />
-											<h3 className="text-sm font-semibold text-green-800 mb-1 mt-0">
+									<div className="mt-5 p-3.5 bg-green-50 border border-green-200 rounded-lg">
+										<div className="flex items-start gap-1.5">
+											<CheckCircle2 className="w-4.5 h-4.5 text-green-600" aria-hidden="true" />
+											<h3 className="text-[13px] font-semibold text-green-800 mb-0.5 mt-[3px]">
 												{ __( 'Privacy Guaranteed', 'wp-ai-blogger' ) }
 											</h3>
 										</div>
-										<p className="text-xs text-green-700">
+										<p className="text-[11px] text-green-700">
 											{ __( 'We respect your privacy. No spam, unsubscribe anytime. Your data is secure and never shared.', 'wp-ai-blogger' ) }
 										</p>
 									</div>
 								</form>
 							</div>
 
-							{ /* Benefits Section */ }
-							<div>
-								<h3 className="text-xl font-semibold text-gray-900 mb-6">
-									{ __( 'What You\'ll Receive', 'wp-ai-blogger' ) }
-								</h3>
+						{ /* Benefits Section */ }
+						<div>
+							<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
+								{ __( 'What You\'ll Receive', 'wp-ai-blogger' ) }
+							</h3>
 
-								<div className="space-y-4">
-									{ benefits.map( ( benefit, index ) => (
+							<div className="space-y-3.5">
+								{ benefits.map( ( benefit, index ) => (
 										<BenefitCard
 											key={ index }
 											icon={ benefit.icon }
