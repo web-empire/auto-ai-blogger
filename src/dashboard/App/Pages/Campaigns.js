@@ -549,7 +549,7 @@ export default function Campaigns() {
 																						isUpdating || shouldDisableSwitch
 																							? 'opacity-50 cursor-default bg-gray-300 focus:outline-none'
 																							: isPaused
-																								? 'bg-brand-200 focus:ring-2 focus:ring-brand-300 focus:ring-offset-2 focus:outline-none cursor-pointer'
+																								? 'bg-brand-300 focus:ring-2 focus:ring-brand-300 focus:ring-offset-2 focus:outline-none cursor-pointer'
 																								: 'bg-brand-500 focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 focus:outline-none cursor-pointer'
 																					}` }
 																				>
@@ -609,7 +609,7 @@ export default function Campaigns() {
 																			<span className="truncate block">{ campaign.last_post_title }</span>
 																		</Tooltip>
 																	) : (
-																		<span className="text-gray-500">{ __( 'No post created yet.', 'wp-ai-blogger' ) }</span>
+																		<span className="text-gray-500">{ __( 'Scheduled - No posts yet', 'wp-ai-blogger' ) }</span>
 																	) }
 																</div>
 															</td>
@@ -646,7 +646,7 @@ export default function Campaigns() {
 
 																		// Show appropriate message based on posts created
 																		if ( postsCreated === 0 ) {
-																			return __( 'Not yet started - No posts created', 'wp-ai-blogger' );
+																			return __( 'Scheduled - No posts yet', 'wp-ai-blogger' );
 																		}
 																		return `${ __( 'Last Post Run', 'wp-ai-blogger' ) }: ${ campaign.lastRun }`;
 																	} )() }

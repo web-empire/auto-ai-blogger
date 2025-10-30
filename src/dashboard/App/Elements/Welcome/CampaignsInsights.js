@@ -48,7 +48,7 @@ MetricCard.displayName = 'CampaignMetricCard';
 // Helper function to format date consistently
 const formatLastPostRun = ( lastRun ) => {
 	if ( ! lastRun || lastRun === 'Not Started Yet.' ) {
-		return 'Not Started Yet.';
+		return 'Scheduled - No posts yet';
 	}
 
 	try {
@@ -218,6 +218,32 @@ const CampaignCard = memo( ( { campaign } ) => {
 						getOnlyDetails={ true }
 					/>
 					<div className="flex items-center justify-between min-h-[24px]">
+						<span className="text-xs font-medium text-gray-600">{ __( 'Status', 'wp-ai-blogger' ) }</span>
+						<div className="text-sm font-semibold text-right capitalize">
+							{ ( () => {
+								// Use same logic as Campaigns.js switch tooltip
+								const postsCreated = parseInt( campaign?.postsCreated ) || 0;
+								const postsTarget = parseInt( campaign?.postsTarget ) || 0;
+								const postsFailed = parseInt( campaign?.postsFailed ) || 0;
+								const isPaused = campaign?.isPaused || false;
+								const campaignCompleted = campaign?.campaignCompleted || false;
+
+								// Check if completed
+								const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+								const allAttemptsMade = postsTarget > 0 && ( postsCreated + postsFailed ) >= postsTarget;
+								const isCompleted = campaign?.status === 'draft' || isTargetMet || allAttemptsMade || campaignCompleted;
+
+								if ( isCompleted ) {
+									return <span className="text-gray-600">{ __( 'Complete', 'wp-ai-blogger' ) }</span>;
+								}
+								if ( isPaused ) {
+									return <span className="text-brand">{ __( 'Paused', 'wp-ai-blogger' ) }</span>;
+								}
+								return <span className="text-green-600">{ __( 'Active', 'wp-ai-blogger' ) }</span>;
+							} )() }
+						</div>
+					</div>
+					<div className="flex items-center justify-between min-h-[24px]">
 						<span className="text-xs font-medium text-gray-600">{ __( 'Last Post Run', 'wp-ai-blogger' ) }</span>
 						<div className="text-sm font-semibold text-gray-900 text-right">
 							{ formatLastPostRun( campaign?.lastRun ) }
@@ -379,11 +405,12 @@ function CampaignsInsights( { onError } ) {
 		const totalPosts = campaignArray.reduce( ( sum, c ) => sum + ( parseInt( c.postsCreated ) || 0 ), 0 );
 		const totalVisits = campaignArray.reduce( ( sum, c ) => sum + ( parseInt( c.postsVisit ) || 0 ), 0 );
 
-		// Sort campaigns by last run date (most recent first) and get top 10 for horizontal scroll
+		// Sort campaigns by creation date (most recent first) and get top 10 for horizontal scroll
 		const recentCampaigns = [ ...campaignArray ]
 			.sort( ( a, b ) => {
-				const dateA = a.lastRun && a.lastRun !== 'Not Started Yet.' ? new Date( a.lastRun ) : new Date( 0 );
-				const dateB = b.lastRun && b.lastRun !== 'Not Started Yet.' ? new Date( b.lastRun ) : new Date( 0 );
+				// Sort by created_at date (newest first)
+				const dateA = a.created_at ? new Date( a.created_at ) : new Date( 0 );
+				const dateB = b.created_at ? new Date( b.created_at ) : new Date( 0 );
 				return dateB - dateA; // Most recent first
 			} )
 			.slice( 0, 10 );
