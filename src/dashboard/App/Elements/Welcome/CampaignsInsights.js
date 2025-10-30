@@ -277,7 +277,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<List className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
+							<List className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 						</Tooltip>
 					</a>
 
@@ -288,7 +288,7 @@ const CampaignCard = memo( ( { campaign } ) => {
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<ChartNoAxesColumn className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
+							<ChartNoAxesColumn className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 						</Tooltip>
 					</a>
 
@@ -299,9 +299,9 @@ const CampaignCard = memo( ( { campaign } ) => {
 						>
 							{
 								openingConfigureDrawer ? (
-									<RotateCw className="w-3.5 h-3.5 animate-spin text-brand hover:text-brand-700" />
+									<RotateCw className="w-3.5 h-3.5 animate-spin text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 								) : (
-									<Settings className="w-3.5 h-3.5 text-brand hover:text-brand-700" />
+									<Settings className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 								)
 							}
 						</Tooltip>
