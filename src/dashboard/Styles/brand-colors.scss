@@ -30,21 +30,21 @@
 
 /* Utility classes for brand colors */
 .wpaib-bg-brand {
-	background-color: var(--wpaib-brand-primary);
+	background-color: var( --wpaib-brand-primary );
 }
 
 .wpaib-bg-brand-hover:hover {
-	background-color: var(--wpaib-brand-primary-hover);
+	background-color: var( --wpaib-brand-primary-hover );
 }
 
 .wpaib-text-brand {
-	color: var(--wpaib-brand-primary);
+	color: var( --wpaib-brand-primary );
 }
 
 .wpaib-border-brand {
-	border-color: var(--wpaib-brand-primary);
+	border-color: var( --wpaib-brand-primary );
 }
 
 .wpaib-gradient-brand {
-	background: linear-gradient(135deg, var(--wpaib-brand-500) 0%, var(--wpaib-brand-700) 100%);
+	background: linear-gradient( 135deg, var( --wpaib-brand-500 ) 0%, var( --wpaib-brand-700 ) 100% );
 }

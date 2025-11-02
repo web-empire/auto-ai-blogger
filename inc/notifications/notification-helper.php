@@ -35,25 +35,6 @@ class Notification_Helper {
 	}
 
 	/**
-	 * Initialize notification hooks.
-	 *
-	 * @since 1.0.0
-	 */
-	private function init_hooks(): void {
-		// Campaign Started.
-		add_action( 'wpaib_campaign_started', [ $this, 'handle_campaign_started' ], 10, 2 );
-
-		// Post Created Successfully.
-		add_action( 'wpaib_post_created_successfully', [ $this, 'handle_post_created' ], 10, 3 );
-
-		// Campaign Completed.
-		add_action( 'wpaib_campaign_completed', [ $this, 'handle_campaign_completed' ], 10, 3 );
-
-		// Campaign Failed/Terminated.
-		add_action( 'wpaib_campaign_failed', [ $this, 'handle_campaign_failed' ], 10, 3 );
-	}
-
-	/**
 	 * Handle Campaign Started notification.
 	 *
 	 * @param int   $campaign_id Campaign ID.
@@ -71,12 +52,12 @@ class Notification_Helper {
 		}
 
 		$data = [
-			'campaign_id'    => $campaign_id,
-			'campaign_name'  => $campaign->post_title,
-			'target_posts'   => $campaign_data['postsTarget'] ?? 0,
-			'frequency'      => $this->format_frequency( $campaign_data ),
-			'keywords'       => is_array( $campaign_data['keywords'] ?? null ) ? implode( ', ', $campaign_data['keywords'] ) : ( $campaign_data['keywords'] ?? '' ),
-			'campaign_url'   => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_id'   => $campaign_id,
+			'campaign_name' => $campaign->post_title,
+			'target_posts'  => $campaign_data['postsTarget'] ?? 0,
+			'frequency'     => $this->format_frequency( $campaign_data ),
+			'keywords'      => is_array( $campaign_data['keywords'] ?? null ) ? implode( ', ', $campaign_data['keywords'] ) : ( $campaign_data['keywords'] ?? '' ),
+			'campaign_url'  => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'campaign_started', $data );
@@ -85,9 +66,9 @@ class Notification_Helper {
 	/**
 	 * Handle Post Created Successfully notification.
 	 *
-	 * @param int    $campaign_id Campaign ID.
-	 * @param int    $post_id Post ID.
-	 * @param array  $post_data Post data.
+	 * @param int   $campaign_id Campaign ID.
+	 * @param int   $post_id Post ID.
+	 * @param array $post_data Post data.
 	 * @since 1.0.0
 	 */
 	public function handle_post_created( $campaign_id, $post_id, $post_data ): void {
@@ -96,23 +77,23 @@ class Notification_Helper {
 		}
 
 		$campaign = get_post( $campaign_id );
-		$post = get_post( $post_id );
+		$post     = get_post( $post_id );
 
 		if ( ! $campaign || ! $post ) {
 			return;
 		}
 
 		$data = [
-			'campaign_id'    => $campaign_id,
-			'campaign_name'  => $campaign->post_title,
-			'post_id'        => $post_id,
-			'post_title'     => $post->post_title,
-			'post_number'    => $post_data['post_number'] ?? 0,
-			'posts_created'  => $post_data['posts_created'] ?? 0,
-			'posts_target'   => $post_data['posts_target'] ?? 0,
-			'post_url'       => get_permalink( $post_id ),
-			'edit_url'       => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
-			'campaign_url'   => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_id'   => $campaign_id,
+			'campaign_name' => $campaign->post_title,
+			'post_id'       => $post_id,
+			'post_title'    => $post->post_title,
+			'post_number'   => $post_data['post_number'] ?? 0,
+			'posts_created' => $post_data['posts_created'] ?? 0,
+			'posts_target'  => $post_data['posts_target'] ?? 0,
+			'post_url'      => get_permalink( $post_id ),
+			'edit_url'      => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
+			'campaign_url'  => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'post_created', $data );
@@ -182,6 +163,25 @@ class Notification_Helper {
 	}
 
 	/**
+	 * Initialize notification hooks.
+	 *
+	 * @since 1.0.0
+	 */
+	private function init_hooks(): void {
+		// Campaign Started.
+		add_action( 'wpaib_campaign_started', [ $this, 'handle_campaign_started' ], 10, 2 );
+
+		// Post Created Successfully.
+		add_action( 'wpaib_post_created_successfully', [ $this, 'handle_post_created' ], 10, 3 );
+
+		// Campaign Completed.
+		add_action( 'wpaib_campaign_completed', [ $this, 'handle_campaign_completed' ], 10, 3 );
+
+		// Campaign Failed/Terminated.
+		add_action( 'wpaib_campaign_failed', [ $this, 'handle_campaign_failed' ], 10, 3 );
+	}
+
+	/**
 	 * Send notification via enabled channels.
 	 *
 	 * @param string $notification_type Type of notification.
@@ -214,7 +214,7 @@ class Notification_Helper {
 		}
 
 		$email_templates = Email_Templates::get_instance();
-		$template_data = $email_templates->get_template( $notification_type, $data );
+		$template_data   = $email_templates->get_template( $notification_type, $data );
 
 		if ( ! $template_data ) {
 			return;
@@ -270,7 +270,7 @@ class Notification_Helper {
 	 */
 	private function is_email_enabled(): bool {
 		$enabled = Helper::get_option( 'emailNotificationEnabled', false );
-		$value = Helper::get_option( 'emailNotificationValue', '' );
+		$value   = Helper::get_option( 'emailNotificationValue', '' );
 		return $enabled && ! empty( $value );
 	}
 
@@ -282,7 +282,7 @@ class Notification_Helper {
 	 */
 	private function is_whatsapp_enabled(): bool {
 		$enabled = Helper::get_option( 'whatsappNotificationEnabled', false );
-		$value = Helper::get_option( 'whatsappNotificationValue', '' );
+		$value   = Helper::get_option( 'whatsappNotificationValue', '' );
 		return $enabled && ! empty( $value );
 	}
 
@@ -300,9 +300,7 @@ class Notification_Helper {
 
 		// Split by comma and clean up.
 		$emails = array_map( 'trim', explode( ',', $email_value ) );
-		$emails = array_filter( $emails, 'is_email' );
-
-		return $emails;
+		return array_filter( $emails, 'is_email' );
 	}
 
 	/**
@@ -324,7 +322,7 @@ class Notification_Helper {
 	 */
 	private function format_frequency( $campaign_data ): string {
 		$interval = $campaign_data['repeatInterval'] ?? 1;
-		$unit = $campaign_data['repeatUnit'] ?? 'day';
+		$unit     = $campaign_data['repeatUnit'] ?? 'day';
 
 		$unit_labels = [
 			'hour'  => _n( 'hour', 'hours', $interval, 'wp-ai-blogger' ),

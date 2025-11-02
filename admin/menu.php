@@ -165,20 +165,20 @@ class Menu {
 		$admin_site_email_address = sanitize_email( Helper::get_option( 'adminEmail', get_option( 'admin_email' ) ) );
 
 		// Get settings with proper defaults - no need for redundant variables.
-		$site_title        = sanitize_text_field( Helper::get_option( 'siteTitle', $blog_name ) );
-		$site_description  = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
-		$site_for          = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
-		$license           = sanitize_text_field( Helper::get_option( 'license', '' ) );
-		$temperature       = (float) Helper::get_option( 'temperature', 1.0 );
-		$harassment        = absint( Helper::get_option( 'harassment', 2 ) );
-		$hate              = absint( Helper::get_option( 'hate', 2 ) );
-		$sexually_explicit = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
-		$dangerous_content = absint( Helper::get_option( 'dangerousContent', 2 ) );
-		$post_ideas        = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
+		$site_title         = sanitize_text_field( Helper::get_option( 'siteTitle', $blog_name ) );
+		$site_description   = sanitize_textarea_field( Helper::get_option( 'siteDescription', '' ) );
+		$site_for           = sanitize_text_field( Helper::get_option( 'siteFor', '' ) );
+		$license            = sanitize_text_field( Helper::get_option( 'license', '' ) );
+		$temperature        = (float) Helper::get_option( 'temperature', 1.0 );
+		$harassment         = absint( Helper::get_option( 'harassment', 2 ) );
+		$hate               = absint( Helper::get_option( 'hate', 2 ) );
+		$sexually_explicit  = absint( Helper::get_option( 'sexuallyExplicit', 2 ) );
+		$dangerous_content  = absint( Helper::get_option( 'dangerousContent', 2 ) );
+		$post_ideas         = sanitize_textarea_field( Helper::get_option( 'postIdeas', '' ) );
 		$created_post_ideas = sanitize_textarea_field( Helper::get_option( 'createdPostIdeas', '' ) );
-		$token_total       = absint( Helper::get_option( 'tokenTotal', 0 ) );
-		$token_remaining   = absint( Helper::get_option( 'tokenRemaining', 0 ) );
-		$license_status    = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
+		$token_total        = absint( Helper::get_option( 'tokenTotal', 0 ) );
+		$token_remaining    = absint( Helper::get_option( 'tokenRemaining', 0 ) );
+		$license_status     = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
 		// Notification settings - default to disabled.
 		$email_notification_enabled    = (bool) Helper::get_option( 'emailNotificationEnabled', false );

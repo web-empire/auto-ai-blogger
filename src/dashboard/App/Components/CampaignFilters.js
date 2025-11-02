@@ -5,14 +5,14 @@ import { ChevronDown, ArrowUp, ArrowDown, Search, X } from 'lucide-react';
 /**
  * CampaignFilters component for sorting and searching campaigns
  *
- * @param {Object} props - Component props
- * @param {string} props.sortBy - Current sort option
- * @param {Function} props.onSortChange - Callback when sort option changes
- * @param {string} props.searchTerm - Current search term
- * @param {Function} props.onSearchChange - Callback when search term changes
- * @param {boolean} props.showSortDropdown - Whether sort dropdown is open
+ * @param {Object}   props                      - Component props
+ * @param {string}   props.sortBy               - Current sort option
+ * @param {Function} props.onSortChange         - Callback when sort option changes
+ * @param {string}   props.searchTerm           - Current search term
+ * @param {Function} props.onSearchChange       - Callback when search term changes
+ * @param {boolean}  props.showSortDropdown     - Whether sort dropdown is open
  * @param {Function} props.onToggleSortDropdown - Callback to toggle sort dropdown
- * @param {Array} props.sortOptions - Array of sort options (optional, uses default if not provided)
+ * @param {Array}    props.sortOptions          - Array of sort options (optional, uses default if not provided)
  */
 const CampaignFilters = ( {
 	sortBy,

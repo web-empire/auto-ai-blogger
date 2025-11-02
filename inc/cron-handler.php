@@ -70,7 +70,7 @@ class Cron_Handler {
 			$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
 			$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
 			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
-			$max_failures    = intval( Metadata::get_campaign_meta( $campaign_id, 'maxFailures' ) ) ?: 20;
+			$max_failures    = intval( Metadata::get_campaign_meta( $campaign_id, 'maxFailures' ) ?? 20 );
 
 			// Trigger "Campaign Started" notification only once on the first post attempt.
 			$started_notification_sent = Metadata::get_campaign_meta( $campaign_id, 'startedNotificationSent' );
@@ -79,13 +79,13 @@ class Cron_Handler {
 					'wpaib_campaign_started',
 					$campaign_id,
 					[
-						'postsTarget'     => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
-						'repeatInterval'  => Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' ),
-						'repeatUnit'      => Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' ),
-						'keywords'        => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
+						'postsTarget'    => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+						'repeatInterval' => Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' ),
+						'repeatUnit'     => Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' ),
+						'keywords'       => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
 					]
 				);
-				
+
 				// Mark that we've sent the started notification.
 				Metadata::update_campaign_meta( $campaign_id, 'startedNotificationSent', true );
 			}
@@ -94,8 +94,9 @@ class Cron_Handler {
 			$target_post_number = $posts_created + 1;
 
 			// Get or initialize retry tracking for current post.
-			$retry_tracking = Metadata::get_campaign_meta( $campaign_id, 'retryTracking' ) ?: [];
-			$post_key = 'post_' . $target_post_number;
+			$tracking_meta   = Metadata::get_campaign_meta( $campaign_id, 'retryTracking' );
+			$retry_tracking  = ! empty( $tracking_meta ) ? $tracking_meta : [];
+			$post_key        = 'post_' . $target_post_number;
 			$current_attempt = isset( $retry_tracking[ $post_key ] ) ? intval( $retry_tracking[ $post_key ] ) + 1 : 1;
 
 			// Update scheduled count and retry tracking.
@@ -466,10 +467,10 @@ class Cron_Handler {
 			if ( $is_retry ) {
 				// For retries after failures, use a short interval (2 minutes).
 				$interval_seconds = apply_filters( 'wpaib_retry_interval_seconds', 120 ); // 2 minutes default.
-				$next_run = time() + $interval_seconds;
+				$next_run         = time() + $interval_seconds;
 			} else {
 				// Check if this is a weekly campaign with specific days selected.
-				if ( 'week' === $repeat_unit ) {
+				if ( $repeat_unit === 'week' ) {
 					$repeat_weekly_on = Metadata::get_campaign_meta( $campaign_id, 'repeatWeeklyOn' );
 
 					// If specific weekdays are selected, use weekday scheduling.
@@ -478,12 +479,12 @@ class Cron_Handler {
 					} else {
 						// No specific days selected, use normal weekly interval.
 						$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
-						$next_run = time() + $interval_seconds;
+						$next_run         = time() + $interval_seconds;
 					}
 				} else {
 					// For non-weekly campaigns, use normal interval.
 					$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
-					$next_run = time() + $interval_seconds;
+					$next_run         = time() + $interval_seconds;
 				}
 			}
 
@@ -553,7 +554,7 @@ class Cron_Handler {
 		];
 
 		// Get current day number (1-7).
-		$current_day = (int) date( 'N' );
+		$current_day  = (int) date( 'N' );
 		$current_time = time();
 
 		// Convert selected days to numeric format and sort.
@@ -573,13 +574,13 @@ class Cron_Handler {
 		sort( $selected_day_numbers );
 
 		// Find the next occurrence.
-		$next_day = null;
+		$next_day    = null;
 		$days_to_add = 0;
 
 		// Check for next occurrence in current week.
 		foreach ( $selected_day_numbers as $day_number ) {
 			if ( $day_number > $current_day ) {
-				$next_day = $day_number;
+				$next_day    = $day_number;
 				$days_to_add = $next_day - $current_day;
 				break;
 			}
@@ -587,8 +588,8 @@ class Cron_Handler {
 
 		// If no day found in current week, use the first day of next week.
 		if ( $next_day === null ) {
-			$next_day = $selected_day_numbers[0];
-			$days_to_add = ( 7 - $current_day ) + $next_day;
+			$next_day    = $selected_day_numbers[0];
+			$days_to_add = 7 - $current_day + $next_day;
 		}
 
 		// Calculate next timestamp.
@@ -596,15 +597,13 @@ class Cron_Handler {
 
 		// Allow testing plugins to modify the weekday interval.
 		// Pass the days_to_add for context (testing plugins can use this).
-		$next_timestamp = apply_filters(
+		return apply_filters(
 			'wpaib_weekday_next_occurrence',
 			$next_timestamp,
 			$selected_days,
 			$days_to_add,
 			$campaign_id
 		);
-
-		return $next_timestamp;
 	}
 
 	/**

@@ -158,7 +158,6 @@ const PersonaFormStep = memo( () => {
 	const reduxSiteTitle = useSelector( ( state ) => state?.siteTitle || '' );
 	const reduxSiteFor = useSelector( ( state ) => state?.siteFor || '' );
 	const reduxSiteDescription = useSelector( ( state ) => state?.siteDescription || '' );
-	const adminAppUrl = useSelector( ( state ) => state?.adminAppUrl || '' );
 
 	// Enhanced form state using Redux data directly
 	const [ formData, setFormData ] = useState( {
