@@ -18,6 +18,7 @@ use WPAIBlogger\Core\Editor;
 use WPAIBlogger\Core\Frontend;
 use WPAIBlogger\Core\Maintenance;
 use WPAIBlogger\Inc\Cron_Handler;
+use WPAIBlogger\Inc\Notifications\Notification_Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -79,6 +80,12 @@ class Loader {
 		/* Cron Handler init (always loaded for cron functionality) */
 		Cron_Handler::get_instance();
 
+		/* Notification Helper init (handles all notification hooks) */
+		Notification_Helper::get_instance();
+
+		/* Register custom cron schedules */
+		add_filter( 'cron_schedules', [ $this, 'register_custom_cron_schedules' ] );
+
 		if ( is_admin() ) {
 			/* Ajax init */
 			Ajax::get_instance();
@@ -112,6 +119,27 @@ class Loader {
 			return false;
 		}
 		return $status;
+	}
+
+	/**
+	 * Register custom cron schedules dynamically.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array Modified schedules array.
+	 * @since 1.0.0
+	 */
+	public function register_custom_cron_schedules( $schedules ) {
+		$custom_schedules = get_option( 'wpaib_custom_cron_schedules', [] );
+
+		if ( ! empty( $custom_schedules ) && is_array( $custom_schedules ) ) {
+			foreach ( $custom_schedules as $name => $schedule ) {
+				if ( ! isset( $schedules[ $name ] ) ) {
+					$schedules[ $name ] = $schedule;
+				}
+			}
+		}
+
+		return $schedules;
 	}
 
 	/**

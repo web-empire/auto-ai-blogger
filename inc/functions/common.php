@@ -115,7 +115,7 @@ function wpaib_get_all_campaigns() {
 					continue;
 				}
 
-				$campaign_data = Metadata::get_campaign_data( $campaign->ID, true );
+				$campaign_data = Metadata::get_campaign_data( $campaign->ID, false );
 
 				// Sanitize campaign data.
 				if ( is_array( $campaign_data ) && ! empty( $campaign_data ) ) {

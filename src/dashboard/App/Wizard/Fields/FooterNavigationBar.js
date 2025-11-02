@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Loader2, Check } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // Enhanced progress indicator component
 const ProgressIndicator = memo( ( { currentStep, maxSteps } ) => {
@@ -16,8 +16,8 @@ const ProgressIndicator = memo( ( { currentStep, maxSteps } ) => {
 						key={ index }
 						className={ `
 							w-3 h-3 rounded-full transition-all duration-300 ease-in-out
-							${ currentStep >= index ? 'bg-indigo-600 scale-110' : 'bg-gray-300' }
-							${ currentStep === index ? 'ring-2 ring-indigo-200 ring-offset-2' : '' }
+							${ currentStep >= index ? 'bg-brand-600 scale-110' : 'bg-gray-300' }
+							${ currentStep === index ? 'ring-2 ring-brand-200 ring-offset-2' : '' }
 						` }
 						aria-label={ `Step ${ index + 1 } ${ currentStep >= index ? 'completed' : 'pending' }` }
 					/>
@@ -48,9 +48,9 @@ const NavigationButton = memo( ( {
 	const baseClasses = 'relative inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95';
 
 	const variantClasses = {
-		primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-sm hover:shadow-md',
-		secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500 shadow-sm',
-		ghost: 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500',
+		primary: 'bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500 shadow-sm hover:shadow-md',
+		secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-brand-500 shadow-sm',
+		ghost: 'text-gray-600 hover:text-brand-600 hover:bg-brand-50 focus:ring-brand-500',
 	};
 
 	const handleClick = useCallback( ( e ) => {
@@ -99,9 +99,6 @@ const FooterNavigationBar = memo( ( props ) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	// Redux selectors
-	const adminAppUrl = useSelector( ( state ) => state.adminAppUrl );
-
 	const { previousStep, nextStep, currentStep, maxSteps } = props;
 
 	// Enhanced URL parameter handling
@@ -121,7 +118,7 @@ const FooterNavigationBar = memo( ( props ) => {
 		setIsNavigating( true );
 		try {
 			await new Promise( ( resolve ) => setTimeout( resolve, 100 ) ); // Small delay for UX
-			navigate( `${ adminAppUrl }&step=${ previousStep }` );
+			navigate( `?step=${ previousStep }` );
 		} finally {
 			setIsNavigating( false );
 		}
@@ -134,7 +131,7 @@ const FooterNavigationBar = memo( ( props ) => {
 			setIsNavigating( true );
 			try {
 				await new Promise( ( resolve ) => setTimeout( resolve, 100 ) ); // Small delay for UX
-				navigate( `${ adminAppUrl }&step=${ nextStep }` );
+				navigate( `?step=${ nextStep }` );
 			} finally {
 				setIsNavigating( false );
 			}

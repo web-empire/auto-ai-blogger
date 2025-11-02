@@ -47,6 +47,7 @@
 		<exclude name="WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders" />
 		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get" />
 		<exclude name="WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__HTTP_USER_AGENT__" />
+		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail" />
 	</rule>
 
 	<rule ref="WordPress-Core">

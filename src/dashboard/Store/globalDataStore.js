@@ -4,12 +4,13 @@ import globalDataReducer from './globalDataReducer';
 /**
  * Safely parse localized data with type conversion and fallbacks
  *
- * @param {*}      value        - Value to parse from localized data
- * @param {string} type         - Target type: 'string', 'number', 'boolean', 'array', 'object'
- * @param {*}      defaultValue - Default value returned if parsing fails
+ * @param {*}       value        - Value to parse from localized data
+ * @param {string}  type         - Target type: 'string', 'number', 'boolean', 'array', 'object'
+ * @param {*}       defaultValue - Default value returned if parsing fails
+ * @param {boolean} parseJSON    - Whether to parse JSON strings for object types
  * @return {*} Parsed value with correct type or default value
  */
-const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => {
+const safeParseLocalizedData = ( value, type = 'string', defaultValue = '', parseJSON = false ) => {
 	try {
 		switch ( type ) {
 			case 'number':
@@ -24,6 +25,14 @@ const safeParseLocalizedData = ( value, type = 'string', defaultValue = '' ) => 
 			case 'array':
 				return Array.isArray( value ) ? value : ( value ? [ value ] : [] );
 			case 'object':
+				if ( parseJSON && typeof value === 'string' ) {
+					try {
+						const parsed = JSON.parse( value );
+						return typeof parsed === 'object' && parsed !== null ? parsed : defaultValue;
+					} catch ( e ) {
+						return defaultValue;
+					}
+				}
 				return value && typeof value === 'object' ? value : defaultValue;
 			default:
 				return value !== undefined && value !== null ? String( value ) : defaultValue;
@@ -79,6 +88,7 @@ const getInitialState = () => {
 		dangerousContent: safeParseLocalizedData( wpaib_localized_data.dangerous_content, 'number', 2 ),
 		license: safeParseLocalizedData( wpaib_localized_data.license, 'string', '' ),
 		postIdeas: safeParseLocalizedData( wpaib_localized_data.postIdeas, 'string', '' ),
+		createdPostIdeas: safeParseLocalizedData( wpaib_localized_data.createdPostIdeas, 'object', {}, true ),
 		tokenTotal: safeParseLocalizedData( wpaib_localized_data.token_total, 'number', 0 ),
 		tokenRemaining: safeParseLocalizedData( wpaib_localized_data.token_remaining, 'number', 0 ),
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),

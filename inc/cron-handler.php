@@ -60,28 +60,59 @@ class Cron_Handler {
 				return;
 			}
 
+			// Check if campaign is paused.
+			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
+			if ( $is_paused ) {
+				return;
+			}
+
 			// Get current campaign statistics.
 			$posts_created   = intval( Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ) );
 			$posts_scheduled = intval( Metadata::get_campaign_meta( $campaign_id, 'postsScheduled' ) );
 			$posts_failed    = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
+			$max_failures    = intval( Metadata::get_campaign_meta( $campaign_id, 'maxFailures' ) ?? 20 );
+
+			// Trigger "Campaign Started" notification only once on the first post attempt.
+			$started_notification_sent = Metadata::get_campaign_meta( $campaign_id, 'startedNotificationSent' );
+			if ( ! $started_notification_sent && $posts_created === 0 && $posts_scheduled === 0 ) {
+				do_action(
+					'wpaib_campaign_started',
+					$campaign_id,
+					[
+						'postsTarget'    => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+						'repeatInterval' => Metadata::get_campaign_meta( $campaign_id, 'repeatInterval' ),
+						'repeatUnit'     => Metadata::get_campaign_meta( $campaign_id, 'repeatUnit' ),
+						'keywords'       => Metadata::get_campaign_meta( $campaign_id, 'keywords' ),
+					]
+				);
+
+				// Mark that we've sent the started notification.
+				Metadata::update_campaign_meta( $campaign_id, 'startedNotificationSent', true );
+			}
 
 			// Calculate which post number we're trying to create.
-			// Post number = posts already created + 1 (next post to create).
 			$target_post_number = $posts_created + 1;
 
-			// Calculate attempt number for this specific post.
-			// For the current post being attempted:.
-			// - If this is the first attempt: attempt = 1.
-			// - If retries: attempt = (total_scheduled - posts_created - posts_failed) + 1.
-			// This ensures we count attempts correctly per post.
-			$pending_attempts = $posts_scheduled - $posts_created;
-			$current_attempt  = $pending_attempts + 1;           // Update scheduled count at the beginning of attempt (regardless of success/failure).
+			// Get or initialize retry tracking for current post.
+			$tracking_meta   = Metadata::get_campaign_meta( $campaign_id, 'retryTracking' );
+			$retry_tracking  = ! empty( $tracking_meta ) ? $tracking_meta : [];
+			$post_key        = 'post_' . $target_post_number;
+			$current_attempt = isset( $retry_tracking[ $post_key ] ) ? intval( $retry_tracking[ $post_key ] ) + 1 : 1;
+
+			// Update scheduled count and retry tracking.
 			Metadata::update_campaign_meta( $campaign_id, 'postsScheduled', $posts_scheduled + 1 );
 			Metadata::update_campaign_meta( $campaign_id, 'lastRun', current_time( 'mysql' ) );
+
+			$retry_tracking[ $post_key ] = $current_attempt;
+			Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
 
 			$result = $this->generate_post_from_campaign( $campaign_id, $target_post_number, $current_attempt );
 
 			if ( $result['success'] ) {
+				// Clear retry tracking for this post on success.
+				unset( $retry_tracking[ $post_key ] );
+				Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
+
 				// Log success with post and attempt information.
 				wpaib_log_campaign_success(
 					$campaign_id,
@@ -98,30 +129,39 @@ class Cron_Handler {
 					]
 				);
 
+				// Trigger notification: Post Created Successfully.
+				do_action(
+					'wpaib_post_created_successfully',
+					$campaign_id,
+					$result['post_id'],
+					[
+						'post_number'   => $target_post_number,
+						'posts_created' => $posts_created + 1,
+						'posts_target'  => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+					]
+				);
+
 				// Schedule next post with normal frequency after success.
 				$this->schedule_next_post( $campaign_id, false );
 			} else {
 				// Log detailed error information with post and attempt numbers.
 				$error_type = $result['error_type'] ?? $this->determine_error_type( $result['message'] ?? '' );
 
-				// Increment failed counter before logging.
-				$posts_failed     = intval( Metadata::get_campaign_meta( $campaign_id, 'postsFailed' ) );
-				$new_posts_failed = $posts_failed + 1;
-				Metadata::update_campaign_meta( $campaign_id, 'postsFailed', $new_posts_failed );
-
 				$context = [
 					'post_number'     => $target_post_number,
 					'attempt_number'  => $current_attempt,
+					'max_retries'     => $max_failures,
 					'error_type'      => $error_type,
 					'posts_created'   => $posts_created,
-					'posts_scheduled' => $posts_scheduled + 1, // Include the current attempt.
-					'posts_failed'    => $new_posts_failed,
+					'posts_scheduled' => $posts_scheduled + 1,
+					'posts_failed'    => $posts_failed,
 				];
 
 				$error_message = sprintf(
-					'Post #%d creation failed on attempt #%d: %s',
+					'Post #%d creation failed on attempt #%d/%d: %s',
 					$target_post_number,
 					$current_attempt,
+					$max_failures,
 					$result['message'] ?? 'Unknown error'
 				);
 
@@ -130,8 +170,40 @@ class Cron_Handler {
 					$error_type,
 					$error_message,
 					$context
-				);              // Schedule retry with short interval after failure.
-				$this->schedule_next_post( $campaign_id, true );
+				);
+
+				// Check if we've exhausted all retries for this post.
+				if ( $current_attempt >= $max_failures ) {
+					// All retries exhausted - mark this post as failed.
+					$new_posts_failed = $posts_failed + 1;
+					Metadata::update_campaign_meta( $campaign_id, 'postsFailed', $new_posts_failed );
+
+					// Clear retry tracking for this post.
+					unset( $retry_tracking[ $post_key ] );
+					Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
+
+					// Log that we're giving up on this post.
+					wpaib_log_campaign_error(
+						$campaign_id,
+						'post_abandoned',
+						sprintf(
+							'Post #%d abandoned after %d failed attempts. Moving to next post.',
+							$target_post_number,
+							$max_failures
+						),
+						[
+							'post_number'    => $target_post_number,
+							'total_attempts' => $max_failures,
+							'posts_failed'   => $new_posts_failed,
+						]
+					);
+
+					// Schedule next post (moving on to the next post number).
+					$this->schedule_next_post( $campaign_id, false );
+				} else {
+					// Still have retries left - schedule retry with short interval.
+					$this->schedule_next_post( $campaign_id, true );
+				}
 			}
 		} catch ( \Exception $e ) {
 			return;
@@ -224,6 +296,17 @@ class Cron_Handler {
 			$posts_target = Metadata::get_campaign_meta( $campaign_id, 'postsTarget' );
 			if ( $posts_target > 0 && $new_posts_created >= intval( $posts_target ) ) {
 				$this->mark_campaign_completed( $campaign_id, 'target_reached' );
+
+				// Trigger notification: Campaign Completed.
+				do_action(
+					'wpaib_campaign_completed',
+					$campaign_id,
+					'target_reached',
+					[
+						'posts_created' => $new_posts_created,
+						'posts_target'  => $posts_target,
+					]
+				);
 			}
 
 			return [
@@ -384,12 +467,26 @@ class Cron_Handler {
 			if ( $is_retry ) {
 				// For retries after failures, use a short interval (2 minutes).
 				$interval_seconds = apply_filters( 'wpaib_retry_interval_seconds', 120 ); // 2 minutes default.
+				$next_run         = time() + $interval_seconds;
 			} else {
-				// For successful posts, use normal campaign frequency.
-				$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
-			}
+				// Check if this is a weekly campaign with specific days selected.
+				if ( $repeat_unit === 'week' ) {
+					$repeat_weekly_on = Metadata::get_campaign_meta( $campaign_id, 'repeatWeeklyOn' );
 
-			$next_run = time() + $interval_seconds;
+					// If specific weekdays are selected, use weekday scheduling.
+					if ( ! empty( $repeat_weekly_on ) && is_array( $repeat_weekly_on ) ) {
+						$next_run = $this->calculate_next_weekday( $repeat_weekly_on, $campaign_id );
+					} else {
+						// No specific days selected, use normal weekly interval.
+						$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+						$next_run         = time() + $interval_seconds;
+					}
+				} else {
+					// For non-weekly campaigns, use normal interval.
+					$interval_seconds = $this->get_interval_seconds( $repeat_interval, $repeat_unit );
+					$next_run         = time() + $interval_seconds;
+				}
+			}
 
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 
@@ -429,6 +526,84 @@ class Cron_Handler {
 
 		// Allow testing plugins to modify intervals.
 		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
+	}
+
+	/**
+	 * Calculate the next occurrence of selected weekdays.
+	 *
+	 * @param array $selected_days Array of selected weekday abbreviations (e.g., ['mon', 'wed', 'fri']).
+	 * @param int   $campaign_id Campaign ID for filter context.
+	 * @return int Timestamp of next occurrence.
+	 * @since x.x.x
+	 */
+	private function calculate_next_weekday( $selected_days, $campaign_id ): int {
+		if ( empty( $selected_days ) || ! is_array( $selected_days ) ) {
+			// Fallback to 1 week if no days selected.
+			return time() + WEEK_IN_SECONDS;
+		}
+
+		// Map weekday abbreviations to PHP day numbers (1 = Monday, 7 = Sunday).
+		$day_map = [
+			'mon' => 1,
+			'tue' => 2,
+			'wed' => 3,
+			'thu' => 4,
+			'fri' => 5,
+			'sat' => 6,
+			'sun' => 7,
+		];
+
+		// Get current day number (1-7).
+		$current_day  = (int) gmdate( 'N' );
+		$current_time = time();
+
+		// Convert selected days to numeric format and sort.
+		$selected_day_numbers = [];
+		foreach ( $selected_days as $day ) {
+			$day = strtolower( trim( $day ) );
+			if ( isset( $day_map[ $day ] ) ) {
+				$selected_day_numbers[] = $day_map[ $day ];
+			}
+		}
+
+		if ( empty( $selected_day_numbers ) ) {
+			// Fallback if no valid days.
+			return time() + WEEK_IN_SECONDS;
+		}
+
+		sort( $selected_day_numbers );
+
+		// Find the next occurrence.
+		$next_day    = null;
+		$days_to_add = 0;
+
+		// Check for next occurrence in current week.
+		foreach ( $selected_day_numbers as $day_number ) {
+			if ( $day_number > $current_day ) {
+				$next_day    = $day_number;
+				$days_to_add = $next_day - $current_day;
+				break;
+			}
+		}
+
+		// If no day found in current week, use the first day of next week.
+		if ( $next_day === null ) {
+			$next_day    = $selected_day_numbers[0];
+			$days_to_add = 7 - $current_day + $next_day;
+		}
+
+		// Calculate next timestamp.
+		$next_timestamp = $current_time + ( $days_to_add * DAY_IN_SECONDS );
+
+		// Allow testing plugins to modify the weekday interval.
+		// Pass the days_to_add for context (testing plugins can use this).
+		return apply_filters(
+			'wpaib_weekday_next_occurrence',
+			$next_timestamp,
+			$selected_days,
+			$days_to_add,
+			$campaign_id
+		);
 	}
 
 	/**
@@ -536,6 +711,23 @@ class Cron_Handler {
 					'termination_reason' => $reason,
 					'posts_failed'       => $posts_failed,
 					'max_failures'       => $max_failures,
+				]
+			);
+
+			// Trigger notification: Campaign Failed/Terminated.
+			do_action(
+				'wpaib_campaign_failed',
+				$campaign_id,
+				sprintf(
+					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
+					__( 'Maximum failures reached (%1$d/%2$d)', 'wp-ai-blogger' ),
+					$posts_failed,
+					$max_failures
+				),
+				[
+					'posts_created' => Metadata::get_campaign_meta( $campaign_id, 'postsCreated' ),
+					'posts_target'  => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
+					'posts_failed'  => $posts_failed,
 				]
 			);
 		}

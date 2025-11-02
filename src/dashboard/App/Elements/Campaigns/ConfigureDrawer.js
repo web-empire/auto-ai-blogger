@@ -149,7 +149,7 @@ export default function ConfigureDrawer( props ) {
 						>
 							<form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
 								<div className="h-0 flex-1 overflow-y-auto">
-									<div className="bg-indigo-700 px-4 py-4 sm:px-6 mt-8">
+									<div className="bg-brand px-4 py-4 sm:px-6 mt-8">
 										<div className="flex items-center justify-between">
 											<h2 className="text-base font-semibold text-white m-0 p-0">
 												{
@@ -164,7 +164,7 @@ export default function ConfigureDrawer( props ) {
 												<button
 													type="button"
 													onClick={ closePopup }
-													className="relative rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white border-none"
+													className="relative rounded-md bg-brand text-brand-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white border-none"
 												>
 													<span className="absolute -inset-2.5" />
 													<span className="sr-only">Close panel</span>
@@ -178,19 +178,19 @@ export default function ConfigureDrawer( props ) {
 										<nav className="justify-between flex" aria-label="Tabs">
 											<a
 												onClick={ () => setActiveTab( 'campaign' ) }
-												className={ `w-full campaign-settings-tab text-left text-sm/6 cursor-pointer text-gray-500 whitespace-nowrap py-4 border-b-2 border-gray-300 bg-transparent ${ 'campaign' === activeTab ? 'font-medium border-indigo-500 text-indigo-600' : 'hover:text-gray-900 hover:border-gray-300 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-left text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'campaign' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'General', 'wp-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'filters' ) }
-												className={ `w-full campaign-settings-tab text-center text-sm/6 cursor-pointer text-gray-500 whitespace-nowrap py-4 border-b-2 border-gray-300 bg-transparent ${ 'filters' === activeTab ? 'font-medium border-indigo-500 text-indigo-600' : 'hover:text-gray-900 hover:border-gray-300 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-center text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'filters' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'Filters', 'wp-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'advanced' ) }
-												className={ `w-full campaign-settings-tab text-right text-sm/6 cursor-pointer text-gray-500 whitespace-nowrap py-4 border-b-2 border-gray-300 bg-transparent ${ 'advanced' === activeTab ? 'font-medium border-indigo-500 text-indigo-600' : 'hover:text-gray-900 hover:border-gray-300 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-right text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'advanced' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'Advanced', 'wp-ai-blogger' ) }
 											</a>
@@ -219,7 +219,7 @@ export default function ConfigureDrawer( props ) {
 																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																			: isViewMode
 																				? 'bg-gray-50 outline-gray-200'
-																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
 																	}` }
 																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
@@ -245,7 +245,7 @@ export default function ConfigureDrawer( props ) {
 																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																			: isViewMode
 																				? 'bg-gray-50 outline-gray-200'
-																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
 																	}` }
 																	defaultValue={ drawerData.keywords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
@@ -295,7 +295,7 @@ export default function ConfigureDrawer( props ) {
 																					? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
 																					: isViewMode
 																						? 'bg-gray-50 outline-gray-200'
-																						: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600'
+																						: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
 																			}` }
 																		/>
 																	</div>
@@ -339,7 +339,7 @@ export default function ConfigureDrawer( props ) {
 																	min="1"
 																	max="365"
 																	readOnly={ isViewMode }
-																	className={ `block w-20 rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-20 rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 																<select
 																	className={ `min-w-[100px] ${ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }` }
@@ -377,11 +377,11 @@ export default function ConfigureDrawer( props ) {
 																					( drawerData.repeatWeeklyOn || [] ).includes( day )
 																						? fieldErrors[ 'weekly-days' ]
 																							? 'bg-red-600 text-white border-red-600'
-																							: 'bg-indigo-600 text-white border-indigo-600'
+																							: 'bg-brand text-white border-brand'
 																						: fieldErrors[ 'weekly-days' ]
 																							? 'bg-red-50 text-red-900 border-red-300'
 																							: 'bg-white text-gray-900 border-gray-300'
-																				} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white hover:border-indigo-600' }` }
+																				} ${ isViewMode ? 'cursor-not-allowed' : 'hover:bg-brand-600 hover:text-white hover:border-brand-600' }` }
 																				disabled={ isViewMode }
 																			>
 																				{ day }
@@ -398,27 +398,21 @@ export default function ConfigureDrawer( props ) {
 														) }
 
 														<div>
-															<div className="flex items-center justify-between mb-2">
-																<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium ${
-																	fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
-																}` }>
-																	{ __( 'Start Date', 'wp-ai-blogger' ) }
-																	<Tooltip
-																		text={ __( 'Start Date can not be update later.', 'wp-ai-blogger' ) }
-																		delay={ 100 }
-																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
-																	>
-																		<QuestionMarkCircleIcon
-																			aria-hidden="true"
-																			className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
-																		/>
-																	</Tooltip>
-																</label>
-
-																<div className="text-xs text-gray-500">
-																	{ __( 'Only future date-time is allowed.', 'wp-ai-blogger' ) }
-																</div>
-															</div>
+															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
+																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
+															}` }>
+																{ __( 'Start Date', 'wp-ai-blogger' ) }
+																<Tooltip
+																	text={ __( 'Start Date can not be updated later.', 'wp-ai-blogger' ) }
+																	delay={ 100 }
+																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+																>
+																	<QuestionMarkCircleIcon
+																		aria-hidden="true"
+																		className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																	/>
+																</Tooltip>
+															</label>
 															<DateTimeField
 																id="start-date"
 																name="start-date"
@@ -458,7 +452,7 @@ export default function ConfigureDrawer( props ) {
 																			type="radio"
 																			checked={ drawerData.status === 'publish' }
 																			aria-describedby="privacy-public-description"
-																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
+																			className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-brand-600 checked:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																			onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'publish' } ) }
 																			disabled={ isViewMode }
 																		/>
@@ -484,7 +478,7 @@ export default function ConfigureDrawer( props ) {
 																				type="radio"
 																				checked={ drawerData.status === 'draft' }
 																				aria-describedby="privacy-private-to-project-description"
-																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
+																				className="relative size-4 appearance-none rounded-full border border-gray-300 before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-brand-600 checked:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden"
 																				onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, status: 'draft' } ) }
 																				disabled={ isViewMode }
 																			/>
@@ -651,7 +645,7 @@ export default function ConfigureDrawer( props ) {
 																	min="1"
 																	readOnly={ isViewMode }
 																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 															</div>
 														</div>
@@ -671,7 +665,7 @@ export default function ConfigureDrawer( props ) {
 																	min="1"
 																	readOnly={ isViewMode }
 																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 															</div>
 														</div>
@@ -685,7 +679,7 @@ export default function ConfigureDrawer( props ) {
 																	checked={ drawerData.overrideSitePersona }
 																	onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
 																	id="override-site-persona"
-																	disabled={ isViewMode }
+																	disabled={ isViewMode || ! wpaib_localized_data.pro_available }
 																/>
 															</div>
 														</div>
@@ -717,7 +711,7 @@ export default function ConfigureDrawer( props ) {
 																		<SettingLabel forId="more-about-blog" title={ __( 'Campaign Description:', 'wp-ai-blogger' ) } />
 																		<textarea
 																			id="more-about-blog"
-																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600' }` }
+																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																			value={ drawerData.overrideSiteDescription }
 																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
 																			readOnly={ isViewMode }
@@ -747,7 +741,7 @@ export default function ConfigureDrawer( props ) {
 																subHeading={ __( 'Upgrade to Pro for more features and benefits.', 'wp-ai-blogger' ) }
 																linkText={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
 																linkUrl={ wpaib_localized_data.pro_purchase_url }
-																colorScheme="blue"
+																colorScheme="brand"
 																size="medium"
 																ariaLabel={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
 															/>
@@ -817,7 +811,7 @@ export default function ConfigureDrawer( props ) {
 														return isCompletedBase || isAllAttemptsMadeWithFailures;
 													} )() )
 														? 'cursor-not-allowed opacity-50 bg-gray-400 text-gray-200 focus-visible:outline-gray-400'
-														: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600'
+														: 'bg-brand text-white hover:bg-brand-700 focus-visible:outline-brand'
 												}` }
 												title={ drawerData.type === 'edit' && ( () => {
 													const postsCreated = parseInt( drawerData.postsCreated ) || 0;

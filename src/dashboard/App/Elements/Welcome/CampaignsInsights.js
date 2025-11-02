@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, memo, useState } from 'react';
+import React, { useMemo, useCallback, memo, useState, useRef } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, ChartNoAxesColumn, RotateCw, Settings, List } from 'lucide-react';
+import { Lock, TrendingUp, Eye, BarChart3, ExternalLink, ChartNoAxesColumn, RotateCw, Settings, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
@@ -11,20 +11,20 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Enhanced metric card component with animations and accessibility.
 const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, className = '', getOnlyDetails = false } ) => (
-	<div className={ `${ getOnlyDetails ? '' : 'bg-white rounded-lg p-4 border border-solid border-gray-200 hover:border-indigo-300 transition-all duration-200 shadow-sm hover:shadow-lg' } ${ className }` }>
+	<div className={ `${ getOnlyDetails ? '' : 'bg-white rounded-lg p-4 border border-solid border-gray-200 hover:border-brand transition-all duration-200 shadow-sm hover:shadow-lg' } ${ className }` }>
 		<div className="flex items-center justify-between">
 			<div className="flex items-center gap-2">
 				{
 					! getOnlyDetails && (
-						<div className={ `${ getOnlyDetails ? '' : 'p-2 bg-indigo-50 rounded-lg' }` }>
-							<Icon className="w-4 h-4 text-indigo-600 flex" aria-hidden="true" />
+						<div className={ `${ getOnlyDetails ? '' : 'p-2 bg-brand-50 rounded-lg' }` }>
+							<Icon className="w-4 h-4 text-brand flex" aria-hidden="true" />
 						</div>
 					)
 				}
-				<span className="text-sm font-medium text-gray-600">{ metric }</span>
+				<span className="text-xs font-medium text-gray-600">{ metric }</span>
 			</div>
 
-			<div className={ `${ getOnlyDetails ? 'text-base' : 'text-xl' } font-medium text-gray-900` } aria-label={ `${ metric }: ${ value }` }>
+			<div className={ `${ getOnlyDetails ? 'text-sm' : 'text-xl' } font-semibold text-gray-900` } aria-label={ `${ metric }: ${ value }` }>
 				{ value }
 				{ trend && (
 					<div className={ `flex items-center gap-1 text-xs ${ trend > 0 ? 'text-green-600' : 'text-red-600' }` }>
@@ -45,43 +45,40 @@ const MetricCard = memo( ( { metric, value, description, icon: Icon, trend, clas
 
 MetricCard.displayName = 'CampaignMetricCard';
 
+// Helper function to format date consistently
+const formatLastPostRun = ( lastRun ) => {
+	if ( ! lastRun || lastRun === 'Not Started Yet.' ) {
+		return 'Scheduled - No posts yet';
+	}
+
+	try {
+		const date = new Date( lastRun );
+		return date.toLocaleString( 'en-US', {
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true,
+		} );
+	} catch ( error ) {
+		return lastRun;
+	}
+};
+
 // Enhanced campaign card component with better UX.
 const CampaignCard = memo( ( { campaign } ) => {
+	const navigate = useNavigate();
 	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
 
 	const campaigns = useSelector( ( state ) => state.allCampaigns ) || {};
 	const isPerformant = ( campaign?.postsVisit || 0 ) > 100;
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
-	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults );
+	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults ); // eslint-disable-line no-unused-vars
 	const [ openViewDrawer, setOpenViewDrawer ] = useState( false );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
-
-	const viewCampaignConfiguration = ( e ) => {
-		e.preventDefault();
-
-		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
-		if ( ! campaignId ) {
-			return;
-		}
-
-		fetchCampaignMetaData( campaignId )
-			.then( ( data ) => {
-				if ( data ) {
-					setViewConfigureData(
-						{
-							...data,
-							type: 'view',
-						}
-					);
-					setOpenViewDrawer( true );
-				}
-			} )
-			.catch( ( error ) => {
-				console.error( error );
-			} );
-	};
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
@@ -171,15 +168,15 @@ const CampaignCard = memo( ( { campaign } ) => {
 	};
 
 	return (
-		<div className="relative overflow-hidden rounded-xl bg-white shadow-sm border border-solid border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 group">
+		<div className="relative overflow-hidden rounded-lg bg-white shadow-sm border border-solid border-gray-200 hover:shadow-md hover:border-brand transition-all duration-200 flex flex-col h-full">
 			{ /* Performance indicator */ }
 			{ isPerformant && (
-				<div className="absolute top-3 right-3 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-					{ __( 'High performing', 'wp-ai-blogger' ) }
+				<div className="absolute top-2 right-2 bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full font-medium z-10">
+					{ __( 'High', 'wp-ai-blogger' ) }
 				</div>
 			) }
 
-			<div className="p-4">
+			<div className="p-3 flex-1">
 				{ /* Metrics grid */ }
 				<div className="flex flex-col gap-2">
 					<MetricCard
@@ -195,55 +192,91 @@ const CampaignCard = memo( ( { campaign } ) => {
 						trend={ campaign?.visitTrend }
 						getOnlyDetails={ true }
 					/>
-					<MetricCard
-						metric={ __( 'Last Post Run', 'wp-ai-blogger' ) }
-						value={ campaign?.lastRun || __( 'Not Started Yet.', 'wp-ai-blogger' ) }
-						icon={ Calendar }
-						getOnlyDetails={ true }
-					/>
+					<div className="flex items-center justify-between min-h-[24px]">
+						<span className="text-xs font-medium text-gray-600">{ __( 'Status', 'wp-ai-blogger' ) }</span>
+						<div className="text-sm font-semibold text-right capitalize">
+							{ ( () => {
+								// Use same logic as Campaigns.js switch tooltip
+								const postsCreated = parseInt( campaign?.postsCreated ) || 0;
+								const postsTarget = parseInt( campaign?.postsTarget ) || 0;
+								const postsFailed = parseInt( campaign?.postsFailed ) || 0;
+								const isPaused = campaign?.isPaused || false;
+								const campaignCompleted = campaign?.campaignCompleted || false;
+
+								// Check if completed
+								const isTargetMet = postsTarget > 0 && postsCreated >= postsTarget;
+								const allAttemptsMade = postsTarget > 0 && ( postsCreated + postsFailed ) >= postsTarget;
+								const isCompleted = campaign?.status === 'draft' || isTargetMet || allAttemptsMade || campaignCompleted;
+
+								if ( isCompleted ) {
+									return <span className="text-gray-600">{ __( 'Complete', 'wp-ai-blogger' ) }</span>;
+								}
+								if ( isPaused ) {
+									return <span className="text-brand">{ __( 'Paused', 'wp-ai-blogger' ) }</span>;
+								}
+								return <span className="text-green-600">{ __( 'Active', 'wp-ai-blogger' ) }</span>;
+							} )() }
+						</div>
+					</div>
+					<div className="flex items-center justify-between min-h-[24px]">
+						<span className="text-xs font-medium text-gray-600">{ __( 'Last Post Run', 'wp-ai-blogger' ) }</span>
+						<div className="text-sm font-semibold text-gray-900 text-right">
+							{ formatLastPostRun( campaign?.lastRun ) }
+						</div>
+					</div>
 				</div>
 			</div>
 
-			{ /* Enhanced footer with action */ }
-			<div className="bg-gray-50 p-4 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-all duration-200" onClick={ viewCampaignConfiguration }>
-				<TrimWordsContent
-					content={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
-					count={ 5 }
-				/>
+			{ /* Enhanced footer with action - Fixed height for consistency */ }
+			<div className="bg-gray-50 px-3 py-2.5 border-t border-gray-100 w-full flex items-center justify-between text-sm font-medium transition-all duration-200 min-h-[52px]">
+				<a
+					href={ `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` }
+					className="text-brand hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 rounded-md transition-colors duration-200 no-underline truncate flex-1 min-w-0 mr-2"
+					onClick={ ( e ) => {
+						e.preventDefault();
+						navigate( `?page=wp-ai-blogger&path=campaigns&id=${ campaign.id }` );
+					} }
+					title={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
+				>
+					<TrimWordsContent
+						content={ campaign?.title || __( 'Unnamed Campaign', 'wp-ai-blogger' ) }
+						count={ 5 }
+					/>
+				</a>
 
-				<div className="flex items-center gap-x-3">
-					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+				<div className="flex items-center gap-x-1.5 flex-shrink-0">
+					<a href="#" className="text-gray-500 hover:text-brand-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 						viewCampaignPosts( e, campaign.id );
 					} }>
 						<Tooltip text={ __( 'Posts List', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<List className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+							<List className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 						</Tooltip>
 					</a>
 
-					<a href="#" className="text-gray-500 hover:text-indigo-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
+					<a href="#" className="text-gray-500 hover:text-brand-900" data-campaign_id={ campaign.id } onClick={ ( e ) => {
 						openCampaignAnalytics( e, campaign.id );
 					} }>
 						<Tooltip text={ __( 'Analytics', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
-							<ChartNoAxesColumn className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+							<ChartNoAxesColumn className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 						</Tooltip>
 					</a>
 
-					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-indigo-900" onClick={ configureCampaign }>
+					<a href="#" data-campaign_id={ campaign.id } className="text-gray-500 hover:text-brand-900" onClick={ configureCampaign }>
 						<Tooltip text={ __( 'Configure', 'wp-ai-blogger' ) }
 							delay={ 100 }
 							className="z-999999 bg-black text-xs text-white shadow-md p-2 rounded-md"
 						>
 							{
 								openingConfigureDrawer ? (
-									<RotateCw className="w-4 h-4 animate-spin text-indigo-600 hover:text-indigo-700" />
+									<RotateCw className="w-3.5 h-3.5 animate-spin text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 								) : (
-									<Settings className="w-4 h-4 text-indigo-600 hover:text-indigo-700" />
+									<Settings className="w-3.5 h-3.5 text-brand hover:text-brand-700" style={ { outline: 'none' } } tabIndex="-1" />
 								)
 							}
 						</Tooltip>
@@ -330,13 +363,16 @@ function CampaignsInsights( { onError } ) {
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
 	const allCampaigns = useSelector( ( state ) => state.allCampaigns ) || {};
 	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
+	const scrollContainerRef = useRef( null );
+	const [ canScrollLeft, setCanScrollLeft ] = useState( false );
+	const [ canScrollRight, setCanScrollRight ] = useState( false );
 
 	// Memoized campaigns data with enhancements
 	const campaignsData = useMemo( () => {
 		const campaigns = allCampaigns;
 
 		if ( ! campaigns || typeof campaigns !== 'object' ) {
-			return { campaigns: [], totalCampaigns: 0, activeCampaigns: 0, totalPosts: 0, totalVisits: 0 };
+			return { campaigns: [], totalCampaigns: 0, activeCampaigns: 0, totalPosts: 0, totalVisits: 0, recentCampaigns: [] };
 		}
 
 		const campaignArray = Object.values( campaigns );
@@ -344,12 +380,23 @@ function CampaignsInsights( { onError } ) {
 		const totalPosts = campaignArray.reduce( ( sum, c ) => sum + ( parseInt( c.postsCreated ) || 0 ), 0 );
 		const totalVisits = campaignArray.reduce( ( sum, c ) => sum + ( parseInt( c.postsVisit ) || 0 ), 0 );
 
+		// Sort campaigns by creation date (most recent first) and get top 10 for horizontal scroll
+		const recentCampaigns = [ ...campaignArray ]
+			.sort( ( a, b ) => {
+				// Sort by created_at date (newest first)
+				const dateA = a.created_at ? new Date( a.created_at ) : new Date( 0 );
+				const dateB = b.created_at ? new Date( b.created_at ) : new Date( 0 );
+				return dateB - dateA; // Most recent first
+			} )
+			.slice( 0, 10 );
+
 		return {
 			campaigns: campaignArray,
 			totalCampaigns: campaignArray.length,
 			activeCampaigns,
 			totalPosts,
 			totalVisits,
+			recentCampaigns,
 		};
 	}, [ allCampaigns ] );
 
@@ -363,6 +410,47 @@ function CampaignsInsights( { onError } ) {
 			onError?.( error, { component: 'CampaignsInsights', action: 'navigate_to_license' } );
 		}
 	}, [ navigate, onError, homeSlug ] );
+
+	// Scroll navigation handlers
+	const updateScrollButtons = useCallback( () => {
+		if ( scrollContainerRef.current ) {
+			const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+			setCanScrollLeft( scrollLeft > 0 );
+			setCanScrollRight( scrollLeft < scrollWidth - clientWidth - 10 ); // 10px threshold
+		}
+	}, [] );
+
+	const scrollLeft = useCallback( () => {
+		if ( scrollContainerRef.current ) {
+			const cardWidth = 320 + 16; // card width (80 * 4px) + gap (16px)
+			scrollContainerRef.current.scrollBy( {
+				left: -cardWidth,
+				behavior: 'smooth',
+			} );
+			setTimeout( updateScrollButtons, 300 ); // Update after animation
+		}
+	}, [ updateScrollButtons ] );
+
+	const scrollRight = useCallback( () => {
+		if ( scrollContainerRef.current ) {
+			const cardWidth = 320 + 16; // card width (80 * 4px) + gap (16px)
+			scrollContainerRef.current.scrollBy( {
+				left: cardWidth,
+				behavior: 'smooth',
+			} );
+			setTimeout( updateScrollButtons, 300 ); // Update after animation
+		}
+	}, [ updateScrollButtons ] );
+
+	// Update scroll buttons on mount and when campaigns change
+	React.useEffect( () => {
+		updateScrollButtons();
+		const container = scrollContainerRef.current;
+		if ( container ) {
+			container.addEventListener( 'scroll', updateScrollButtons );
+			return () => container.removeEventListener( 'scroll', updateScrollButtons );
+		}
+	}, [ campaignsData.recentCampaigns, updateScrollButtons ] );
 
 	// License check.
 	if ( licenseStatus !== 'licensed' ) {
@@ -394,33 +482,79 @@ function CampaignsInsights( { onError } ) {
 			className="px-4 sm:px-6 lg:px-8 py-8"
 			aria-labelledby="campaigns-insights-heading"
 		>
-			{ /* Enhanced campaigns grid */ }
-			<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
-				{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
-			</h2>
-			<div
-				className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-6"
-				role="region"
-				aria-label={ __( 'Campaigns list', 'wp-ai-blogger' ) }
-			>
-				{ campaignsData?.campaigns && Array.isArray( campaignsData.campaigns ) && campaignsData.campaigns.length > 0 ? (
-					campaignsData.campaigns.map( ( campaign, index ) => (
-						<CampaignCard
-							key={ campaign?.id || `campaign-${ index }` }
-							campaign={ campaign }
-						/>
-					) )
-				) : (
-					<div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-						<BarChart3 className="w-12 h-12 mb-4 text-gray-300" />
-						<p className="text-lg font-medium mb-2">
-							{ __( 'No campaigns found', 'wp-ai-blogger' ) }
-						</p>
-						<p className="text-sm">
-							{ __( 'Create your first campaign to start generating content automatically.', 'wp-ai-blogger' ) }
-						</p>
-					</div>
+			{ /* Header with View All link */ }
+			<div className="flex items-center justify-between mb-6">
+				<h2 id="campaigns-insights-heading" className="text-xl font-bold text-gray-900 p-0 m-0">
+					{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
+				</h2>
+				<a
+					href={ `?page=${ homeSlug }&path=campaigns` }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						navigate( `?page=${ homeSlug }&path=campaigns` );
+					} }
+					className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-700 no-underline transition-colors"
+				>
+					{ __( 'View All', 'wp-ai-blogger' ) }
+					<ExternalLink className="w-3.5 h-3.5" />
+				</a>
+			</div>
+
+			{ /* Scrollable container with arrow navigation */ }
+			<div className="relative">
+				{ /* Left arrow */ }
+				{ canScrollLeft && (
+					<button
+						onClick={ scrollLeft }
+						className="absolute left-2 top-1/2 -translate-y-1/2 pb-1 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
+						aria-label={ __( 'Scroll left', 'wp-ai-blogger' ) }
+					>
+						<ChevronLeft className="w-5 h-5 text-brand" />
+					</button>
 				) }
+
+				{ /* Right arrow */ }
+				{ canScrollRight && (
+					<button
+						onClick={ scrollRight }
+						className="absolute right-2 top-1/2 -translate-y-1/2 pb-1 z-10 bg-white hover:bg-gray-50 border-[3px] border-brand rounded-full p-2 shadow-lg transition-all duration-200"
+						aria-label={ __( 'Scroll right', 'wp-ai-blogger' ) }
+					>
+						<ChevronRight className="w-5 h-5 text-brand" />
+					</button>
+				) }
+
+				{ /* Horizontal scrollable container */ }
+				<div
+					ref={ scrollContainerRef }
+					className="overflow-x-auto -mx-4 px-4"
+					style={ { scrollbarWidth: 'none', msOverflowStyle: 'none' } }
+				>
+					<style>{ `
+						.overflow-x-auto::-webkit-scrollbar {
+							display: none;
+						}
+					` }</style>
+					<div className="flex gap-4 min-w-max">
+						{ campaignsData.recentCampaigns && campaignsData.recentCampaigns.length > 0 ? (
+							campaignsData.recentCampaigns.map( ( campaign, index ) => (
+								<div key={ campaign?.id || `campaign-${ index }` } className="w-80 flex-shrink-0">
+									<CampaignCard campaign={ campaign } />
+								</div>
+							) )
+						) : (
+							<div className="w-full flex flex-col items-center justify-center py-12 text-gray-500">
+								<BarChart3 className="w-12 h-12 mb-4 text-gray-300" />
+								<p className="text-lg font-medium mb-2">
+									{ __( 'No campaigns found', 'wp-ai-blogger' ) }
+								</p>
+								<p className="text-sm">
+									{ __( 'Create your first campaign to start generating content automatically.', 'wp-ai-blogger' ) }
+								</p>
+							</div>
+						) }
+					</div>
+				</div>
 			</div>
 		</section>
 	);

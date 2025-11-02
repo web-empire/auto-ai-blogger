@@ -2,13 +2,13 @@
 @use "./Styles/common.scss";
 @use "./Styles/typography-config.scss";
 @use "./Styles/tailwind-important.scss";
+@use "./Styles/brand-colors.scss";
 
 @import url( "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" );
 
-* {
+#wp-ai-blogger-main-page--wrapper *,
+.ai-blogger-container * {
 	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
 }
 
 #wp-ai-blogger-main-page--wrapper,
@@ -26,11 +26,6 @@
 	background: #fff;
 }
 
-.posts_page_wp-ai-blogger #wpbody-content {
-	padding: 0;
-	height: 100vh;
-}
-
 .wpaib-vertical-divider {
 	width: 1px;
 	height: 24px;
@@ -38,12 +33,18 @@
 	border-right: 1px solid #e5e7eb;
 }
 
-.posts_page_wp-ai-blogger .clear {
+#wp-ai-blogger-main-page--wrapper .clear {
 	display: none;
 }
-#wp-ai-blogger-main-page--wrapper {
-	height: 100%;
+
+.posts_page_wp-ai-blogger #wpcontent {
+	padding-left: 0;
 }
+
+#wp-ai-blogger-main-page--wrapper {
+	min-height: 100vh;
+}
+
 #headlessui-portal-root button,
 #wp-ai-blogger-main-page--wrapper button {
 	cursor: pointer;
@@ -58,7 +59,7 @@
 
 #headlessui-portal-root select,
 .posts_page_wp-ai-blogger select.wpaib-select-control {
-	@apply col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6;
+	@apply col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6;
 }
 
 .post-filters-option > * {
@@ -74,6 +75,49 @@
 .posts_page_wp-ai-blogger input[type="range"] {
 	padding: 0;
 }
+
+/* Override WordPress default focus styles for all inputs within our plugin */
+.posts_page_wp-ai-blogger input[type="checkbox"]:focus,
+.posts_page_wp-ai-blogger input[type="color"]:focus,
+.posts_page_wp-ai-blogger input[type="date"]:focus,
+.posts_page_wp-ai-blogger input[type="datetime-local"]:focus,
+.posts_page_wp-ai-blogger input[type="datetime"]:focus,
+.posts_page_wp-ai-blogger input[type="email"]:focus,
+.posts_page_wp-ai-blogger input[type="month"]:focus,
+.posts_page_wp-ai-blogger input[type="number"]:focus,
+.posts_page_wp-ai-blogger input[type="password"]:focus,
+.posts_page_wp-ai-blogger input[type="radio"]:focus,
+.posts_page_wp-ai-blogger input[type="search"]:focus,
+.posts_page_wp-ai-blogger input[type="tel"]:focus,
+.posts_page_wp-ai-blogger input[type="text"]:focus,
+.posts_page_wp-ai-blogger input[type="time"]:focus,
+.posts_page_wp-ai-blogger input[type="url"]:focus,
+.posts_page_wp-ai-blogger input[type="week"]:focus,
+.posts_page_wp-ai-blogger select:focus,
+.posts_page_wp-ai-blogger textarea:focus,
+#headlessui-portal-root input[type="checkbox"]:focus,
+#headlessui-portal-root input[type="color"]:focus,
+#headlessui-portal-root input[type="date"]:focus,
+#headlessui-portal-root input[type="datetime-local"]:focus,
+#headlessui-portal-root input[type="datetime"]:focus,
+#headlessui-portal-root input[type="email"]:focus,
+#headlessui-portal-root input[type="month"]:focus,
+#headlessui-portal-root input[type="number"]:focus,
+#headlessui-portal-root input[type="password"]:focus,
+#headlessui-portal-root input[type="radio"]:focus,
+#headlessui-portal-root input[type="search"]:focus,
+#headlessui-portal-root input[type="tel"]:focus,
+#headlessui-portal-root input[type="text"]:focus,
+#headlessui-portal-root input[type="time"]:focus,
+#headlessui-portal-root input[type="url"]:focus,
+#headlessui-portal-root input[type="week"]:focus,
+#headlessui-portal-root select:focus,
+#headlessui-portal-root textarea:focus {
+	border-color: var( --wpaib-brand-600 ) !important;
+	box-shadow: 0 0 0 1px var( --wpaib-brand-600 ) !important;
+	outline: 2px solid transparent !important;
+}
+
 .wp-ai-blogger-wizard #wpfooter {
 	display: none;
 }
@@ -164,8 +208,9 @@
 	background: #f1f1f1;
 }
 
-.posts_page_wp-ai-blogger #wpcontent {
+.posts_page_wp-ai-blogger #wpbody-content {
 	padding-left: 0;
+	padding-right: 0;
 }
 
 .posts_page_wp-ai-blogger a:active,
@@ -174,16 +219,21 @@
 	box-shadow: none;
 }
 
+.posts_page_wp-ai-blogger #wpbody-content a:active:not( .wpaib-menu ):not( .campaign-settings-tab ),
+.posts_page_wp-ai-blogger #wpbody-content a:hover:not( .wpaib-menu ):not( .campaign-settings-tab ) {
+	color: var( --wpaib-brand-primary-hover );
+}
+
 .wpaib-button {
-	@apply bg-[#2563eb] text-white hover:bg-[#1d4ed8] rounded-s p-2 text-sm font-semibold;
+	@apply bg-[var(--wpaib-brand-primary)] text-white hover:bg-[var(--wpaib-brand-primary-hover)] rounded-s p-2 text-sm font-semibold;
 }
 
 .wpaib-active-state-button {
-	border-bottom: 2px solid #2563eb;
+	border-bottom: 2px solid var( --wpaib-brand-primary );
 }
 
 .lucide-loader-pinwheel {
-	color: #2563eb;
+	color: var( --wpaib-brand-primary );
 }
 
 #wp-ai-blogger-main-page--wrapper a {
@@ -201,17 +251,18 @@
 	border-bottom: 2px solid transparent;
 }
 .wpaib-menu.wpaib-active-menu {
-	border-color: rgb( 4 107 210 );
+	border-color: var( --wpaib-brand-primary ) !important;
+	color: var( --wpaib-brand-primary ) !important;
 }
 
 .wpaib-wizard--button {
-	@apply rounded border border-transparent px-5 py-2.5 bg-[#2563eb] cursor-pointer text-[15px] justify-center text-center font-medium text-white shadow flex-shrink-0 flex items-center;
+	@apply rounded border border-transparent px-5 py-2.5 bg-[var(--wpaib-brand-primary)] cursor-pointer text-[15px] justify-center text-center font-medium text-white shadow flex-shrink-0 flex items-center;
 
 	&:hover {
-		@apply hover:bg-[#1d4ed8];
+		@apply hover:bg-[var(--wpaib-brand-primary-hover)];
 	}
 	&:focus {
-		@apply outline-none ring-2 ring-white ring-offset-2 ring-offset-blue-400;
+		@apply outline-none ring-2 ring-white ring-offset-2 ring-offset-purple-400;
 	}
 	&.is-loading {
 		background-size: 100px 100%;

@@ -194,11 +194,11 @@ const ContentHeader = ( {
 	}, [ title ] );
 
 	return (
-		<div className={ `flex items-center w-full justify-between mb-8 wpaib-content-header bg-gradient-to-r from-blue-50 to-indigo-50 border rounded-xl border-b border-gray-200 p-6` }>
+		<div className={ `flex items-center w-full justify-between mb-8 wpaib-content-header bg-gradient-to-r from-brand-50 to-indigo-50 border rounded-xl border-b border-gray-200 p-6` }>
 			<div className={ `flex items-center w-full gap-4` }>
 				{ Icon && (
-					<div className={ `p-3 bg-blue-100 rounded-lg flex` }>
-						<Icon className={ `w-6 h-6 text-blue-600` } aria-hidden="true" />
+					<div className={ `p-3 bg-brand-100 rounded-lg flex` }>
+						<Icon className={ `w-6 h-6 text-brand-600` } aria-hidden="true" />
 					</div>
 				) }
 
@@ -215,7 +215,7 @@ const ContentHeader = ( {
 								type="button"
 								disabled={ processing || Object.keys( settingsToSave ).length === 0 }
 								onClick={ saveSettings }
-								className="cursor-pointer inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+								className="cursor-pointer inline-flex items-center justify-center rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 								aria-label={ processing ? __( 'Saving settings…', 'wp-ai-blogger' ) : __( 'Save settings', 'wp-ai-blogger' ) }
 								aria-describedby={ lastSaveTime ? 'last-save-time' : undefined }
 							>

@@ -2,7 +2,7 @@ import React, { useRef, useCallback, useMemo, memo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { X, Settings, User, CreditCard, Mail, CheckCircle2 } from 'lucide-react';
-import BrandIcon from '@AppImages/crown.svg';
+import BrandIcon from '@AppImages/brand-logo.svg';
 import { updateApiData } from '@Utils/ApiData';
 import { useDispatch } from 'react-redux';
 
@@ -38,10 +38,10 @@ const StepIndicator = memo( ( { menu, isActive, isCompleted, onClick } ) => {
 			type="button"
 			className={ `
 				group inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg
-				transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+				transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2
 				${ isActive
-			? 'bg-indigo-100 text-indigo-700 shadow-sm border-2 border-indigo-200'
-			: 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 border-2 border-transparent'
+			? 'bg-brand-100 text-brand-700 shadow-sm border-2 border-brand-200'
+			: 'text-gray-600 hover:text-brand-600 hover:bg-brand-50 border-2 border-transparent'
 		}
 				${ isCompleted && ! isActive ? 'text-green-600 hover:text-green-700 hover:bg-green-50' : '' }
 			` }
@@ -53,7 +53,7 @@ const StepIndicator = memo( ( { menu, isActive, isCompleted, onClick } ) => {
 			<Icon
 				className={ `
 					w-4 h-4 transition-colors duration-200
-					${ isActive ? 'text-indigo-600' : '' }
+					${ isActive ? 'text-brand-600' : '' }
 					${ isCompleted && ! isActive ? 'text-green-500' : '' }
 				` }
 				aria-hidden="true"
@@ -167,13 +167,13 @@ const NavigationBar = memo( () => {
 	// Enhanced step navigation
 	const handleStepNavigation = useCallback( ( stepId ) => {
 		if ( stepId && stepId !== currentStep ) {
-			navigate( `${ wpaib_localized_data.admin_app_url }&step=${ stepId }` );
+			navigate( `?step=${ stepId }` );
 		}
 	}, [ navigate, currentStep ] );
 
 	return (
 		<header
-			className="wpaib-setup-header bg-white border-b border-gray-200 shadow-sm fixed top-[32px] left-[160px] right-0 z-[999999]"
+			className="wpaib-setup-header bg-white border-b border-gray-200 shadow-sm"
 			role="banner"
 			aria-label={ __( 'Setup wizard navigation', 'wp-ai-blogger' ) }
 		>
@@ -229,7 +229,7 @@ const NavigationBar = memo( () => {
 			{ /* Progress bar */ }
 			<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
 				<div
-					className="h-full bg-indigo-600 transition-all duration-300 ease-in-out"
+					className="h-full bg-brand-600 transition-all duration-300 ease-in-out"
 					style={ {
 						width: `${ ( ( menus.findIndex( ( m ) => m.id === currentStep ) + 1 ) / menus.length ) * 100 }%`,
 					} }

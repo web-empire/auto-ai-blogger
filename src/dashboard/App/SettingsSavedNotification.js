@@ -37,12 +37,12 @@ const NotificationTypes = {
 	},
 	info: {
 		icon: InfoIcon,
-		iconColor: 'text-blue-500',
-		bgGradient: 'bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50',
-		borderColor: 'border-blue-200',
-		shadowColor: 'shadow-blue-100/50',
-		accentColor: 'bg-blue-500',
-		iconBg: 'bg-blue-100',
+		iconColor: 'text-brand-500',
+		bgGradient: 'bg-gradient-to-r from-brand-50 via-indigo-50 to-brand-50',
+		borderColor: 'border-brand-200',
+		shadowColor: 'shadow-brand-100/50',
+		accentColor: 'bg-brand-500',
+		iconBg: 'bg-brand-100',
 	},
 };
 

@@ -81,12 +81,18 @@ const ProButton = forwardRef( ( {
 
 	// Variant styles
 	const variants = {
-		primary: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600',
+		primary: 'text-white focus-visible:outline-brand-600',
 		secondary: 'bg-slate-200 text-slate-900 hover:bg-slate-300 focus-visible:outline-slate-500',
-		outline: 'border-2 border-indigo-600 text-indigo-600 bg-transparent hover:bg-indigo-50 focus-visible:outline-indigo-600',
-		ghost: 'text-indigo-600 bg-transparent hover:bg-indigo-50 focus-visible:outline-indigo-600',
+		outline: 'border-2 border-brand-600 text-brand-600 bg-transparent hover:bg-brand-50 focus-visible:outline-brand-600',
+		ghost: 'text-brand-600 bg-transparent hover:bg-brand-50 focus-visible:outline-brand-600',
 		danger: 'bg-red-600 text-white hover:bg-red-500 focus-visible:outline-red-600',
 	};
+
+	// Inline styles for primary variant gradient (better specificity than Tailwind classes)
+	const primaryGradientStyle = variant === 'primary' ? {
+		background: 'linear-gradient(to right, #9138c8, #d42ec1)',
+		transition: 'all 0.2s',
+	} : {};
 
 	// Size styles
 	const sizes = {
@@ -176,9 +182,19 @@ const ProButton = forwardRef( ( {
 					loadingClasses,
 					className
 				) }
+				style={ {
+					...primaryGradientStyle,
+					...( props.style || {} ),
+				} }
 				onClick={ handleUpgrade }
 				onMouseEnter={ tooltip ? () => setShowTooltip( true ) : undefined }
 				onMouseLeave={ tooltip ? () => setShowTooltip( false ) : undefined }
+				onMouseOver={ variant === 'primary' ? ( e ) => {
+					e.currentTarget.style.background = 'linear-gradient(to right, #7c2fb0, #b823a3)';
+				} : undefined }
+				onMouseOut={ variant === 'primary' ? ( e ) => {
+					e.currentTarget.style.background = 'linear-gradient(to right, #9138c8, #d42ec1)';
+				} : undefined }
 				aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
 				aria-disabled={ disabled || loading }
 				{ ...elementProps }
