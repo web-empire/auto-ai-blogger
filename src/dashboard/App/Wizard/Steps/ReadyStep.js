@@ -47,10 +47,10 @@ SuccessFeature.displayName = 'ReadySuccessFeature';
 
 // Enhanced next steps component
 const NextStepsCard = memo( () => (
-	<div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+	<div className="mt-8 p-6 bg-gradient-to-r from-brand-50 to-indigo-50 border border-brand-200 rounded-xl">
 		<div className="flex items-center gap-3 mb-4">
-			<div className="p-2 bg-blue-100 rounded-lg">
-				<PlayCircle className="w-6 h-6 text-blue-600" aria-hidden="true" />
+			<div className="p-2 bg-brand-100 rounded-lg">
+				<PlayCircle className="w-6 h-6 text-brand-600" aria-hidden="true" />
 			</div>
 			<div>
 				<h3 className="text-lg font-semibold text-gray-900">
@@ -80,8 +80,8 @@ const NextStepsCard = memo( () => (
 		<a
 			href="#"
 			className="
-				inline-flex items-center gap-2 mt-4 text-sm font-medium text-blue-600
-				hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
+				inline-flex items-center gap-2 mt-4 text-sm font-medium text-brand-600
+				hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500
 				focus:ring-offset-2 rounded transition-colors duration-200
 			"
 			aria-label={ __( 'Watch getting started video', 'wp-ai-blogger' ) }

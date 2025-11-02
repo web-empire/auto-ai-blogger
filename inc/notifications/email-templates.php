@@ -62,7 +62,7 @@ class Email_Templates {
 			$data['campaign_name']
 		);
 
-		$body = $this->get_email_header();
+		$body  = $this->get_email_header();
 		$body .= sprintf(
 			'<h2 style="color: #4F46E5; margin-bottom: 16px;">%s</h2>',
 			__( '🚀 Campaign Started Successfully!', 'wp-ai-blogger' )
@@ -114,7 +114,7 @@ class Email_Templates {
 			$data['post_title']
 		);
 
-		$body = $this->get_email_header();
+		$body  = $this->get_email_header();
 		$body .= sprintf(
 			'<h2 style="color: #10B981; margin-bottom: 16px;">%s</h2>',
 			__( '✅ New Post Created Successfully!', 'wp-ai-blogger' )
@@ -173,7 +173,7 @@ class Email_Templates {
 			$data['campaign_name']
 		);
 
-		$body = $this->get_email_header();
+		$body  = $this->get_email_header();
 		$body .= sprintf(
 			'<h2 style="color: #8B5CF6; margin-bottom: 16px;">%s</h2>',
 			__( '🎉 Campaign Completed Successfully!', 'wp-ai-blogger' )
@@ -225,7 +225,7 @@ class Email_Templates {
 			$data['campaign_name']
 		);
 
-		$body = $this->get_email_header();
+		$body  = $this->get_email_header();
 		$body .= sprintf(
 			'<h2 style="color: #EF4444; margin-bottom: 16px;">%s</h2>',
 			__( '⚠️ Campaign Failed/Terminated', 'wp-ai-blogger' )
@@ -307,7 +307,7 @@ class Email_Templates {
 	 */
 	private function get_email_footer(): string {
 		$site_name = get_bloginfo( 'name' );
-		$site_url = get_bloginfo( 'url' );
+		$site_url  = get_bloginfo( 'url' );
 
 		return '
 								</td>
@@ -316,7 +316,7 @@ class Email_Templates {
 								<td style="background-color: #F9FAFB; padding: 32px 40px; border-top: 1px solid #E5E7EB;">
 									<p style="margin: 0 0 12px 0; font-size: 14px; color: #6B7280; text-align: center;">' . __( 'You are receiving this notification because you have enabled notifications for WP AI Blogger.', 'wp-ai-blogger' ) . '</p>
 									<p style="margin: 0; font-size: 12px; color: #9CA3AF; text-align: center;">
-										© ' . date( 'Y' ) . ' <a href="' . esc_url( $site_url ) . '" style="color: #4F46E5; text-decoration: none;">' . esc_html( $site_name ) . '</a>. ' . __( 'All rights reserved.', 'wp-ai-blogger' ) . '
+										© ' . gmdate( 'Y' ) . ' <a href="' . esc_url( $site_url ) . '" style="color: #4F46E5; text-decoration: none;">' . esc_html( $site_name ) . '</a>. ' . __( 'All rights reserved.', 'wp-ai-blogger' ) . '
 									</p>
 								</td>
 							</tr>

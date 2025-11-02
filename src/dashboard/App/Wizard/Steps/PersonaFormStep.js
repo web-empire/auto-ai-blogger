@@ -33,7 +33,7 @@ const FormField = memo( ( {
 	const handleBlur = useCallback( () => setIsFocused( false ), [] );
 
 	const fieldClasses = `
-		w-full pl-4 !pr-10 py-3 text-sm border rounded-lg transition-all duration-200
+		w-full pl-3.5 !pr-9 py-2.5 text-[13px] border rounded-lg transition-all duration-200
 		${ error ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 bg-white focus:border-purple-500 focus:ring-purple-500' }
 		${ isFocused ? 'shadow-md' : 'shadow-sm' } focus:outline-none focus:ring-2 focus:ring-opacity-50 placeholder:text-gray-400
 	`;
@@ -42,9 +42,9 @@ const FormField = memo( ( {
 		<div className="space-y-2">
 			<label
 				htmlFor={ id }
-				className="flex items-center text-sm font-semibold text-gray-900 relative"
+				className="flex items-center text-[13px] font-semibold text-gray-900 relative"
 			>
-				{ Icon && <Icon className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" /> }
+				{ Icon && <Icon className="w-3.5 h-3.5 text-gray-600 mr-2" aria-hidden="true" /> }
 				{ label }
 				{ required && <span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span> }
 			</label>
@@ -81,18 +81,18 @@ const FormField = memo( ( {
 				) }
 
 				{ /* Status indicator */ }
-				<div className="absolute right-3 top-3">
+				<div className="absolute right-2.5 top-2.5">
 					{ error ? (
-						<AlertCircle className="w-4 h-4 text-red-500" aria-hidden="true" />
+						<AlertCircle className="w-3.5 h-3.5 text-red-500" aria-hidden="true" />
 					) : value && ! error ? (
-						<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+						<CheckCircle2 className="w-3.5 h-3.5 text-green-500" aria-hidden="true" />
 					) : null }
 				</div>
 			</div>
 
 			{ /* Character count */ }
 			{ maxLength && (
-				<div className="flex justify-between items-center text-xs">
+				<div className="flex justify-between items-center text-[11px]">
 					{
 						description && (
 							<p className="text-gray-400">{ description }</p>
@@ -106,8 +106,8 @@ const FormField = memo( ( {
 
 			{ /* Error message without character count */ }
 			{ error && ! maxLength && (
-				<p id={ `${ id }-error` } className="text-xs text-red-600 flex items-center gap-1">
-					<AlertCircle className="w-3 h-3" />
+				<p id={ `${ id }-error` } className="text-[11px] text-red-600 flex items-center gap-1">
+					<AlertCircle className="w-2.5 h-2.5" />
 					{ error }
 				</p>
 			) }
@@ -118,23 +118,16 @@ const FormField = memo( ( {
 FormField.displayName = 'PersonaFormField';
 
 // Enhanced submit button component
-const SubmitButton = memo( ( { onClick, loading, disabled, children } ) => {
-	const handleClick = useCallback( ( e ) => {
-		e.preventDefault();
-		if ( ! disabled && ! loading ) {
-			onClick( e );
-		}
-	}, [ onClick, disabled, loading ] );
-
+const SubmitButton = ( { onClick, loading, disabled, children } ) => {
 	return (
 		<button
 			type="submit"
-			onClick={ handleClick }
+			onClick={ onClick }
 			disabled={ disabled || loading }
 			className="
-				group inline-flex items-center gap-3 px-8 py-4
+				group inline-flex items-center gap-2.5 px-7 py-3.5
 				bg-gradient-to-r from-indigo-600 to-purple-600
-				text-white font-semibold rounded-xl shadow-lg
+				text-white font-semibold rounded-xl shadow-lg text-[13px]
 				hover:from-indigo-700 hover:to-purple-700
 				focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
 				transform transition-all duration-200 hover:scale-105 hover:shadow-xl
@@ -143,16 +136,16 @@ const SubmitButton = memo( ( { onClick, loading, disabled, children } ) => {
 			aria-label={ __( 'Continue to next step', 'wp-ai-blogger' ) }
 		>
 			{ loading ? (
-				<Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+				<Loader2 className="w-4.5 h-4.5 animate-spin" aria-hidden="true" />
 			) : (
 				<span>{ children }</span>
 			) }
 			{ ! loading && (
-				<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+				<ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
 			) }
 		</button>
 	);
-} );
+};
 
 SubmitButton.displayName = 'PersonaSubmitButton';
 
@@ -165,7 +158,6 @@ const PersonaFormStep = memo( () => {
 	const reduxSiteTitle = useSelector( ( state ) => state?.siteTitle || '' );
 	const reduxSiteFor = useSelector( ( state ) => state?.siteFor || '' );
 	const reduxSiteDescription = useSelector( ( state ) => state?.siteDescription || '' );
-	const adminAppUrl = useSelector( ( state ) => state?.adminAppUrl || '' );
 
 	// Enhanced form state using Redux data directly
 	const [ formData, setFormData ] = useState( {
@@ -323,8 +315,11 @@ const PersonaFormStep = memo( () => {
 				throw new Error( `Failed to save some settings: ${ failedKeys }` );
 			}
 
+			// Scroll to top before navigating
+			window.scrollTo( { top: 0, behavior: 'smooth' } );
+
 			// Navigate to next step
-			navigate( `${ adminAppUrl }&step=license` );
+			navigate( `?step=license` );
 		} catch ( error ) {
 			console.error( 'Form submission error:', error );
 			setErrors( { submit: __( 'Failed to save your information. Please try again.', 'wp-ai-blogger' ) } );
@@ -346,34 +341,36 @@ const PersonaFormStep = memo( () => {
 		const trimmedFor = formData.siteFor?.trim() || '';
 		const trimmedDescription = formData.siteDescription?.trim() || '';
 
-		return trimmedTitle.length >= 3 && trimmedTitle.length <= 100 &&
-			   trimmedFor.length >= 10 && trimmedFor.length <= 200 &&
-			   trimmedDescription.length >= 20 && trimmedDescription.length <= 1000;
-	}, [ formData ] );
+		const titleValid = trimmedTitle.length > 0 && trimmedTitle.length <= 100;
+		const forValid = trimmedFor.length > 0 && trimmedFor.length <= 200;
+		const descValid = trimmedDescription.length > 0 && trimmedDescription.length <= 1000;
+
+		return titleValid && forValid && descValid;
+	}, [ formData.siteTitle, formData.siteFor, formData.siteDescription ] );
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6"
+			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-5"
 			role="main"
 			aria-labelledby="persona-heading"
 		>
 			<div className="w-full max-w-2xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
 					{ /* Header */ }
-					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
-						<div className="mb-3">
-							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
-								<User className="w-4 h-4 mr-2" aria-hidden="true" />
+					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-center">
+						<div className="mb-2.5">
+							<span className="inline-flex items-center px-3.5 py-1.5 bg-white bg-opacity-20 text-white text-[13px] font-medium rounded-full tracking-wide uppercase">
+								<User className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
 								{ __( 'Step 2 of 5', 'wp-ai-blogger' ) }
 							</span>
 						</div>
-						<h1 id="persona-heading" className="text-2xl md:text-3xl font-bold text-white mb-4">
+						<h1 id="persona-heading" className="text-2xl md:text-[27px] font-bold text-white mb-3.5">
 							{ __( 'Tell Us About Your Site', 'wp-ai-blogger' ) }
 						</h1>
 
 						{ /* Progress bar */ }
-						<div className="mt-4">
-							<div className="bg-white bg-opacity-20 rounded-full h-2 overflow-hidden">
+						<div className="mt-3.5">
+							<div className="bg-white bg-opacity-20 rounded-full h-1.5 overflow-hidden">
 								<div
 									className="bg-white h-full transition-all duration-500 ease-out"
 									style={ { width: `${ completionPercentage }%` } }
@@ -391,8 +388,8 @@ const PersonaFormStep = memo( () => {
 					</div>
 
 					{ /* Form */ }
-					<form className="p-6 md:p-8" onSubmit={ handleSubmit } noValidate>
-						<div className="space-y-6">
+					<form className="p-5 md:p-7" onSubmit={ handleSubmit } noValidate>
+						<div className="space-y-5">
 							<FormField
 								id="wpaib-site-title"
 								label={ __( 'Site Title', 'wp-ai-blogger' ) }
@@ -437,16 +434,16 @@ const PersonaFormStep = memo( () => {
 
 						{ /* Submit error */ }
 						{ errors.submit && (
-							<div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-								<p className="text-red-700 text-sm flex items-center gap-2">
-									<AlertCircle className="w-4 h-4" />
+							<div className="mt-3.5 p-2.5 bg-red-50 border border-red-200 rounded-lg">
+								<p className="text-red-700 text-[13px] flex items-center gap-1.5">
+									<AlertCircle className="w-3.5 h-3.5" />
 									{ errors.submit }
 								</p>
 							</div>
 						) }
 
 						{ /* Submit button */ }
-						<div className="flex justify-center pt-6">
+						<div className="flex justify-center pt-5">
 							<SubmitButton
 								onClick={ handleSubmit }
 								loading={ isSubmitting }
@@ -459,8 +456,8 @@ const PersonaFormStep = memo( () => {
 				</div>
 
 				{ /* Help text */ }
-				<div className="text-center mt-4">
-					<p className="text-sm text-gray-600">
+				<div className="text-center mt-3.5">
+					<p className="text-[13px] text-gray-600">
 						{ __( 'This information will be used to configure your AI content generator for optimal results.', 'wp-ai-blogger' ) }
 					</p>
 				</div>

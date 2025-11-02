@@ -18,9 +18,9 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 		<div className="space-y-2">
 			<label
 				htmlFor="wpaib-license"
-				className="flex items-center text-sm font-semibold text-gray-900 relative"
+				className="flex items-center text-[13px] font-semibold text-gray-900 relative"
 			>
-				<Key className="w-4 h-4 text-gray-600 mr-2" aria-hidden="true" />
+				<Key className="w-3.5 h-3.5 text-gray-600 mr-1.5" aria-hidden="true" />
 				{ __( 'License Key', 'wp-ai-blogger' ) }
 				<span className="text-red-500 ml-[2px]" aria-label={ __( 'Required', 'wp-ai-blogger' ) }>*</span>
 			</label>
@@ -36,7 +36,7 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 					disabled={ disabled }
 					placeholder={ __( 'Enter your license key here…', 'wp-ai-blogger' ) }
 					className={ `
-						w-full pl-4 pr-10 py-3 text-sm border rounded-lg transition-all duration-200
+						w-full pl-3.5 pr-9 py-2.5 text-[13px] border rounded-lg transition-all duration-200
 						${ error
 			? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
 			: 'border-gray-300 bg-white focus:border-indigo-500 focus:ring-indigo-500'
@@ -51,20 +51,20 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 				/>
 
 				{ /* Status indicator */ }
-				<div className="absolute right-3 top-3">
+				<div className="absolute right-2.5 top-2.5">
 					{ processing ? (
-						<Loader2 className="w-4 h-4 text-indigo-500 animate-spin" aria-hidden="true" />
+						<Loader2 className="w-3.5 h-3.5 text-indigo-500 animate-spin" aria-hidden="true" />
 					) : error ? (
-						<AlertCircle className="w-4 h-4 text-red-500" aria-hidden="true" />
+						<AlertCircle className="w-3.5 h-3.5 text-red-500" aria-hidden="true" />
 					) : value && ! error ? (
-						<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
+						<CheckCircle2 className="w-3.5 h-3.5 text-green-500" aria-hidden="true" />
 					) : null }
 				</div>
 			</div>
 
 			{ error && (
-				<p id="license-error" className="text-xs text-red-600 flex items-center gap-1 force-mt-1">
-					<AlertCircle className="w-3 h-3" />
+				<p id="license-error" className="text-[11px] text-red-600 flex items-center gap-1 force-mt-1">
+					<AlertCircle className="w-2.5 h-2.5" />
 					{ error }
 				</p>
 			) }
@@ -89,9 +89,9 @@ const SubmitButton = memo( ( { onClick, disabled, loading, children } ) => {
 			onClick={ handleClick }
 			disabled={ disabled || loading }
 			className="
-				group inline-flex items-center gap-3 px-8 py-4
+				group inline-flex items-center gap-2.5 px-7 py-3.5
 				bg-gradient-to-r from-indigo-600 to-purple-600
-				text-white font-semibold rounded-xl shadow-lg
+				text-white font-semibold rounded-xl shadow-lg text-[13px]
 				hover:from-indigo-700 hover:to-purple-700
 				focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
 				transform transition-all duration-200 hover:scale-105 hover:shadow-xl
@@ -100,12 +100,12 @@ const SubmitButton = memo( ( { onClick, disabled, loading, children } ) => {
 			aria-label={ __( 'Activate license and continue', 'wp-ai-blogger' ) }
 		>
 			{ loading ? (
-				<Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+				<Loader2 className="w-4.5 h-4.5 animate-spin" aria-hidden="true" />
 			) : (
 				<span>{ children }</span>
 			) }
 			{ ! loading && (
-				<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+				<ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
 			) }
 		</button>
 	);
@@ -123,7 +123,6 @@ const LicenseStep = memo( () => {
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce );
 	const upgradeLink = useSelector( ( state ) => state.upgradeLink );
-	const adminAppUrl = useSelector( ( state ) => state.adminAppUrl );
 	const licenseStatusFromRedux = useSelector( ( state ) => state.licenseStatus );
 
 	// Component state
@@ -302,9 +301,12 @@ const LicenseStep = memo( () => {
 
 		const success = await activateLicense();
 		if ( success ) {
+			// Scroll to top before navigating
+			window.scrollTo( { top: 0, behavior: 'smooth' } );
+
 			// Small delay for better UX
 			setTimeout( () => {
-				navigate( `${ adminAppUrl }&step=optin` );
+				navigate( `?step=optin` );
 			}, 1000 );
 		}
 	}, [ license, activateLicense, navigate ] );
@@ -329,31 +331,31 @@ const LicenseStep = memo( () => {
 
 	return (
 		<main
-			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4"
+			className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex justify-center p-5"
 			role="main"
 			aria-labelledby="license-heading"
 		>
 			<div className="w-full max-w-2xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
 					{ /* Header */ }
-					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
-						<div className="mb-4">
-							<span className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full tracking-wide uppercase">
-								<Shield className="w-4 h-4 mr-2" aria-hidden="true" />
+					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-center">
+						<div className="mb-2.5">
+							<span className="inline-flex items-center px-3.5 py-1.5 bg-white bg-opacity-20 text-white text-[13px] font-medium rounded-full tracking-wide uppercase">
+								<Shield className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
 								{ __( 'Step 3 of 5', 'wp-ai-blogger' ) }
 							</span>
 						</div>
-						<h1 id="license-heading" className="text-3xl font-bold text-white mb-2">
+						<h1 id="license-heading" className="text-2xl md:text-[27px] font-bold text-white mb-3.5">
 							{ __( 'Activate Your License', 'wp-ai-blogger' ) }
 						</h1>
-						<p className="text-indigo-100 text-lg">
+						<p className="text-indigo-100 text-base mt-3.5">
 							{ __( 'Connect your site to unlock AI-powered content generation with your license key.', 'wp-ai-blogger' ) }
 						</p>
 					</div>
 
 					{ /* Form */ }
-					<div className="p-8">
-						<form className="space-y-6" onSubmit={ ( e ) => {
+					<div className="p-5 md:p-7">
+						<form className="space-y-5" onSubmit={ ( e ) => {
 							e.preventDefault(); handleSubmit();
 						} }>
 							<LicenseInput
@@ -369,17 +371,17 @@ const LicenseStep = memo( () => {
 								subHeading={ __( 'Get started with free credits today..', 'wp-ai-blogger' ) }
 								linkText={ __( 'Claim Free Credits', 'wp-ai-blogger' ) }
 								linkUrl={ upgradeLink }
-								colorScheme="blue"
+								colorScheme="brand"
 								size="medium"
 								ariaLabel={ __( 'Get free credits - opens in new tab', 'wp-ai-blogger' ) }
 							/>
 
 							{ /* Success message */ }
 							{ licenseStatus === 'licensed' && ! error && (
-								<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-									<div className="flex items-center gap-2">
-										<CheckCircle2 className="w-5 h-5 text-green-600" aria-hidden="true" />
-										<p className="text-green-800 font-medium">
+								<div className="p-3.5 bg-green-50 border border-green-200 rounded-lg">
+									<div className="flex items-center gap-1.5">
+										<CheckCircle2 className="w-4.5 h-4.5 text-green-600" aria-hidden="true" />
+										<p className="text-green-800 font-medium text-[13px]">
 											{ __( 'License activated successfully!', 'wp-ai-blogger' ) }
 										</p>
 									</div>
@@ -387,7 +389,7 @@ const LicenseStep = memo( () => {
 							) }
 
 							{ /* Submit button */ }
-							<div className="flex justify-center pt-6 m-0">
+							<div className="flex justify-center pt-5 m-0">
 								<SubmitButton
 									onClick={ handleSubmit }
 									disabled={ ! ( typeof license === 'string' && license.trim() ) }
@@ -399,8 +401,8 @@ const LicenseStep = memo( () => {
 						</form>
 
 						{ /* Additional info */ }
-						<div className="mt-8 text-center">
-							<p className="text-sm text-gray-600 leading-relaxed">
+						<div className="mt-7 text-center">
+							<p className="text-[13px] text-gray-600 leading-relaxed">
 								{ __( 'Your license key connects your site to our AI services and allocates content generation tokens. ', 'wp-ai-blogger' ) }
 								<a
 									href={ upgradeLink }

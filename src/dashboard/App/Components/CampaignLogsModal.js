@@ -118,7 +118,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 				return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
 			case 'scheduled':
 			case 'pending':
-				return <Clock className="w-4 h-4 text-blue-600" />;
+				return <Clock className="w-4 h-4 text-brand-600" />;
 			case 'running':
 			case 'processing':
 				return <Activity className="w-4 h-4 text-indigo-600 animate-spin" />;
@@ -144,7 +144,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 				return `${ baseClasses } bg-yellow-100 text-yellow-800`;
 			case 'scheduled':
 			case 'pending':
-				return `${ baseClasses } bg-blue-100 text-blue-800`;
+				return `${ baseClasses } bg-brand-100 text-brand-800`;
 			case 'running':
 			case 'processing':
 				return `${ baseClasses } bg-indigo-100 text-indigo-800`;
@@ -161,8 +161,8 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 						{ /* Header */ }
 						<div className="flex items-center justify-between bg-gray-50 px-6 py-4 border-b border-gray-200">
 							<div className="flex items-center space-x-3">
-								<div className="p-2 bg-blue-100 rounded-lg flex">
-									<ScrollText className="w-5 h-5 text-blue-600" />
+								<div className="p-2 bg-brand-100 rounded-lg flex">
+									<ScrollText className="w-5 h-5 text-brand-600" />
 								</div>
 								<div>
 									<h3 className="text-lg font-semibold text-gray-900 m-0">
@@ -195,7 +195,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 									<p className="text-red-600">{ error }</p>
 									<button
 										onClick={ fetchLogsData }
-										className="mt-2 text-blue-600 hover:text-blue-800 text-sm"
+										className="mt-2 text-brand-600 hover:text-brand-800 text-sm"
 									>
 										{ __( 'Try Again', 'wp-ai-blogger' ) }
 									</button>
@@ -204,15 +204,15 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 								<div className="space-y-4">
 									{ /* Summary Stats */ }
 									<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-										<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+										<div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
 											<div className="flex items-center justify-between">
 												<div className="flex flex-col gap-2">
-													<p className="text-sm text-blue-600 m-0">{ __( 'Scheduled', 'wp-ai-blogger' ) }</p>
-													<p className="text-lg font-semibold text-blue-900 m-0">
+													<p className="text-sm text-brand-600 m-0">{ __( 'Scheduled', 'wp-ai-blogger' ) }</p>
+													<p className="text-lg font-semibold text-brand-900 m-0">
 														{ parseInt( campaignData?.postsScheduled ) || 0 }
 													</p>
 												</div>
-												<Clock className="w-5 h-5 text-blue-600" />
+												<Clock className="w-5 h-5 text-brand-600" />
 											</div>
 										</div>
 										<div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -234,7 +234,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 														{ ( () => {
 															// Calculate actual failed attempts from error logs
 															// Count all error logs (including retries that eventually succeeded)
-															const errorLogs = logsData?.logs?.filter( log =>
+															const errorLogs = logsData?.logs?.filter( ( log ) =>
 																log.status?.toLowerCase() === 'error' ||
 																log.status?.toLowerCase() === 'failed' ||
 																log.status?.toLowerCase() === 'failure'
@@ -381,7 +381,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 												<h4 className="text-base font-medium text-gray-900 m-0">{ __( 'Activity Timeline', 'wp-ai-blogger' ) }</h4>
 												<button
 													onClick={ fetchLogsData }
-													className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 p-1 rounded-md"
+													className="text-xs text-brand-600 hover:text-brand-800 flex items-center gap-1 p-1 rounded-md"
 													disabled={ loading }
 												>
 													<Activity className={ `w-3 h-3 ${ loading ? 'animate-spin' : '' }` } />
@@ -449,8 +449,8 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																	{ ( log.post_id || log.post_title ) && (
 																		<div className="flex items-center gap-2 text-xs mt-2">
 																			{ log.post_id && (
-																				<span className="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
-																					<span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
+																				<span className="inline-flex items-center px-2 py-1 bg-brand-50 text-brand-700 rounded-full">
+																					<span className="w-2 h-2 bg-brand-500 rounded-full mr-1"></span>
 																					{ __( 'ID:', 'wp-ai-blogger' ) } { log.post_id }
 																				</span>
 																			) }

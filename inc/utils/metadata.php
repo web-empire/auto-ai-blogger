@@ -511,7 +511,7 @@ class Metadata {
 			$meta_frequency = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 
 			// Add weekday selection info if it's a weekly campaign with specific days.
-			if ( 'week' === $repeat_unit && ! empty( $metadata['repeatWeeklyOn'] ) && is_array( $metadata['repeatWeeklyOn'] ) ) {
+			if ( $repeat_unit === 'week' && ! empty( $metadata['repeatWeeklyOn'] ) && is_array( $metadata['repeatWeeklyOn'] ) ) {
 				$day_names = [
 					'mon' => __( 'Mon', 'wp-ai-blogger' ),
 					'tue' => __( 'Tue', 'wp-ai-blogger' ),

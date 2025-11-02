@@ -24,11 +24,11 @@ const InfoCard = memo( ( {
 	// Color scheme mappings
 	const colorClasses = {
 		blue: {
-			bg: 'bg-blue-50',
-			border: 'border-blue-200',
-			iconColor: 'text-blue-600',
-			titleColor: 'text-blue-900',
-			textColor: 'text-blue-700',
+			bg: 'bg-brand-50',
+			border: 'border-brand-200',
+			iconColor: 'text-brand-600',
+			titleColor: 'text-brand-900',
+			textColor: 'text-brand-700',
 		},
 		green: {
 			bg: 'bg-green-50',

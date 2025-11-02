@@ -1075,13 +1075,11 @@ class Ajax {
 			$security_check = $this->validate_ajax_security( 'pause_campaign' );
 			if ( is_wp_error( $security_check ) ) {
 				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
-				return;
 			}
 
 			// Nonce validation.
 			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
-				return;
 			}
 
 			// Get and validate campaign ID.
@@ -1089,34 +1087,29 @@ class Ajax {
 
 			if ( $campaign_id <= 0 ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
 			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Check user permissions.
 			if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
-				return;
 			}
 
 			// Check if campaign is already paused.
 			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( $is_paused ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign is already paused.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Check if campaign is already completed.
 			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
 				wp_send_json_error( [ 'message' => __( 'Cannot pause a completed campaign.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Pause the campaign.
@@ -1126,10 +1119,12 @@ class Ajax {
 			// Clear scheduled events.
 			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
 
-			wp_send_json_success( [
-				'message'  => __( 'Campaign paused successfully.', 'wp-ai-blogger' ),
-				'isPaused' => true,
-			] );
+			wp_send_json_success(
+				[
+					'message'  => __( 'Campaign paused successfully.', 'wp-ai-blogger' ),
+					'isPaused' => true,
+				]
+			);
 
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [ 'message' => __( 'An error occurred while pausing the campaign.', 'wp-ai-blogger' ) ] );
@@ -1148,13 +1143,11 @@ class Ajax {
 			$security_check = $this->validate_ajax_security( 'resume_campaign' );
 			if ( is_wp_error( $security_check ) ) {
 				wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
-				return;
 			}
 
 			// Nonce validation.
 			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
-				return;
 			}
 
 			// Get and validate campaign ID.
@@ -1162,34 +1155,29 @@ class Ajax {
 
 			if ( $campaign_id <= 0 ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
 			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Check user permissions.
 			if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'permission' ) ] );
-				return;
 			}
 
 			// Check if campaign is paused.
 			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( ! $is_paused ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign is not paused.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Check if campaign is completed.
 			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
 				wp_send_json_error( [ 'message' => __( 'Cannot resume a completed campaign.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Check if target is already reached.
@@ -1198,7 +1186,6 @@ class Ajax {
 
 			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign target already reached.', 'wp-ai-blogger' ) ] );
-				return;
 			}
 
 			// Resume the campaign.
@@ -1207,23 +1194,82 @@ class Ajax {
 
 			// Ensure campaign status is publish.
 			if ( $campaign->post_status !== 'publish' ) {
-				wp_update_post( [
-					'ID'          => $campaign_id,
-					'post_status' => 'publish',
-				] );
+				wp_update_post(
+					[
+						'ID'          => $campaign_id,
+						'post_status' => 'publish',
+					]
+				);
 			}
 
 			// Schedule the next post immediately (or after a short delay).
 			$next_run = time() + 60; // Start in 1 minute.
 			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
 
-			wp_send_json_success( [
-				'message'  => __( 'Campaign resumed successfully.', 'wp-ai-blogger' ),
-				'isPaused' => false,
-			] );
+			wp_send_json_success(
+				[
+					'message'  => __( 'Campaign resumed successfully.', 'wp-ai-blogger' ),
+					'isPaused' => false,
+				]
+			);
 
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [ 'message' => __( 'An error occurred while resuming the campaign.', 'wp-ai-blogger' ) ] );
+		}
+	}
+
+	/**
+	 * Reschedule a campaign's cron jobs (debug utility).
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function wpaib_reschedule_campaign(): void {
+		try {
+			// Nonce validation.
+			if ( ! check_ajax_referer( 'wpaib_reschedule_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed', 'wp-ai-blogger' ) ] );
+			}
+
+			// Permission check.
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action', 'wp-ai-blogger' ) ] );
+			}
+
+			// Get campaign ID.
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
+
+			if ( ! $campaign_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID', 'wp-ai-blogger' ) ] );
+			}
+
+			// Get campaign metadata.
+			$repeat_interval = get_post_meta( $campaign_id, 'repeatInterval', true );
+			$repeat_unit     = get_post_meta( $campaign_id, 'repeatUnit', true );
+			$start_date      = get_post_meta( $campaign_id, 'startDate', true );
+
+			if ( empty( $repeat_interval ) || empty( $repeat_unit ) ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign is missing repeat interval or unit', 'wp-ai-blogger' ) ] );
+			}
+
+			// Create meta_input array.
+			$meta_input = [
+				'repeatInterval' => $repeat_interval,
+				'repeatUnit'     => $repeat_unit,
+				'startDate'      => $start_date,
+			];
+
+			// Call the existing schedule method.
+			$this->schedule_campaign_posts( $campaign_id, $meta_input );
+
+			wp_send_json_success(
+				[
+					'message' => __( 'Campaign cron jobs rescheduled successfully!', 'wp-ai-blogger' ),
+				]
+			);
+
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [ 'message' => __( 'Failed to reschedule campaign', 'wp-ai-blogger' ) ] );
 		}
 	}
 
@@ -2532,64 +2578,5 @@ class Ajax {
 		}
 
 		return $sample_logs;
-	}
-
-	/**
-	 * Reschedule a campaign's cron jobs (debug utility).
-	 *
-	 * @since x.x.x
-	 * @return void
-	 */
-	public function wpaib_reschedule_campaign(): void {
-		try {
-			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_reschedule_nonce', 'security', false ) ) {
-				wp_send_json_error( [ 'message' => __( 'Security check failed', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Permission check.
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Get campaign ID.
-			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
-
-			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Get campaign metadata.
-			$repeat_interval = get_post_meta( $campaign_id, 'repeatInterval', true );
-			$repeat_unit     = get_post_meta( $campaign_id, 'repeatUnit', true );
-			$start_date      = get_post_meta( $campaign_id, 'startDate', true );
-
-			if ( empty( $repeat_interval ) || empty( $repeat_unit ) ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign is missing repeat interval or unit', 'wp-ai-blogger' ) ] );
-				return;
-			}
-
-			// Create meta_input array.
-			$meta_input = [
-				'repeatInterval' => $repeat_interval,
-				'repeatUnit'     => $repeat_unit,
-				'startDate'      => $start_date,
-			];
-
-			// Call the existing schedule method.
-			$this->schedule_campaign_posts( $campaign_id, $meta_input );
-
-			wp_send_json_success(
-				[
-					'message' => __( 'Campaign cron jobs rescheduled successfully!', 'wp-ai-blogger' ),
-				]
-			);
-
-		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'Failed to reschedule campaign', 'wp-ai-blogger' ) ] );
-		}
 	}
 }

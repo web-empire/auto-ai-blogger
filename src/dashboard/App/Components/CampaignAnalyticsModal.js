@@ -90,8 +90,8 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 						{ /* Header */ }
 						<div className="flex items-center justify-between bg-gray-50 px-6 py-4 border-b border-gray-200">
 							<div className="flex items-center space-x-3">
-								<div className="p-2 bg-blue-100 rounded-lg flex">
-									<BarChart3 className="w-5 h-5 text-blue-600" />
+								<div className="p-2 bg-brand-100 rounded-lg flex">
+									<BarChart3 className="w-5 h-5 text-brand-600" />
 								</div>
 								<div>
 									<h3 className="text-lg font-semibold text-gray-900 m-0">
@@ -134,13 +134,13 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 										{ /* Top Stats */ }
 										<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 											{ /* Published Posts & Views */ }
-											<div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+											<div className="bg-gradient-to-r from-brand-50 to-indigo-50 p-4 rounded-lg border border-brand-200">
 												<div className="flex items-center justify-between">
 													<div className="flex flex-col gap-2">
-														<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Created Posts', 'wp-ai-blogger' ) }</p>
-														<p className="text-2xl font-bold text-blue-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
+														<p className="text-sm font-medium text-brand-600 m-0">{ __( 'Created Posts', 'wp-ai-blogger' ) }</p>
+														<p className="text-2xl font-bold text-brand-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
 													</div>
-													<TrendingUp className="w-6 h-6 text-blue-500" />
+													<TrendingUp className="w-6 h-6 text-brand-500" />
 												</div>
 											</div>
 
@@ -236,7 +236,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 												</div>
 												<div className="flex items-center justify-end space-x-1">
 													<CheckCircle className="w-4 h-4 text-green-300" />
-													<span className="text-sm">{ __( 'AI Performance Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
+													<span className="text-sm">{ __( 'Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
 												</div>
 											</div>
 										</div>

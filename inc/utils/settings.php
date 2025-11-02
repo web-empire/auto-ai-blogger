@@ -103,6 +103,10 @@ class Settings {
 					'default' => '',
 					'type'    => 'string',
 				],
+				'createdPostIdeas'            => [
+					'default' => '',
+					'type'    => 'string',
+				],
 				// Notification settings.
 				'emailNotificationEnabled'    => [
 					'default' => false,

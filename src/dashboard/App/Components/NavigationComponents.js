@@ -191,16 +191,16 @@ export const TokenDisplayAndRefresh = () => {
 			<button
 				disabled={ licenseStatus !== 'licensed' || processing || ! license }
 				className={ `
-					text-indigo-700
-					bg-indigo-50
-					border border-indigo-200
+					text-brand-700
+					bg-brand-50
+					border border-brand-200
 					rounded-md p-1 mr-2
 					flex items-center justify-center
 					font-medium
 					focus:outline-none focus:ring-0
 					${ licenseStatus !== 'licensed' || processing || ! license
 			? 'opacity-50 cursor-not-allowed'
-			: 'cursor-pointer hover:text-indigo-900 hover:bg-indigo-100 hover:border-indigo-300' }
+			: 'cursor-pointer hover:text-brand-900 hover:bg-brand-100 hover:border-brand-300' }
 					${ processing ? 'pointer-events-none' : '' }
 				` }
 				onClick={ refreshTokens }
