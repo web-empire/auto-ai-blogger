@@ -554,7 +554,7 @@ class Cron_Handler {
 		];
 
 		// Get current day number (1-7).
-		$current_day  = (int) date( 'N' );
+		$current_day  = (int) gmdate( 'N' );
 		$current_time = time();
 
 		// Convert selected days to numeric format and sort.
