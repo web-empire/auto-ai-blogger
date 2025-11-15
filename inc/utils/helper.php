@@ -46,6 +46,7 @@ class Helper {
 		'sexuallyExplicit',
 		'dangerousContent',
 		'postIdeas',
+		'createdPostIdeas',
 		'tokenTotal',
 		'tokenRemaining',
 		'apiKey',
@@ -401,6 +402,49 @@ class Helper {
 				}
 
 				// For any other type, return empty string.
+				return '';
+
+			case 'createdPostIdeas':
+				// Handle JSON string of created post ideas {title: editUrl, ...}
+				if ( is_string( $value ) ) {
+					// Try to decode JSON
+					$decoded = json_decode( $value, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						// Sanitize each title and URL
+						$sanitized = [];
+						foreach ( $decoded as $title => $url ) {
+							$clean_title = sanitize_textarea_field( $title );
+							$clean_url   = esc_url_raw( $url );
+							if ( ! empty( $clean_title ) && ! empty( $clean_url ) ) {
+								$sanitized[ $clean_title ] = $clean_url;
+							}
+						}
+						// Return as JSON string
+						return ! empty( $sanitized ) ? wp_json_encode( $sanitized ) : '';
+					}
+
+					// Try with stripslashes for double-escaped JSON
+					$unescaped = stripslashes( $value );
+					$decoded   = json_decode( $unescaped, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						// Sanitize each title and URL
+						$sanitized = [];
+						foreach ( $decoded as $title => $url ) {
+							$clean_title = sanitize_textarea_field( $title );
+							$clean_url   = esc_url_raw( $url );
+							if ( ! empty( $clean_title ) && ! empty( $clean_url ) ) {
+								$sanitized[ $clean_title ] = $clean_url;
+							}
+						}
+						// Return as JSON string
+						return ! empty( $sanitized ) ? wp_json_encode( $sanitized ) : '';
+					}
+
+					// If not valid JSON, return empty string
+					return '';
+				}
+
+				// For any other type, return empty string
 				return '';
 
 			case 'blogName':

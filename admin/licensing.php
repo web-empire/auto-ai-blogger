@@ -282,8 +282,9 @@ class Licensing {
 
 			// Clear license data from admin settings.
 			Helper::update_option( 'license_status', 'unlicensed' );
-			Helper::update_option( 'tokenTotal', 0 );
-			Helper::update_option( 'tokenRemaining', 0 );
+
+			// Clear token data using the shared helper function.
+			wpaib_update_token_data( [ 'total' => 0, 'remaining' => 0 ] );
 
 			// Log successful deactivation.
 			$this->log_license_activity( 'deactivate', $current_license, get_current_user_id() );
@@ -840,25 +841,7 @@ class Licensing {
 			return false;
 		}
 
-		// Validate required token fields.
-		if ( ! isset( $data['data']['total'] ) || ! isset( $data['data']['remaining'] ) ) {
-			return false;
-		}
-
-		// Sanitize and validate token values.
-		$token_total     = absint( $data['data']['total'] );
-		$token_remaining = absint( $data['data']['remaining'] );
-
-		// Validate token values make sense.
-		if ( $token_total < 0 || $token_remaining < 0 || $token_remaining > $token_total ) {
-			return false;
-		}
-
-		// Save token data using Helper class with validation.
-		$total_result     = Helper::update_option( 'tokenTotal', $token_total );
-		$remaining_result = Helper::update_option( 'tokenRemaining', $token_remaining );
-
-		// Return success status.
-		return $total_result['success'] && $remaining_result['success'];
+		// Update token data using the shared helper function.
+		return wpaib_update_token_data( $data['data'] );
 	}
 }

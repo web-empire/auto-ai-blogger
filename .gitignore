@@ -5,6 +5,9 @@ node_modules/
 wordpress/
 artifact/
 
+# Copilot documentation
+copilot_readme/
+
 # Logs
 *.log
 

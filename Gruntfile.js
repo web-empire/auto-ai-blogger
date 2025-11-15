@@ -48,6 +48,7 @@ module.exports = function (grunt) {
 					'!.DS_Store',
 					'!phpinsights.php',
 					'!src/**',
+					'!copilot_readme/**',
 				],
 				dest: 'wp-ai-blogger/',
 			},
