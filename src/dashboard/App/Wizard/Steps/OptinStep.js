@@ -315,7 +315,9 @@ const OptinStep = memo( () => {
 						<h2 className="text-[17px] font-semibold text-indigo-100 mb-3.5">
 							{ __( 'Get personalized growth insights', 'wp-ai-blogger' ) }
 						</h2>
-					</div>					<div className="p-5 md:p-7">
+					</div>
+
+					<div className="p-5 md:p-7">
 						<div className="grid lg:grid-cols-2 gap-5">
 							{ /* Form Section */ }
 							<div>

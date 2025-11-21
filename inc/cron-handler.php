@@ -251,15 +251,33 @@ class Cron_Handler {
 
 			$api_data = $api_response['data'];
 
+			// Update token data if present in the API response.
+			if ( isset( $api_data['token_data'] ) && is_array( $api_data['token_data'] ) ) {
+				wpaib_update_token_data( $api_data['token_data'] );
+			}
+
+			// Process images if they exist in the API response.
+			$featured_image_id = null;
+			// Don't sanitize - content contains Gutenberg blocks with HTML comments.
+			// wp_kses_post() strips these comments. Content comes from our controlled API.
+			$post_content = $api_data['post_content'] ?? '';
+
+			if ( ! empty( $api_data['images'] ) && is_array( $api_data['images'] ) ) {
+				// Use the same image processing method from Ajax class.
+				$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_data['images'] );
+				if ( ! is_wp_error( $processed_result ) && is_array( $processed_result ) ) {
+					$post_content      = $processed_result['content'];
+					$featured_image_id = $processed_result['featured_image_id'] ?? null;
+				}
+			}
+
 			$post_data = [
 				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
-				'post_content' => wp_kses_post( $api_data['post_content'] ?? '' ),
+				'post_content' => $post_content,
 				'post_status'  => $post_status ? $post_status : 'draft',
 				'post_type'    => $post_type ? $post_type : 'post',
 				'post_author'  => $author_id ? $author_id : get_current_user_id(),
-			];
-
-			if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
+			];          if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
 				$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
 			}
 
@@ -281,10 +299,14 @@ class Cron_Handler {
 				wp_set_post_tags( $post_id, $tag );
 			}
 
+			// Set featured image if available.
+			if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
+				set_post_thumbnail( $post_id, $featured_image_id );
+			}
+
 			// Add campaign reference meta to the post.
 			add_post_meta( $post_id, 'wp_aib_reference', 1 );
 			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
-
 			$posts_created     = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			$new_posts_created = intval( $posts_created ) + 1;
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $new_posts_created );
@@ -356,12 +378,21 @@ class Cron_Handler {
 
 			$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
+			// Get campaign name for better context.
+			$campaign_post = get_post( $campaign_id );
+			$campaign_name = $campaign_post ? $campaign_post->post_title : 'Campaign Post';
+
+			// Default image count is 1 for campaign posts.
+			// Pro plugin can filter this to allow user-configured image count.
+			$image_count = apply_filters( 'wpaib_campaign_image_count', 2, $campaign_id );
+			$image_count = max( 0, min( 5, absint( $image_count ) ) ); // Limit: 0-5 images.
+
 			$max_retries = 2;
 			$retry_delay = 3;
 			$response    = null;
 
 			for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
-				$response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_words, $site_persona_details );
+				$response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_words, $site_persona_details, $campaign_id, $campaign_name, $image_count );
 
 				if ( ! is_wp_error( $response ) ) {
 					break;
@@ -734,5 +765,209 @@ class Cron_Handler {
 
 		// Clear any scheduled events since campaign is now complete.
 		wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+	}
+
+	/**
+	 * Process images from API response and replace placeholders with actual images.
+	 *
+	 * @param string $content HTML content with image placeholders.
+	 * @param array  $images  Array of image data from API.
+	 * @return array|WP_Error Array with 'content' and 'featured_image_id' or WP_Error on failure.
+	 * @since x.x.x
+	 */
+	private function process_images_and_replace_placeholders( $content, $images ) {
+		if ( empty( $images ) || ! is_array( $images ) ) {
+			return [
+				'content'           => $content,
+				'featured_image_id' => null,
+			];
+		}
+
+		$featured_image_id = null;
+		$uploaded_images   = [];
+
+		// Upload all images first.
+		foreach ( $images as $image ) {
+			if ( empty( $image['url'] ) ) {
+				continue;
+			}
+
+			$alt_text      = $image['alt'] ?? '';
+			$attachment_id = $this->upload_image_to_media_library( $image['url'], $alt_text );
+
+			if ( is_wp_error( $attachment_id ) ) {
+				wpaib_log_error(
+					'image_upload_failed',
+					$attachment_id->get_error_message(),
+					[
+						'image_url' => $image['url'],
+						'alt_text'  => $alt_text,
+					]
+				);
+				continue;
+			}
+
+			// Store first successful upload as featured image.
+			if ( $featured_image_id === null ) {
+				$featured_image_id = $attachment_id;
+			}
+
+			$uploaded_images[] = [
+				'attachment_id' => $attachment_id,
+				'alt_text'      => $alt_text,
+			];
+		}
+
+		// Replace placeholders with actual image blocks.
+		// Skip the first image since it's used as featured image.
+		if ( ! empty( $uploaded_images ) ) {
+			$processed_content = $content;
+
+			// Start from index 1 to skip the featured image (index 0).
+			$uploaded_images_count = count( $uploaded_images );
+			for ( $i = 1; $i < $uploaded_images_count; $i++ ) {
+				$uploaded_image = $uploaded_images[ $i ];
+				$attachment_id  = $uploaded_image['attachment_id'];
+				$alt_text       = $uploaded_image['alt_text'];
+
+				// Create Gutenberg image block with the attachment ID.
+				$image_block = sprintf(
+					'<!-- wp:image {"id":%d,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="%s" alt="%s" class="wp-image-%d"/></figure>
+<!-- /wp:image -->',
+					$attachment_id,
+					wp_get_attachment_url( $attachment_id ),
+					esc_attr( $alt_text ),
+					$attachment_id
+				);
+
+				// Replace the first occurrence of the placeholder.
+				$placeholder_pos = strpos( $processed_content, '{{WP_AIB_IMAGE}}' );
+				if ( $placeholder_pos !== false ) {
+					$processed_content = substr_replace(
+						$processed_content,
+						$image_block,
+						$placeholder_pos,
+						strlen( '{{WP_AIB_IMAGE}}' )
+					);
+				}
+			}
+
+			// Remove any remaining placeholders that weren't replaced.
+			$processed_content = str_replace( '{{WP_AIB_IMAGE}}', '', $processed_content );
+
+			return [
+				'content'           => $processed_content,
+				'featured_image_id' => $featured_image_id,
+			];
+		}
+
+		return [
+			'content'           => $content,
+			'featured_image_id' => null,
+		];
+	}
+
+	/**
+	 * Upload image to WordPress media library.
+	 *
+	 * @param string $image_url Image URL to download and upload.
+	 * @param string $alt_text  Alt text for the image.
+	 * @return int|WP_Error Attachment ID on success, WP_Error on failure.
+	 * @since x.x.x
+	 */
+	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
+		try {
+			// Download the image.
+			$response = wp_remote_get(
+				$image_url,
+				[
+					'timeout' => 30,
+					'headers' => [
+						'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+					],
+				]
+			);
+
+			if ( is_wp_error( $response ) ) {
+				return new \WP_Error(
+					'image_download_failed',
+					__( 'Failed to download image: ', 'wp-ai-blogger' ) . $response->get_error_message()
+				);
+			}
+
+			$http_code = wp_remote_retrieve_response_code( $response );
+			if ( $http_code !== 200 ) {
+				return new \WP_Error(
+					'image_download_http_error',
+					sprintf(
+						/* translators: %d is the HTTP status code */
+						__( 'Image download returned HTTP error %d', 'wp-ai-blogger' ),
+						$http_code
+					)
+				);
+			}
+
+			$image_data = wp_remote_retrieve_body( $response );
+			if ( empty( $image_data ) ) {
+				return new \WP_Error(
+					'image_download_empty',
+					__( 'Downloaded image data is empty', 'wp-ai-blogger' )
+				);
+			}
+
+			// Get image info from the URL.
+			$url_path   = wp_parse_url( $image_url, PHP_URL_PATH );
+			$image_info = is_string( $url_path ) ? pathinfo( $url_path ) : [];
+			$filename   = sanitize_file_name( $image_info['filename'] ?? 'generated-image' );
+			$extension  = $image_info['extension'] ?? 'jpg';
+
+			// Ensure we have a valid filename.
+			if ( empty( $filename ) ) {
+				$filename = 'generated-image-' . time();
+			}
+
+			$filename .= '.' . $extension;
+
+			// Upload to WordPress.
+			$upload = wp_upload_bits( $filename, null, $image_data );
+			if ( $upload['error'] ) {
+				return new \WP_Error(
+					'image_upload_failed',
+					__( 'Failed to upload image: ', 'wp-ai-blogger' ) . $upload['error']
+				);
+			}
+
+			// Create attachment.
+			$attachment = [
+				'post_mime_type' => wp_check_filetype( $upload['file'] )['type'],
+				'post_title'     => sanitize_text_field( $alt_text ),
+				'post_content'   => '',
+				'post_status'    => 'inherit',
+			];
+
+			$attachment_id = wp_insert_attachment( $attachment, $upload['file'] );
+			if ( is_wp_error( $attachment_id ) ) {
+				return $attachment_id;
+			}
+
+			// Set alt text.
+			if ( ! empty( $alt_text ) ) {
+				update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $alt_text ) );
+			}
+
+			// Generate attachment metadata.
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+			wp_update_attachment_metadata( $attachment_id, $attachment_data );
+
+			return $attachment_id;
+
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'image_upload_exception',
+				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
+			);
+		}
 	}
 }

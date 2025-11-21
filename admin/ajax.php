@@ -661,6 +661,11 @@ class Ajax {
 				$this->remove_post_idea_from_db( $post_data['title'] );
 			}
 
+			// Update token data if available from API response.
+			if ( is_array( $token_data ) && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
+				wpaib_update_token_data( $token_data );
+			}
+
 			$success_response = [
 				'message'   => $this->get_error_msg( 'success' ),
 				'post_id'   => $post_id,
@@ -921,44 +926,6 @@ class Ajax {
 					'error'   => 'Exception occurred during fetching campaign analytics',
 				]
 			);
-		}
-	}
-
-	/**
-	 * Create a single post from a campaign (called by cron).
-	 *
-	 * @param int $campaign_id Campaign ID.
-	 * @return void
-	 * @since x.x.x
-	 */
-	public function create_single_post_from_campaign( $campaign_id ): void {
-		try {
-			$campaign_id = absint( $campaign_id );
-			if ( ! $campaign_id ) {
-				return;
-			}
-
-			// Get campaign.
-			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN || $campaign->post_status !== 'publish' ) {
-				return;
-			}
-
-			// Check if target reached.
-			$posts_created = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-			$posts_target  = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
-
-			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
-				// Target reached, clear schedule.
-				wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
-				return;
-			}
-
-			// Create the post.
-			$this->generate_post_from_campaign( $campaign_id );
-
-		} catch ( \Exception $e ) {
-			return;
 		}
 	}
 
@@ -1803,24 +1770,44 @@ class Ajax {
 	 * @return array<string, mixed>|\WP_Error Processed data with content and featured image ID or error.
 	 * @since x.x.x
 	 */
+	/**
+	 * Processes images and replaces placeholders in content according to image placement rules.
+	 *
+	 * Rules:
+	 * - 0 images: Remove all placeholders, no featured image.
+	 * - 1 image: Set as featured only, remove all placeholders from content.
+	 * - >1 images: First = featured, remaining replace placeholders or insert after H2 sections.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $content Content markup with potential {{WP_AIB_IMAGE}} placeholders.
+	 * @param array  $images  Array of image data with 'url' and optional 'alt_text'.
+	 * @return array|\WP_Error Array with 'content' and 'featured_image_id', or WP_Error on failure.
+	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		try {
+			// Validate input.
+			if ( ! is_string( $content ) ) {
+				return new \WP_Error(
+					'invalid_content',
+					__( 'Content must be a string.', 'wp-ai-blogger' )
+				);
+			}
+
 			if ( empty( $images ) || ! is_array( $images ) ) {
+				// No images - remove all placeholders.
+				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
 				return [
-					'content'           => $content,
+					'content'           => trim( $cleaned_content ),
 					'featured_image_id' => null,
 				];
 			}
 
-			$processed_content = $content;
-			$image_html_blocks = [];
-			$featured_image_id = null;
-
-			// Process each image.
+			// Upload all images to media library and normalize data.
+			$normalized_images = [];
 			foreach ( $images as $image_data ) {
 				if ( ! is_array( $image_data ) || empty( $image_data['url'] ) ) {
-					// Skip images without URLs.
-					continue;
+					continue; // Skip invalid images.
 				}
 
 				// Upload image to media library.
@@ -1830,56 +1817,60 @@ class Ajax {
 				);
 
 				if ( is_wp_error( $attachment_id ) ) {
-					// Log error but continue processing other images.
+					// Log error but continue with other images.
 					continue;
 				}
 
-				// Set the first successfully uploaded image as featured image.
-				if ( $featured_image_id === null ) {
-					$featured_image_id = $attachment_id;
-				}
-
-				// Get the uploaded image details.
+				// Get uploaded image details.
 				$image_url = wp_get_attachment_url( $attachment_id );
 				$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
 
-				if ( empty( $image_alt ) ) {
-					$image_alt = isset( $image_data['alt_text'] ) ? (string) $image_data['alt_text'] : 'Generated image';
+				if ( empty( $image_alt ) && isset( $image_data['alt_text'] ) ) {
+					$image_alt = (string) $image_data['alt_text'];
 				}
 
-				// Create Gutenberg image block.
-				$image_block = sprintf(
-					/* translators: %1$s: Image alt text. %2$s: Image URL. */
-					'<!-- wp:image {"id":%d,"sizeSlug":"large","linkDestination":"none"} -->' . "\n" .
-					'<figure class="wp-block-image size-large"><img src="%s" alt="%s" class="wp-image-%d"/></figure>' . "\n" .
-					'<!-- /wp:image -->',
-					$attachment_id,
-					esc_url( (string) $image_url ),
-					esc_attr( (string) $image_alt ),
-					$attachment_id
-				);
-
-				$image_html_blocks[] = $image_block;
+				$normalized_images[] = [
+					'id'  => $attachment_id,
+					'src' => $image_url,
+					'alt' => ! empty( $image_alt ) ? $image_alt : 'Generated image',
+				];
 			}
 
-			// Replace placeholders with actual images.
-			$placeholder_count = substr_count( $processed_content, '{{WP_AIB_IMAGE}}' );
-			$available_images  = count( $image_html_blocks );
+			// Case 1: No successfully uploaded images - remove placeholders.
+			if ( empty( $normalized_images ) ) {
+				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
+				return [
+					'content'           => trim( $cleaned_content ),
+					'featured_image_id' => null,
+				];
+			}
 
-			// Replace each placeholder with an image (cycle through available images if needed).
-			for ( $i = 0; $i < $placeholder_count; $i++ ) {
-				$image_index = $i % max( 1, $available_images );
-				$image_block = $image_html_blocks[ $image_index ] ?? '';
+			// Case 2: Exactly 1 image - set as featured, remove all placeholders.
+			if ( count( $normalized_images ) === 1 ) {
+				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
+				return [
+					'content'           => trim( $cleaned_content ),
+					'featured_image_id' => $normalized_images[0]['id'],
+				];
+			}
 
-				// Replace first occurrence of the placeholder.
-				$replacement_result = preg_replace( '/\{\{WP_AIB_IMAGE\}\}/', $image_block, $processed_content, 1 );
-				if ( $replacement_result !== null ) {
-					$processed_content = $replacement_result;
-				}
+			// Case 3: Multiple images - first is featured, remaining go into content.
+			$featured_image_id = $normalized_images[0]['id'];
+			$remaining_images  = array_slice( $normalized_images, 1 );
+
+			// Check if placeholders exist.
+			$placeholder_count = preg_match_all( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', $content );
+
+			if ( $placeholder_count > 0 ) {
+				// Replace placeholders with image blocks.
+				$content = $this->replace_placeholders_with_images( $content, $remaining_images );
+			} else {
+				// No placeholders - inject after H2 headings.
+				$content = $this->inject_images_after_h2_sections( $content, $remaining_images );
 			}
 
 			return [
-				'content'           => $processed_content,
+				'content'           => trim( $content ),
 				'featured_image_id' => $featured_image_id,
 			];
 
@@ -1889,6 +1880,159 @@ class Ajax {
 				__( 'Exception occurred during image processing: ', 'wp-ai-blogger' ) . $e->getMessage()
 			);
 		}
+	}
+
+	/**
+	 * Builds a core/image Gutenberg block.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int    $attachment_id The WordPress attachment ID.
+	 * @param string $src           The image source URL.
+	 * @param string $alt           The image alt text (optional).
+	 * @return string The Gutenberg image block markup.
+	 */
+	private function build_core_image_block( int $attachment_id, string $src, string $alt = '' ): string {
+		// Build attributes.
+		$attrs = [
+			'id'              => $attachment_id,
+			'sizeSlug'        => 'full',
+			'linkDestination' => 'none',
+		];
+
+		$attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_SLASHES );
+
+		// Sanitize URL and alt text.
+		$escaped_src = esc_url( $src );
+		$escaped_alt = esc_attr( $alt );
+
+		// Build the image block.
+		return "<!-- wp:image {$attrs_json} -->\n" .
+			'<figure class="wp-block-image size-full">' .
+			"<img src=\"{$escaped_src}\" alt=\"{$escaped_alt}\" class=\"wp-image-{$attachment_id}\"/> </figure> <!-- /wp:image -->\n\n";
+	}
+
+	/**
+	 * Replaces {{WP_AIB_IMAGE}} placeholders with actual image blocks.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $markup Content markup with placeholders.
+	 * @param array  $images Array of normalized image data.
+	 * @return string Content with placeholders replaced by image blocks.
+	 */
+	private function replace_placeholders_with_images( string $markup, array $images ): string {
+		$image_index  = 0;
+		$total_images = count( $images );
+
+		// Replace each placeholder with an image block.
+		$markup = preg_replace_callback(
+			'/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m',
+			function ( $matches ) use ( &$image_index, $total_images, $images ) {
+				if ( $image_index < $total_images ) {
+					$image = $images[ $image_index ];
+					$image_index++;
+
+					$block = $this->build_core_image_block(
+						$image['id'],
+						$image['src'],
+						$image['alt']
+					);
+
+					// Escape special characters for replacement.
+					return addcslashes( $block, '\\$' );
+				}
+
+				// No more images - remove placeholder.
+				return '';
+			},
+			$markup
+		);
+
+		// Remove any leftover placeholders.
+		return preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $markup );
+	}
+
+	/**
+	 * Injects images after H2 heading sections when no placeholders exist.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $markup Content markup without placeholders.
+	 * @param array  $images Array of normalized image data.
+	 * @return string Content with images injected after H2 sections.
+	 */
+	private function inject_images_after_h2_sections( string $markup, array $images ): string {
+		if ( empty( $images ) ) {
+			return $markup;
+		}
+
+		$lines         = explode( "\n", $markup );
+		$output_lines  = [];
+		$image_index   = 0;
+		$total_images  = count( $images );
+		$in_heading    = false;
+		$heading_level = 0;
+
+		foreach ( $lines as $line ) {
+			$output_lines[] = $line;
+
+			// Detect heading block opening.
+			if ( preg_match( '/^<!--\s*wp:heading\s*(\{[^}]*\})?\s*-->/', $line, $matches ) ) {
+				$in_heading = true;
+
+				// Parse heading level from attributes.
+				if ( isset( $matches[1] ) ) {
+					$attrs_json    = $matches[1];
+					$attrs         = json_decode( $attrs_json, true );
+					$heading_level = $attrs['level'] ?? 2;
+				} else {
+					$heading_level = 2; // Default level.
+				}
+			}
+
+			// Detect heading block closing.
+			if ( $in_heading && preg_match( '/^<!--\s*\/wp:heading\s*-->/', $line ) ) {
+				$in_heading = false;
+
+				// If this was an H2 and we have images left, insert one.
+				if ( $heading_level === 2 && $image_index < $total_images ) {
+					$image = $images[ $image_index ];
+					$image_index++;
+
+					$image_block = $this->build_core_image_block(
+						$image['id'],
+						$image['src'],
+						$image['alt']
+					);
+
+					// Add image block after the heading (split into lines).
+					$image_lines = explode( "\n", trim( $image_block ) );
+					foreach ( $image_lines as $img_line ) {
+						$output_lines[] = $img_line;
+					}
+				}
+			}
+		}
+
+		// Append any leftover images at the end.
+		while ( $image_index < $total_images ) {
+			$image = $images[ $image_index ];
+			$image_index++;
+
+			$image_block = $this->build_core_image_block(
+				$image['id'],
+				$image['src'],
+				$image['alt']
+			);
+
+			$image_lines = explode( "\n", trim( $image_block ) );
+			foreach ( $image_lines as $img_line ) {
+				$output_lines[] = $img_line;
+			}
+		}
+
+		return implode( "\n", $output_lines );
 	}
 
 	/**
@@ -2010,7 +2154,6 @@ class Ajax {
 			}
 
 			$interval = absint( $meta_input['repeatInterval'] );
-			$unit     = sanitize_text_field( $meta_input['repeatUnit'] );
 
 			if ( ! $interval ) {
 				return;
@@ -2042,9 +2185,6 @@ class Ajax {
 				return;
 			}
 
-			// Calculate interval in seconds.
-			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
-
 			// Get the start date from campaign metadata.
 			$start_date      = $meta_input['startDate'] ?? '';
 			$start_timestamp = time() + 60; // Default fallback: 1 minute from now.
@@ -2074,14 +2214,10 @@ class Ajax {
 				// If parsing fails, use the default (1 minute from now).
 			}
 
-			// Schedule the first post at the user-defined start date/time.
-			// If no start date is set or it's in the past, it will default to 1 minute from now.
+			// Schedule the first post at the user-defined start date/time using single event.
+			// The cron handler will self-schedule subsequent posts after each execution.
+			// This matches the pause/resume pattern where we schedule one event at a time.
 			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
-
-			// Schedule recurring posts using WordPress cron system.
-			// The recurring schedule starts after the first post is created + interval.
-			wp_schedule_event( $start_timestamp + $interval_seconds, $this->get_wp_cron_schedule( $interval, $unit ), 'wpaib_create_single_post', [ $campaign_id ] );
-
 		} catch ( \Exception $e ) {
 			return;
 		}
@@ -2148,167 +2284,6 @@ class Ajax {
 		}
 
 		return $schedule_name;
-	}
-
-	/**
-	 * Generate a post from campaign data.
-	 *
-	 * @param int $campaign_id Campaign ID.
-	 * @return int|WP_Error Post ID on success, WP_Error on failure.
-	 * @since x.x.x
-	 */
-	private function generate_post_from_campaign( $campaign_id ) {
-		// Get campaign metadata.
-		$keywords           = get_post_meta( $campaign_id, 'keywords', true );
-		$post_type          = get_post_meta( $campaign_id, 'postType', true ) ?? 'post';
-		$post_status        = get_post_meta( $campaign_id, 'postStatus', true ) ?? 'draft';
-		$post_author        = get_post_meta( $campaign_id, 'author', true ) ?? 1;
-		$post_category      = get_post_meta( $campaign_id, 'category', true );
-		$post_tag           = get_post_meta( $campaign_id, 'tags', true );
-		$summary_as_excerpt = get_post_meta( $campaign_id, 'summaryAsExcerpt', true );
-
-		// Get site persona details.
-		$site_persona = [
-			'name'             => get_bloginfo( 'name' ),
-			'site_title'       => get_bloginfo( 'name' ),
-			'site_purpose'     => get_bloginfo( 'description' ),
-			'site_description' => get_bloginfo( 'description' ),
-		];
-
-		// Get API response.
-		$api_response = $this->call_post_creation_api( $keywords, $site_persona );
-
-		if ( is_wp_error( $api_response ) ) {
-			return $api_response;
-		}
-
-		// Create the post.
-		$post_data = [
-			'post_title'   => $api_response['post_title'] ?? 'Auto Generated Post',
-			'post_content' => $api_response['post_content'] ?? '',
-			'post_type'    => $post_type,
-			'post_status'  => $post_status,
-			'post_author'  => $post_author,
-		];
-
-		if ( ! empty( $post_category ) ) {
-			$post_data['post_category'] = [ absint( $post_category ) ];
-		}
-
-		if ( ! empty( $post_tag ) ) {
-			$post_data['tags_input'] = [ sanitize_text_field( $post_tag ) ];
-		}
-
-		if ( $summary_as_excerpt && ! empty( $api_response['summary'] ) ) {
-			$post_data['post_excerpt'] = $api_response['summary'];
-		}
-
-		$post_id = wp_insert_post( $post_data );
-
-		if ( is_wp_error( $post_id ) || ! $post_id ) {
-			return new \WP_Error( 'post_creation_failed', 'Failed to create post' );
-		}
-
-		// Add campaign reference.
-		add_post_meta( $post_id, 'wp_aib_reference', 1 );
-		add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
-
-		// Update campaign stats.
-		$posts_created     = absint( get_post_meta( $campaign_id, 'postsCreated', true ) );
-		$new_posts_created = $posts_created + 1;
-		update_post_meta( $campaign_id, 'postsCreated', $new_posts_created );
-		update_post_meta( $campaign_id, 'lastRun', time() );
-		update_post_meta( $campaign_id, 'lastPostID', $post_id );
-
-		// Check if campaign has reached its target and mark as completed.
-		$posts_target = absint( get_post_meta( $campaign_id, 'postsTarget', true ) );
-		if ( $posts_target > 0 && $new_posts_created >= $posts_target ) {
-			// Update campaign status to completed by changing post status.
-			wp_update_post(
-				[
-					'ID'          => $campaign_id,
-					'post_status' => 'draft', // Set to draft to indicate completion/inactivity.
-				]
-			);
-
-			// Add a completion meta flag.
-			update_post_meta( $campaign_id, 'campaignCompleted', true );
-			update_post_meta( $campaign_id, 'completedAt', time() );
-
-			// Clear any scheduled events since campaign is now complete.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
-		}
-
-		return $post_id;
-	}
-
-	/**
-	 * Call the post creation API.
-	 *
-	 * @param string               $keywords Keywords for post generation.
-	 * @param array<string, mixed> $site_persona Site persona details.
-	 * @return array|WP_Error API response or error.
-	 * @since x.x.x
-	 */
-	private function call_post_creation_api( $keywords, $site_persona ) {
-		if ( empty( $keywords ) ) {
-			return new \WP_Error( 'missing_keywords', 'Keywords are required' );
-		}
-
-		// Get settings for proper API format.
-		$settings = \WPAIBlogger\Inc\Utils\Settings::get_ai_blogger_settings();
-
-		// Prepare API request to match server API generate_campaign_post method exactly.
-		$body = [
-			// Required by server API generate_campaign_post method.
-			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
-			'maxTitleWords'     => 10,
-			'maxWords'          => 1000,
-			'name'              => 'Manual Post Creation', // Campaign name - server expects this.
-			'license'           => \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' ),
-
-			// Safety settings - required by server.
-			'temperature'       => floatval( $settings['temperature'] ?? 0.7 ),
-			'harassment'        => absint( $settings['harassment'] ?? 2 ),
-			'hate'              => absint( $settings['hate'] ?? 2 ),
-			'sexually_explicit' => absint( $settings['sexuallyExplicit'] ?? 2 ),
-			'dangerous_content' => absint( $settings['dangerousContent'] ?? 2 ),
-
-			// Site persona - required by server.
-			'site_title'        => $site_persona['site_title'] ?? ( $settings['siteTitle'] ?? '' ),
-			'site_purpose'      => $site_persona['site_purpose'] ?? ( $settings['siteFor'] ?? '' ),
-			'site_description'  => $site_persona['site_description'] ?? ( $settings['siteDescription'] ?? '' ),
-		];
-
-		$args = [
-			'method'  => 'POST',
-			'timeout' => 30,
-			'headers' => [
-				'Content-Type' => 'application/json',
-				'User-Agent'   => 'WP-AI-Blogger/' . ( WP_AI_BLOGGER_VERSION ?? '1.0.0' ),
-			],
-			'body'    => wp_json_encode( $body ),
-		];
-
-		$response = wp_remote_post( WP_AI_BLOGGER_POST_CREATION_API, $args );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( $response_code !== 200 ) {
-			return new \WP_Error( 'api_error', "API returned status code: {$response_code}" );
-		}
-
-		$body = wp_remote_retrieve_body( $response );
-		$data = json_decode( $body, true );
-
-		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			return new \WP_Error( 'invalid_json', 'Invalid JSON response from API' );
-		}
-
-		return $data;
 	}
 
 	/**
