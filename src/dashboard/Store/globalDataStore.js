@@ -4,9 +4,9 @@ import globalDataReducer from './globalDataReducer';
 /**
  * Safely parse localized data with type conversion and fallbacks
  *
- * @param {*}      value        - Value to parse from localized data
- * @param {string} type         - Target type: 'string', 'number', 'boolean', 'array', 'object'
- * @param {*}      defaultValue - Default value returned if parsing fails
+ * @param {*}       value        - Value to parse from localized data
+ * @param {string}  type         - Target type: 'string', 'number', 'boolean', 'array', 'object'
+ * @param {*}       defaultValue - Default value returned if parsing fails
  * @param {boolean} parseJSON    - Whether to parse JSON strings for object types
  * @return {*} Parsed value with correct type or default value
  */

@@ -4,16 +4,11 @@
  * Renders a preview list of blocks[] with NO raw HTML injection.
  * All content is extracted as plain text for security.
  *
- * @package WP_AI_Blogger
- * @subpackage Dashboard/Utils
+ * @package
  * @since x.x.x
  */
 
 import React from 'react';
-
-/**
- * @typedef {import('./types.js').Block} Block
- */
 
 /**
  * Strips HTML tags and returns plain text.
@@ -37,7 +32,7 @@ const stripHtml = ( html ) => {
 /**
  * Truncates text to specified length with ellipsis.
  *
- * @param {string} text - Text to truncate
+ * @param {string} text      - Text to truncate
  * @param {number} maxLength - Maximum length
  * @return {string} Truncated text
  */
@@ -69,7 +64,7 @@ const countListItems = ( innerHTML ) => {
 /**
  * Preview component for a single heading block.
  *
- * @param {Object} props - Component props
+ * @param {Object} props       - Component props
  * @param {Object} props.block - The heading block
  * @return {JSX.Element} Heading preview
  */
@@ -92,7 +87,7 @@ const HeadingBlockPreview = ( { block } ) => {
 /**
  * Preview component for a single paragraph block.
  *
- * @param {Object} props - Component props
+ * @param {Object} props       - Component props
  * @param {Object} props.block - The paragraph block
  * @return {JSX.Element} Paragraph preview
  */
@@ -115,7 +110,7 @@ const ParagraphBlockPreview = ( { block } ) => {
 /**
  * Preview component for a single list block.
  *
- * @param {Object} props - Component props
+ * @param {Object} props       - Component props
  * @param {Object} props.block - The list block
  * @return {JSX.Element} List preview
  */
@@ -152,7 +147,7 @@ const ListBlockPreview = ( { block } ) => {
 /**
  * Preview component for a single quote block.
  *
- * @param {Object} props - Component props
+ * @param {Object} props       - Component props
  * @param {Object} props.block - The quote block
  * @return {JSX.Element} Quote preview
  */
@@ -164,7 +159,7 @@ const QuoteBlockPreview = ( { block } ) => {
 	return (
 		<div className="block-preview block-preview-quote">
 			<span className="block-type-badge block-type-quote">
-				"
+				{ '"' }
 			</span>
 			<span className="block-content block-content-quote">
 				{ preview || '(Empty quote)' }
@@ -176,7 +171,7 @@ const QuoteBlockPreview = ( { block } ) => {
 /**
  * Preview component for an image placeholder block.
  *
- * @param {Object} props - Component props
+ * @param {Object} props       - Component props
  * @param {number} props.index - Image index
  * @return {JSX.Element} Image placeholder preview
  */
@@ -198,8 +193,8 @@ const ImagePlaceholderPreview = ( { index } ) => {
 /**
  * Main BlockPreview component - renders a list of blocks safely.
  *
- * @param {Object} props - Component props
- * @param {Block[]} props.blocks - Array of blocks to preview
+ * @param {Object} props             - Component props
+ * @param {Object} props.blocks      - Array of blocks to preview
  * @param {string} [props.className] - Additional CSS class
  * @return {JSX.Element} Block previews
  */
@@ -263,8 +258,8 @@ const BlockPreview = ( { blocks, className = '' } ) => {
 /**
  * Block statistics component - shows counts and metrics.
  *
- * @param {Object} props - Component props
- * @param {Block[]} props.blocks - Array of blocks
+ * @param {Object} props        - Component props
+ * @param {Object} props.blocks - Array of blocks
  * @return {JSX.Element} Block statistics
  */
 const BlockStatistics = ( { blocks } ) => {

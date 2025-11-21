@@ -11,8 +11,8 @@ module.exports = {
 				required_icon_color: '#EF4444',
 				// Legacy blogapp colors (updated to brand purple for consistency)
 				blogapp: {
-					DEFAULT: '#9138c8',  // Brand purple
-					hover: '#7a2db0',    // Brand purple hover
+					DEFAULT: '#9138c8', // Brand purple
+					hover: '#7a2db0', // Brand purple hover
 				},
 				// New brand color - Purple (#9138c8)
 				brand: {
@@ -22,8 +22,8 @@ module.exports = {
 					200: '#e9d5ff',
 					300: '#d8b4fe',
 					400: '#c084fc',
-					500: '#9138c8',  // Primary brand color
-					600: '#7a2db0',  // Hover state
+					500: '#9138c8', // Primary brand color
+					600: '#7a2db0', // Hover state
 					700: '#6b21a8',
 					800: '#581c87',
 					900: '#3b0764',

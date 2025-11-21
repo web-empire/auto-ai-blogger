@@ -4,16 +4,11 @@
  * Handles inserting server-generated Gutenberg markup into WordPress editor
  * with proper validation and image placeholder counting.
  *
- * @package WP_AI_Blogger
- * @subpackage Dashboard/Utils
+ * @package
  * @since x.x.x
  */
 
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * @typedef {import('./types.js').GenerateContentResponse} GenerateContentResponse
- */
 
 /**
  * Counts occurrences of {{WP_AIB_IMAGE}} placeholders in markup.
@@ -34,7 +29,7 @@ const countImagePlaceholders = ( markup ) => {
 /**
  * Validates image placeholder count matches requested count.
  *
- * @param {string} markup - Gutenberg markup
+ * @param {string} markup         - Gutenberg markup
  * @param {number} requestedCount - Requested image count
  * @return {Object} Validation result
  */
@@ -110,7 +105,7 @@ const insertIntoBlockEditor = ( markup ) => {
 	}
 
 	try {
-		const { dispatch, select } = window.wp.data;
+		const { dispatch } = window.wp.data;
 		const { parse } = window.wp.blocks;
 
 		// Parse the markup into blocks
@@ -167,7 +162,7 @@ const detectEditor = () => {
  * 3. Detects and uses appropriate editor (Block or Classic)
  * 4. Returns validation warnings if any
  *
- * @param {GenerateContentResponse} response - API response from server
+ * @param {Object} response                - API response from server
  * @param {number} [requestedImageCount=0] - Requested image count
  * @return {Object} Insert result
  */
@@ -221,8 +216,8 @@ const insertToEditor = ( response, requestedImageCount = 0 ) => {
  *
  * Alternative to direct editor insertion - creates a draft post.
  *
- * @param {string} title - Post title
- * @param {GenerateContentResponse} response - API response
+ * @param {string} title     - Post title
+ * @param {Object} response  - API response
  * @param {Object} [options] - Additional options
  * @return {Promise<Object>} Created post data
  */
@@ -266,7 +261,7 @@ const createPostDraft = async ( title, response, options = {} ) => {
  * This should be called AFTER images are uploaded to media library.
  *
  * @param {string} markup - Gutenberg markup with {{WP_AIB_IMAGE}} placeholders
- * @param {Array} images - Array of image data with attachment_id and src
+ * @param {Array}  images - Array of image data with attachment_id and src
  * @return {string} Markup with images inserted
  */
 const replaceImagePlaceholders = ( markup, images ) => {

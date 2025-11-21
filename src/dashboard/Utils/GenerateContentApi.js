@@ -1,26 +1,18 @@
 /**
  * API utility for generating AI content.
  *
- * @package WP_AI_Blogger
- * @subpackage Dashboard/Utils
+ * @package
  * @since x.x.x
  */
 
 import apiFetch from '@wordpress/api-fetch';
 
 /**
- * @typedef {import('./types.js').GenerateContentResponse} GenerateContentResponse
- * @typedef {import('./types.js').GenerateContentOptions} GenerateContentOptions
- * @typedef {import('./types.js').InsufficientTokensError} InsufficientTokensError
- * @typedef {import('./types.js').ApiError} ApiError
- */
-
-/**
  * Error class for insufficient tokens.
  */
 class InsufficientTokensError extends Error {
 	/**
-	 * @param {string} message - Error message
+	 * @param {string} message   - Error message
 	 * @param {Object} tokenData - Token data
 	 */
 	constructor( message, tokenData ) {
@@ -38,9 +30,9 @@ class InsufficientTokensError extends Error {
 class ApiRequestError extends Error {
 	/**
 	 * @param {string} message - Error message
-	 * @param {number} status - HTTP status code
-	 * @param {string} code - Error code
-	 * @param {*} data - Additional error data
+	 * @param {number} status  - HTTP status code
+	 * @param {string} code    - Error code
+	 * @param {*}      data    - Additional error data
 	 */
 	constructor( message, status, code, data ) {
 		super( message );
@@ -82,8 +74,8 @@ const validateTitle = ( title ) => {
 /**
  * Validates and normalizes options.
  *
- * @param {GenerateContentOptions} options - The options to validate
- * @return {GenerateContentOptions} Normalized options
+ * @param {Object} options - The options to validate
+ * @return {Object} Normalized options
  */
 const validateAndNormalizeOptions = ( options = {} ) => {
 	const normalized = { ...options };
@@ -111,10 +103,10 @@ const validateAndNormalizeOptions = ( options = {} ) => {
 /**
  * Makes a single API request attempt.
  *
- * @param {string} title - Blog post title
- * @param {GenerateContentOptions} options - Generation options
- * @param {AbortSignal} signal - AbortController signal
- * @return {Promise<GenerateContentResponse>}
+ * @param {string}      title   - Blog post title
+ * @param {Object}      options - Generation options
+ * @param {AbortSignal} signal  - AbortController signal
+ * @return {Promise<Object>} - The API response
  */
 const makeApiRequest = async ( title, options, signal ) => {
 	const endpoint = '/wp-json/wp-ai-blogger/v1/generate-content-from-title';
@@ -183,10 +175,10 @@ const isRetryableError = ( error ) => {
  * - Distinct handling of 402 insufficient_tokens errors
  * - Comprehensive error handling and validation
  *
- * @param {string} title - The blog post title
- * @param {GenerateContentOptions} [options={}] - Generation options
+ * @param {string}          title             - The blog post title
+ * @param {Object}          [options={}]      - Generation options
  * @param {AbortController} [abortController] - Optional AbortController for cancellation
- * @return {Promise<GenerateContentResponse>} The generated content response
+ * @return {Promise<Object>} - The generated content response
  * @throws {InsufficientTokensError} When tokens are insufficient (402)
  * @throws {ApiRequestError} For other API errors
  * @throws {Error} For validation errors

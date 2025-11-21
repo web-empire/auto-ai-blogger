@@ -3,8 +3,7 @@
  *
  * Displays imageSearchTerms as editable chips with optional POST back to server.
  *
- * @package WP_AI_Blogger
- * @subpackage Dashboard/Utils
+ * @package
  * @since x.x.x
  */
 
@@ -13,12 +12,12 @@ import React, { useState, useRef, useEffect } from 'react';
 /**
  * Single editable chip component.
  *
- * @param {Object} props - Component props
- * @param {string} props.term - Search term
- * @param {number} props.index - Term index
- * @param {Function} props.onEdit - Edit callback
- * @param {Function} props.onDelete - Delete callback
- * @param {boolean} [props.disabled] - Disabled state
+ * @param {Object}   props            - Component props
+ * @param {string}   props.term       - Search term
+ * @param {number}   props.index      - Term index
+ * @param {Function} props.onEdit     - Edit callback
+ * @param {Function} props.onDelete   - Delete callback
+ * @param {boolean}  [props.disabled] - Disabled state
  * @return {JSX.Element} Editable chip
  */
 const EditableChip = ( { term, index, onEdit, onDelete, disabled = false } ) => {
@@ -64,6 +63,8 @@ const EditableChip = ( { term, index, onEdit, onDelete, disabled = false } ) => 
 
 	/**
 	 * Handles key press in edit mode.
+	 *
+	 * @param {Object} e
 	 */
 	const handleKeyDown = ( e ) => {
 		if ( e.key === 'Enter' ) {
@@ -125,13 +126,13 @@ const EditableChip = ( { term, index, onEdit, onDelete, disabled = false } ) => 
 /**
  * Image Search Terms editor component.
  *
- * @param {Object} props - Component props
- * @param {string[]} props.terms - Array of search terms
- * @param {Function} props.onChange - Change callback (newTerms)
- * @param {Function} [props.onSave] - Optional save callback (calls server)
- * @param {number} [props.maxTerms] - Maximum number of terms
- * @param {boolean} [props.disabled] - Disabled state
- * @param {boolean} [props.showSaveButton] - Show save to server button
+ * @param {Object}   props                  - Component props
+ * @param {string[]} props.terms            - Array of search terms
+ * @param {Function} props.onChange         - Change callback (newTerms)
+ * @param {Function} [props.onSave]         - Optional save callback (calls server)
+ * @param {number}   [props.maxTerms]       - Maximum number of terms
+ * @param {boolean}  [props.disabled]       - Disabled state
+ * @param {boolean}  [props.showSaveButton] - Show save to server button
  * @return {JSX.Element} Image search terms editor
  */
 const ImageSearchTermsEditor = ( {
@@ -155,6 +156,9 @@ const ImageSearchTermsEditor = ( {
 
 	/**
 	 * Handles term edit.
+	 *
+	 * @param {number} index
+	 * @param {string} newValue
 	 */
 	const handleEdit = ( index, newValue ) => {
 		const updated = [ ...localTerms ];
@@ -166,6 +170,8 @@ const ImageSearchTermsEditor = ( {
 
 	/**
 	 * Handles term deletion.
+	 *
+	 * @param {number} index
 	 */
 	const handleDelete = ( index ) => {
 		const updated = localTerms.filter( ( _, i ) => i !== index );
@@ -203,6 +209,8 @@ const ImageSearchTermsEditor = ( {
 
 	/**
 	 * Handles key press in add input.
+	 *
+	 * @param {Object} e
 	 */
 	const handleAddKeyDown = ( e ) => {
 		if ( e.key === 'Enter' ) {
@@ -318,9 +326,9 @@ const ImageSearchTermsEditor = ( {
 /**
  * Compact chip list component (read-only display).
  *
- * @param {Object} props - Component props
- * @param {string[]} props.terms - Array of search terms
- * @param {string} [props.className] - Additional CSS class
+ * @param {Object}   props             - Component props
+ * @param {string[]} props.terms       - Array of search terms
+ * @param {string}   [props.className] - Additional CSS class
  * @return {JSX.Element} Compact chip list
  */
 const ImageSearchTermsDisplay = ( { terms = [], className = '' } ) => {

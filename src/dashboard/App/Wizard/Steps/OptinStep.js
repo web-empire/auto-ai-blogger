@@ -322,7 +322,7 @@ const OptinStep = memo( () => {
 							{ /* Form Section */ }
 							<div>
 								<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
-										{ __( 'Your Information', 'wp-ai-blogger' ) }
+									{ __( 'Your Information', 'wp-ai-blogger' ) }
 								</h3>
 
 								<form className="space-y-5" onSubmit={ submitOptinForm }>
@@ -397,14 +397,14 @@ const OptinStep = memo( () => {
 
 								<div className="space-y-3.5">
 									{ benefits.map( ( benefit, index ) => (
-											<BenefitCard
-												key={ index }
-												icon={ benefit.icon }
-												title={ benefit.title }
-												description={ benefit.description }
-												highlight={ benefit.highlight }
-											/>
-										) ) }
+										<BenefitCard
+											key={ index }
+											icon={ benefit.icon }
+											title={ benefit.title }
+											description={ benefit.description }
+											highlight={ benefit.highlight }
+										/>
+									) ) }
 								</div>
 							</div>
 						</div>

@@ -249,35 +249,35 @@ class Cron_Handler {
 				];
 			}
 
-		$api_data = $api_response['data'];
+			$api_data = $api_response['data'];
 
-		// Update token data if present in the API response.
-		if ( isset( $api_data['token_data'] ) && is_array( $api_data['token_data'] ) ) {
-			wpaib_update_token_data( $api_data['token_data'] );
-		}
-
-		// Process images if they exist in the API response.
-		$featured_image_id = null;
-		// Don't sanitize - content contains Gutenberg blocks with HTML comments.
-		// wp_kses_post() strips these comments. Content comes from our controlled API.
-		$post_content = $api_data['post_content'] ?? '';
-
-		if ( ! empty( $api_data['images'] ) && is_array( $api_data['images'] ) ) {
-			// Use the same image processing method from Ajax class
-			$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_data['images'] );
-			if ( ! is_wp_error( $processed_result ) && is_array( $processed_result ) ) {
-				$post_content      = $processed_result['content'];
-				$featured_image_id = $processed_result['featured_image_id'] ?? null;
+			// Update token data if present in the API response.
+			if ( isset( $api_data['token_data'] ) && is_array( $api_data['token_data'] ) ) {
+				wpaib_update_token_data( $api_data['token_data'] );
 			}
-		}
 
-		$post_data = [
-			'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
-			'post_content' => $post_content,
-			'post_status'  => $post_status ? $post_status : 'draft',
-			'post_type'    => $post_type ? $post_type : 'post',
-			'post_author'  => $author_id ? $author_id : get_current_user_id(),
-		];			if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
+			// Process images if they exist in the API response.
+			$featured_image_id = null;
+			// Don't sanitize - content contains Gutenberg blocks with HTML comments.
+			// wp_kses_post() strips these comments. Content comes from our controlled API.
+			$post_content = $api_data['post_content'] ?? '';
+
+			if ( ! empty( $api_data['images'] ) && is_array( $api_data['images'] ) ) {
+				// Use the same image processing method from Ajax class.
+				$processed_result = $this->process_images_and_replace_placeholders( $post_content, $api_data['images'] );
+				if ( ! is_wp_error( $processed_result ) && is_array( $processed_result ) ) {
+					$post_content      = $processed_result['content'];
+					$featured_image_id = $processed_result['featured_image_id'] ?? null;
+				}
+			}
+
+			$post_data = [
+				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
+				'post_content' => $post_content,
+				'post_status'  => $post_status ? $post_status : 'draft',
+				'post_type'    => $post_type ? $post_type : 'post',
+				'post_author'  => $author_id ? $author_id : get_current_user_id(),
+			];          if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
 				$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
 			}
 
@@ -292,21 +292,22 @@ class Cron_Handler {
 				];
 			}
 
-		if ( ! empty( $category ) ) {
-			wp_set_post_categories( $post_id, [ $category ] );
-		}
-		if ( ! empty( $tag ) ) {
-			wp_set_post_tags( $post_id, $tag );
-		}
+			if ( ! empty( $category ) ) {
+				wp_set_post_categories( $post_id, [ $category ] );
+			}
+			if ( ! empty( $tag ) ) {
+				wp_set_post_tags( $post_id, $tag );
+			}
 
-		// Set featured image if available.
-		if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
-			set_post_thumbnail( $post_id, $featured_image_id );
-		}
+			// Set featured image if available.
+			if ( $featured_image_id && is_numeric( $featured_image_id ) ) {
+				set_post_thumbnail( $post_id, $featured_image_id );
+			}
 
-		// Add campaign reference meta to the post.
-		add_post_meta( $post_id, 'wp_aib_reference', 1 );
-		add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );			$posts_created     = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
+			// Add campaign reference meta to the post.
+			add_post_meta( $post_id, 'wp_aib_reference', 1 );
+			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
+			$posts_created     = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			$new_posts_created = intval( $posts_created ) + 1;
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $new_posts_created );
 			Metadata::update_campaign_meta( $campaign_id, 'lastPostID', $post_id );
@@ -384,7 +385,7 @@ class Cron_Handler {
 			// Default image count is 1 for campaign posts.
 			// Pro plugin can filter this to allow user-configured image count.
 			$image_count = apply_filters( 'wpaib_campaign_image_count', 2, $campaign_id );
-			$image_count = max( 0, min( 5, absint( $image_count ) ) ); // Limit: 0-5 images
+			$image_count = max( 0, min( 5, absint( $image_count ) ) ); // Limit: 0-5 images.
 
 			$max_retries = 2;
 			$retry_delay = 3;
@@ -807,7 +808,7 @@ class Cron_Handler {
 			}
 
 			// Store first successful upload as featured image.
-			if ( null === $featured_image_id ) {
+			if ( $featured_image_id === null ) {
 				$featured_image_id = $attachment_id;
 			}
 
@@ -823,7 +824,8 @@ class Cron_Handler {
 			$processed_content = $content;
 
 			// Start from index 1 to skip the featured image (index 0).
-			for ( $i = 1; $i < count( $uploaded_images ); $i++ ) {
+			$uploaded_images_count = count( $uploaded_images );
+			for ( $i = 1; $i < $uploaded_images_count; $i++ ) {
 				$uploaded_image = $uploaded_images[ $i ];
 				$attachment_id  = $uploaded_image['attachment_id'];
 				$alt_text       = $uploaded_image['alt_text'];
@@ -841,7 +843,7 @@ class Cron_Handler {
 
 				// Replace the first occurrence of the placeholder.
 				$placeholder_pos = strpos( $processed_content, '{{WP_AIB_IMAGE}}' );
-				if ( false !== $placeholder_pos ) {
+				if ( $placeholder_pos !== false ) {
 					$processed_content = substr_replace(
 						$processed_content,
 						$image_block,

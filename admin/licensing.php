@@ -284,7 +284,12 @@ class Licensing {
 			Helper::update_option( 'license_status', 'unlicensed' );
 
 			// Clear token data using the shared helper function.
-			wpaib_update_token_data( [ 'total' => 0, 'remaining' => 0 ] );
+			wpaib_update_token_data(
+				[
+					'total'     => 0,
+					'remaining' => 0,
+				]
+			);
 
 			// Log successful deactivation.
 			$this->log_license_activity( 'deactivate', $current_license, get_current_user_id() );

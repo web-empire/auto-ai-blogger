@@ -567,17 +567,19 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		// Get existing post titles from campaign (if campaign_id is provided).
 		$existing_post_titles = [];
 		if ( $campaign_id > 0 ) {
-			$existing_posts = get_posts( [
-				'post_type'      => 'post',
-				'posts_per_page' => -1,
-				'meta_query'     => [
-					[
-						'key'   => 'wp_aib_campaign_id',
-						'value' => $campaign_id,
+			$existing_posts = get_posts(
+				[
+					'post_type'      => 'post',
+					'posts_per_page' => -1,
+					'meta_query'     => [
+						[
+							'key'   => 'wp_aib_campaign_id',
+							'value' => $campaign_id,
+						],
 					],
-				],
-				'fields'         => 'ids',
-			] );
+					'fields'         => 'ids',
+				]
+			);
 
 			if ( ! empty( $existing_posts ) ) {
 				foreach ( $existing_posts as $post_id ) {
@@ -654,13 +656,13 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		// Validate response.
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( $response_code !== 200 ) {
-			// Parse error response body to extract actual error details
+			// Parse error response body to extract actual error details.
 			$error_body = wp_remote_retrieve_body( $response );
 			$error_data = json_decode( $error_body, true );
 
-			// If server returned structured error, use it
+			// If server returned structured error, use it.
 			if ( is_array( $error_data ) && isset( $error_data['code'] ) ) {
-				$error_code = sanitize_text_field( $error_data['code'] );
+				$error_code    = sanitize_text_field( $error_data['code'] );
 				$error_message = isset( $error_data['message'] ) ?
 					sanitize_text_field( $error_data['message'] ) :
 					"API returned status code: {$response_code}";
@@ -668,7 +670,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 				return new WP_Error( $error_code, $error_message, [ 'status' => $response_code ] );
 			}
 
-			// Fallback for non-structured errors
+			// Fallback for non-structured errors.
 			return new WP_Error( 'api_error', "API returned status code: {$response_code}", [ 'status' => $response_code ] );
 		}
 
@@ -718,7 +720,7 @@ function wpaib_sanitize_api_response( $data ) {
 			// Preserve HTML/Gutenberg blocks for content fields.
 			// Don't use wp_kses_post as it strips HTML comments needed for Gutenberg blocks.
 			if ( in_array( $clean_key, [ 'post_content', 'content', 'excerpt' ], true ) ) {
-				$sanitized[ $clean_key ] = $value; // Keep as-is, comes from our controlled API
+				$sanitized[ $clean_key ] = $value; // Keep as-is, comes from our controlled API.
 			} else {
 				$sanitized[ $clean_key ] = sanitize_text_field( $value );
 			}

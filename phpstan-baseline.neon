@@ -6,18 +6,18 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^Call to function is_wp_error\\(\\) with 0 will always evaluate to false\\.$#"
 			count: 4
 			path: admin/ajax.php
 
 		-
 			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
-			count: 5
+			count: 4
+			path: admin/ajax.php
+
+		-
+			message: "#^Cannot access offset 'level' on mixed\\.$#"
+			count: 1
 			path: admin/ajax.php
 
 		-
@@ -26,17 +26,7 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Cannot access offset 'post_content' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^Cannot access offset 'post_content' on mixed\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Cannot access offset 'post_title' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -56,11 +46,6 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Cannot access offset 'summary' on array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^Cannot access offset 'title' on mixed\\.$#"
 			count: 2
 			path: admin/ajax.php
@@ -72,46 +57,41 @@ parameters:
 
 		-
 			message: "#^Cannot cast mixed to string\\.$#"
-			count: 15
-			path: admin/ajax.php
-
-		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) should return array\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
-			count: 4
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) should return array\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns mixed\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_post_from_campaign\\(\\) has invalid return type WPAIBlogger\\\\Admin\\\\WP_Error\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_post_from_campaign\\(\\) should return int\\|WPAIBlogger\\\\Admin\\\\WP_Error but returns WP_Error\\.$#"
-			count: 1
+			count: 10
 			path: admin/ajax.php
 
 		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:generate_sample_campaign_logs\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:get_wp_cron_schedule\\(\\) is unused\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:inject_images_after_h2_sections\\(\\) has parameter \\$images with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:process_images_and_replace_placeholders\\(\\) has parameter \\$images with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:process_images_and_replace_placeholders\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:replace_placeholders_with_images\\(\\) has parameter \\$images with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:replace_placeholders_with_images\\(\\) should return string but returns string\\|null\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -141,18 +121,8 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Parameter \\#1 \\$keywords of method WPAIBlogger\\\\Admin\\\\Ajax\\:\\:call_post_creation_api\\(\\) expects string, mixed given\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^Parameter \\#1 \\$maybeint of function absint expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 14
-			path: admin/ajax.php
-
-		-
-			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: mixed, post_content\\: mixed, post_type\\: mixed, post_status\\: mixed, post_author\\: mixed, post_category\\?\\: array\\{int\\}, tags_input\\?\\: array\\{string\\}, post_excerpt\\?\\: mixed\\} given\\.$#"
-			count: 1
+			count: 9
 			path: admin/ajax.php
 
 		-
@@ -161,8 +131,8 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^Parameter \\#1 \\$str of function sanitize_text_field expects string, mixed given\\.$#"
-			count: 1
+			message: "#^Parameter \\#1 \\$string of function trim expects string, string\\|null given\\.$#"
+			count: 3
 			path: admin/ajax.php
 
 		-
@@ -172,11 +142,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
-			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 30, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'WP\\-AI\\-Blogger/0\\.0\\.1'\\}, body\\: non\\-empty\\-string\\|false\\} given\\.$#"
 			count: 1
 			path: admin/ajax.php
 
@@ -201,6 +166,11 @@ parameters:
 			path: admin/ajax.php
 
 		-
+			message: "#^Parameter \\#3 \\$subject of function preg_replace expects array\\|string, string\\|null given\\.$#"
+			count: 1
+			path: admin/ajax.php
+
+		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: admin/ajax.php
@@ -211,18 +181,13 @@ parameters:
 			path: admin/ajax.php
 
 		-
-			message: "#^is_wp_error\\(array\\|WPAIBlogger\\\\Admin\\\\WP_Error\\) will always evaluate to false\\.$#"
-			count: 1
-			path: admin/ajax.php
-
-		-
 			message: "#^is_wp_error\\(int\\) will always evaluate to false\\.$#"
 			count: 4
 			path: admin/ajax.php
 
 		-
 			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
-			count: 5
+			count: 4
 			path: admin/ajax.php
 
 		-
@@ -452,12 +417,22 @@ parameters:
 
 		-
 			message: "#^Call to function is_wp_error\\(\\) with int\\<0, max\\> will always evaluate to false\\.$#"
+			count: 2
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Call to method get_error_message\\(\\) on an unknown class WPAIBlogger\\\\Inc\\\\WP_Error\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
 			message: "#^Cannot access offset non\\-falsy\\-string on mixed\\.$#"
 			count: 2
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Function wpaib_log_error not found\\.$#"
+			count: 1
 			path: inc/cron-handler.php
 
 		-
@@ -476,7 +451,42 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Offset 'post_title' on array\\{post_title\\: string, post_content\\: string, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:process_images_and_replace_placeholders\\(\\) has invalid return type WPAIBlogger\\\\Inc\\\\WP_Error\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:process_images_and_replace_placeholders\\(\\) has parameter \\$images with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:process_images_and_replace_placeholders\\(\\) never returns WPAIBlogger\\\\Inc\\\\WP_Error so it can be removed from the return type\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:process_images_and_replace_placeholders\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:upload_image_to_media_library\\(\\) has invalid return type WPAIBlogger\\\\Inc\\\\WP_Error\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:upload_image_to_media_library\\(\\) should return int\\|WPAIBlogger\\\\Inc\\\\WP_Error but returns WP_Error\\.$#"
+			count: 5
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Offset 'post_title' on array\\{post_title\\: string, post_content\\: mixed, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#1 \\$attachment_id of function wp_get_attachment_url expects int, int\\|WPAIBlogger\\\\Inc\\\\WP_Error given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -486,7 +496,7 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
-			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: string, post_content\\: string, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} given\\.$#"
+			message: "#^Parameter \\#1 \\$postarr of function wp_insert_post expects array\\{ID\\?\\: int, post_author\\?\\: int, post_date\\?\\: string, post_date_gmt\\?\\: string, post_content\\?\\: string, post_content_filtered\\?\\: string, post_title\\?\\: string, post_excerpt\\?\\: string, \\.\\.\\.\\}, array\\{post_title\\: string, post_content\\: mixed, post_status\\: mixed, post_type\\: mixed, post_author\\: mixed, post_excerpt\\?\\: string\\} given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -511,7 +521,17 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
+			message: "#^Parameter \\#2 \\$thumbnail_id of function set_post_thumbnail expects int, float\\|int\\<min, \\-1\\>\\|int\\<1, max\\>\\|string given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
 			message: "#^Parameter \\#2 \\$unit of method WPAIBlogger\\\\Inc\\\\Cron_Handler\\:\\:get_interval_seconds\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, int\\|WPAIBlogger\\\\Inc\\\\WP_Error given\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -536,12 +556,27 @@ parameters:
 			path: inc/cron-handler.php
 
 		-
+			message: "#^Parameter \\#5 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, int\\|WPAIBlogger\\\\Inc\\\\WP_Error given\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
+			message: "#^is_wp_error\\(array\\|WPAIBlogger\\\\Inc\\\\WP_Error\\) will always evaluate to false\\.$#"
+			count: 1
+			path: inc/cron-handler.php
+
+		-
 			message: "#^is_wp_error\\(int\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
 		-
 			message: "#^is_wp_error\\(int\\<0, max\\>\\) will always evaluate to false\\.$#"
+			count: 2
+			path: inc/cron-handler.php
+
+		-
+			message: "#^is_wp_error\\(int\\|WPAIBlogger\\\\Inc\\\\WP_Error\\) will always evaluate to false\\.$#"
 			count: 1
 			path: inc/cron-handler.php
 
@@ -662,6 +697,11 @@ parameters:
 
 		-
 			message: "#^Function wpaib_sanitize_api_response\\(\\) should return array but returns string\\.$#"
+			count: 1
+			path: inc/functions/common.php
+
+		-
+			message: "#^Function wpaib_update_token_data\\(\\) has parameter \\$token_data with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: inc/functions/common.php
 

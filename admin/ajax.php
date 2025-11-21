@@ -1786,7 +1786,7 @@ class Ajax {
 	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		try {
-			// Validate input
+			// Validate input.
 			if ( ! is_string( $content ) ) {
 				return new \WP_Error(
 					'invalid_content',
@@ -1795,7 +1795,7 @@ class Ajax {
 			}
 
 			if ( empty( $images ) || ! is_array( $images ) ) {
-				// No images - remove all placeholders
+				// No images - remove all placeholders.
 				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
 				return [
 					'content'           => trim( $cleaned_content ),
@@ -1803,25 +1803,25 @@ class Ajax {
 				];
 			}
 
-			// Upload all images to media library and normalize data
+			// Upload all images to media library and normalize data.
 			$normalized_images = [];
 			foreach ( $images as $image_data ) {
 				if ( ! is_array( $image_data ) || empty( $image_data['url'] ) ) {
-					continue; // Skip invalid images
+					continue; // Skip invalid images.
 				}
 
-				// Upload image to media library
+				// Upload image to media library.
 				$attachment_id = $this->upload_image_to_media_library(
 					(string) $image_data['url'],
 					isset( $image_data['alt_text'] ) ? (string) $image_data['alt_text'] : 'Generated image'
 				);
 
 				if ( is_wp_error( $attachment_id ) ) {
-					// Log error but continue with other images
+					// Log error but continue with other images.
 					continue;
 				}
 
-				// Get uploaded image details
+				// Get uploaded image details.
 				$image_url = wp_get_attachment_url( $attachment_id );
 				$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
 
@@ -1832,11 +1832,11 @@ class Ajax {
 				$normalized_images[] = [
 					'id'  => $attachment_id,
 					'src' => $image_url,
-					'alt' => $image_alt ?: 'Generated image',
+					'alt' => ! empty( $image_alt ) ? $image_alt : 'Generated image',
 				];
 			}
 
-			// Case 1: No successfully uploaded images - remove placeholders
+			// Case 1: No successfully uploaded images - remove placeholders.
 			if ( empty( $normalized_images ) ) {
 				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
 				return [
@@ -1845,7 +1845,7 @@ class Ajax {
 				];
 			}
 
-			// Case 2: Exactly 1 image - set as featured, remove all placeholders
+			// Case 2: Exactly 1 image - set as featured, remove all placeholders.
 			if ( count( $normalized_images ) === 1 ) {
 				$cleaned_content = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $content );
 				return [
@@ -1854,18 +1854,18 @@ class Ajax {
 				];
 			}
 
-			// Case 3: Multiple images - first is featured, remaining go into content
+			// Case 3: Multiple images - first is featured, remaining go into content.
 			$featured_image_id = $normalized_images[0]['id'];
 			$remaining_images  = array_slice( $normalized_images, 1 );
 
-			// Check if placeholders exist
+			// Check if placeholders exist.
 			$placeholder_count = preg_match_all( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', $content );
 
 			if ( $placeholder_count > 0 ) {
-				// Replace placeholders with image blocks
+				// Replace placeholders with image blocks.
 				$content = $this->replace_placeholders_with_images( $content, $remaining_images );
 			} else {
-				// No placeholders - inject after H2 headings
+				// No placeholders - inject after H2 headings.
 				$content = $this->inject_images_after_h2_sections( $content, $remaining_images );
 			}
 
@@ -1893,7 +1893,7 @@ class Ajax {
 	 * @return string The Gutenberg image block markup.
 	 */
 	private function build_core_image_block( int $attachment_id, string $src, string $alt = '' ): string {
-		// Build attributes
+		// Build attributes.
 		$attrs = [
 			'id'              => $attachment_id,
 			'sizeSlug'        => 'full',
@@ -1902,16 +1902,14 @@ class Ajax {
 
 		$attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_SLASHES );
 
-		// Sanitize URL and alt text
+		// Sanitize URL and alt text.
 		$escaped_src = esc_url( $src );
 		$escaped_alt = esc_attr( $alt );
 
-		// Build the image block
+		// Build the image block.
 		return "<!-- wp:image {$attrs_json} -->\n" .
-		       "<figure class=\"wp-block-image size-full\">" .
-		       "<img src=\"{$escaped_src}\" alt=\"{$escaped_alt}\" class=\"wp-image-{$attachment_id}\"/>" .
-		       "</figure>\n" .
-		       "<!-- /wp:image -->\n\n";
+			'<figure class="wp-block-image size-full">' .
+			"<img src=\"{$escaped_src}\" alt=\"{$escaped_alt}\" class=\"wp-image-{$attachment_id}\"/> </figure> <!-- /wp:image -->\n\n";
 	}
 
 	/**
@@ -1927,7 +1925,7 @@ class Ajax {
 		$image_index  = 0;
 		$total_images = count( $images );
 
-		// Replace each placeholder with an image block
+		// Replace each placeholder with an image block.
 		$markup = preg_replace_callback(
 			'/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m',
 			function ( $matches ) use ( &$image_index, $total_images, $images ) {
@@ -1941,20 +1939,18 @@ class Ajax {
 						$image['alt']
 					);
 
-					// Escape special characters for replacement
+					// Escape special characters for replacement.
 					return addcslashes( $block, '\\$' );
 				}
 
-				// No more images - remove placeholder
+				// No more images - remove placeholder.
 				return '';
 			},
 			$markup
 		);
 
-		// Remove any leftover placeholders
-		$markup = preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $markup );
-
-		return $markup;
+		// Remove any leftover placeholders.
+		return preg_replace( '/^\s*\{\{WP_AIB_IMAGE\}\}\s*$/m', '', $markup );
 	}
 
 	/**
@@ -1971,37 +1967,37 @@ class Ajax {
 			return $markup;
 		}
 
-		$lines        = explode( "\n", $markup );
-		$output_lines = [];
-		$image_index  = 0;
-		$total_images = count( $images );
-		$in_heading   = false;
+		$lines         = explode( "\n", $markup );
+		$output_lines  = [];
+		$image_index   = 0;
+		$total_images  = count( $images );
+		$in_heading    = false;
 		$heading_level = 0;
 
 		foreach ( $lines as $line ) {
 			$output_lines[] = $line;
 
-			// Detect heading block opening
+			// Detect heading block opening.
 			if ( preg_match( '/^<!--\s*wp:heading\s*(\{[^}]*\})?\s*-->/', $line, $matches ) ) {
 				$in_heading = true;
 
-				// Parse heading level from attributes
+				// Parse heading level from attributes.
 				if ( isset( $matches[1] ) ) {
 					$attrs_json    = $matches[1];
 					$attrs         = json_decode( $attrs_json, true );
 					$heading_level = $attrs['level'] ?? 2;
 				} else {
-					$heading_level = 2; // Default level
+					$heading_level = 2; // Default level.
 				}
 			}
 
-			// Detect heading block closing
+			// Detect heading block closing.
 			if ( $in_heading && preg_match( '/^<!--\s*\/wp:heading\s*-->/', $line ) ) {
 				$in_heading = false;
 
-				// If this was an H2 and we have images left, insert one
+				// If this was an H2 and we have images left, insert one.
 				if ( $heading_level === 2 && $image_index < $total_images ) {
-					$image       = $images[ $image_index ];
+					$image = $images[ $image_index ];
 					$image_index++;
 
 					$image_block = $this->build_core_image_block(
@@ -2010,7 +2006,7 @@ class Ajax {
 						$image['alt']
 					);
 
-					// Add image block after the heading (split into lines)
+					// Add image block after the heading (split into lines).
 					$image_lines = explode( "\n", trim( $image_block ) );
 					foreach ( $image_lines as $img_line ) {
 						$output_lines[] = $img_line;
@@ -2019,9 +2015,9 @@ class Ajax {
 			}
 		}
 
-		// Append any leftover images at the end
+		// Append any leftover images at the end.
 		while ( $image_index < $total_images ) {
-			$image       = $images[ $image_index ];
+			$image = $images[ $image_index ];
 			$image_index++;
 
 			$image_block = $this->build_core_image_block(
@@ -2158,7 +2154,6 @@ class Ajax {
 			}
 
 			$interval = absint( $meta_input['repeatInterval'] );
-			$unit     = sanitize_text_field( $meta_input['repeatUnit'] );
 
 			if ( ! $interval ) {
 				return;
@@ -2190,9 +2185,6 @@ class Ajax {
 				return;
 			}
 
-			// Calculate interval in seconds.
-			$interval_seconds = $this->calculate_interval_seconds( $interval, $unit );
-
 			// Get the start date from campaign metadata.
 			$start_date      = $meta_input['startDate'] ?? '';
 			$start_timestamp = time() + 60; // Default fallback: 1 minute from now.
@@ -2222,10 +2214,11 @@ class Ajax {
 				// If parsing fails, use the default (1 minute from now).
 			}
 
-		// Schedule the first post at the user-defined start date/time using single event.
-		// The cron handler will self-schedule subsequent posts after each execution.
-		// This matches the pause/resume pattern where we schedule one event at a time.
-		wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );		} catch ( \Exception $e ) {
+			// Schedule the first post at the user-defined start date/time using single event.
+			// The cron handler will self-schedule subsequent posts after each execution.
+			// This matches the pause/resume pattern where we schedule one event at a time.
+			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
+		} catch ( \Exception $e ) {
 			return;
 		}
 	}
