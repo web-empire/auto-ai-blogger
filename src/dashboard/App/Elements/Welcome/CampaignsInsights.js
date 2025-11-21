@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, memo, useState, useRef } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Lock, TrendingUp, Eye, Calendar, BarChart3, ExternalLink, ChartNoAxesColumn, RotateCw, Settings, List, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lock, TrendingUp, Eye, BarChart3, ExternalLink, ChartNoAxesColumn, RotateCw, Settings, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
@@ -59,7 +59,7 @@ const formatLastPostRun = ( lastRun ) => {
 			year: 'numeric',
 			hour: 'numeric',
 			minute: '2-digit',
-			hour12: true
+			hour12: true,
 		} );
 	} catch ( error ) {
 		return lastRun;
@@ -75,35 +75,10 @@ const CampaignCard = memo( ( { campaign } ) => {
 	const isPerformant = ( campaign?.postsVisit || 0 ) > 100;
 	const [ openingConfigureDrawer, setOpeningConfigureDrawer ] = useState( false );
 	const [ analyticsModal, setAnalyticsModal ] = useState( { isOpen: false, campaignId: null, campaignData: null } );
-	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults );
+	const [ viewConfigureData, setViewConfigureData ] = useState( defaultMetaDefaults ); // eslint-disable-line no-unused-vars
 	const [ openViewDrawer, setOpenViewDrawer ] = useState( false );
 	const [ openDrawer, setOpenDrawer ] = useState( false );
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
-
-	const viewCampaignConfiguration = ( e ) => {
-		e.preventDefault();
-
-		const campaignId = e.currentTarget.getAttribute( 'data-campaign_id' );
-		if ( ! campaignId ) {
-			return;
-		}
-
-		fetchCampaignMetaData( campaignId )
-			.then( ( data ) => {
-				if ( data ) {
-					setViewConfigureData(
-						{
-							...data,
-							type: 'view',
-						}
-					);
-					setOpenViewDrawer( true );
-				}
-			} )
-			.catch( ( error ) => {
-				console.error( error );
-			} );
-	};
 
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();

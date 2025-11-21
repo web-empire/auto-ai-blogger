@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Loader2, Check } from 'lucide-react';
 import { updateApiData } from '@Utils/ApiData';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // Enhanced progress indicator component
 const ProgressIndicator = memo( ( { currentStep, maxSteps } ) => {
@@ -98,9 +98,6 @@ const FooterNavigationBar = memo( ( props ) => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
-
-	// Redux selectors
-	const adminAppUrl = useSelector( ( state ) => state.adminAppUrl );
 
 	const { previousStep, nextStep, currentStep, maxSteps } = props;
 

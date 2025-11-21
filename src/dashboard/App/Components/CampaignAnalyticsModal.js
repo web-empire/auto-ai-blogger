@@ -236,7 +236,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 												</div>
 												<div className="flex items-center justify-end space-x-1">
 													<CheckCircle className="w-4 h-4 text-green-300" />
-													<span className="text-sm">{ __( 'AI Performance Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
+													<span className="text-sm">{ __( 'Reviews & Recommendations', 'wp-ai-blogger' ) }</span>
 												</div>
 											</div>
 										</div>

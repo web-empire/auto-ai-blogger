@@ -214,13 +214,13 @@ export default function ConfigureDrawer( props ) {
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, title: e.target.value } ) }
 																	type="text"
 																	readOnly={ isViewMode }
-																className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
-																	fieldErrors[ 'project-name' ]
-																		? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
-																		: isViewMode
-																			? 'bg-gray-50 outline-gray-200'
-																			: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
-																}` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'project-name' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
+																	}` }
 																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
 																/>
 																{ fieldErrors[ 'project-name' ] && (

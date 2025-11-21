@@ -105,13 +105,13 @@ export default function MainNav() {
 							className="h-full ml-4 sm:ml-8 sm:flex gap-y-4 gap-x-8"
 							aria-label="Primary navigation"
 						>
-						{ navMenus.map( ( menu ) => {
-							const isActive = activePage === menu.slug && activePath === menu.path;
-							const linkClasses = isActive
-								? 'mb-4 sm:mb-0 border-brand text-brand hover:text-brand hover:border-brand inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
-								: 'mb-4 sm:mb-0 border-slate-600 text-slate-600 hover:border-slate-500 hover:text-slate-500 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu';
+							{ navMenus.map( ( menu ) => {
+								const isActive = activePage === menu.slug && activePath === menu.path;
+								const linkClasses = isActive
+									? 'mb-4 sm:mb-0 border-brand text-brand hover:text-brand hover:border-brand inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
+									: 'mb-4 sm:mb-0 border-slate-600 text-slate-600 hover:border-slate-500 hover:text-slate-500 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu';
 
-							return (
+								return (
 									<Fragment key={ `${ menu.slug }-${ menu.path || 'home' }` }>
 										<Link
 											to={ {

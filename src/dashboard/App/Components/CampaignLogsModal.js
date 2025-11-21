@@ -234,7 +234,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 														{ ( () => {
 															// Calculate actual failed attempts from error logs
 															// Count all error logs (including retries that eventually succeeded)
-															const errorLogs = logsData?.logs?.filter( log =>
+															const errorLogs = logsData?.logs?.filter( ( log ) =>
 																log.status?.toLowerCase() === 'error' ||
 																log.status?.toLowerCase() === 'failed' ||
 																log.status?.toLowerCase() === 'failure'

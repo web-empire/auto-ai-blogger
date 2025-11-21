@@ -113,8 +113,8 @@
 #headlessui-portal-root input[type="week"]:focus,
 #headlessui-portal-root select:focus,
 #headlessui-portal-root textarea:focus {
-	border-color: var(--wpaib-brand-600) !important;
-	box-shadow: 0 0 0 1px var(--wpaib-brand-600) !important;
+	border-color: var( --wpaib-brand-600 ) !important;
+	box-shadow: 0 0 0 1px var( --wpaib-brand-600 ) !important;
 	outline: 2px solid transparent !important;
 }
 
@@ -219,9 +219,9 @@
 	box-shadow: none;
 }
 
-.posts_page_wp-ai-blogger #wpbody-content a:active:not(.wpaib-menu):not(.campaign-settings-tab),
-.posts_page_wp-ai-blogger #wpbody-content a:hover:not(.wpaib-menu):not(.campaign-settings-tab) {
-	color: var(--wpaib-brand-primary-hover);
+.posts_page_wp-ai-blogger #wpbody-content a:active:not( .wpaib-menu ):not( .campaign-settings-tab ),
+.posts_page_wp-ai-blogger #wpbody-content a:hover:not( .wpaib-menu ):not( .campaign-settings-tab ) {
+	color: var( --wpaib-brand-primary-hover );
 }
 
 .wpaib-button {
@@ -229,11 +229,11 @@
 }
 
 .wpaib-active-state-button {
-	border-bottom: 2px solid var(--wpaib-brand-primary);
+	border-bottom: 2px solid var( --wpaib-brand-primary );
 }
 
 .lucide-loader-pinwheel {
-	color: var(--wpaib-brand-primary);
+	color: var( --wpaib-brand-primary );
 }
 
 #wp-ai-blogger-main-page--wrapper a {
@@ -251,8 +251,8 @@
 	border-bottom: 2px solid transparent;
 }
 .wpaib-menu.wpaib-active-menu {
-	border-color: var(--wpaib-brand-primary) !important;
-	color: var(--wpaib-brand-primary) !important;
+	border-color: var( --wpaib-brand-primary ) !important;
+	color: var( --wpaib-brand-primary ) !important;
 }
 
 .wpaib-wizard--button {

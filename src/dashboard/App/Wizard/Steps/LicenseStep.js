@@ -123,7 +123,6 @@ const LicenseStep = memo( () => {
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce );
 	const upgradeLink = useSelector( ( state ) => state.upgradeLink );
-	const adminAppUrl = useSelector( ( state ) => state.adminAppUrl );
 	const licenseStatusFromRedux = useSelector( ( state ) => state.licenseStatus );
 
 	// Component state

@@ -94,10 +94,6 @@ const ProButton = forwardRef( ( {
 		transition: 'all 0.2s',
 	} : {};
 
-	const primaryGradientHoverStyle = variant === 'primary' ? {
-		'--hover-gradient': 'linear-gradient(to right, #7c2fb0, #b823a3)',
-	} : {};
-
 	// Size styles
 	const sizes = {
 		small: 'px-2 py-1 text-xs',

@@ -301,30 +301,32 @@ const OptinStep = memo( () => {
 		>
 			<div className="w-full max-w-4xl">
 				<div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-				{ /* Header */ }
-				<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-center">
-					<div className="mb-2.5">
-						<span className="inline-flex items-center px-3.5 py-1.5 bg-white bg-opacity-20 text-white text-[13px] font-medium rounded-full tracking-wide uppercase">
-							<Star className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-							{ __( 'Step 4 of 5', 'wp-ai-blogger' ) }
-						</span>
+					{ /* Header */ }
+					<div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-center">
+						<div className="mb-2.5">
+							<span className="inline-flex items-center px-3.5 py-1.5 bg-white bg-opacity-20 text-white text-[13px] font-medium rounded-full tracking-wide uppercase">
+								<Star className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+								{ __( 'Step 4 of 5', 'wp-ai-blogger' ) }
+							</span>
+						</div>
+						<h1 id="optin-heading" className="text-[27px] font-bold text-white mb-3.5">
+							{ __( 'Almost There!', 'wp-ai-blogger' ) }
+						</h1>
+						<h2 className="text-[17px] font-semibold text-indigo-100 mb-3.5">
+							{ __( 'Get personalized growth insights', 'wp-ai-blogger' ) }
+						</h2>
 					</div>
-					<h1 id="optin-heading" className="text-[27px] font-bold text-white mb-3.5">
-						{ __( 'Almost There!', 'wp-ai-blogger' ) }
-					</h1>
-					<h2 className="text-[17px] font-semibold text-indigo-100 mb-3.5">
-						{ __( 'Get personalized growth insights', 'wp-ai-blogger' ) }
-					</h2>
-				</div>					<div className="p-5 md:p-7">
+
+					<div className="p-5 md:p-7">
 						<div className="grid lg:grid-cols-2 gap-5">
 							{ /* Form Section */ }
 							<div>
 								<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
-									{ __( 'Your Information', 'wp-ai-blogger' ) }
-							</h3>
+										{ __( 'Your Information', 'wp-ai-blogger' ) }
+								</h3>
 
-							<form className="space-y-5" onSubmit={ submitOptinForm }>
-								<FormField
+								<form className="space-y-5" onSubmit={ submitOptinForm }>
+									<FormField
 										id="wpaib-user-name"
 										label={ __( 'First Name', 'wp-ai-blogger' ) }
 										type="text"
@@ -387,22 +389,22 @@ const OptinStep = memo( () => {
 								</form>
 							</div>
 
-						{ /* Benefits Section */ }
-						<div>
-							<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
-								{ __( 'What You\'ll Receive', 'wp-ai-blogger' ) }
-							</h3>
+							{ /* Benefits Section */ }
+							<div>
+								<h3 className="text-[17px] font-semibold text-gray-900 mb-5">
+									{ __( 'What You\'ll Receive', 'wp-ai-blogger' ) }
+								</h3>
 
-							<div className="space-y-3.5">
-								{ benefits.map( ( benefit, index ) => (
-										<BenefitCard
-											key={ index }
-											icon={ benefit.icon }
-											title={ benefit.title }
-											description={ benefit.description }
-											highlight={ benefit.highlight }
-										/>
-									) ) }
+								<div className="space-y-3.5">
+									{ benefits.map( ( benefit, index ) => (
+											<BenefitCard
+												key={ index }
+												icon={ benefit.icon }
+												title={ benefit.title }
+												description={ benefit.description }
+												highlight={ benefit.highlight }
+											/>
+										) ) }
 								</div>
 							</div>
 						</div>
