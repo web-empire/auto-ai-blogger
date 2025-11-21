@@ -26,6 +26,29 @@ namespace WPAIBlogger {
         {
         }
         /**
+         * Suppress translation error.
+         *
+         * @param bool   $status       Status.
+         * @param string $function_name Function name.
+         * @param string $message      Message.
+         * @param string $version      Version.
+         *
+         * @return bool
+         */
+        public function suppress_translation_error($status, $function_name, $message, $version)
+        {
+        }
+        /**
+         * Register custom cron schedules dynamically.
+         *
+         * @param array $schedules Existing cron schedules.
+         * @return array Modified schedules array.
+         * @since 1.0.0
+         */
+        public function register_custom_cron_schedules($schedules)
+        {
+        }
+        /**
          * Initiator
          *
          * @since 1.0.0
@@ -57,6 +80,71 @@ namespace WPAIBlogger {
          * @since 1.0.0
          */
         public function deactivation_actions() : void
+        {
+        }
+    }
+}
+namespace WPAIBlogger\Inc\Traits {
+    /**
+     * Trait Get_Instance.
+     *
+     * @since 1.0.0
+     */
+    trait Get_Instance
+    {
+        /**
+         * Instance object.
+         *
+         * @var object Class Instance.
+         */
+        private static $instance = null;
+        /**
+         * Initiator
+         *
+         * @since 1.0.0
+         * @return object initialized object of class.
+         */
+        public static function get_instance()
+        {
+        }
+    }
+}
+namespace WPAIBlogger\Inc {
+    /**
+     * Cron Handler class for WP AI Blogger.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Inc\Cron
+     * @since 1.0.0
+     */
+    class Cron_Handler
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Initialize cron hooks.
+         */
+        protected function __construct()
+        {
+        }
+        /**
+         * Create a single post from campaign (cron callback).
+         *
+         * @param int $campaign_id The ID of the campaign.
+         * @since x.x.x
+         */
+        public function create_single_post_from_campaign($campaign_id) : void
+        {
+        }
+        /**
+         * Generate a post from campaign data.
+         *
+         * @param int $campaign_id The ID of the campaign.
+         * @param int $target_post_number The post number being attempted.
+         * @param int $current_attempt The attempt number for this post.
+         * @return array An array containing the success status and message.
+         * @since x.x.x
+         */
+        public function generate_post_from_campaign($campaign_id, $target_post_number = 0, $current_attempt = 0) : array
         {
         }
     }
@@ -153,31 +241,6 @@ namespace {
          * @return mixed URL.
          */
         public static function get_url()
-        {
-        }
-    }
-}
-namespace WPAIBlogger\Inc\Traits {
-    /**
-     * Trait Get_Instance.
-     *
-     * @since 1.0.0
-     */
-    trait Get_Instance
-    {
-        /**
-         * Instance object.
-         *
-         * @var object Class Instance.
-         */
-        private static $instance = null;
-        /**
-         * Initiator
-         *
-         * @since 1.0.0
-         * @return object initialized object of class.
-         */
-        public static function get_instance()
         {
         }
     }
@@ -296,11 +359,11 @@ namespace WPAIBlogger\Inc\Utils {
         {
         }
         /**
-         * Returns the campaign meta value.
+         * Returns the campaign meta value with security validation.
          *
          * @param int    $campaign_id The campaign ID.
          * @param string $key         The meta key.
-         * @return string
+         * @return mixed
          *
          * @since 1.0.0
          */
@@ -308,7 +371,7 @@ namespace WPAIBlogger\Inc\Utils {
         {
         }
         /**
-         * Update the campaign meta value.
+         * Update the campaign meta value with security validation.
          *
          * @param int    $campaign_id The campaign ID.
          * @param string $key         The meta key.
@@ -339,6 +402,17 @@ namespace WPAIBlogger\Inc\Utils {
          * @since 1.0.0
          */
         public static function get_default_settings()
+        {
+        }
+        /**
+         * Sanitize output values based on data type.
+         *
+         * @since 1.0.0
+         * @param mixed  $value     The value to sanitize.
+         * @param string $data_type The data type for sanitization.
+         * @return mixed Sanitized value.
+         */
+        public static function sanitize_output($value, $data_type = 'string')
         {
         }
         /**
@@ -388,9 +462,67 @@ namespace WPAIBlogger\Inc\Utils {
         }
     }
     /**
-     * This class setup all Helper functions.
+     * This class will holds the code to sanitize data.
      *
-     * @class Helper
+     * @class Sanitizer
+     */
+    class Sanitizer
+    {
+        /**
+         * Gets sanitized post statuses
+         *
+         * @since 1.0.0
+         * @return array Sanitized post statuses
+         */
+        public static function get_sanitized_post_statuses() : array
+        {
+        }
+        /**
+         * Gets sanitized categories
+         *
+         * @since 1.0.0
+         * @return array Sanitized categories
+         */
+        public static function get_sanitized_categories() : array
+        {
+        }
+        /**
+         * Gets sanitized tags
+         *
+         * @since 1.0.0
+         * @return array Sanitized tags
+         */
+        public static function get_sanitized_tags() : array
+        {
+        }
+        /**
+         * Gets sanitized authors
+         *
+         * @since 1.0.0
+         * @return array Sanitized authors
+         */
+        public static function get_sanitized_authors() : array
+        {
+        }
+        /**
+         * Gets sanitized post types
+         *
+         * @since 1.0.0
+         * @return array Sanitized post types
+         */
+        public static function get_sanitized_post_types() : array
+        {
+        }
+    }
+    /**
+     * Helper class for settings management.
+     *
+     * This class provides utility functions for managing plugin settings
+     * with validation, sanitization, and access control.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Utils
+     * @since 1.0.0
      */
     class Helper
     {
@@ -407,11 +539,11 @@ namespace WPAIBlogger\Inc\Utils {
         {
         }
         /**
-         * Update option from the database for the admin settings.
+         * Update option in the database for the admin settings.
          *
          * @param  string $key      The option key.
          * @param  mixed  $value    Option value to update.
-         * @return string           Return the option value
+         * @return array            Returns array with 'success' boolean and 'value' for the sanitized value
          *
          * @since 1.0.0
          */
@@ -422,11 +554,21 @@ namespace WPAIBlogger\Inc\Utils {
          * Delete option from the database for the admin settings.
          *
          * @param  string $key The option key.
-         * @return void
+         * @return bool True on success, false on failure.
          *
          * @since 1.0.0
          */
-        public static function delete_option($key) : void
+        public static function delete_option($key) : bool
+        {
+        }
+        /**
+         * Bulk update multiple options with validation.
+         *
+         * @since 1.0.0
+         * @param array $options Array of key-value pairs to update.
+         * @return bool True on success, false on failure.
+         */
+        public static function bulk_update_options(array $options) : bool
         {
         }
     }
@@ -1031,6 +1173,123 @@ namespace SureCart\Licensing {
         }
     }
 }
+namespace WPAIBlogger\Inc\Notifications {
+    /**
+     * Email Templates class.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Inc\Notifications
+     * @since 1.0.0
+     */
+    class Email_Templates
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Get email template for notification type.
+         *
+         * @param string $notification_type Type of notification.
+         * @param array  $data Notification data.
+         * @return array|null Template data with 'subject' and 'body' keys.
+         * @since 1.0.0
+         */
+        public function get_template($notification_type, $data) : ?array
+        {
+        }
+    }
+    /**
+     * Notification Helper class.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Inc\Notifications
+     * @since 1.0.0
+     */
+    class Notification_Helper
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Constructor.
+         */
+        protected function __construct()
+        {
+        }
+        /**
+         * Handle Campaign Started notification.
+         *
+         * @param int   $campaign_id Campaign ID.
+         * @param array $campaign_data Campaign data.
+         * @since 1.0.0
+         */
+        public function handle_campaign_started($campaign_id, $campaign_data) : void
+        {
+        }
+        /**
+         * Handle Post Created Successfully notification.
+         *
+         * @param int   $campaign_id Campaign ID.
+         * @param int   $post_id Post ID.
+         * @param array $post_data Post data.
+         * @since 1.0.0
+         */
+        public function handle_post_created($campaign_id, $post_id, $post_data) : void
+        {
+        }
+        /**
+         * Handle Campaign Completed notification.
+         *
+         * @param int    $campaign_id Campaign ID.
+         * @param string $reason Completion reason.
+         * @param array  $campaign_data Campaign data.
+         * @since 1.0.0
+         */
+        public function handle_campaign_completed($campaign_id, $reason, $campaign_data) : void
+        {
+        }
+        /**
+         * Handle Campaign Failed/Terminated notification.
+         *
+         * @param int    $campaign_id Campaign ID.
+         * @param string $reason Failure reason.
+         * @param array  $campaign_data Campaign data.
+         * @since 1.0.0
+         */
+        public function handle_campaign_failed($campaign_id, $reason, $campaign_data) : void
+        {
+        }
+    }
+    /**
+     * WhatsApp Handler class.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Inc\Notifications
+     * @since 1.0.0
+     */
+    class Whatsapp_Handler
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Send WhatsApp notification.
+         *
+         * @param string                $notification_type Type of notification.
+         * @param string                $phone_number Phone number to send to.
+         * @param array<string, string> $data Notification data.
+         * @return bool True if sent successfully.
+         * @since 1.0.0
+         */
+        public function send_notification($notification_type, $phone_number, $data) : bool
+        {
+        }
+        /**
+         * Validate phone number format.
+         *
+         * @param string $phone_number Phone number to validate.
+         * @return bool True if valid.
+         * @since 1.0.0
+         */
+        public function validate_phone_number($phone_number) : bool
+        {
+        }
+    }
+}
 namespace WPAIBlogger\Core {
     /**
      * Update Compatibility
@@ -1118,47 +1377,114 @@ namespace WPAIBlogger\Core {
         }
     }
     /**
-     * Create auto blog post scheduler
+     * Editor support & extended functionality.
      *
      * @since 1.0.0
      */
-    class Scheduler
+    class Editor
     {
         use \WPAIBlogger\Inc\Traits\Get_Instance;
         /**
-         *  Constructor
+         * Constructor
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function __construct()
+        {
+        }
+    }
+    /**
+     * This class handles admin filters for posts
+     *
+     * @class Frontend
+     */
+    class Frontend
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Constructor
+         *
+         * @since x.x.x
          */
         public function __construct()
         {
         }
         /**
-         * Custom cron schedules.
+         * Track post views.
          *
-         * @param array $schedules Schedules.
-         * @since 1.0.0
-         * @return array
-         */
-        public function custom_cron_schedules($schedules)
-        {
-        }
-        /**
-         * Create blog post.
-         *
-         * @param int $campaign_id Campaign ID.
-         *
-         * @since 1.0.0
          * @return void
+         * @since x.x.x
          */
-        public function create_blog_post($campaign_id) : void
+        public function track_post_views() : void
         {
         }
     }
 }
 namespace WPAIBlogger\Admin {
     /**
-     * This class setup all admin AJAX action
+     * This class handles admin filters for posts
      *
-     * @class Ajax
+     * @class Filters
+     */
+    class Filters
+    {
+        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        /**
+         * Constructor
+         *
+         * @since x.x.x
+         */
+        public function __construct()
+        {
+        }
+        /**
+         * Add campaign filter dropdown to posts admin page.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function add_campaign_filter() : void
+        {
+        }
+        /**
+         * Filter posts by campaign when campaign filter is applied.
+         *
+         * @param \WP_Query $query The WP_Query instance.
+         * @since x.x.x
+         * @return \WP_Query $query The WP_Query instance.
+         */
+        public function filter_posts_by_campaign($query)
+        {
+        }
+        /**
+         * Add campaign column to posts admin page.
+         *
+         * @param array<string, string> $columns Existing columns.
+         * @since x.x.x
+         * @return array<string, string> Modified columns.
+         */
+        public function add_campaign_column($columns)
+        {
+        }
+        /**
+         * Show campaign column content.
+         *
+         * @param string $column  Column name.
+         * @param int    $post_id Post ID.
+         * @since x.x.x
+         * @return void
+         */
+        public function show_campaign_column_content($column, $post_id) : void
+        {
+        }
+    }
+    /**
+     * Admin AJAX class for WP AI Blogger.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Admin
+     * @since 1.0.0
      */
     class Ajax
     {
@@ -1169,16 +1495,16 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @access public
          *
-         * @var array
+         * @var array<string>
          */
-        public $ajax_events = ['wpaib_update_admin_setting', 'wpaib_create_campaign', 'wpaib_update_campaign', 'wpaib_get_campaign_metadata'];
+        public $ajax_events = ['wpaib_update_admin_setting', 'wpaib_create_campaign', 'wpaib_update_campaign', 'wpaib_get_campaign_metadata', 'wpaib_create_post', 'wpaib_run_campaign', 'wpaib_get_campaign_analytics', 'wpaib_delete_campaign', 'wpaib_get_campaign_logs', 'wpaib_pause_campaign', 'wpaib_resume_campaign', 'wpaib_reschedule_campaign'];
         /**
          * Holds all nonce for AJAX events.
          *
          * @since 1.0.0
          * @access public
          *
-         * @var array
+         * @var array<string, string>
          */
         public static $nonce = [];
         /**
@@ -1201,7 +1527,15 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Handler to update admin app settings.
+         * Add security headers to AJAX responses.
+         *
+         * @since x.x.x
+         */
+        public function add_security_headers() : void
+        {
+        }
+        /**
+         * Handler to update admin app settings with security.
          *
          * @since 1.0.0
          * @return void
@@ -1210,7 +1544,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Handler to create campaign.
+         * Handler to create campaign with security.
          *
          * @since 1.0.0
          * @return void
@@ -1219,7 +1553,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Handler to update campaign.
+         * Handler to update campaign with security.
          *
          * @since 1.0.0
          * @return void
@@ -1228,7 +1562,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Handler to get campaign metadata in drawer edit settings.
+         * Handler to get campaign metadata in drawer edit settings with security.
          *
          * @since 1.0.0
          * @return void
@@ -1236,15 +1570,98 @@ namespace WPAIBlogger\Admin {
         public function wpaib_get_campaign_metadata() : void
         {
         }
+        /**
+         * Handler to create post with security.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_create_post() : void
+        {
+        }
+        /**
+         * Handler to run campaign with security.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_run_campaign() : void
+        {
+        }
+        /**
+         * Handler to get campaign analytics data.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function wpaib_get_campaign_analytics() : void
+        {
+        }
+        /**
+         * Create a single post from a campaign (called by cron).
+         *
+         * @param int $campaign_id Campaign ID.
+         * @return void
+         * @since x.x.x
+         */
+        public function create_single_post_from_campaign($campaign_id) : void
+        {
+        }
+        /**
+         * Handler to delete campaign with security.
+         *
+         * @since 1.0.0
+         * @return void
+         */
+        public function wpaib_delete_campaign() : void
+        {
+        }
+        /**
+         * Handler to get campaign logs with security.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function wpaib_get_campaign_logs() : void
+        {
+        }
+        /**
+         * Handler to pause campaign with security.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function wpaib_pause_campaign() : void
+        {
+        }
+        /**
+         * Handler to resume campaign with security.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function wpaib_resume_campaign() : void
+        {
+        }
+        /**
+         * Reschedule a campaign's cron jobs (debug utility).
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function wpaib_reschedule_campaign() : void
+        {
+        }
     }
     /**
-     * Frontend Compatibility
+     * Admin Menu class for WP AI Blogger.
+     *
+     * This class handles secure admin menu setup, script loading, and data localization.
+     * Implements comprehensive security measures including input validation,
+     * data sanitization, and secure script loading.
      *
      * @package wp-ai-blogger
-     */
-    /**
-     * Menu setup
-     *
+     * @subpackage Admin
      * @since 1.0.0
      */
     class Menu
@@ -1255,17 +1672,24 @@ namespace WPAIBlogger\Admin {
          */
         public const PAGE_ID = WP_AI_BLOGGER_SLUG;
         /**
-         * Constructor
+         * Constructor with security setup.
          *
          * @since 1.0.0
-         *
          * @return void
          */
         public function __construct()
         {
         }
         /**
-         * Initialize Admin Setup.
+         * Add security headers for admin pages.
+         *
+         * @since x.x.x
+         */
+        public function add_admin_security_headers() : void
+        {
+        }
+        /**
+         * Initialize Admin Setup with security.
          *
          * @since 1.0.0
          */
@@ -1273,7 +1697,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Renders the hub screen canvas.
+         * Renders the hub screen canvas with security validation.
          *
          * @since 1.0.0
          */
@@ -1281,7 +1705,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Enqueue the Admin's build files for plugin to work.
+         * Enqueue the Admin's build files for plugin to work with security.
          *
          * @since 1.0.0
          */
@@ -1306,9 +1730,15 @@ namespace WPAIBlogger\Admin {
         }
     }
     /**
-     * This class setup admin init
+     * Admin API class for WP AI Blogger.
      *
-     * @class API
+     * This class handles REST API endpoints for admin settings and operations.
+     * Implements security measures including rate limiting, input validation,
+     * and proper authentication.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Admin
+     * @since 1.0.0
      */
     class API extends \WP_REST_Controller
     {
@@ -1326,11 +1756,43 @@ namespace WPAIBlogger\Admin {
          */
         protected $rest_base = '/admin/settings/';
         /**
+         * Settings update route.
+         *
+         * @var string
+         */
+        protected $update_route = '/admin/settings/update';
+        /**
+         * License verification route.
+         *
+         * @var string
+         */
+        protected $license_route = '/admin/license/';
+        /**
          * Constructor
          *
          * @since 1.0.0
          */
         public function __construct()
+        {
+        }
+        /**
+         * Add security headers to API responses.
+         *
+         * @since 1.0.0
+         */
+        public function add_security_headers() : void
+        {
+        }
+        /**
+         * Set security headers for API responses.
+         *
+         * @param bool                        $served  Whether the request has already been served.
+         * @param \WP_HTTP_Response_Interface $result  Result to send to the client.
+         * @param \WP_REST_Request            $request Request used to generate the response.
+         * @param \WP_REST_Server             $server  Server instance.
+         * @return bool
+         */
+        public function set_security_headers($served, $result, $request, $server) : bool
         {
         }
         /**
@@ -1345,27 +1807,90 @@ namespace WPAIBlogger\Admin {
          * Get common settings.
          *
          * @param \WP_REST_Request $request Full details about the request.
-         * @return array $updated_option defaults + set DB option data.
+         * @return \WP_REST_Response|\WP_Error Settings data or error.
          *
          * @since 1.0.0
          */
-        public function get_admin_settings($request)
+        public function get_admin_settings(\WP_REST_Request $request) : \WP_REST_Response|\WP_Error
         {
         }
         /**
-         * Check whether a given request has permission to read notes.
+         * Update admin settings.
          *
-         * @param  WP_REST_Request $request Full details about the request.
-         * @return WP_Error|bool
+         * @param \WP_REST_Request $request Full details about the request.
+         * @return \WP_REST_Response|\WP_Error Updated settings or error.
+         *
          * @since 1.0.0
          */
-        public function get_permissions_check($request)
+        public function update_admin_settings(\WP_REST_Request $request) : \WP_REST_Response|\WP_Error
+        {
+        }
+        /**
+         * Check whether a given request has permission to read settings.
+         *
+         * @param  \WP_REST_Request $request Full details about the request.
+         * @return \WP_Error|bool
+         * @since 1.0.0
+         */
+        public function get_permissions_check(\WP_REST_Request $request) : \WP_Error|bool
+        {
+        }
+        /**
+         * Check whether a given request has permission to update settings.
+         *
+         * @param  \WP_REST_Request $request Full details about the request.
+         * @return \WP_Error|bool
+         * @since 1.0.0
+         */
+        public function update_permissions_check(\WP_REST_Request $request) : \WP_Error|bool
+        {
+        }
+        /**
+         * Check whether a given request has permission to manage licenses.
+         *
+         * @param  \WP_REST_Request $request Full details about the request.
+         * @return \WP_Error|bool
+         * @since 1.0.0
+         */
+        public function license_permissions_check(\WP_REST_Request $request) : \WP_Error|bool
+        {
+        }
+        /**
+         * Verify license with security.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return \WP_REST_Response|\WP_Error Response or error.
+         */
+        public function verify_license(\WP_REST_Request $request) : \WP_REST_Response|\WP_Error
+        {
+        }
+        /**
+         * Activate license with security.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return \WP_REST_Response|\WP_Error Response or error.
+         */
+        public function activate_license(\WP_REST_Request $request) : \WP_REST_Response|\WP_Error
+        {
+        }
+        /**
+         * Deactivate license with security.
+         *
+         * @param \WP_REST_Request $request The request object.
+         * @return \WP_REST_Response|\WP_Error Response or error.
+         */
+        public function deactivate_license(\WP_REST_Request $request) : \WP_REST_Response|\WP_Error
         {
         }
     }
     /**
-     * Licensing handler class.
+     * Licensing handler class with security.
      *
+     * This class provides license management including activation, deactivation,
+     * validation, and status checking with security measures.
+     *
+     * @package wp-ai-blogger
+     * @subpackage Admin
      * @since 1.0.0
      */
     class Licensing
@@ -1378,7 +1903,10 @@ namespace WPAIBlogger\Admin {
          */
         public $error_messages = [];
         /**
-         * Class constructor
+         * Class constructor with security setup.
+         *
+         * Initializes licensing functionality with proper WordPress hooks
+         * and security measures. Only loads in admin context.
          *
          * @since 1.0.0
          * @return void
@@ -1387,18 +1915,31 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Licensing setup.
-         * Creates a client object for SureCart licensing.
+         * Initialize licensing functionality.
+         *
+         * Sets up error messages, licensing client, and AJAX handlers
+         * with proper security validation.
          *
          * @since 1.0.0
-         * @return \SureCart\Licensing\Client
+         * @return void
+         */
+        public function initialize_licensing() : void
+        {
+        }
+        /**
+         * Creates and configures SureCart licensing client.
+         *
+         * Initializes the licensing client with proper error handling
+         * and validation of required constants.
+         *
+         * @since 1.0.0
+         * @return \SureCart\Licensing\Client|null Client instance or null on failure.
          */
         public static function licensing_setup()
         {
         }
         /**
-         * Licensing setup.
-         * Creates a client object for SureCart licensing.
+         * Initialize licensing client on WordPress init.
          *
          * @since 1.0.0
          * @return void
@@ -1407,7 +1948,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Activate license
+         * Activate license with security validation.
          *
          * @hooked wp_ajax_wp_ai_blogger_activate_license
          * @since 1.0.0
@@ -1417,7 +1958,7 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Deactivate license.
+         * Deactivate license with security validation.
          *
          * @hooked wp_ajax_wp_ai_blogger_deactivate_license
          * @since 1.0.0
@@ -1427,132 +1968,167 @@ namespace WPAIBlogger\Admin {
         {
         }
         /**
-         * Checks if license is active.
+         * Checks if license is active with security validation.
          *
          * @since 1.0.0
          * @return bool
          */
-        public static function is_license_active()
+        public static function is_license_active() : bool
         {
         }
         /**
-         * Display admin notice to activate license
+         * Display admin notice to activate license with security.
          *
          * @since 1.0.0
          */
         public function license_activation_notice() : void
         {
         }
+        /**
+         * Validates license periodically for security.
+         *
+         * @since x.x.x
+         * @return void
+         */
+        public function validate_license_periodically() : void
+        {
+        }
     }
 }
 namespace {
     /**
-     * Get user details.
+     * Get user details with security validation.
      *
-     * @param string $detail Detail to get.
+     * @param string $detail Detail to get (name|email).
+     * @return string User detail or empty string on failure.
      * @since 1.0.0
      */
     function wpaib_get_user_detail($detail)
     {
     }
     /**
-     * Clean variables using sanitize_text_field.
+     * Clean the plugin data with security validation.
      *
-     * @param mixed $var Data to sanitize.
-     * @return mixed
-     *
-     * @since 0.0.1
+     * @param mixed $data Data to clean.
+     * @return mixed Cleaned data.
+     * @since 1.0.0
      */
-    function wpaib_clean_data($var)
+    function wpaib_clean_data($data)
     {
     }
     /**
-     * Get all campaigns.
+     * Get all campaigns with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized campaigns data.
      */
     function wpaib_get_all_campaigns()
     {
     }
     /**
-     * Get all post statuses.
+     * Get all generated posts with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized generated posts data.
+     */
+    function wpaib_get_generated_posts()
+    {
+    }
+    /**
+     * Get array depth safely to prevent memory issues.
+     *
+     * @since x.x.x
+     * @param array $array Array to check depth.
+     * @return int Array depth.
+     */
+    function wpaib_get_array_depth(array $array) : int
+    {
+    }
+    /**
+     * Get all post statuses with security.
+     *
+     * @since 1.0.0
+     * @return array Sanitized post statuses.
      */
     function wpaib_get_post_statuses()
     {
     }
     /**
-     * Get all post types.
+     * Get all post types with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized post types.
      */
     function wpaib_get_post_types()
     {
     }
     /**
-     * Get all categories.
+     * Get post categories with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized categories.
      */
     function wpaib_get_categories()
     {
     }
     /**
-     * Get all tags.
+     * Get post tags with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized tags.
      */
     function wpaib_get_tags()
     {
     }
     /**
-     * Get all authors.
+     * Get all authors with security validation.
      *
-     * @since 0.0.1
+     * @since 1.0.0
+     * @return array Sanitized authors list.
      */
     function wpaib_get_authors()
     {
     }
     /**
-     * Get all custom schedules to schedule auto blog posts.
-     *
-     * @return array
-     * @since 1.0.0
-     */
-    function wpaib_get_schedules()
-    {
-    }
-    /**
-     * Get all custom schedules to schedule auto blog posts.
+     * Check if the campaign posts target is achieved with security validation.
      *
      * @param int $campaign_id Campaign ID.
-     * @param int $days       Days.
-     * @return void
-     * @since 1.0.0
-     */
-    function wpaib_update_schedules($campaign_id, $days) : void
-    {
-    }
-    /**
-     * Check if the campaign posts target is achieved.
-     *
-     * @param int $campaign_id Campaign ID.
-     * @return bool
+     * @return bool Target achievement status.
      * @since 1.0.0
      */
     function wpaib_is_campaign_posts_target_achieved($campaign_id)
     {
     }
     /**
-     * Get API response in order to create blog post.
+     * Get API response to create blog post with security validation.
      *
-     * @param string $keywords         Keywords.
-     * @param int    $max_title_words  Max title words.
-     * @param int    $max_content_words Max content words.
+     * @param string $keywords             Keywords.
+     * @param int    $max_title_words      Max title words.
+     * @param int    $max_content_words    Max content words.
+     * @param array  $site_persona_details Site persona details.
+     * @since 1.0.0
+     * @return array|WP_Error Sanitized API response or error.
+     */
+    function wpaib_get_post_creation_api_response($keywords, $max_title_words, $max_content_words, $site_persona_details)
+    {
+    }
+    /**
+     * Sanitize API response data recursively.
+     *
+     * @param array $data API response data.
+     * @return array Sanitized data.
+     */
+    function wpaib_sanitize_api_response($data)
+    {
+    }
+    /**
+     * Get site persona details with security validation.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @return array Sanitized site persona details.
      * @since 1.0.0
      */
-    function wpaib_get_post_creation_api_response($keywords, $max_title_words, $max_content_words)
+    function wpaib_get_site_persona_details($campaign_id = 0)
     {
     }
     /**
@@ -1562,7 +2138,91 @@ namespace {
      * @return int|WP_Error
      * @since 1.0.0
      */
-    function wpaib_create_blog_post($campaign_id)
+    /**
+     * Track post views for analytics.
+     *
+     * @param int $post_id Post ID.
+     * @return void
+     * @since x.x.x
+     */
+    function wpaib_track_post_view($post_id) : void
+    {
+    }
+    /**
+     * Log detailed error information for campaign post creation failures.
+     *
+     * @param int    $campaign_id Campaign ID.
+     * @param string $error_type Type of error (api_error, validation_error, network_error, etc.).
+     * @param string $error_message Detailed error message.
+     * @param array  $context Additional context data.
+     * @return void
+     * @since x.x.x
+     */
+    function wpaib_log_campaign_error($campaign_id, $error_type, $error_message, $context = []) : void
+    {
+    }
+    /**
+     * Log successful post creation for campaign.
+     *
+     * @param int   $campaign_id Campaign ID.
+     * @param int   $post_id Created post ID.
+     * @param array $context Additional context data.
+     * @return void
+     * @since x.x.x
+     */
+    function wpaib_log_campaign_success($campaign_id, $post_id, $context = []) : void
+    {
+    }
+    /**
+     * Get formatted success logs for a campaign.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @param int $limit Maximum number of logs to return.
+     * @return array Formatted success logs.
+     * @since x.x.x
+     */
+    function wpaib_get_campaign_success_logs($campaign_id, $limit = 20) : array
+    {
+    }
+    /**
+     * Get formatted error logs for a campaign.
+     *
+     * @param int $campaign_id Campaign ID.
+     * @param int $limit Maximum number of logs to return.
+     * @return array Formatted error logs.
+     * @since x.x.x
+     */
+    function wpaib_get_campaign_error_logs($campaign_id, $limit = 20) : array
+    {
+    }
+    /**
+     * Get user-friendly error message based on error type.
+     *
+     * @param string $error_type The error type.
+     * @param string $original_message The original error message.
+     * @return string User-friendly error message.
+     * @since x.x.x
+     */
+    function wpaib_get_user_friendly_error_message($error_type, $original_message) : string
+    {
+    }
+    /**
+     * Get solution suggestion based on error type.
+     *
+     * @param string $error_type The error type.
+     * @return string Solution suggestion.
+     * @since x.x.x
+     */
+    function wpaib_get_error_solution_suggestion($error_type) : string
+    {
+    }
+    /**
+     * Create standardized timestamp data for logging.
+     *
+     * @return array Array containing various timestamp formats.
+     * @since x.x.x
+     */
+    function wpaib_create_timestamp_data() : array
     {
     }
     // Define Constants.
@@ -1579,10 +2239,9 @@ namespace {
     \define('WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger');
     \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
     \define('WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1');
-    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post/');
+    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post');
     // CPT Constants.
     \define('WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign');
     // Define Upgrade Link.
     \define('WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/');
 }
-

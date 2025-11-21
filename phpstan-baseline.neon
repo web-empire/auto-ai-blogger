@@ -1246,36 +1246,6 @@ parameters:
 			path: inc/notifications/whatsapp-handler.php
 
 		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:campaign_completed_message\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:campaign_failed_message\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:campaign_started_message\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:get_message\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:post_created_message\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
-			message: "#^Method WPAIBlogger\\\\Inc\\\\Notifications\\\\WhatsApp_Handler\\:\\:send_notification\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: inc/notifications/whatsapp-handler.php
-
-		-
 			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{timeout\\: 30, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'WP\\-AI\\-Blogger/0\\.0\\.1'\\}, body\\: non\\-empty\\-string\\|false\\} given\\.$#"
 			count: 1
 			path: inc/notifications/whatsapp-handler.php

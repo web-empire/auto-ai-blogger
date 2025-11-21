@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
  * @subpackage Inc\Notifications
  * @since 1.0.0
  */
-class WhatsApp_Handler {
+class Whatsapp_Handler {
 	use Get_Instance;
 
 	/**
@@ -36,9 +36,9 @@ class WhatsApp_Handler {
 	/**
 	 * Send WhatsApp notification.
 	 *
-	 * @param string $notification_type Type of notification.
-	 * @param string $phone_number Phone number to send to.
-	 * @param array  $data Notification data.
+	 * @param string                $notification_type Type of notification.
+	 * @param string                $phone_number Phone number to send to.
+	 * @param array<string, string> $data Notification data.
 	 * @return bool True if sent successfully.
 	 * @since 1.0.0
 	 */
@@ -71,8 +71,8 @@ class WhatsApp_Handler {
 	/**
 	 * Get WhatsApp message for notification type.
 	 *
-	 * @param string $notification_type Type of notification.
-	 * @param array  $data Notification data.
+	 * @param string                $notification_type Type of notification.
+	 * @param array<string, string> $data Notification data.
 	 * @return string WhatsApp message.
 	 * @since 1.0.0
 	 */
@@ -94,7 +94,7 @@ class WhatsApp_Handler {
 	/**
 	 * Campaign Started WhatsApp message.
 	 *
-	 * @param array $data Notification data.
+	 * @param array<string, string> $data Notification data.
 	 * @return string WhatsApp message.
 	 * @since 1.0.0
 	 */
@@ -115,7 +115,7 @@ class WhatsApp_Handler {
 	/**
 	 * Post Created WhatsApp message.
 	 *
-	 * @param array $data Notification data.
+	 * @param array<string, string> $data Notification data.
 	 * @return string WhatsApp message.
 	 * @since 1.0.0
 	 */
@@ -137,7 +137,7 @@ class WhatsApp_Handler {
 	/**
 	 * Campaign Completed WhatsApp message.
 	 *
-	 * @param array $data Notification data.
+	 * @param array<string, string> $data Notification data.
 	 * @return string WhatsApp message.
 	 * @since 1.0.0
 	 */
@@ -157,7 +157,7 @@ class WhatsApp_Handler {
 	/**
 	 * Campaign Failed WhatsApp message.
 	 *
-	 * @param array $data Notification data.
+	 * @param array<string, string> $data Notification data.
 	 * @return string WhatsApp message.
 	 * @since 1.0.0
 	 */

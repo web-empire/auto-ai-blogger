@@ -248,7 +248,7 @@ class Notification_Helper {
 			return;
 		}
 
-		$whatsapp_handler = WhatsApp_Handler::get_instance();
+		$whatsapp_handler = Whatsapp_Handler::get_instance();
 		$whatsapp_handler->send_notification( $notification_type, $whatsapp_number, $data );
 	}
 
