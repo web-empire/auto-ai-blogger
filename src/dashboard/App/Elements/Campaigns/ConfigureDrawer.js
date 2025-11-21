@@ -178,19 +178,19 @@ export default function ConfigureDrawer( props ) {
 										<nav className="justify-between flex" aria-label="Tabs">
 											<a
 												onClick={ () => setActiveTab( 'campaign' ) }
-												className={ `w-full campaign-settings-tab text-left text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'campaign' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-left text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'campaign' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'General', 'wp-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'filters' ) }
-												className={ `w-full campaign-settings-tab text-center text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'filters' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-center text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'filters' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'Filters', 'wp-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'advanced' ) }
-												className={ `w-full campaign-settings-tab text-right text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'advanced' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-slate-600 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
+												className={ `w-full campaign-settings-tab text-right text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'advanced' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
 												{ __( 'Advanced', 'wp-ai-blogger' ) }
 											</a>
