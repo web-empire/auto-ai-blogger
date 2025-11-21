@@ -511,10 +511,13 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @param int    $max_title_words      Max title words.
  * @param int    $max_content_words    Max content words.
  * @param array  $site_persona_details Site persona details.
+ * @param int    $campaign_id          Campaign ID (optional).
+ * @param string $campaign_name        Campaign name (optional).
+ * @param int    $image_count          Number of images to generate (optional, default 1).
  * @since 1.0.0
  * @return array|WP_Error Sanitized API response or error.
  */
-function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details ) {
+function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1 ) {
 	// Check user capabilities (skip during cron execution).
 	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return new WP_Error( 'insufficient_permissions', 'Insufficient permissions to create posts.' );
@@ -561,13 +564,48 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		// Get additional settings to match server API format.
 		$settings = Settings::get_ai_blogger_settings();
 
+		// Get existing post titles from campaign (if campaign_id is provided).
+		$existing_post_titles = [];
+		if ( $campaign_id > 0 ) {
+			$existing_posts = get_posts(
+				[
+					'post_type'      => 'post',
+					'posts_per_page' => -1,
+					'meta_query'     => [
+						[
+							'key'   => 'wp_aib_campaign_id',
+							'value' => $campaign_id,
+						],
+					],
+					'fields'         => 'ids',
+				]
+			);
+
+			if ( ! empty( $existing_posts ) ) {
+				foreach ( $existing_posts as $post_id ) {
+					$post_title = get_the_title( $post_id );
+					if ( ! empty( $post_title ) ) {
+						$existing_post_titles[] = $post_title;
+					}
+				}
+			}
+		}
+
+		// Get campaign name if provided, otherwise use default.
+		if ( empty( $campaign_name ) && $campaign_id > 0 ) {
+			$campaign_post = get_post( $campaign_id );
+			$campaign_name = $campaign_post ? $campaign_post->post_title : 'Campaign Post';
+		} elseif ( empty( $campaign_name ) ) {
+			$campaign_name = 'Campaign Post';
+		}
+
 		// Prepare request body to match the server API generate_campaign_post method exactly.
 		$body_args = [
-			// Required by server API generate_campaign_post method.
+			// Required by server API generate_campaign_post_v2 method.
 			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
 			'maxTitleWords'     => $max_title_words,
 			'maxWords'          => $max_content_words,
-			'name'              => 'Campaign Post', // Campaign name - server expects this.
+			'name'              => sanitize_text_field( $campaign_name ),
 			'license'           => $license,
 
 			// Safety settings - required by server.
@@ -581,8 +619,14 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 			'site_title'        => $sanitized_persona['site_title'] ?? ( $settings['siteTitle'] ?? '' ),
 			'site_purpose'      => $sanitized_persona['site_purpose'] ?? ( $settings['siteFor'] ?? '' ),
 			'site_description'  => $sanitized_persona['site_description'] ?? ( $settings['siteDescription'] ?? '' ),
-		];      // Validate API endpoint.
-		$api_url   = WP_AI_BLOGGER_POST_CREATION_API;
+
+			// Image settings - controlled via filter (default: 1 image).
+			'image_count'       => max( 0, min( 5, absint( $image_count ) ) ),
+
+			// Existing post titles for uniqueness.
+			'existing_titles'   => $existing_post_titles,
+		];      // Validate API endpoint - use new campaign post API.
+		$api_url   = WP_AI_BLOGGER_CAMPAIGN_POST_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
@@ -612,7 +656,22 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		// Validate response.
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( $response_code !== 200 ) {
-			return new WP_Error( 'api_error', "API returned status code: {$response_code}" );
+			// Parse error response body to extract actual error details.
+			$error_body = wp_remote_retrieve_body( $response );
+			$error_data = json_decode( $error_body, true );
+
+			// If server returned structured error, use it.
+			if ( is_array( $error_data ) && isset( $error_data['code'] ) ) {
+				$error_code    = sanitize_text_field( $error_data['code'] );
+				$error_message = isset( $error_data['message'] ) ?
+					sanitize_text_field( $error_data['message'] ) :
+					"API returned status code: {$response_code}";
+
+				return new WP_Error( $error_code, $error_message, [ 'status' => $response_code ] );
+			}
+
+			// Fallback for non-structured errors.
+			return new WP_Error( 'api_error', "API returned status code: {$response_code}", [ 'status' => $response_code ] );
 		}
 
 		$body = wp_remote_retrieve_body( $response );
@@ -658,9 +717,10 @@ function wpaib_sanitize_api_response( $data ) {
 		if ( is_array( $value ) ) {
 			$sanitized[ $clean_key ] = wpaib_sanitize_api_response( $value );
 		} elseif ( is_string( $value ) ) {
-			// Preserve HTML for content fields but sanitize.
-			if ( in_array( $clean_key, [ 'content', 'excerpt' ], true ) ) {
-				$sanitized[ $clean_key ] = wp_kses_post( $value );
+			// Preserve HTML/Gutenberg blocks for content fields.
+			// Don't use wp_kses_post as it strips HTML comments needed for Gutenberg blocks.
+			if ( in_array( $clean_key, [ 'post_content', 'content', 'excerpt' ], true ) ) {
+				$sanitized[ $clean_key ] = $value; // Keep as-is, comes from our controlled API.
 			} else {
 				$sanitized[ $clean_key ] = sanitize_text_field( $value );
 			}
@@ -1102,4 +1162,48 @@ function wpaib_create_timestamp_data(): array {
 		'unix_timestamp' => $unix_timestamp,
 		'formatted_date' => $formatted_date,
 	];
+}
+
+/**
+ * Update token data from API response or license verification.
+ *
+ * This function validates and updates the tokenTotal and tokenRemaining
+ * settings. It's used across different parts of the plugin to maintain
+ * consistent token data updates.
+ *
+ * @param array $token_data Token data containing 'total' and 'remaining' keys.
+ * @return bool True if update was successful, false otherwise.
+ * @since x.x.x
+ */
+function wpaib_update_token_data( $token_data ): bool {
+	try {
+		if ( ! is_array( $token_data ) ) {
+			return false;
+		}
+
+		// Validate required token fields.
+		if ( ! isset( $token_data['total'] ) || ! isset( $token_data['remaining'] ) ) {
+			return false;
+		}
+
+		// Sanitize and validate token values.
+		$token_total     = absint( $token_data['total'] );
+		$token_remaining = absint( $token_data['remaining'] );
+
+		// Validate token values make sense.
+		if ( $token_total < 0 || $token_remaining < 0 || $token_remaining > $token_total ) {
+			return false;
+		}
+
+		// Update token data using Helper class.
+		$total_result     = \WPAIBlogger\Inc\Utils\Helper::update_option( 'tokenTotal', $token_total );
+		$remaining_result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'tokenRemaining', $token_remaining );
+
+		// Return success status.
+		return $total_result['success'] && $remaining_result['success'];
+
+	} catch ( \Exception $e ) {
+		// Silently fail to avoid breaking execution.
+		return false;
+	}
 }

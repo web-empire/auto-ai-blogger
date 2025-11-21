@@ -341,7 +341,7 @@ export default function PostIdeas() {
 			hate,
 			sexually_explicit: sexuallyExplicit,
 			dangerous_content: dangerousContent,
-			image_count: 1,
+			image_count: 2,
 		};
 
 		formData.append( 'post_data', JSON.stringify( postData ) );
@@ -398,7 +398,7 @@ export default function PostIdeas() {
 				// Use the edit link provided by the backend
 				const editUrl = response.data.edit_link;
 
-				// Store the created post information in Redux and persist to database
+				// Store the created post information in Redux
 				dispatch( {
 					type: ADD_CREATED_POST_IDEA,
 					payload: {
@@ -407,12 +407,20 @@ export default function PostIdeas() {
 					},
 				} );
 
-				// Persist to database
+				// Persist to database (non-blocking - don't fail if this errors)
 				const updatedCreatedPosts = {
 					...createdPosts,
 					[ title ]: editUrl,
 				};
-				await updateApiData( 'createdPostIdeas', JSON.stringify( updatedCreatedPosts ), dispatch, abortControllerRef );
+
+				// Try to persist but don't let it fail the success flow
+				try {
+					await updateApiData( 'createdPostIdeas', JSON.stringify( updatedCreatedPosts ), dispatch, abortControllerRef );
+				} catch ( persistError ) {
+					// Log the error but don't show it to the user since the post was created successfully
+					console.warn( 'Failed to persist created post idea to database:', persistError.message );
+					// The Redux state is already updated, so the UI will still work correctly
+				}
 
 				// Handle token data if present (update Redux state only, database already updated)
 				if ( response.data.token_data &&
@@ -428,9 +436,15 @@ export default function PostIdeas() {
 						payload: response.data.token_data.remaining,
 					} );
 
-					// Update API data in database
-					await updateApiData( 'tokenTotal', response.data.token_data.total, dispatch, abortControllerRef );
-					await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
+					// Try to update API data in database (non-blocking)
+					try {
+						await updateApiData( 'tokenTotal', response.data.token_data.total, dispatch, abortControllerRef );
+						await updateApiData( 'tokenRemaining', response.data.token_data.remaining, dispatch, abortControllerRef );
+					} catch ( tokenPersistError ) {
+						// Log the error but don't show it to the user
+						console.warn( 'Failed to persist token data to database:', tokenPersistError.message );
+						// Redux state is already updated, so the UI will show correct values
+					}
 				}
 
 				dispatch( {
