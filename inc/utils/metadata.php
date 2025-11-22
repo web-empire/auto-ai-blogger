@@ -474,6 +474,51 @@ class Metadata {
 	}
 
 	/**
+	 * Calculate total visits for all posts in a campaign.
+	 *
+	 * @param int $campaign_id The campaign ID.
+	 * @return int Total visits across all posts in the campaign.
+	 * @since 1.0.0
+	 */
+	public static function calculate_campaign_total_visits( $campaign_id ) {
+		// Validate campaign ID.
+		$campaign_id = absint( $campaign_id );
+		if ( $campaign_id <= 0 ) {
+			return 0;
+		}
+
+		// Get all posts for this campaign.
+		$campaign_posts = get_posts(
+			[
+				'post_type'              => 'any',
+				'post_status'            => 'any',
+				'meta_query'             => [
+					[
+						'key'     => 'wp_aib_campaign_id',
+						'value'   => $campaign_id,
+						'compare' => '=',
+					],
+				],
+				'numberposts'            => -1,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			]
+		);
+
+		// Calculate total visits.
+		$total_visits = 0;
+		if ( ! empty( $campaign_posts ) ) {
+			foreach ( $campaign_posts as $post_id ) {
+				$views = absint( get_post_meta( $post_id, 'post_views_count', true ) );
+				$total_visits += $views;
+			}
+		}
+
+		return $total_visits;
+	}
+
+	/**
 	 * Get passed campaign post data.
 	 *
 	 * @param int  $post_id The post ID.
@@ -500,11 +545,15 @@ class Metadata {
 		$meta_frequency       = absint( $metadata['repeatInterval'] ?? 0 );
 		$repeat_unit          = $metadata['repeatUnit'] ?? 'day';
 
+		// Calculate total visits from all posts in this campaign.
+		$total_visits = self::calculate_campaign_total_visits( $post_id );
+
 		// Always use raw numeric values for the frontend.
 		$metadata['postsCreated']   = $meta_posts_created;
 		$metadata['postsScheduled'] = $meta_posts_scheduled;
 		$metadata['postsFailed']    = $meta_posts_failed;
 		$metadata['postsTarget']    = $meta_posts_target;
+		$metadata['postsVisit']     = $total_visits;
 
 		// Format frequency for display.
 		if ( ! $plain_metadata ) {
