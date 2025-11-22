@@ -55,8 +55,6 @@ class Helper {
 		'adminEmail',
 		'emailNotificationEnabled',
 		'emailNotificationValue',
-		'whatsappNotificationEnabled',
-		'whatsappNotificationValue',
 	];
 
 	/**
@@ -161,7 +159,7 @@ class Helper {
 		$sanitized_value = self::sanitize_input( $original_key, $value );
 
 		// Check if sanitization failed (false can be a valid value for boolean fields).
-		$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+		$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled' ];
 		if ( $sanitized_value === false && ! in_array( $original_key, $boolean_fields, true ) ) {
 			return [
 				'success' => false,
@@ -290,7 +288,7 @@ class Helper {
 			$sanitized_value = self::sanitize_input( $original_key, $value );
 
 			// Check if sanitization failed (false can be a valid value for boolean fields).
-			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
+			$boolean_fields = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled' ];
 			$is_valid_value = $sanitized_value !== false || in_array( $original_key, $boolean_fields, true );
 
 			if ( $is_valid_value ) {
@@ -467,14 +465,11 @@ class Helper {
 				}
 				return $api_key;
 
-			case 'enableLogging':
-				return (bool) $value;
+		case 'enableLogging':
+			return (bool) $value;
 
-			case 'emailNotificationEnabled':
-			case 'whatsappNotificationEnabled':
-				return (bool) $value;
-
-			case 'emailNotificationValue':
+		case 'emailNotificationEnabled':
+			return (bool) $value;			case 'emailNotificationValue':
 				// Support multiple email addresses separated by commas.
 				if ( empty( $value ) ) {
 					return '';
@@ -487,24 +482,10 @@ class Helper {
 						$valid_emails[] = $sanitized_email;
 					}
 				}
-				// Return empty string if no valid emails (rather than false) to allow saving when disabled.
-				return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
+			// Return empty string if no valid emails (rather than false) to allow saving when disabled.
+			return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
 
-			case 'whatsappNotificationValue':
-				// Basic phone number validation (international format).
-				$phone = sanitize_text_field( $value );
-				// Allow empty values (for when notification is disabled).
-				if ( empty( $phone ) ) {
-					return '';
-				}
-				// Allow international format: +[country code][number].
-				if ( ! preg_match( '/^\+?[1-9]\d{1,14}$/', $phone ) ) {
-					// Return empty string instead of false to allow saving when invalid/empty.
-					return '';
-				}
-				return $phone;
-
-			default:
+		default:
 				// Unknown key type, apply basic sanitization.
 				if ( is_string( $value ) ) {
 					return sanitize_text_field( $value );
@@ -540,11 +521,9 @@ class Helper {
 				$original_key_index = array_search( $key, $sanitized_allowed_keys );
 				$original_key       = self::$allowed_keys[ $original_key_index ];
 
-				// Boolean fields can have false as a valid value.
-				$boolean_fields   = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled', 'whatsappNotificationEnabled' ];
-				$is_boolean_field = in_array( $original_key, $boolean_fields, true );
-
-				// Include the value if it's not false, or if it's false but for a boolean field.
+			// Boolean fields can have false as a valid value.
+			$boolean_fields   = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled' ];
+			$is_boolean_field = in_array( $original_key, $boolean_fields, true );				// Include the value if it's not false, or if it's false but for a boolean field.
 				if ( $value !== false || $is_boolean_field ) {
 					$validated[ $key ] = $value;
 				}

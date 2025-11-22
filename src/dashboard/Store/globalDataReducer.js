@@ -165,8 +165,6 @@ const globalDataReducer = ( state = {}, action ) => {
 		// Notification settings
 		UPDATE_EMAIL_NOTIFICATION_ENABLED: () => ( { ...state, emailNotificationEnabled: Boolean( action.payload ) } ),
 		UPDATE_EMAIL_NOTIFICATION_VALUE: () => ( { ...state, emailNotificationValue: String( action.payload || '' ) } ),
-		UPDATE_WHATSAPP_NOTIFICATION_ENABLED: () => ( { ...state, whatsappNotificationEnabled: Boolean( action.payload ) } ),
-		UPDATE_WHATSAPP_NOTIFICATION_VALUE: () => ( { ...state, whatsappNotificationValue: String( action.payload || '' ) } ),
 
 		CLEAR_ERROR: () => ( { ...state, error: null } ),
 		STORE_ERROR: () => ( { ...state, error: action.payload?.message || 'Store error occurred', isLoading: false } ),

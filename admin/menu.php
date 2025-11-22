@@ -183,8 +183,6 @@ class Menu {
 		// Notification settings - default to disabled.
 		$email_notification_enabled    = (bool) Helper::get_option( 'emailNotificationEnabled', false );
 		$email_notification_value      = sanitize_text_field( Helper::get_option( 'emailNotificationValue', $admin_site_email_address ) );
-		$whatsapp_notification_enabled = (bool) Helper::get_option( 'whatsappNotificationEnabled', false );
-		$whatsapp_notification_value   = sanitize_text_field( Helper::get_option( 'whatsappNotificationValue', '' ) );
 
 		// Get data with proper error handling in the methods themselves.
 		$post_statuses     = Sanitizer::get_sanitized_post_statuses();
@@ -250,8 +248,6 @@ class Menu {
 				// Notification settings.
 				'email_notification_enabled'    => $email_notification_enabled,
 				'email_notification_value'      => $email_notification_value,
-				'whatsapp_notification_enabled' => $whatsapp_notification_enabled,
-				'whatsapp_notification_value'   => $whatsapp_notification_value,
 
 				// Token and licensing information.
 				'token_total'                   => $token_total,
