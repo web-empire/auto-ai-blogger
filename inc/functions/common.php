@@ -301,8 +301,8 @@ function wpaib_get_post_types() {
 
 		$queried_post_types = array_diff( $queried_post_types, $excluded_post_types );
 
-		// Add built-in post types with security check.
-		$builtin_post_types = [ 'post', 'page' ];
+		// Add built-in post types with security check (excluding 'page' as it's not suitable for campaigns).
+		$builtin_post_types = [ 'post' ];
 
 		foreach ( $builtin_post_types as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
