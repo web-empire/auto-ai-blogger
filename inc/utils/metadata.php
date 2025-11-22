@@ -80,7 +80,7 @@ class Metadata {
 					'type'    => 'string',
 				],
 				'summaryAsExcerpt'        => [
-					'default' => false,
+					'default' => true,
 					'type'    => 'bool',
 				],
 				'author'                  => [
