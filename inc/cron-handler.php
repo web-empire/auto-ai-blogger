@@ -271,6 +271,10 @@ class Cron_Handler {
 				}
 			}
 
+			// Replace internal link placeholders with actual WordPress URLs.
+			$previous_posts = wpaib_get_previous_campaign_posts( $campaign_id, 5 );
+			$post_content   = wpaib_replace_internal_link_placeholders( $post_content, $previous_posts );
+
 			$post_data = [
 			'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
 			'post_content' => $post_content,
