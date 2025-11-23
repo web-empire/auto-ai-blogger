@@ -694,8 +694,8 @@ export default function ConfigureDrawer( props ) {
 															{ __( 'Number of Content Images', 'wp-ai-blogger' ) }
 															<Tooltip
 																text={ wpaib_localized_data.pro_available
-																	? __( 'Number of images in post content (1-4). A featured image is automatically included.', 'wp-ai-blogger' )
-																	: __( 'Free users are limited to 1 content image. Upgrade to Pro for up to 4. Featured image is always included.', 'wp-ai-blogger' )
+																	? __( 'Number of images in post content (1-5). A featured image is automatically included.', 'wp-ai-blogger' )
+																	: __( 'Free users are limited to 1 content image. Upgrade to Pro for up to 5. Featured image is always included.', 'wp-ai-blogger' )
 																}
 																delay={ 100 }
 																className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
@@ -717,7 +717,7 @@ export default function ConfigureDrawer( props ) {
 																		return;
 																	}
 																	let value = parseInt( e.target.value ) || 0;
-																	const maxLimit = wpaib_localized_data.pro_available ? 4 : 1;
+																	const maxLimit = wpaib_localized_data.pro_available ? 5 : 1;
 																	
 																	// Enforce limits
 																	if ( value > maxLimit ) {
@@ -731,7 +731,7 @@ export default function ConfigureDrawer( props ) {
 																onWheel={ ( e ) => e.target.blur() }
 																type="number"
 																min="1"
-																max={ wpaib_localized_data.pro_available ? 4 : 1 }
+																max={ wpaib_localized_data.pro_available ? 5 : 1 }
 																readOnly={ isViewMode }
 																disabled={ wpaib_localized_data.pro_available ? false : true }
 																placeholder={ wpaib_localized_data.pro_available ? __( 'e.g., 3', 'wp-ai-blogger' ) : __( '1 (Free limit)', 'wp-ai-blogger' ) }
