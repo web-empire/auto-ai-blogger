@@ -19,8 +19,6 @@ const selectSettings = ( state ) => ( {
 	dangerousContent: typeof state.dangerousContent === 'number' ? state.dangerousContent : 2,
 	emailNotificationEnabled: typeof state.emailNotificationEnabled === 'boolean' ? state.emailNotificationEnabled : false,
 	emailNotificationValue: state.emailNotificationValue || '',
-	whatsappNotificationEnabled: typeof state.whatsappNotificationEnabled === 'boolean' ? state.whatsappNotificationEnabled : false,
-	whatsappNotificationValue: state.whatsappNotificationValue || '',
 	isLoading: state.isLoading || false,
 	error: state.error || null,
 } );
@@ -47,8 +45,6 @@ export const useSettingsSelector = () => {
 		settings.dangerousContent,
 		settings.emailNotificationEnabled,
 		settings.emailNotificationValue,
-		settings.whatsappNotificationEnabled,
-		settings.whatsappNotificationValue,
 		settings.isLoading,
 		settings.error,
 	] );
@@ -85,10 +81,6 @@ export const useSettingSelector = ( settingKey ) => {
 				return typeof state.emailNotificationEnabled === 'boolean' ? state.emailNotificationEnabled : false;
 			case 'emailNotificationValue':
 				return state.emailNotificationValue || '';
-			case 'whatsappNotificationEnabled':
-				return typeof state.whatsappNotificationEnabled === 'boolean' ? state.whatsappNotificationEnabled : false;
-			case 'whatsappNotificationValue':
-				return state.whatsappNotificationValue || '';
 			case 'isLoading':
 				return state.isLoading || false;
 			case 'error':
