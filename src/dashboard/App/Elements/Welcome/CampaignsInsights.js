@@ -461,7 +461,7 @@ function CampaignsInsights( { onError } ) {
 	if ( ! campaignsData.campaigns || campaignsData.campaigns.length === 0 ) {
 		return (
 			<section
-				className="px-4 sm:px-6 lg:px-8 pb-8 pt-0"
+				className="px-4 sm:px-6 lg:px-8 pb-8 pt-8"
 				aria-labelledby="campaigns-insights-heading"
 			>
 				<div className="mb-6">

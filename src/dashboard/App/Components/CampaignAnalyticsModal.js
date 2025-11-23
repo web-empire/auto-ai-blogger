@@ -71,6 +71,10 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 	};
 
 	const onUpgradePro = ( e ) => {
+		if ( wpaib_localized_data.pro_available ) {
+			return;
+		}
+
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -221,7 +225,11 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 												</div>
 												<button className="bg-white text-indigo-600 px-4 py-2 rounded font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-1 text-sm" onClick={ onUpgradePro }>
 													<Zap className="w-4 h-4" />
-													<span>{ __( 'Upgrade', 'wp-ai-blogger' ) }</span>
+													<span>
+														{
+															wpaib_localized_data.pro_available ? __( 'Soon', 'wp-ai-blogger' ) : __( 'Upgrade', 'wp-ai-blogger' )
+														}
+													</span>
 												</button>
 											</div>
 
