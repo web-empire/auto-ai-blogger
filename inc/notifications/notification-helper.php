@@ -2,7 +2,7 @@
 /**
  * Notification Helper class for WP AI Blogger.
  *
- * Handles sending notifications via email and WhatsApp for campaign events.
+ * Handles sending notifications via email for campaign events.
  *
  * @package wp-ai-blogger
  * @subpackage Inc\Notifications
@@ -193,11 +193,6 @@ class Notification_Helper {
 		if ( $this->is_email_enabled() ) {
 			$this->send_email_notification( $notification_type, $data );
 		}
-
-		// Send WhatsApp notification.
-		if ( $this->is_whatsapp_enabled() ) {
-			$this->send_whatsapp_notification( $notification_type, $data );
-		}
 	}
 
 	/**
@@ -236,30 +231,13 @@ class Notification_Helper {
 	}
 
 	/**
-	 * Send WhatsApp notification.
-	 *
-	 * @param string $notification_type Type of notification.
-	 * @param array  $data Notification data.
-	 * @since 1.0.0
-	 */
-	private function send_whatsapp_notification( $notification_type, $data ): void {
-		$whatsapp_number = $this->get_whatsapp_number();
-		if ( empty( $whatsapp_number ) ) {
-			return;
-		}
-
-		$whatsapp_handler = Whatsapp_Handler::get_instance();
-		$whatsapp_handler->send_notification( $notification_type, $whatsapp_number, $data );
-	}
-
-	/**
 	 * Check if any notifications are enabled.
 	 *
 	 * @return bool True if enabled.
 	 * @since 1.0.0
 	 */
 	private function are_notifications_enabled(): bool {
-		return $this->is_email_enabled() || $this->is_whatsapp_enabled();
+		return $this->is_email_enabled();
 	}
 
 	/**
@@ -271,18 +249,6 @@ class Notification_Helper {
 	private function is_email_enabled(): bool {
 		$enabled = Helper::get_option( 'emailNotificationEnabled', false );
 		$value   = Helper::get_option( 'emailNotificationValue', '' );
-		return $enabled && ! empty( $value );
-	}
-
-	/**
-	 * Check if WhatsApp notifications are enabled.
-	 *
-	 * @return bool True if enabled.
-	 * @since 1.0.0
-	 */
-	private function is_whatsapp_enabled(): bool {
-		$enabled = Helper::get_option( 'whatsappNotificationEnabled', false );
-		$value   = Helper::get_option( 'whatsappNotificationValue', '' );
 		return $enabled && ! empty( $value );
 	}
 
@@ -301,16 +267,6 @@ class Notification_Helper {
 		// Split by comma and clean up.
 		$emails = array_map( 'trim', explode( ',', $email_value ) );
 		return array_filter( $emails, 'is_email' );
-	}
-
-	/**
-	 * Get WhatsApp number for notifications.
-	 *
-	 * @return string WhatsApp number.
-	 * @since 1.0.0
-	 */
-	private function get_whatsapp_number(): string {
-		return Helper::get_option( 'whatsappNotificationValue', '' );
 	}
 
 	/**

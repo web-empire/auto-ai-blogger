@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useSelector, useDispatch } from 'react-redux';
-import { Mail, MessageCircle, Bell, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Bell, AlertCircle, CheckCircle2 } from 'lucide-react';
 import SwitchControl from '@Components/SwitchControl';
 import SettingsContainer from '@Components/SettingsContainer';
 import InfoCard from '@Components/InfoCard';
@@ -183,8 +183,6 @@ const Notifications = memo( () => {
 	const emailNotificationEnabled = useSelector( ( state ) => state.emailNotificationEnabled ) ?? false;
 	const emailNotificationValue = useSelector( ( state ) => state.emailNotificationValue ) ??
 		( ( typeof wpaib_localized_data !== 'undefined' && wpaib_localized_data?.admin_email ) || '' );
-	const whatsappNotificationEnabled = useSelector( ( state ) => state.whatsappNotificationEnabled ) ?? false;
-	const whatsappNotificationValue = useSelector( ( state ) => state.whatsappNotificationValue ) ?? '';
 
 	// Get Redux config for API calls
 	const adminNonce = useSelector( ( state ) => state.adminNonce );
@@ -196,10 +194,6 @@ const Notifications = memo( () => {
 			enabled: emailNotificationEnabled,
 			value: emailNotificationValue,
 		},
-		whatsapp: {
-			enabled: whatsappNotificationEnabled,
-			value: whatsappNotificationValue,
-		},
 	} );
 
 	// Sync local state with Redux when Redux state changes
@@ -209,22 +203,12 @@ const Notifications = memo( () => {
 				enabled: emailNotificationEnabled,
 				value: emailNotificationValue,
 			},
-			whatsapp: {
-				enabled: whatsappNotificationEnabled,
-				value: whatsappNotificationValue,
-			},
 		} );
-	}, [ emailNotificationEnabled, emailNotificationValue, whatsappNotificationEnabled, whatsappNotificationValue ] );
+	}, [ emailNotificationEnabled, emailNotificationValue ] );
 
 	// Email validation pattern (supports multiple emails)
 	const emailPattern = useMemo( () =>
 		/^[^\s@]+@[^\s@]+\.[^\s@]+(?:\s*,\s*[^\s@]+@[^\s@]+\.[^\s@]+)*$/,
-	[]
-	);
-
-	// Phone validation pattern (international format)
-	const phonePattern = useMemo( () =>
-		/^\+?[1-9]\d{1,14}$/,
 	[]
 	);
 
@@ -253,18 +237,6 @@ const Notifications = memo( () => {
 		saveSetting( 'emailNotificationEnabled', newEnabled );
 	}, [ dispatch, notifications.email.enabled, saveSetting ] );
 
-	const toggleWhatsApp = useCallback( () => {
-		const newEnabled = ! notifications.whatsapp.enabled;
-		setNotifications( ( prev ) => ( {
-			...prev,
-			whatsapp: { ...prev.whatsapp, enabled: newEnabled },
-		} ) );
-		// Update Redux store
-		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_ENABLED', payload: newEnabled } );
-		// Save to database
-		saveSetting( 'whatsappNotificationEnabled', newEnabled );
-	}, [ dispatch, notifications.whatsapp.enabled, saveSetting ] );
-
 	// Input change handlers - update both local state, Redux, and database
 	const updateEmail = useCallback( ( value ) => {
 		setNotifications( ( prev ) => ( {
@@ -275,17 +247,6 @@ const Notifications = memo( () => {
 		dispatch( { type: 'UPDATE_EMAIL_NOTIFICATION_VALUE', payload: value } );
 		// Save to database (debounced in real implementation)
 		saveSetting( 'emailNotificationValue', value );
-	}, [ dispatch, saveSetting ] );
-
-	const updateWhatsApp = useCallback( ( value ) => {
-		setNotifications( ( prev ) => ( {
-			...prev,
-			whatsapp: { ...prev.whatsapp, value },
-		} ) );
-		// Update Redux store
-		dispatch( { type: 'UPDATE_WHATSAPP_NOTIFICATION_VALUE', payload: value } );
-		// Save to database (debounced in real implementation)
-		saveSetting( 'whatsappNotificationValue', value );
 	}, [ dispatch, saveSetting ] );
 
 	return (
@@ -307,21 +268,6 @@ const Notifications = memo( () => {
 							inputType="email"
 							helpText={ __( 'Enter multiple email addresses separated by commas for team notifications.', 'wp-ai-blogger' ) }
 							validationPattern={ emailPattern }
-						/>
-
-						{ /* WhatsApp notifications */ }
-						<NotificationCard
-							icon={ <MessageCircle /> }
-							title={ __( 'WhatsApp Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive instant notifications on WhatsApp.', 'wp-ai-blogger' ) }
-							enabled={ notifications.whatsapp.enabled }
-							onToggle={ toggleWhatsApp }
-							inputValue={ notifications.whatsapp.value }
-							onInputChange={ updateWhatsApp }
-							inputPlaceholder={ __( '+1234567890', 'wp-ai-blogger' ) }
-							inputType="tel"
-							helpText={ __( 'Enter your WhatsApp number with country code (e.g., +1234567890).', 'wp-ai-blogger' ) }
-							validationPattern={ phonePattern }
 						/>
 
 						{ /* Information box */ }

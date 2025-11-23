@@ -7,26 +7,24 @@ import { Save, Gift } from 'lucide-react';
 /**
  * Enhanced ContentHeader component with improved error handling and UX
  *
- * @param {Object}      props                                     Component properties
- * @param {string}      [props.title='']                          Header title
- * @param {string}      [props.tab='']                            Current active tab
- * @param {string}      [props.siteTitle='']                      Site title setting
- * @param {string}      [props.siteFor='']                        Site for setting
- * @param {string}      [props.siteDescription='']                Site description setting
- * @param {number}      [props.temperature=0.7]                   Temperature setting for AI responses
- * @param {number}      [props.harassment=2]                      Harassment content filter setting
- * @param {number}      [props.hate=2]                            Hate content filter setting
- * @param {number}      [props.sexuallyExplicit=2]                Sexually explicit content filter
- * @param {number}      [props.dangerousContent=2]                Dangerous content filter setting
- * @param {boolean}     [props.emailNotificationEnabled=false]    Email notification enabled state
- * @param {string}      [props.emailNotificationValue='']         Email notification value
- * @param {boolean}     [props.whatsappNotificationEnabled=false] WhatsApp notification enabled state
- * @param {string}      [props.whatsappNotificationValue='']      WhatsApp notification value
- * @param {string}      [props.className='']                      Additional CSS classes
- * @param {Function}    [props.onSaveStart]                       Callback when save starts
- * @param {Function}    [props.onSaveComplete]                    Callback when save completes successfully
- * @param {Function}    [props.onSaveError]                       Callback when save fails
- * @param {JSX.Element} [props.icon=Gift]                         Icon component to display in header
+ * @param {Object}      props                                  Component properties
+ * @param {string}      [props.title='']                       Header title
+ * @param {string}      [props.tab='']                         Current active tab
+ * @param {string}      [props.siteTitle='']                   Site title setting
+ * @param {string}      [props.siteFor='']                     Site for setting
+ * @param {string}      [props.siteDescription='']             Site description setting
+ * @param {number}      [props.temperature=0.7]                Temperature setting for AI responses
+ * @param {number}      [props.harassment=2]                   Harassment content filter setting
+ * @param {number}      [props.hate=2]                         Hate content filter setting
+ * @param {number}      [props.sexuallyExplicit=2]             Sexually explicit content filter
+ * @param {number}      [props.dangerousContent=2]             Dangerous content filter setting
+ * @param {boolean}     [props.emailNotificationEnabled=false] Email notification enabled state
+ * @param {string}      [props.emailNotificationValue='']      Email notification value
+ * @param {string}      [props.className='']                   Additional CSS classes
+ * @param {Function}    [props.onSaveStart]                    Callback when save starts
+ * @param {Function}    [props.onSaveComplete]                 Callback when save completes successfully
+ * @param {Function}    [props.onSaveError]                    Callback when save fails
+ * @param {JSX.Element} [props.icon=Gift]                      Icon component to display in header
  * @return {JSX.Element|null} Rendered header component or null if tab is 'license'
  */
 const ContentHeader = ( {
@@ -43,8 +41,6 @@ const ContentHeader = ( {
 	dangerousContent = 2,
 	emailNotificationEnabled = false,
 	emailNotificationValue = '',
-	whatsappNotificationEnabled = false,
-	whatsappNotificationValue = '',
 	className = '', // eslint-disable-line no-unused-vars
 	onSaveStart,
 	onSaveComplete,
@@ -68,8 +64,6 @@ const ContentHeader = ( {
 			dangerousContent,
 			emailNotificationEnabled,
 			emailNotificationValue: emailNotificationEnabled ? emailNotificationValue : '',
-			whatsappNotificationEnabled,
-			whatsappNotificationValue: whatsappNotificationEnabled ? whatsappNotificationValue : '',
 		};
 
 		// Filter out undefined and null values.
@@ -87,8 +81,6 @@ const ContentHeader = ( {
 		dangerousContent,
 		emailNotificationEnabled,
 		emailNotificationValue,
-		whatsappNotificationEnabled,
-		whatsappNotificationValue,
 	] );
 
 	// Enhanced save function with better error handling
@@ -110,10 +102,6 @@ const ContentHeader = ( {
 			// Validate notification settings
 			if ( emailNotificationEnabled && ( ! emailNotificationValue || ! emailNotificationValue.trim() ) ) {
 				throw new Error( __( 'Email address cannot be empty.', 'wp-ai-blogger' ) );
-			}
-
-			if ( whatsappNotificationEnabled && ( ! whatsappNotificationValue || ! whatsappNotificationValue.trim() ) ) {
-				throw new Error( __( 'Phone number cannot be empty.', 'wp-ai-blogger' ) );
 			}
 
 			// Save settings sequentially to avoid race conditions and database conflicts

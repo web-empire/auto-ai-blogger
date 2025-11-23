@@ -10,6 +10,7 @@ import {
 	Zap,
 	BarChart3,
 	CheckCircle,
+	Eye,
 } from 'lucide-react';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -132,8 +133,8 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 								) : (
 									<div className="space-y-6">
 										{ /* Top Stats */ }
-										<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-											{ /* Published Posts & Views */ }
+										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+											{ /* Published Posts */ }
 											<div className="bg-gradient-to-r from-brand-50 to-indigo-50 p-4 rounded-lg border border-brand-200">
 												<div className="flex items-center justify-between">
 													<div className="flex flex-col gap-2">
@@ -141,6 +142,17 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 														<p className="text-2xl font-bold text-brand-900 m-0">{ analyticsData?.publishedPosts || campaignData?.postsCreated || 0 }</p>
 													</div>
 													<TrendingUp className="w-6 h-6 text-brand-500" />
+												</div>
+											</div>
+
+											{ /* Total Visits */ }
+											<div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+												<div className="flex items-center justify-between">
+													<div className="flex flex-col gap-2">
+														<p className="text-sm font-medium text-blue-600 m-0">{ __( 'Total Visits', 'wp-ai-blogger' ) }</p>
+														<p className="text-2xl font-bold text-blue-900 m-0">{ formatNumber( analyticsData?.totalViews || campaignData?.postsVisit || 0 ) }</p>
+													</div>
+													<Eye className="w-6 h-6 text-blue-500" />
 												</div>
 											</div>
 

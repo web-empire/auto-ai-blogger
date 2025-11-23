@@ -551,6 +551,7 @@ class Ajax {
 			// If no content provided, generate content from title via API.
 			$featured_image_id = null;
 			$post_content      = $post_data['post_content'] ?? '';
+			$post_excerpt      = ''; // Initialize excerpt variable.
 			$token_data        = null; // Initialize token data variable.
 
 			if ( empty( $post_content ) && ! empty( $post_title ) ) {
@@ -575,6 +576,14 @@ class Ajax {
 					$post_content = $api_result['post_content'] ?? '';
 					// Store token data from API response.
 					$token_data = $api_result['token_data'] ?? null;
+
+					// Extract and limit excerpt/summary to 160 characters.
+					if ( ! empty( $api_result['summary'] ) && is_string( $api_result['summary'] ) ) {
+						$post_excerpt = (string) $api_result['summary'];
+						if ( mb_strlen( $post_excerpt ) > 160 ) {
+							$post_excerpt = mb_substr( $post_excerpt, 0, 157 ) . '...';
+						}
+					}
 
 					// Process images if they exist in the API response.
 					if ( ! empty( $api_result['images'] ) && is_array( $api_result['images'] ) ) {
@@ -629,6 +638,11 @@ class Ajax {
 				'post_status'  => $post_status,
 				'post_type'    => $post_type,
 			];
+
+			// Add excerpt if available.
+			if ( ! empty( $post_excerpt ) ) {
+				$post_args['post_excerpt'] = wp_kses_post( $post_excerpt );
+			}
 
 			if ( ! empty( $meta_data ) && is_array( $meta_data ) ) {
 				$post_args['meta_input'] = $meta_data;
@@ -1745,11 +1759,15 @@ class Ajax {
 			// Extract images array if present.
 			$images = isset( $decoded_response['images'] ) && is_array( $decoded_response['images'] ) ? $decoded_response['images'] : [];
 
+			// Extract summary/excerpt if present.
+			$summary = isset( $decoded_response['summary'] ) && is_string( $decoded_response['summary'] ) ? (string) $decoded_response['summary'] : '';
+
 			// Extract and update token data if present.
 			$token_data = isset( $decoded_response['token_data'] ) && is_array( $decoded_response['token_data'] ) ? $decoded_response['token_data'] : null;
 
 			return [
 				'post_content' => $generated_content,
+				'summary'      => $summary,
 				'images'       => $images,
 				'token_data'   => $token_data,
 			];

@@ -271,19 +271,28 @@ class Cron_Handler {
 				}
 			}
 
+			// Replace internal link placeholders with actual WordPress URLs.
+			$previous_posts = wpaib_get_previous_campaign_posts( $campaign_id, 5 );
+			$post_content   = wpaib_replace_internal_link_placeholders( $post_content, $previous_posts );
+
 			$post_data = [
 				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
 				'post_content' => $post_content,
 				'post_status'  => $post_status ? $post_status : 'draft',
 				'post_type'    => $post_type ? $post_type : 'post',
 				'post_author'  => $author_id ? $author_id : get_current_user_id(),
-			];          if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
-				$post_data['post_excerpt'] = sanitize_text_field( $api_data['summary'] );
+			];
+
+			if ( $summary_as_excerpt && ! empty( $api_data['summary'] ) ) {
+				// Limit excerpt to 160 characters for SEO best practices.
+				$excerpt = sanitize_text_field( $api_data['summary'] );
+				if ( mb_strlen( $excerpt ) > 160 ) {
+					$excerpt = mb_substr( $excerpt, 0, 157 ) . '...';
+				}
+				$post_data['post_excerpt'] = $excerpt;
 			}
 
-			$post_id = wp_insert_post( $post_data );
-
-			if ( is_wp_error( $post_id ) || ! $post_id ) {
+			$post_id = wp_insert_post( $post_data );            if ( is_wp_error( $post_id ) || ! $post_id ) {
 				$wp_error_message = is_wp_error( $post_id ) ? $post_id->get_error_message() : 'Unknown database error';
 				return [
 					'success'    => false,

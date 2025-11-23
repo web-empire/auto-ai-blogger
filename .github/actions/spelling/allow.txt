@@ -189,3 +189,5 @@ Segoe
 thu
 Twilio
 addcslashes
+HOMELINK
+LINKID
