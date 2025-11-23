@@ -79,9 +79,9 @@ export const useSettingSelector = ( settingKey ) => {
 				return typeof state.dangerousContent === 'number' ? state.dangerousContent : 2;
 			case 'emailNotificationEnabled':
 				return typeof state.emailNotificationEnabled === 'boolean' ? state.emailNotificationEnabled : false;
-		case 'emailNotificationValue':
-			return state.emailNotificationValue || '';
-		case 'isLoading':
+			case 'emailNotificationValue':
+				return state.emailNotificationValue || '';
+			case 'isLoading':
 				return state.isLoading || false;
 			case 'error':
 				return state.error || null;

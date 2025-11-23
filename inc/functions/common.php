@@ -529,12 +529,14 @@ function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
 		// Get previously created posts from this campaign.
 		$posts = get_posts(
 			[
-				'post_type'      => 'post',
-				'post_status'    => 'publish',
-				'posts_per_page' => $limit,
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-				'meta_query'     => [
+				'post_type'              => 'post',
+				'post_status'            => 'publish',
+				'posts_per_page'         => $limit,
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => [
 					[
 						'key'   => 'wp_aib_campaign_id',
 						'value' => $campaign_id,
@@ -560,7 +562,6 @@ function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
 		return $previous_posts;
 
 	} catch ( \Exception $e ) {
-		error_log( "[WP AI Blogger] Error fetching previous campaign posts: " . $e->getMessage() );
 		return [];
 	}
 }
@@ -630,15 +631,17 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		if ( $campaign_id > 0 ) {
 			$existing_posts = get_posts(
 				[
-					'post_type'      => 'post',
-					'posts_per_page' => -1,
-					'meta_query'     => [
+					'post_type'              => 'post',
+					'posts_per_page'         => -1,
+					'meta_query'             => [
 						[
 							'key'   => 'wp_aib_campaign_id',
 							'value' => $campaign_id,
 						],
 					],
-					'fields'         => 'ids',
+					'fields'                 => 'ids',
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
 				]
 			);
 
@@ -1295,14 +1298,9 @@ function wpaib_replace_internal_link_placeholders( $content, $previous_posts = [
 	}
 
 	try {
-		// Log original content for debugging
-		error_log( "[WP AI Blogger] Before replacement - Content contains: " . ( strpos( $content, '__HOMELINK__' ) !== false ? 'YES' : 'NO' ) . ' homepage placeholders' );
-
-		// Replace homepage link placeholder
+		// Replace homepage link placeholder.
 		$home_url = home_url();
 		$content  = str_replace( '__HOMELINK__', esc_url( $home_url ), $content );
-
-		error_log( "[WP AI Blogger] After replacement - Homepage URL used: " . $home_url );
 
 		// Replace post ID placeholders.
 		if ( ! empty( $previous_posts ) && is_array( $previous_posts ) ) {
@@ -1314,8 +1312,6 @@ function wpaib_replace_internal_link_placeholders( $content, $previous_posts = [
 					// Replace __LINKID__ with actual URL.
 					$placeholder = '__LINK' . $post_id . '__';
 					$content     = str_replace( $placeholder, $post_url, $content );
-
-					error_log( "[WP AI Blogger] Replaced placeholder {$placeholder} with {$post_url}" );
 				}
 			}
 		}
@@ -1324,19 +1320,13 @@ function wpaib_replace_internal_link_placeholders( $content, $previous_posts = [
 		$content = preg_replace( '/__LINK\d+__/', '', $content );
 		$content = preg_replace( '/__HOMELINK__/', '', $content );
 
-		// Also clean up old format if it exists
+		// Also clean up old format if it exists.
 		$content = preg_replace( '/\{\{INTERNAL_LINK:\d+\}\}/', '', $content );
 		$content = preg_replace( '/\{\{INTERNAL_LINK:home\}\}/', '', $content );
-
-		// Log if there's a malformed link
-		if ( strpos( $content, 'href="home' ) !== false || strpos( $content, "href='home" ) !== false ) {
-			error_log( "[WP AI Blogger] WARNING: Found malformed href with 'home' - AI may have generated incorrect link format" );
-		}
 
 		return $content;
 
 	} catch ( \Exception $e ) {
-		error_log( "[WP AI Blogger] Error replacing internal link placeholders: " . $e->getMessage() );
 		return $content;
 	}
 }

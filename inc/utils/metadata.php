@@ -510,7 +510,7 @@ class Metadata {
 		$total_visits = 0;
 		if ( ! empty( $campaign_posts ) ) {
 			foreach ( $campaign_posts as $post_id ) {
-				$views = absint( get_post_meta( $post_id, 'post_views_count', true ) );
+				$views         = absint( get_post_meta( $post_id, 'post_views_count', true ) );
 				$total_visits += $views;
 			}
 		}

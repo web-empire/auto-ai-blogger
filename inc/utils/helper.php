@@ -465,11 +465,13 @@ class Helper {
 				}
 				return $api_key;
 
-		case 'enableLogging':
-			return (bool) $value;
+			case 'enableLogging':
+				return (bool) $value;
 
-		case 'emailNotificationEnabled':
-			return (bool) $value;			case 'emailNotificationValue':
+			case 'emailNotificationEnabled':
+				return (bool) $value;
+
+			case 'emailNotificationValue':
 				// Support multiple email addresses separated by commas.
 				if ( empty( $value ) ) {
 					return '';
@@ -482,10 +484,10 @@ class Helper {
 						$valid_emails[] = $sanitized_email;
 					}
 				}
-			// Return empty string if no valid emails (rather than false) to allow saving when disabled.
-			return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
+				// Return empty string if no valid emails (rather than false) to allow saving when disabled.
+				return ! empty( $valid_emails ) ? implode( ', ', $valid_emails ) : '';
 
-		default:
+			default:
 				// Unknown key type, apply basic sanitization.
 				if ( is_string( $value ) ) {
 					return sanitize_text_field( $value );
@@ -521,9 +523,9 @@ class Helper {
 				$original_key_index = array_search( $key, $sanitized_allowed_keys );
 				$original_key       = self::$allowed_keys[ $original_key_index ];
 
-			// Boolean fields can have false as a valid value.
-			$boolean_fields   = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled' ];
-			$is_boolean_field = in_array( $original_key, $boolean_fields, true );				// Include the value if it's not false, or if it's false but for a boolean field.
+				// Boolean fields can have false as a valid value.
+				$boolean_fields   = [ 'userOnboarded', 'enableLogging', 'emailNotificationEnabled' ];
+				$is_boolean_field = in_array( $original_key, $boolean_fields, true );               // Include the value if it's not false, or if it's false but for a boolean field.
 				if ( $value !== false || $is_boolean_field ) {
 					$validated[ $key ] = $value;
 				}

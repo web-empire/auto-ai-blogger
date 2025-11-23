@@ -267,11 +267,11 @@ const Notifications = memo( () => {
 							inputPlaceholder={ __( 'admin@example.com, editor@example.com', 'wp-ai-blogger' ) }
 							inputType="email"
 							helpText={ __( 'Enter multiple email addresses separated by commas for team notifications.', 'wp-ai-blogger' ) }
-						validationPattern={ emailPattern }
-					/>
+							validationPattern={ emailPattern }
+						/>
 
-					{ /* Information box */ }
-					<InfoCard
+						{ /* Information box */ }
+						<InfoCard
 							icon={ Bell }
 							title={ __( 'Notification Types', 'wp-ai-blogger' ) }
 							items={ [
