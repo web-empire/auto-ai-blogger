@@ -116,6 +116,14 @@ export default function ConfigureDrawer( props ) {
 			}, 4000 );
 			return;
 		}
+		if ( drawerData.overrideSitePersona && ! drawerData.overrideSiteFor ) {
+			showFieldError( 'blog-for', __( 'Campaign For should not be empty when override is enabled.', 'wp-ai-blogger' ), 'advanced' );
+			return;
+		}
+		if ( drawerData.overrideSitePersona && ! drawerData.overrideSiteDescription ) {
+			showFieldError( 'more-about-blog', __( 'Campaign Description should not be empty when override is enabled.', 'wp-ai-blogger' ), 'advanced' );
+			return;
+		}
 
 		setErrorMessage( '' );
 		setFieldErrors( {} );
@@ -630,98 +638,198 @@ export default function ConfigureDrawer( props ) {
 											<div className="flex flex-1 flex-col justify-between">
 												<div className="divide-y divide-gray-200 px-4 sm:px-6">
 													<div className="space-y-6 pb-5 pt-6">
-														<div className="flex items-center justify-between">
-															<label htmlFor="maximum-title-words" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Maximum Title Words', 'wp-ai-blogger' ) }
-															</label>
+													<div className="flex items-center justify-between">
+														<label htmlFor="maximum-words" className="flex items-center text-sm/6 font-medium text-gray-900">
+															{ __( 'Maximum Content Words', 'wp-ai-blogger' ) }
+															<Tooltip
+																text={ wpaib_localized_data.pro_available
+																	? __( 'Set the maximum number of words for generated content (100-5000 words).', 'wp-ai-blogger' )
+																	: __( 'Free users are limited to 1000 words. Upgrade to Pro to customize up to 5000 words.', 'wp-ai-blogger' )
+																}
+																delay={ 100 }
+																className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+															>
+																<QuestionMarkCircleIcon
+																	aria-hidden="true"
+																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																/>
+															</Tooltip>
+														</label>
 
+														<div className="mt-2">
+															<input
+																id="maximum-words"
+																name="maximum-words"
+																value={ drawerData.maxWords || '' }
+																onChange={ ( e ) => {
+																	if ( isViewMode ) {
+																		return;
+																	}
+																	let value = parseInt( e.target.value ) || 0;
+																	const maxLimit = wpaib_localized_data.pro_available ? 5000 : 1000;
+																	
+																	// Enforce limits
+																	if ( value > maxLimit ) {
+																		value = maxLimit;
+																	} else if ( value < 0 ) {
+																		value = 0;
+																	}
+																	
+																	setDrawerData( { ...drawerData, maxWords: value } );
+																} }
+																onWheel={ ( e ) => e.target.blur() }
+																type="number"
+																min="100"
+																max={ wpaib_localized_data.pro_available ? 5000 : 1000 }
+																readOnly={ isViewMode }
+																disabled={ wpaib_localized_data.pro_available ? false : true }
+																placeholder={ wpaib_localized_data.pro_available ? __( 'e.g., 1500', 'wp-ai-blogger' ) : __( '1000 (Free limit)', 'wp-ai-blogger' ) }
+																className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
+															/>
+														</div>
+													</div>
+
+													<div className="flex items-center justify-between">
+														<label htmlFor="number-of-images" className="flex items-center text-sm/6 font-medium text-gray-900">
+															{ __( 'Number of Content Images', 'wp-ai-blogger' ) }
+															<Tooltip
+																text={ wpaib_localized_data.pro_available
+																	? __( 'Number of images in post content (1-4). A featured image is automatically included.', 'wp-ai-blogger' )
+																	: __( 'Free users are limited to 1 content image. Upgrade to Pro for up to 4. Featured image is always included.', 'wp-ai-blogger' )
+																}
+																delay={ 100 }
+																className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+															>
+																<QuestionMarkCircleIcon
+																	aria-hidden="true"
+																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																/>
+															</Tooltip>
+														</label>
+
+														<div className="mt-2">
+															<input
+																id="number-of-images"
+																name="number-of-images"
+																value={ drawerData.numberOfImages || '' }
+																onChange={ ( e ) => {
+																	if ( isViewMode ) {
+																		return;
+																	}
+																	let value = parseInt( e.target.value ) || 0;
+																	const maxLimit = wpaib_localized_data.pro_available ? 4 : 1;
+																	
+																	// Enforce limits
+																	if ( value > maxLimit ) {
+																		value = maxLimit;
+																	} else if ( value < 0 ) {
+																		value = 0;
+																	}
+																	
+																	setDrawerData( { ...drawerData, numberOfImages: value } );
+																} }
+																onWheel={ ( e ) => e.target.blur() }
+																type="number"
+																min="1"
+																max={ wpaib_localized_data.pro_available ? 4 : 1 }
+																readOnly={ isViewMode }
+																disabled={ wpaib_localized_data.pro_available ? false : true }
+																placeholder={ wpaib_localized_data.pro_available ? __( 'e.g., 3', 'wp-ai-blogger' ) : __( '1 (Free limit)', 'wp-ai-blogger' ) }
+																className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
+															/>
+														</div>
+													</div>
+
+													<div className="flex items-center justify-between">
+														<label htmlFor="override-site-persona" className="flex items-center text-sm/6 font-medium text-gray-900">
+															{ __( 'Override Site Persona for this Campaign?', 'wp-ai-blogger' ) }
+															<Tooltip
+																text={ wpaib_localized_data.pro_available
+																	? __( 'Customize site persona specifically for this campaign. This overrides your global site settings.', 'wp-ai-blogger' )
+																	: __( 'Pro feature: Customize site persona per campaign. Upgrade to unlock.', 'wp-ai-blogger' )
+																}
+																delay={ 100 }
+																className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+															>
+																<QuestionMarkCircleIcon
+																	aria-hidden="true"
+																	className="size-4 ml-1 text-gray-400 group-hover:text-gray-500"
+																/>
+															</Tooltip>
+														</label>
+														<div className="mt-2">
+															<SwitchControl
+																checked={ drawerData.overrideSitePersona }
+																onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
+																id="override-site-persona"
+																disabled={ isViewMode || ! wpaib_localized_data.pro_available }
+															/>
+														</div>
+													</div>
+
+											{
+												drawerData.overrideSitePersona && (
+													<>
+														<div>
+															<label htmlFor="blog-for" className="block text-sm/6 font-medium text-gray-900">
+																{ __( 'Campaign For', 'wp-ai-blogger' ) }
+															</label>
 															<div className="mt-2">
 																<input
-																	id="maximum-title-words"
-																	name="maximum-title-words"
-																	defaultValue={ drawerData.maxTitleWords }
-																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxTitleWords: e.target.value } ) }
-																	type="number"
-																	min="1"
+																	id="blog-for"
+																	name="blog-for"
+																	type="text"
+																	defaultValue={ drawerData.overrideSiteFor }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteFor: e.target.value } ) }
 																	readOnly={ isViewMode }
-																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'blog-for' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
+																	}` }
+																	placeholder={ __( 'e.g., Fitness enthusiasts and health-conscious individuals', 'wp-ai-blogger' ) }
 																/>
+																{ fieldErrors[ 'blog-for' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'blog-for' ] }
+																	</p>
+																) }
 															</div>
 														</div>
-
-														<div className="flex items-center justify-between">
-															<label htmlFor="maximum-words" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Maximum Content Words', 'wp-ai-blogger' ) }
-															</label>
-
-															<div className="mt-2">
-																<input
-																	id="maximum-words"
-																	name="maximum-words"
-																	defaultValue={ drawerData.maxWords }
-																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, maxWords: e.target.value } ) }
-																	type="number"
-																	min="1"
-																	readOnly={ isViewMode }
-																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
-																/>
-															</div>
-														</div>
-
-														<div className="flex items-center justify-between">
-															<label htmlFor="override-site-persona" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Override Site Persona for this Campaign?', 'wp-ai-blogger' ) }
-															</label>
-															<div className="mt-2">
-																<SwitchControl
-																	checked={ drawerData.overrideSitePersona }
-																	onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
-																	id="override-site-persona"
-																	disabled={ isViewMode || ! wpaib_localized_data.pro_available }
-																/>
-															</div>
-														</div>
-
-														{
-															drawerData.overrideSitePersona && (
-																<>
-																	<SettingField>
-																		<SettingLabel forId="name-of-the-blog" title={ __( 'Campaign Title:', 'wp-ai-blogger' ) } />
-																		<SettingInput
-																			id="name-of-the-blog"
-																			defaultValue={ drawerData.overrideSiteTitle }
-																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteTitle: e.target.value } ) }
-																			readOnly={ isViewMode }
-																		/>
-																	</SettingField>
-
-																	<SettingField>
-																		<SettingLabel forId="blog-for" title={ __( 'Campaign For:', 'wp-ai-blogger' ) } />
-																		<SettingInput
-																			id="blog-for"
-																			defaultValue={ drawerData.overrideSiteFor }
-																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteFor: e.target.value } ) }
-																			readOnly={ isViewMode }
-																		/>
-																	</SettingField>
-
-																	<SettingField>
-																		<SettingLabel forId="more-about-blog" title={ __( 'Campaign Description:', 'wp-ai-blogger' ) } />
-																		<textarea
-																			id="more-about-blog"
-																			className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
-																			value={ drawerData.overrideSiteDescription }
-																			onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
-																			readOnly={ isViewMode }
-																		/>
-																	</SettingField>
-																</>
-															)
-														}
 
 														<div>
+															<label htmlFor="more-about-blog" className="block text-sm/6 font-medium text-gray-900">
+																{ __( 'Campaign Description', 'wp-ai-blogger' ) }
+															</label>
+															<div className="mt-2">
+																<textarea
+																	id="more-about-blog"
+																	name="more-about-blog"
+																	rows={ 3 }
+																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 transition-colors duration-200 ${
+																		fieldErrors[ 'more-about-blog' ]
+																			? 'bg-red-50 outline-red-300 focus:outline-red-500 text-red-900'
+																			: isViewMode
+																				? 'bg-gray-50 outline-gray-200'
+																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
+																	}` }
+																	value={ drawerData.overrideSiteDescription }
+																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
+																	readOnly={ isViewMode }
+																	placeholder={ __( 'e.g., A comprehensive guide to yoga and wellness practices', 'wp-ai-blogger' ) }
+																/>
+																{ fieldErrors[ 'more-about-blog' ] && (
+																	<p className="mt-1 text-sm text-red-600">
+																		{ fieldErrors[ 'more-about-blog' ] }
+																	</p>
+																) }
+															</div>
+														</div>
+													</>
+												)
+											}														<div>
 															<div className="mt-4 flex text-sm">
 																<a href="#" className="group inline-flex items-center text-gray-500 hover:text-gray-900">
 																	<QuestionMarkCircleIcon

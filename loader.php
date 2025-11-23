@@ -85,6 +85,12 @@ class Loader {
 
 		/* Register custom cron schedules */
 		add_filter( 'cron_schedules', [ $this, 'register_custom_cron_schedules' ] );
+		
+		/* Enforce free user limits for max content words if Pro is not available */
+		if ( ! defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ) {
+			add_filter( 'wpaib_max_content_words', [ $this, 'enforce_free_max_words_limit' ], 10, 2 );
+			add_filter( 'wpaib_campaign_image_count', [ $this, 'enforce_free_image_limit' ], 10, 2 );
+		}
 
 		if ( is_admin() ) {
 			/* Ajax init */
@@ -200,6 +206,47 @@ class Loader {
 	 * @since 1.0.0
 	 */
 	public function deactivation_actions(): void {
+	}
+
+	/**
+	 * Enforce maximum content words limit for free users.
+	 *
+	 * Free users are limited to 1000 words maximum.
+	 * Pro users can customize this value up to 5000 words.
+	 *
+	 * @param int $max_words   The maximum words from campaign settings.
+	 * @param int $campaign_id The campaign ID.
+	 * @return int The enforced maximum words value.
+	 * @since x.x.x
+	 */
+	public function enforce_free_max_words_limit( $max_words, $campaign_id ): int {
+		// Free users are limited to 1000 words max.
+		$free_limit = 1000;
+		
+		// If the requested max_words exceeds free limit, cap it.
+		if ( $max_words > $free_limit ) {
+			$max_words = $free_limit;
+		}
+		
+		// Ensure minimum is at least 100 words.
+		if ( $max_words < 100 ) {
+			$max_words = 100;
+		}
+		
+		return absint( $max_words );
+	}
+
+	/**
+	 * Enforce free user limit for number of images per post.
+	 *
+	 * @param int $image_count The number of images from campaign settings.
+	 * @param int $campaign_id The campaign ID.
+	 * @return int The enforced image count (always 1 for free users).
+	 * @since x.x.x
+	 */
+	public function enforce_free_image_limit( $image_count, $campaign_id ): int {
+		// Free users are limited to 1 image per post.
+		return 1;
 	}
 }
 

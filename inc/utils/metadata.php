@@ -163,8 +163,8 @@ class Metadata {
 					'default' => 1000,
 					'type'    => 'number',
 				],
-				'maxTitleWords'           => [
-					'default' => 10,
+				'numberOfImages'          => [
+					'default' => 1,
 					'type'    => 'number',
 				],
 				'postsVisit'              => [

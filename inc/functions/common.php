@@ -508,7 +508,6 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * Get API response to create blog post with security validation.
  *
  * @param string $keywords             Keywords.
- * @param int    $max_title_words      Max title words.
  * @param int    $max_content_words    Max content words.
  * @param array  $site_persona_details Site persona details.
  * @param int    $campaign_id          Campaign ID (optional).
@@ -517,7 +516,7 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @since 1.0.0
  * @return array|WP_Error Sanitized API response or error.
  */
-function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1 ) {
+function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1 ) {
 	// Check user capabilities (skip during cron execution).
 	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return new WP_Error( 'insufficient_permissions', 'Insufficient permissions to create posts.' );
@@ -528,11 +527,6 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		$keywords = sanitize_textarea_field( $keywords );
 		if ( empty( $keywords ) || strlen( $keywords ) > 1000 ) {
 			return new WP_Error( 'invalid_keywords', 'Invalid keywords provided.' );
-		}
-
-		$max_title_words = absint( $max_title_words );
-		if ( $max_title_words < 1 || $max_title_words > 50 ) {
-			$max_title_words = 10; // Safe default.
 		}
 
 		$max_content_words = absint( $max_content_words );
@@ -603,7 +597,6 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 		$body_args = [
 			// Required by server API generate_campaign_post_v2 method.
 			'keywords'          => is_array( $keywords ) ? $keywords : array_map( 'trim', explode( ',', $keywords ) ),
-			'maxTitleWords'     => $max_title_words,
 			'maxWords'          => $max_content_words,
 			'name'              => sanitize_text_field( $campaign_name ),
 			'license'           => $license,
@@ -631,22 +624,20 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
 
-		$args = [
-			'method'      => 'POST',
-			'timeout'     => 30, // Reduced timeout for security.
-			'redirection' => 5,  // Limited redirects.
-			'httpversion' => '1.1',
-			'blocking'    => true,
-			'headers'     => [
-				'Content-Type' => 'application/json',
-				'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
-			],
-			'body'        => wp_json_encode( $body_args ),
-			'cookies'     => [],
-			'sslverify'   => true, // Enforce SSL verification.
-		];
-
-		$response = wp_remote_post( $api_url, $args );
+	$args = [
+		'method'      => 'POST',
+		'timeout'     => 150, // Increased timeout for long content generation (4750-5000 words).
+		'redirection' => 5,  // Limited redirects.
+		'httpversion' => '1.1',
+		'blocking'    => true,
+		'headers'     => [
+			'Content-Type' => 'application/json',
+			'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
+		],
+		'body'        => wp_json_encode( $body_args ),
+		'cookies'     => [],
+		'sslverify'   => true, // Enforce SSL verification.
+	];		$response = wp_remote_post( $api_url, $args );
 
 		// Check for errors.
 		if ( is_wp_error( $response ) ) {
@@ -655,9 +646,11 @@ function wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max
 
 		// Validate response.
 		$response_code = wp_remote_retrieve_response_code( $response );
+		
 		if ( $response_code !== 200 ) {
 			// Parse error response body to extract actual error details.
 			$error_body = wp_remote_retrieve_body( $response );
+			
 			$error_data = json_decode( $error_body, true );
 
 			// If server returned structured error, use it.
@@ -1089,6 +1082,13 @@ function wpaib_get_user_friendly_error_message( $error_type, $original_message )
 			return __( 'Authentication failed. Please check your license key and ensure it\'s valid and active.', 'wp-ai-blogger' );
 
 		case 'api_error':
+			if ( ! empty( $original_message ) ) {
+				return sprintf(
+					/* translators: %s: Original error message. */
+					__( 'Content generation service error: %s', 'wp-ai-blogger' ),
+					$original_message
+				);
+			}
 			return __( 'Content generation service error. The API returned an unexpected response.', 'wp-ai-blogger' );
 
 		case 'database_error':
