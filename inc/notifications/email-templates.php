@@ -64,7 +64,7 @@ class Email_Templates {
 
 		$body  = $this->get_email_header();
 		$body .= sprintf(
-			'<h2 style="color: #4F46E5; margin-bottom: 16px;">%s</h2>',
+			'<h2 style="color: #4F46E5; margin-bottom: 16px; display: flex; gap: 4px; align-items: center;">%s</h2>',
 			__( '🚀 Campaign Started Successfully!', 'wp-ai-blogger' )
 		);
 
@@ -116,7 +116,7 @@ class Email_Templates {
 
 		$body  = $this->get_email_header();
 		$body .= sprintf(
-			'<h2 style="color: #10B981; margin-bottom: 16px;">%s</h2>',
+			'<h2 style="color: #10B981; margin-bottom: 16px; display: flex; gap: 4px; align-items: center;">%s</h2>',
 			__( '✅ New Post Created Successfully!', 'wp-ai-blogger' )
 		);
 
@@ -175,7 +175,7 @@ class Email_Templates {
 
 		$body  = $this->get_email_header();
 		$body .= sprintf(
-			'<h2 style="color: #8B5CF6; margin-bottom: 16px;">%s</h2>',
+			'<h2 style="color: #8B5CF6; margin-bottom: 16px; display: flex; gap: 4px; align-items: center;">%s</h2>',
 			__( '🎉 Campaign Completed Successfully!', 'wp-ai-blogger' )
 		);
 
@@ -227,7 +227,7 @@ class Email_Templates {
 
 		$body  = $this->get_email_header();
 		$body .= sprintf(
-			'<h2 style="color: #EF4444; margin-bottom: 16px;">%s</h2>',
+			'<h2 style="color: #EF4444; margin-bottom: 16px; display: flex; gap: 4px; align-items: center;">%s</h2>',
 			__( '⚠️ Campaign Failed/Terminated', 'wp-ai-blogger' )
 		);
 
