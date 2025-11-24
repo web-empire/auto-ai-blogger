@@ -58,6 +58,11 @@ export default function MainNav() {
 			return ! menu.requiresLicense || licenseEnabled;
 		} );
 
+		// Let's remove Free vs Pro tab if premium is already enabled as per wpaib_localized_data.pro_available.
+		if ( proAvailable ) {
+			filteredMenus.splice( 3, 1 );
+		}
+
 		// Apply WordPress hooks filter
 		return wp?.hooks?.applyFilters?.( 'wp_ai_blogger_dashboard.main_navigation', filteredMenus ) || filteredMenus;
 	}, [ licenseEnabled, homeSlug ] );

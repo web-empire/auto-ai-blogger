@@ -21,6 +21,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.posts_page_wp-ai-blogger {
+	--tw-bg-opacity: 1;
+	background-color: rgb( 249 250 251 / var( --tw-bg-opacity, 1 ) );
+}
+
 .posts_page_wp-ai-blogger,
 .posts_page_wp-ai-blogger.wp-ai-blogger-wizard {
 	background: #fff;
@@ -39,10 +44,6 @@
 
 .posts_page_wp-ai-blogger #wpcontent {
 	padding-left: 0;
-}
-
-#wp-ai-blogger-main-page--wrapper {
-	min-height: 100vh;
 }
 
 #headlessui-portal-root button,
@@ -208,9 +209,18 @@
 	background: #f1f1f1;
 }
 
+.posts_page_wp-ai-blogger #wpbody,
+.posts_page_wp-ai-blogger #wpwrap {
+	height: 100%;
+}
+
+.posts_page_wp-ai-blogger #wpbody {
+	background: #f9fafb;
+}
 .posts_page_wp-ai-blogger #wpbody-content {
 	padding-left: 0;
 	padding-right: 0;
+	padding-bottom: 0;
 }
 
 .posts_page_wp-ai-blogger a:active,
@@ -322,8 +332,4 @@
 }
 .force-mt-4 {
 	margin-top: 16px !important;
-}
-.wp-ai-blogger-dashboard,
-.wp-ai-blogger-page {
-	@apply h-screen;
 }

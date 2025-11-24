@@ -342,14 +342,14 @@ LicenseRequiredState.displayName = 'CampaignsLicenseRequiredState';
 
 // Enhanced empty state component
 const EmptyState = memo( () => (
-	<div className="text-center py-12">
+	<div className="text-center py-12 bg-white shadow-sm rounded-lg border border-gray-200">
 		<div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
 			<BarChart3 className="w-8 h-8 text-gray-400" aria-hidden="true" />
 		</div>
 		<h3 className="text-lg font-medium text-gray-900 mb-2">
 			{ __( 'No Campaign Data Available', 'wp-ai-blogger' ) }
 		</h3>
-		<p className="text-gray-500 max-w-md !m-auto">
+		<p className="text-gray-500 max-w-lg !m-auto">
 			{ __( 'Campaign insights will appear here once you create and run your first campaign.', 'wp-ai-blogger' ) }
 		</p>
 	</div>

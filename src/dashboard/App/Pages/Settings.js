@@ -282,7 +282,7 @@ function Settings() {
 		<div className="mx-auto lg:flex lg:gap-x-0 h-full">
 			{ /* Enhanced sidebar navigation */ }
 			<aside
-				className="flex overflow-x-auto lg:block lg:w-72 py-8 px-4 lg:flex-none settings-nav"
+				className="flex overflow-x-auto lg:block lg:w-72 py-8 px-4 lg:flex-none settings-nav bg-white h-screen"
 				aria-label={ __( 'Settings navigation', 'wp-ai-blogger' ) }
 			>
 				<nav
