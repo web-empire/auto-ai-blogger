@@ -141,13 +141,13 @@ export const TokenDisplayAndRefresh = () => {
 	const progressPercentage = totalTokens > 0 ? ( ( totalTokens - tokenRemaining ) / totalTokens ) * 100 : 0;
 	const getTokenStatus = () => {
 		const remaining = tokenRemaining;
-		if ( remaining >= 1000 ) {
+		if ( remaining >= 2000 ) {
 			return {
 				text: __( 'Plenty of tokens', 'wp-ai-blogger' ),
 				color: 'bg-green-500',
 			};
 		}
-		if ( remaining >= 100 ) {
+		if ( remaining >= 1000 ) {
 			return {
 				text: __( 'Moderate', 'wp-ai-blogger' ),
 				color: 'bg-amber-500',
