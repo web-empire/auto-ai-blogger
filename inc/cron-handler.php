@@ -221,9 +221,13 @@ class Cron_Handler {
 	 */
 	public function generate_post_from_campaign( $campaign_id, $target_post_number = 0, $current_attempt = 0 ): array {
 		try {
-			$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
-			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
-			$max_title_words    = Metadata::get_campaign_meta( $campaign_id, 'maxTitleWords' ) ?? 10;
+			$keywords  = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
+			$max_words = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
+
+			// Apply filter to allow Pro plugin to modify max_words.
+			// Free users are limited to 1000 words, Pro users can customize.
+			$max_words = apply_filters( 'wpaib_max_content_words', $max_words, $campaign_id );
+
 			$post_type          = Metadata::get_campaign_meta( $campaign_id, 'postType' );
 			$post_status        = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
 			$author_id          = Metadata::get_campaign_meta( $campaign_id, 'author' );
@@ -239,7 +243,7 @@ class Cron_Handler {
 				];
 			}
 
-			$api_response = $this->call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words );
+			$api_response = $this->call_post_creation_api( $campaign_id, $keywords, $max_words );
 
 			if ( ! $api_response['success'] ) {
 				return [
@@ -376,14 +380,12 @@ class Cron_Handler {
 	 * @param int    $campaign_id The ID of the campaign.
 	 * @param string $keywords The keywords for the post.
 	 * @param int    $max_words The maximum number of words for the post.
-	 * @param int    $max_title_words The maximum number of words for the title.
 	 * @return array An array containing the API response data.
 	 * @since x.x.x
 	 */
-	private function call_post_creation_api( $campaign_id, $keywords, $max_words, $max_title_words ): array {
+	private function call_post_creation_api( $campaign_id, $keywords, $max_words ): array {
 		try {
-			$max_words       = $max_words ? $max_words : 1000;
-			$max_title_words = $max_title_words ? $max_title_words : 10;
+			$max_words = $max_words ? $max_words : 1000;
 
 			$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
 
@@ -391,17 +393,24 @@ class Cron_Handler {
 			$campaign_post = get_post( $campaign_id );
 			$campaign_name = $campaign_post ? $campaign_post->post_title : 'Campaign Post';
 
-			// Default image count is 1 for campaign posts.
-			// Pro plugin can filter this to allow user-configured image count.
-			$image_count = apply_filters( 'wpaib_campaign_image_count', 2, $campaign_id );
-			$image_count = max( 0, min( 5, absint( $image_count ) ) ); // Limit: 0-5 images.
+			// Get number of images from campaign metadata (represents content images only).
+			$image_count = Metadata::get_campaign_meta( $campaign_id, 'numberOfImages' ) ?? 1;
+
+			// Apply filter to allow Pro plugin to modify image count.
+			// Free users are limited to 1 image, Pro users can customize 1-4.
+			$image_count = apply_filters( 'wpaib_campaign_image_count', $image_count, $campaign_id );
+			$image_count = max( 1, min( 4, absint( $image_count ) ) ); // Limit: 1-4 content images.
+
+			// Add 1 for featured image (first image is always featured, rest go in content).
+			// Total will be 2-5 images (API limit is 0-5, we use 2-5 range).
+			$total_image_count = $image_count + 1;
 
 			$max_retries = 2;
 			$retry_delay = 3;
 			$response    = null;
 
 			for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
-				$response = wpaib_get_post_creation_api_response( $keywords, $max_title_words, $max_words, $site_persona_details, $campaign_id, $campaign_name, $image_count );
+				$response = wpaib_get_post_creation_api_response( $keywords, $max_words, $site_persona_details, $campaign_id, $campaign_name, $total_image_count );
 
 				if ( ! is_wp_error( $response ) ) {
 					break;
