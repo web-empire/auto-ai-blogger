@@ -350,7 +350,7 @@ export default function Campaigns() {
 	};	if ( ! campaigns || Object.keys( campaigns ).length === 0 ) {
 		return (
 			<>
-				<div className="flex flex-col items-center justify-center gap-y-3 border border-dashed border-gray-300 rounded-md p-6 max-w-lg mx-auto mt-20">
+				<div className="flex flex-col items-center justify-center gap-y-3 border border-dashed border-gray-300 p-6 max-w-lg mx-auto mt-20 bg-white rounded-lg shadow-md">
 					<FolderPlus className="w-8 h-8 text-gray-400" />
 					<h3 className="text-base font-semibold text-gray-900 m-0 p-0">
 						{ __( 'No Campaigns.', 'wp-ai-blogger' ) }
@@ -456,7 +456,7 @@ export default function Campaigns() {
 						<div className="mt-6">
 							<div className="overflow-x-auto shadow ring-1 ring-black/5 sm:rounded-lg" style={ { scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' } }>
 								<table className="w-full divide-y divide-gray-300" style={ { tableLayout: 'fixed', minWidth: '1200px' } }>
-									<thead className="bg-gray-50 header-nav">
+									<thead className="bg-gradient-to-r from-brand-50 to-indigo-50 header-nav">
 										<tr>
 											<th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6" style={ { width: '200px' } }>
 												{ __( 'Name', 'wp-ai-blogger' ) }

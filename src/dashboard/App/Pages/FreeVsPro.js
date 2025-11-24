@@ -2,7 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Features } from '../Elements/FreeVsPro/Features';
 import ProButton from '@Components/ProButton';
-import { Sprout, Check, X, Star, Zap, LifeBuoy } from 'lucide-react';
+import { Sprout, Check, X, Star, Zap, LifeBuoy, Crown } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 // Enhanced status icon component with better accessibility
@@ -82,7 +82,7 @@ const CallToActionSection = memo( () => {
 
 	return (
 		<section
-			className="mt-8 py-12 px-6 bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 border border-indigo-200 rounded-xl shadow-lg"
+			className="mt-8 py-12 px-6 bg-gradient-to-r from-brand-50 to-indigo-50 border border-indigo-200 rounded-xl shadow-lg"
 			aria-labelledby="cta-heading"
 		>
 			<div className="flex flex-col items-center text-center">
@@ -170,7 +170,7 @@ const FreeVsPro = () => {
 									{ __( 'Detailed comparison of features available in Free and Pro versions of AI Blogger', 'wp-ai-blogger' ) }
 								</caption>
 
-								<thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+								<thead className="bg-gradient-to-r from-brand-50 to-indigo-50">
 									<tr role="row">
 										<th
 											scope="col"
@@ -199,7 +199,7 @@ const FreeVsPro = () => {
 											<div className="flex flex-col items-center gap-1">
 												<span className="flex items-center gap-1">
 													{ __( 'Premium', 'wp-ai-blogger' ) }
-													<Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
+													<Crown className="w-4 h-4 text-[#9138c8]" aria-hidden="true" />
 												</span>
 												<span className="text-xs font-normal text-gray-600">
 													{ __( 'Starting at $3.99/month', 'wp-ai-blogger' ) }
