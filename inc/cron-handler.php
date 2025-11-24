@@ -221,13 +221,13 @@ class Cron_Handler {
 	 */
 	public function generate_post_from_campaign( $campaign_id, $target_post_number = 0, $current_attempt = 0 ): array {
 		try {
-			$keywords           = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
-			$max_words          = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
-			
+			$keywords  = Metadata::get_campaign_meta( $campaign_id, 'keywords' );
+			$max_words = Metadata::get_campaign_meta( $campaign_id, 'maxWords' ) ?? 1000;
+
 			// Apply filter to allow Pro plugin to modify max_words.
 			// Free users are limited to 1000 words, Pro users can customize.
 			$max_words = apply_filters( 'wpaib_max_content_words', $max_words, $campaign_id );
-			
+
 			$post_type          = Metadata::get_campaign_meta( $campaign_id, 'postType' );
 			$post_status        = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
 			$author_id          = Metadata::get_campaign_meta( $campaign_id, 'author' );
@@ -380,7 +380,6 @@ class Cron_Handler {
 	 * @param int    $campaign_id The ID of the campaign.
 	 * @param string $keywords The keywords for the post.
 	 * @param int    $max_words The maximum number of words for the post.
-	 * @param int    $max_title_words The maximum number of words for the title.
 	 * @return array An array containing the API response data.
 	 * @since x.x.x
 	 */
@@ -396,12 +395,12 @@ class Cron_Handler {
 
 			// Get number of images from campaign metadata (represents content images only).
 			$image_count = Metadata::get_campaign_meta( $campaign_id, 'numberOfImages' ) ?? 1;
-			
+
 			// Apply filter to allow Pro plugin to modify image count.
 			// Free users are limited to 1 image, Pro users can customize 1-4.
 			$image_count = apply_filters( 'wpaib_campaign_image_count', $image_count, $campaign_id );
 			$image_count = max( 1, min( 4, absint( $image_count ) ) ); // Limit: 1-4 content images.
-			
+
 			// Add 1 for featured image (first image is always featured, rest go in content).
 			// Total will be 2-5 images (API limit is 0-5, we use 2-5 range).
 			$total_image_count = $image_count + 1;

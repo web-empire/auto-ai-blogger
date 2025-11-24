@@ -85,7 +85,7 @@ class Loader {
 
 		/* Register custom cron schedules */
 		add_filter( 'cron_schedules', [ $this, 'register_custom_cron_schedules' ] );
-		
+
 		/* Enforce free user limits for max content words if Pro is not available */
 		if ( ! defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ) {
 			add_filter( 'wpaib_max_content_words', [ $this, 'enforce_free_max_words_limit' ], 10, 2 );
@@ -222,17 +222,17 @@ class Loader {
 	public function enforce_free_max_words_limit( $max_words, $campaign_id ): int {
 		// Free users are limited to 1000 words max.
 		$free_limit = 1000;
-		
+
 		// If the requested max_words exceeds free limit, cap it.
 		if ( $max_words > $free_limit ) {
 			$max_words = $free_limit;
 		}
-		
+
 		// Ensure minimum is at least 100 words.
 		if ( $max_words < 100 ) {
 			$max_words = 100;
 		}
-		
+
 		return absint( $max_words );
 	}
 

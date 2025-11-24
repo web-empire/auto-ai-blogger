@@ -697,20 +697,21 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
 
-	$args = [
-		'method'      => 'POST',
-		'timeout'     => 150, // Increased timeout for long content generation (4750-5000 words).
-		'redirection' => 5,  // Limited redirects.
-		'httpversion' => '1.1',
-		'blocking'    => true,
-		'headers'     => [
-			'Content-Type' => 'application/json',
-			'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
-		],
-		'body'        => wp_json_encode( $body_args ),
-		'cookies'     => [],
-		'sslverify'   => true, // Enforce SSL verification.
-	];		$response = wp_remote_post( $api_url, $args );
+		$args     = [
+			'method'      => 'POST',
+			'timeout'     => 150, // Increased timeout for long content generation (4750-5000 words).
+			'redirection' => 5,  // Limited redirects.
+			'httpversion' => '1.1',
+			'blocking'    => true,
+			'headers'     => [
+				'Content-Type' => 'application/json',
+				'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
+			],
+			'body'        => wp_json_encode( $body_args ),
+			'cookies'     => [],
+			'sslverify'   => true, // Enforce SSL verification.
+		];
+		$response = wp_remote_post( $api_url, $args );
 
 		// Check for errors.
 		if ( is_wp_error( $response ) ) {
@@ -719,11 +720,11 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 
 		// Validate response.
 		$response_code = wp_remote_retrieve_response_code( $response );
-		
+
 		if ( $response_code !== 200 ) {
 			// Parse error response body to extract actual error details.
 			$error_body = wp_remote_retrieve_body( $response );
-			
+
 			$error_data = json_decode( $error_body, true );
 
 			// If server returned structured error, use it.
