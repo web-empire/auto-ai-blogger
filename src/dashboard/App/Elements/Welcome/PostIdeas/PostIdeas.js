@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Plus, MoveRight, RotateCw, Crown, Edit } from 'lucide-react';
+import { Plus, MoveRight, RotateCw, Crown, Edit, WandSparkles } from 'lucide-react';
 import { TrimWordsContent } from '@Utils/TrimWordsContent';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateApiData } from '@Utils/ApiData';
@@ -493,7 +493,7 @@ export default function PostIdeas() {
 					<ProButton
 						variant="primary"
 						size="default"
-						icon={ <Crown className="w-4 h-4" /> }
+						icon={ proAvailable ? <WandSparkles className="w-4 h-4" /> : <Crown className="w-4 h-4" /> }
 						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
 						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
 						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 Suggestions, Upgrade to Pro', 'wp-ai-blogger' ) }

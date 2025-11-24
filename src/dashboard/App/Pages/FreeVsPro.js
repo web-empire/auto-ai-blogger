@@ -24,7 +24,7 @@ const StatusIcon = memo( ( { value, label } ) => {
 			default:
 				return {
 					icon: <span className="text-sm font-medium">{ value }</span>,
-					className: 'text-gray-600 bg-gray-50 border-gray-200',
+					className: 'text-gray-600',
 					label: typeof value === 'string' ? value : __( 'Custom', 'wp-ai-blogger' ),
 				};
 		}
@@ -96,7 +96,7 @@ const CallToActionSection = memo( () => {
 
 				{ /* Enhanced heading with better typography */ }
 				<h2 id="cta-heading" className="text-3xl font-bold text-gray-900 mb-4 max-w-2xl">
-					{ __( 'Start Growing with AI Blogger Pro', 'wp-ai-blogger' ) }
+					{ __( 'Let AI Run Your Blog - You Focus on Growth', 'wp-ai-blogger' ) }
 				</h2>
 
 				{ /* Enhanced description with benefits */ }
@@ -198,11 +198,11 @@ const FreeVsPro = () => {
 										>
 											<div className="flex flex-col items-center gap-1">
 												<span className="flex items-center gap-1">
-													{ __( 'Pro', 'wp-ai-blogger' ) }
+													{ __( 'Premium', 'wp-ai-blogger' ) }
 													<Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
 												</span>
 												<span className="text-xs font-normal text-gray-600">
-													{ __( 'Starting at $9/month', 'wp-ai-blogger' ) }
+													{ __( 'Starting at $3.99/month', 'wp-ai-blogger' ) }
 												</span>
 											</div>
 										</th>

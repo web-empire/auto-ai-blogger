@@ -301,8 +301,8 @@ function wpaib_get_post_types() {
 
 		$queried_post_types = array_diff( $queried_post_types, $excluded_post_types );
 
-		// Add built-in post types with security check.
-		$builtin_post_types = [ 'post', 'page' ];
+		// Add built-in post types with security check (excluding 'page' as it's not suitable for campaigns).
+		$builtin_post_types = [ 'post' ];
 
 		foreach ( $builtin_post_types as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
@@ -505,6 +505,68 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
 }
 
 /**
+ * Get previous campaign posts for internal linking.
+ *
+ * @param int $campaign_id Campaign ID.
+ * @param int $limit       Maximum number of posts to fetch (default 5).
+ * @since 1.0.0
+ * @return array Array of previous posts with id, title, url.
+ */
+function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
+	// Validate campaign ID.
+	$campaign_id = absint( $campaign_id );
+	if ( $campaign_id <= 0 ) {
+		return [];
+	}
+
+	// Limit must be reasonable.
+	$limit = absint( $limit );
+	if ( $limit <= 0 || $limit > 10 ) {
+		$limit = 5;
+	}
+
+	try {
+		// Get previously created posts from this campaign.
+		$posts = get_posts(
+			[
+				'post_type'              => 'post',
+				'post_status'            => 'publish',
+				'posts_per_page'         => $limit,
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => [
+					[
+						'key'   => 'wp_aib_campaign_id',
+						'value' => $campaign_id,
+					],
+				],
+			]
+		);
+
+		if ( empty( $posts ) ) {
+			return [];
+		}
+
+		// Build simplified array with id, title, url.
+		$previous_posts = [];
+		foreach ( $posts as $post ) {
+			$previous_posts[] = [
+				'id'    => $post->ID,
+				'title' => get_the_title( $post->ID ),
+				'url'   => get_permalink( $post->ID ),
+			];
+		}
+
+		return $previous_posts;
+
+	} catch ( \Exception $e ) {
+		return [];
+	}
+}
+
+/**
  * Get API response to create blog post with security validation.
  *
  * @param string $keywords             Keywords.
@@ -563,15 +625,17 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 		if ( $campaign_id > 0 ) {
 			$existing_posts = get_posts(
 				[
-					'post_type'      => 'post',
-					'posts_per_page' => -1,
-					'meta_query'     => [
+					'post_type'              => 'post',
+					'posts_per_page'         => -1,
+					'meta_query'             => [
 						[
 							'key'   => 'wp_aib_campaign_id',
 							'value' => $campaign_id,
 						],
 					],
-					'fields'         => 'ids',
+					'fields'                 => 'ids',
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
 				]
 			);
 
@@ -591,6 +655,12 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 			$campaign_name = $campaign_post ? $campaign_post->post_title : 'Campaign Post';
 		} elseif ( empty( $campaign_name ) ) {
 			$campaign_name = 'Campaign Post';
+		}
+
+		// Get previous campaign posts for internal linking (if campaign_id is provided).
+		$previous_posts = [];
+		if ( $campaign_id > 0 ) {
+			$previous_posts = wpaib_get_previous_campaign_posts( $campaign_id, 5 );
 		}
 
 		// Prepare request body to match the server API generate_campaign_post method exactly.
@@ -618,6 +688,9 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 
 			// Existing post titles for uniqueness.
 			'existing_titles'   => $existing_post_titles,
+
+			// Previous posts for internal linking.
+			'previous_posts'    => $previous_posts,
 		];      // Validate API endpoint - use new campaign post API.
 		$api_url   = WP_AI_BLOGGER_CAMPAIGN_POST_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
@@ -1205,5 +1278,55 @@ function wpaib_update_token_data( $token_data ): bool {
 	} catch ( \Exception $e ) {
 		// Silently fail to avoid breaking execution.
 		return false;
+	}
+}
+
+/**
+ * Replace internal link placeholders with actual WordPress links.
+ *
+ * This function replaces placeholders like __LINK123__ with actual
+ * WordPress post permalinks, and __HOMELINK__ with the homepage URL.
+ *
+ * @param string $content The post content with link placeholders.
+ * @param array  $previous_posts Optional array of previous posts with id, title, url.
+ * @return string Content with placeholders replaced.
+ * @since 1.0.0
+ */
+function wpaib_replace_internal_link_placeholders( $content, $previous_posts = [] ) {
+	if ( empty( $content ) || ! is_string( $content ) ) {
+		return $content;
+	}
+
+	try {
+		// Replace homepage link placeholder.
+		$home_url = home_url();
+		$content  = str_replace( '__HOMELINK__', esc_url( $home_url ), $content );
+
+		// Replace post ID placeholders.
+		if ( ! empty( $previous_posts ) && is_array( $previous_posts ) ) {
+			foreach ( $previous_posts as $post ) {
+				if ( isset( $post['id'] ) && isset( $post['url'] ) ) {
+					$post_id  = absint( $post['id'] );
+					$post_url = esc_url( $post['url'] );
+
+					// Replace __LINKID__ with actual URL.
+					$placeholder = '__LINK' . $post_id . '__';
+					$content     = str_replace( $placeholder, $post_url, $content );
+				}
+			}
+		}
+
+		// Fallback: If any placeholders remain (shouldn't happen), remove them to avoid broken output.
+		$content = preg_replace( '/__LINK\d+__/', '', $content );
+		$content = preg_replace( '/__HOMELINK__/', '', $content );
+
+		// Also clean up old format if it exists.
+		$content = preg_replace( '/\{\{INTERNAL_LINK:\d+\}\}/', '', $content );
+		$content = preg_replace( '/\{\{INTERNAL_LINK:home\}\}/', '', $content );
+
+		return $content;
+
+	} catch ( \Exception $e ) {
+		return $content;
 	}
 }

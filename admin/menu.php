@@ -181,10 +181,8 @@ class Menu {
 		$license_status     = sanitize_key( Helper::get_option( 'license_status', 'unlicensed' ) );
 
 		// Notification settings - default to disabled.
-		$email_notification_enabled    = (bool) Helper::get_option( 'emailNotificationEnabled', false );
-		$email_notification_value      = sanitize_text_field( Helper::get_option( 'emailNotificationValue', $admin_site_email_address ) );
-		$whatsapp_notification_enabled = (bool) Helper::get_option( 'whatsappNotificationEnabled', false );
-		$whatsapp_notification_value   = sanitize_text_field( Helper::get_option( 'whatsappNotificationValue', '' ) );
+		$email_notification_enabled = (bool) Helper::get_option( 'emailNotificationEnabled', false );
+		$email_notification_value   = sanitize_text_field( Helper::get_option( 'emailNotificationValue', $admin_site_email_address ) );
 
 		// Get data with proper error handling in the methods themselves.
 		$post_statuses     = Sanitizer::get_sanitized_post_statuses();
@@ -200,23 +198,23 @@ class Menu {
 			'wp_ai_blogger_localized_admin_data',
 			[
 				// Core WordPress URLs and nonces.
-				'ajax_url'                      => admin_url( 'admin-ajax.php' ),
-				'rest_url'                      => rest_url( WP_AI_BLOGGER_SLUG . '/v1/' ),
-				'admin_nonce'                   => wp_create_nonce( 'wpaib_admin_nonce' ),
-				'rest_nonce'                    => wp_create_nonce( 'wp_rest' ),
-				'admin_page_nonce'              => wp_create_nonce( 'wp_ai_blogger_admin_page' ),
-				'licensing_nonce'               => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
+				'ajax_url'                   => admin_url( 'admin-ajax.php' ),
+				'rest_url'                   => rest_url( WP_AI_BLOGGER_SLUG . '/v1/' ),
+				'admin_nonce'                => wp_create_nonce( 'wpaib_admin_nonce' ),
+				'rest_nonce'                 => wp_create_nonce( 'wp_rest' ),
+				'admin_page_nonce'           => wp_create_nonce( 'wp_ai_blogger_admin_page' ),
+				'licensing_nonce'            => wp_create_nonce( 'wp_ai_blogger_licensing_nonce' ),
 
 				// Static configuration that doesn't change during app lifecycle.
-				'version'                       => WP_AI_BLOGGER_VERSION,
-				'home_slug'                     => sanitize_key( self::PAGE_ID ),
-				'admin_base_url'                => esc_url( admin_url( 'edit.php' ) ),
-				'admin_app_url'                 => esc_url( admin_url( 'edit.php?page=' . self::PAGE_ID ) ),
-				'upgrade_link'                  => defined( 'WP_AI_BLOGGER_UPGRADE_LINK' ) ? esc_url( WP_AI_BLOGGER_UPGRADE_LINK ) : '#',
-				'pro_purchase_url'              => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
-				'pro_available'                 => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
-				'pro_version'                   => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
-				'edit_post_link'                => esc_url(
+				'version'                    => WP_AI_BLOGGER_VERSION,
+				'home_slug'                  => sanitize_key( self::PAGE_ID ),
+				'admin_base_url'             => esc_url( admin_url( 'edit.php' ) ),
+				'admin_app_url'              => esc_url( admin_url( 'edit.php?page=' . self::PAGE_ID ) ),
+				'upgrade_link'               => defined( 'WP_AI_BLOGGER_UPGRADE_LINK' ) ? esc_url( WP_AI_BLOGGER_UPGRADE_LINK ) : '#',
+				'pro_purchase_url'           => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
+				'pro_available'              => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
+				'pro_version'                => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
+				'edit_post_link'             => esc_url(
 					add_query_arg(
 						[
 							'post'   => '{{POST_ID}}',
@@ -227,50 +225,48 @@ class Menu {
 				),
 
 				// User and site information.
-				'current_user_name'             => sanitize_text_field( wpaib_get_user_detail( 'name' ) ),
-				'current_user_email'            => sanitize_email( wpaib_get_user_detail( 'email' ) ),
-				'current_user_id'               => get_current_user_id(),
-				'admin_email'                   => $admin_site_email_address,
-				'site_title'                    => $site_title,
-				'site_description'              => $site_description,
-				'site_for'                      => $site_for,
+				'current_user_name'          => sanitize_text_field( wpaib_get_user_detail( 'name' ) ),
+				'current_user_email'         => sanitize_email( wpaib_get_user_detail( 'email' ) ),
+				'current_user_id'            => get_current_user_id(),
+				'admin_email'                => $admin_site_email_address,
+				'site_title'                 => $site_title,
+				'site_description'           => $site_description,
+				'site_for'                   => $site_for,
 
 				// User settings and preferences.
-				'userOnboarded'                 => (bool) Helper::get_option( 'userOnboarded', false ),
-				'license'                       => $license,
-				'license_status'                => $license_status,
-				'postIdeas'                     => $post_ideas,
-				'createdPostIdeas'              => $created_post_ideas,
-				'temperature'                   => $temperature,
-				'harassment'                    => $harassment,
-				'hate'                          => $hate,
-				'sexually_explicit'             => $sexually_explicit,
-				'dangerous_content'             => $dangerous_content,
+				'userOnboarded'              => (bool) Helper::get_option( 'userOnboarded', false ),
+				'license'                    => $license,
+				'license_status'             => $license_status,
+				'postIdeas'                  => $post_ideas,
+				'createdPostIdeas'           => $created_post_ideas,
+				'temperature'                => $temperature,
+				'harassment'                 => $harassment,
+				'hate'                       => $hate,
+				'sexually_explicit'          => $sexually_explicit,
+				'dangerous_content'          => $dangerous_content,
 
 				// Notification settings.
-				'email_notification_enabled'    => $email_notification_enabled,
-				'email_notification_value'      => $email_notification_value,
-				'whatsapp_notification_enabled' => $whatsapp_notification_enabled,
-				'whatsapp_notification_value'   => $whatsapp_notification_value,
+				'email_notification_enabled' => $email_notification_enabled,
+				'email_notification_value'   => $email_notification_value,
 
 				// Token and licensing information.
-				'token_total'                   => $token_total,
-				'token_remaining'               => $token_remaining,
+				'token_total'                => $token_total,
+				'token_remaining'            => $token_remaining,
 
 				// WordPress data collections.
-				'post_statuses'                 => $post_statuses,
-				'categories'                    => $categories,
-				'tags'                          => $tags,
-				'authors'                       => $authors,
-				'post_types'                    => $post_types,
-				'postmeta_defaults'             => $postmeta_defaults,
-				'all_campaigns'                 => $all_campaigns,
-				'generated_posts'               => $generated_posts,
+				'post_statuses'              => $post_statuses,
+				'categories'                 => $categories,
+				'tags'                       => $tags,
+				'authors'                    => $authors,
+				'post_types'                 => $post_types,
+				'postmeta_defaults'          => $postmeta_defaults,
+				'all_campaigns'              => $all_campaigns,
+				'generated_posts'            => $generated_posts,
 
 				// System configuration.
-				'blog_name'                     => $blog_name,
-				'security_level'                => 'enhanced',
-				'campaign_testing_mode'         => false, // Will be overridden by testing plugin if active.
+				'blog_name'                  => $blog_name,
+				'security_level'             => 'enhanced',
+				'campaign_testing_mode'      => false, // Will be overridden by testing plugin if active.
 			]
 		);
 
