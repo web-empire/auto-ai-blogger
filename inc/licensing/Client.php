@@ -278,7 +278,8 @@ class Client {
 	 * @return bool
 	 */
 	public function is_local_server() {
-		$is_local = in_array( $_SERVER['REMOTE_ADDR'], [ '127.0.0.1', '::1' ], true );
+		$remote_addr = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' );
+		$is_local    = in_array( $remote_addr, [ '127.0.0.1', '::1' ], true );
 		return apply_filters( 'surecart_licensing_is_local', $is_local );
 	}
 

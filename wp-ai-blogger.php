@@ -9,6 +9,8 @@
  * Requires PHP: 5.6
  * Description: WP AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging.
  * Text Domain: wp-ai-blogger
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package wp-ai-blogger
  */

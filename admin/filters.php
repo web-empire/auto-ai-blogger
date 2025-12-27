@@ -47,7 +47,7 @@ class Filters {
 		$current_post_type = $typenow;
 
 		if ( empty( $current_post_type ) && isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
-			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.
@@ -93,7 +93,7 @@ class Filters {
 		// Check if we're filtering a supported post type.
 		$current_post_type = $typenow;
 		if ( empty( $current_post_type ) && ! empty( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
-			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.

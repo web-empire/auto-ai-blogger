@@ -176,7 +176,7 @@ class Licensing {
 		}
 
 		// Input validation and sanitization.
-		$license_key = $this->sanitize_license_key( $_POST['license_key'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
+		$license_key = $this->sanitize_license_key( isset( $_POST['license_key'] ) ? wp_unslash( $_POST['license_key'] ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
 		if ( is_wp_error( $license_key ) ) {
 			wp_send_json_error( [ 'message' => $license_key->get_error_message() ] );
 		}

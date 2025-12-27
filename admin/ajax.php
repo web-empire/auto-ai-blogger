@@ -192,9 +192,9 @@ class Ajax {
 			$sub_option_value = '';
 			if ( isset( $_POST['value'] ) ) {
 				if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
-					$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( wp_unslash( $_POST['value'] ), $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
 				} else {
-					$sub_option_value = Settings::sanitize_data( $_POST['value'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( wp_unslash( $_POST['value'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
 				}
 			}
 
@@ -1316,7 +1316,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function validate_user_agent() {
-		$user_agent = sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
+		$user_agent = sanitize_text_field( wp_unslash( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ) );
 
 		if ( empty( $user_agent ) ) {
 			return new \WP_Error( 'invalid_user_agent', $this->get_error_msg( 'security_violation' ) );
@@ -1356,7 +1356,7 @@ class Ajax {
 	 * @since x.x.x
 	 */
 	private function validate_admin_referer() {
-		$referer = sanitize_text_field( (string) ( $_SERVER['HTTP_REFERER'] ?? '' ) );
+		$referer = sanitize_text_field( wp_unslash( (string) ( $_SERVER['HTTP_REFERER'] ?? '' ) ) );
 
 		if ( ! empty( $referer ) ) {
 			$admin_url = admin_url();

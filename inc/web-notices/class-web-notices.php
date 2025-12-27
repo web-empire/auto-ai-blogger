@@ -82,13 +82,13 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		 * @return void
 		 */
 		public function dismiss_notice(): void {
-			$notice_id           = isset( $_POST['notice_id'] ) ? sanitize_key( $_POST['notice_id'] ) : '';
-			$repeat_notice_after = isset( $_POST['repeat_notice_after'] ) ? absint( $_POST['repeat_notice_after'] ) : '';
-			$nonce               = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+			$notice_id           = isset( $_POST['notice_id'] ) ? sanitize_key( wp_unslash( $_POST['notice_id'] ) ) : '';
+			$repeat_notice_after = isset( $_POST['repeat_notice_after'] ) ? absint( wp_unslash( $_POST['repeat_notice_after'] ) ) : '';
+			$nonce               = isset( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
 			$notice              = $this->get_notice_by_id( $notice_id );
 			$capability          = $notice['capability'] ?? 'manage_options';
 
-			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) {
+			if ( ! apply_filters( 'wpaib_web_notices_user_cap_check', current_user_can( $capability ) ) ) {
 				return;
 			}
 
@@ -213,22 +213,22 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		public static function markup( $notice = [] ): void {
 			wp_enqueue_script( 'web-notices' );
 
-			do_action( 'web_notice_before_markup' );
+			do_action( 'wpaib_web_notice_before_markup' );
 
-			do_action( "web_notice_before_markup_{$notice['id']}" );
+			do_action( "wpaib_web_notice_before_markup_{$notice['id']}" );
 
 			?>
 			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
 				<div class="notice-container">
-					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?>
+					<?php do_action( "wpaib_web_notice_inside_markup_{$notice['id']}" ); ?>
 					<?php echo wp_kses_post( $notice['message'] ); ?>
 				</div>
 			</div>
 			<?php
 
-			do_action( "web_notice_after_markup_{$notice['id']}" );
+			do_action( "wpaib_web_notice_after_markup_{$notice['id']}" );
 
-			do_action( 'web_notice_after_markup' );
+			do_action( 'wpaib_web_notice_after_markup' );
 		}
 
 		/**

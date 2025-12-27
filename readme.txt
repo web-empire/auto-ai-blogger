@@ -1,8 +1,8 @@
-=== WP AI BLOGGER ===
+=== WP AI Blogger ===
 
 Contributors: wpsolvex
-Tags: ai, artificial intelligence, blog, blogging, content creation, auto blogging, automated content, ai writer, content generator, seo, chatgpt, openai, automation, post generator, article writer
-Tested up to: 6.7
+Tags: ai, blogging, content creation, seo, openai
+Tested up to: 6.9
 Stable tag: 0.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

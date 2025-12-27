@@ -154,7 +154,7 @@ class License {
 			if ( $license->get_error_code() === 'not_found' ) {
 				throw new \Exception( $this->client->__( 'This is not a valid license. Please double-check it and try again.' ) );
 			}
-			throw new \Exception( $license->get_error_message() );
+			throw new \Exception( wp_strip_all_tags( (string) $license->get_error_message() ) );
 		}
 		if ( empty( $license->id ) ) {
 			throw new \Exception( $this->client->__( 'This is not a valid license. Please double-check it and try again.' ) );
@@ -180,7 +180,7 @@ class License {
 	public function validate_release() {
 		$current_release = $this->get_current_release();
 		if ( is_wp_error( $current_release ) ) {
-			throw new \Exception( $current_release->get_error_message() );
+			throw new \Exception( wp_strip_all_tags( (string) $current_release->get_error_message() ) );
 		}
 			// if there is no slug or it does not match.
 		if ( empty( $current_release->release_json->slug ) || $this->client->slug !== $current_release->release_json->slug ) {
