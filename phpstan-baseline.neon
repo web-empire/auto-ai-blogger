@@ -321,11 +321,6 @@ parameters:
 			path: admin/licensing.php
 
 		-
-			message: "#^Expression in empty\\(\\) is not falsy\\.$#"
-			count: 3
-			path: admin/licensing.php
-
-		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Licensing\\:\\:fetch_and_save_token_data\\(\\) is unused\\.$#"
 			count: 1
 			path: admin/licensing.php
@@ -353,11 +348,6 @@ parameters:
 		-
 			message: "#^Property WPAIBlogger\\\\Admin\\\\Licensing\\:\\:\\$error_messages type has no value type specified in iterable type array\\.$#"
 			count: 1
-			path: admin/licensing.php
-
-		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 2
 			path: admin/licensing.php
 
 		-
