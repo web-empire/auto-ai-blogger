@@ -58,18 +58,7 @@ class Loader {
 		// Remove this after the translation error is fixed.
 		add_filter( 'doing_it_wrong_trigger_error', [ $this, 'suppress_translation_error' ], 10, 4 );
 
-		add_filter( 'plugin_action_links_' . WP_AI_BLOGGER_BASE_PATH, array( $this, 'plugin_action_links' ) );
-	}
-
-	/**
-	 * Define store constants.
-	 *
-	 * @since 1.0.0
-	 * @return void
-	 */
-	public function define_store_constants() {
-		define( 'WP_AI_BLOGGER_PRODUCT_ID', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_ID' ) ? WP_AI_BLOGGER_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
-		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'WP AI Blogger' );
+		add_filter( 'plugin_action_links_' . WP_AI_BLOGGER_BASE_PATH, [ $this, 'plugin_action_links' ] );
 	}
 
 	/**
@@ -123,6 +112,17 @@ class Loader {
 			// Load Frontend Support.
 			Frontend::get_instance();
 		}
+	}
+
+	/**
+	 * Define store constants.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function define_store_constants(): void {
+		define( 'WP_AI_BLOGGER_PRODUCT_ID', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_ID' ) ? WP_AI_BLOGGER_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
+		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'WP AI Blogger' );
 	}
 
 	/**
@@ -272,11 +272,12 @@ class Loader {
 	 * @since x.x.x
 	 */
 	public function plugin_action_links( $links ) {
-		$links = array_merge( array(
-			'<a href="' . esc_url( admin_url( 'edit.php?page=wp-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'wp-ai-blogger' ) . '</a>'
-		), $links );
-
-		return $links;
+		return array_merge(
+			[
+				'<a href="' . esc_url( admin_url( 'edit.php?page=wp-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'wp-ai-blogger' ) . '</a>',
+			],
+			$links
+		);
 	}
 }
 
