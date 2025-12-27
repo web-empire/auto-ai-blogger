@@ -19,7 +19,7 @@ export const CoreVersion = () => {
 				<Tooltip
 					text={ __( 'CORE', 'wp-ai-blogger' ) }
 					delay={ 100 }
-					className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+					className="z-[99999] bg-black text-white shadow-md p-2 rounded-md uppercase"
 				>
 					<span
 						className="select-none cursor-help"
@@ -34,9 +34,9 @@ export const CoreVersion = () => {
 				<>
 					<span>-</span>
 					<Tooltip
-						text={ __( 'PRO', 'wp-ai-blogger' ) }
+						text={ wpaib_localized_data?.pro_plugin_name || 'PRO' }
 						delay={ 100 }
-						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
+						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md uppercase"
 					>
 						<span
 							className="select-none cursor-help"

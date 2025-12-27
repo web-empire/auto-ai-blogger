@@ -126,14 +126,7 @@ class Licensing {
 		// Validate required constants.
 		if ( ! defined( 'WP_AI_BLOGGER_PRODUCT_NAME' ) ||
 			! defined( 'WP_AI_BLOGGER_PUBLIC_TOKEN' ) ||
-			! defined( 'WP_AI_BLOGGER_FILE' ) ) {
-			return null;
-		}
-
-		// Validate constant values.
-		if ( empty( WP_AI_BLOGGER_PRODUCT_NAME ) ||
-			empty( WP_AI_BLOGGER_PUBLIC_TOKEN ) ||
-			empty( WP_AI_BLOGGER_FILE ) ) {
+			! defined( 'WP_AI_BLOGGER_PRODUCT_FILE' ) ) {
 			return null;
 		}
 
@@ -141,7 +134,7 @@ class Licensing {
 			$client = new \SureCart\Licensing\Client(
 				WP_AI_BLOGGER_PRODUCT_NAME,
 				WP_AI_BLOGGER_PUBLIC_TOKEN,
-				WP_AI_BLOGGER_FILE
+				WP_AI_BLOGGER_PRODUCT_FILE
 			);
 
 			$client->set_textdomain( 'wp-ai-blogger' );

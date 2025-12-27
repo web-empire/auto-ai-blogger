@@ -214,6 +214,7 @@ class Menu {
 				'pro_purchase_url'           => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
 				'pro_available'              => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
 				'pro_version'                => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
+				'pro_plugin_name'            => defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? str_replace( 'WP AI Blogger ', '', WP_AI_BLOGGER_PRO_PRODUCT_NAME ) : '',
 				'edit_post_link'             => esc_url(
 					add_query_arg(
 						[

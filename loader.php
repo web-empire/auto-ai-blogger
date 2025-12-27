@@ -123,6 +123,7 @@ class Loader {
 	public function define_store_constants(): void {
 		define( 'WP_AI_BLOGGER_PRODUCT_ID', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_ID' ) ? WP_AI_BLOGGER_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
 		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'WP AI Blogger' );
+		define( 'WP_AI_BLOGGER_PRODUCT_FILE', defined( 'WP_AI_BLOGGER_PRO_FILE' ) ? WP_AI_BLOGGER_PRO_FILE : WP_AI_BLOGGER_FILE );
 	}
 
 	/**
