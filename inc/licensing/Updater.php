@@ -1,6 +1,8 @@
 <?php
 
-namespace SureCart\Licensing;
+namespace SureCart\Licensing; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * This class will handle the updates.

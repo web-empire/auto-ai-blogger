@@ -1,12 +1,12 @@
 <?php
 /**
- * Cron Handler class for WP AI Blogger.
+ * Cron Handler class for Auto AI Blogger.
  *
  * This class handles cron-related functionality including
  * post creation hooks and scheduling operations.
  * It's loaded on all requests to ensure cron hooks work properly.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
@@ -19,9 +19,9 @@ use WPAIBlogger\Inc\Utils\Metadata;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Cron Handler class for WP AI Blogger.
+ * Cron Handler class for Auto AI Blogger.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
@@ -238,7 +238,7 @@ class Cron_Handler {
 			if ( empty( $keywords ) ) {
 				return [
 					'success'    => false,
-					'message'    => __( 'No keywords found for campaign', 'wp-ai-blogger' ),
+					'message'    => __( 'No keywords found for campaign', 'auto-ai-blogger' ),
 					'error_type' => 'validation_error',
 				];
 			}
@@ -348,7 +348,7 @@ class Cron_Handler {
 				'success'        => true,
 				'message'        => sprintf(
 					/* translators: 1: Post number, 2: Post ID. */
-					__( 'Post #%1$d created successfully with ID: %2$s', 'wp-ai-blogger' ),
+					__( 'Post #%1$d created successfully with ID: %2$s', 'auto-ai-blogger' ),
 					$target_post_number,
 					$post_id
 				),
@@ -442,7 +442,7 @@ class Cron_Handler {
 				// Enhance error message with more context.
 				$detailed_message = sprintf(
 					/* translators: 1: error code, 2: error message */
-					__( 'API Error (%1$s): %2$s', 'wp-ai-blogger' ),
+					__( 'API Error (%1$s): %2$s', 'auto-ai-blogger' ),
 					$error_code,
 					$error_message
 				);
@@ -451,7 +451,7 @@ class Cron_Handler {
 				if ( $attempt > 1 ) {
 					$detailed_message .= sprintf(
 						/* translators: %d: Attempt number. */
-						__( ' (Failed after %d attempts)', 'wp-ai-blogger' ),
+						__( ' (Failed after %d attempts)', 'auto-ai-blogger' ),
 						$attempt
 					);
 				}
@@ -752,7 +752,7 @@ class Cron_Handler {
 				'campaign_terminated',
 				sprintf(
 					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
-					__( 'Campaign terminated: Maximum failures reached (%1$d/%2$d). Please check your settings and try again.', 'wp-ai-blogger' ),
+					__( 'Campaign terminated: Maximum failures reached (%1$d/%2$d). Please check your settings and try again.', 'auto-ai-blogger' ),
 					$posts_failed,
 					$max_failures
 				),
@@ -769,7 +769,7 @@ class Cron_Handler {
 				$campaign_id,
 				sprintf(
 					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
-					__( 'Maximum failures reached (%1$d/%2$d)', 'wp-ai-blogger' ),
+					__( 'Maximum failures reached (%1$d/%2$d)', 'auto-ai-blogger' ),
 					$posts_failed,
 					$max_failures
 				),
@@ -902,7 +902,7 @@ class Cron_Handler {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Auto-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);
@@ -910,7 +910,7 @@ class Cron_Handler {
 			if ( is_wp_error( $response ) ) {
 				return new \WP_Error(
 					'image_download_failed',
-					__( 'Failed to download image: ', 'wp-ai-blogger' ) . $response->get_error_message()
+					__( 'Failed to download image: ', 'auto-ai-blogger' ) . $response->get_error_message()
 				);
 			}
 
@@ -920,7 +920,7 @@ class Cron_Handler {
 					'image_download_http_error',
 					sprintf(
 						/* translators: %d is the HTTP status code */
-						__( 'Image download returned HTTP error %d', 'wp-ai-blogger' ),
+						__( 'Image download returned HTTP error %d', 'auto-ai-blogger' ),
 						$http_code
 					)
 				);
@@ -930,7 +930,7 @@ class Cron_Handler {
 			if ( empty( $image_data ) ) {
 				return new \WP_Error(
 					'image_download_empty',
-					__( 'Downloaded image data is empty', 'wp-ai-blogger' )
+					__( 'Downloaded image data is empty', 'auto-ai-blogger' )
 				);
 			}
 
@@ -952,7 +952,7 @@ class Cron_Handler {
 			if ( $upload['error'] ) {
 				return new \WP_Error(
 					'image_upload_failed',
-					__( 'Failed to upload image: ', 'wp-ai-blogger' ) . $upload['error']
+					__( 'Failed to upload image: ', 'auto-ai-blogger' ) . $upload['error']
 				);
 			}
 
@@ -984,7 +984,7 @@ class Cron_Handler {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'image_upload_exception',
-				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
+				__( 'Exception occurred during image upload: ', 'auto-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}

@@ -1,6 +1,8 @@
 <?php
 
-namespace SureCart\Licensing;
+namespace SureCart\Licensing; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * SureCart Client
@@ -144,9 +146,14 @@ class Client {
 	/**
 	 * Initialize plugin/theme updater
 	 *
-	 * @return SureCart\Updater
+	 * @return SureCart\Updater|null
 	 */
 	public function updater() {
+		// Skip updater for WordPress.org hosted version (updates handled by WordPress.org).
+		if ( defined( 'WPAIB_DISABLE_UPDATER' ) && constant( 'WPAIB_DISABLE_UPDATER' ) ) {
+			return null;
+		}
+
 		if ( ! class_exists( __NAMESPACE__ . '\Updater' ) ) {
 			require_once __DIR__ . '/Updater.php';
 		}
@@ -213,7 +220,7 @@ class Client {
 	public function endpoint() {
 		// allow a constant to be set.
 		if ( defined( 'SURECART_LICENSING_ENDPOINT' ) ) {
-			return trailingslashit( SURECART_LICENSING_ENDPOINT );
+			return trailingslashit( constant( 'SURECART_LICENSING_ENDPOINT' ) );
 		}
 
 		// filterable endpoint.
@@ -278,7 +285,8 @@ class Client {
 	 * @return bool
 	 */
 	public function is_local_server() {
-		$is_local = in_array( $_SERVER['REMOTE_ADDR'], [ '127.0.0.1', '::1' ], true );
+		$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$is_local    = in_array( $remote_addr, [ '127.0.0.1', '::1' ], true );
 		return apply_filters( 'surecart_licensing_is_local', $is_local );
 	}
 

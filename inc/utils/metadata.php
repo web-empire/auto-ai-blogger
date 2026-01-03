@@ -2,7 +2,7 @@
 /**
  * Metadata.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
@@ -557,18 +557,18 @@ class Metadata {
 
 		// Format frequency for display.
 		if ( ! $plain_metadata ) {
-			$meta_frequency = __( 'Every', 'wp-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
+			$meta_frequency = __( 'Every', 'auto-ai-blogger' ) . ' ' . $meta_frequency . ' ' . $repeat_unit;
 
 			// Add weekday selection info if it's a weekly campaign with specific days.
 			if ( $repeat_unit === 'week' && ! empty( $metadata['repeatWeeklyOn'] ) && is_array( $metadata['repeatWeeklyOn'] ) ) {
 				$day_names = [
-					'mon' => __( 'Mon', 'wp-ai-blogger' ),
-					'tue' => __( 'Tue', 'wp-ai-blogger' ),
-					'wed' => __( 'Wed', 'wp-ai-blogger' ),
-					'thu' => __( 'Thu', 'wp-ai-blogger' ),
-					'fri' => __( 'Fri', 'wp-ai-blogger' ),
-					'sat' => __( 'Sat', 'wp-ai-blogger' ),
-					'sun' => __( 'Sun', 'wp-ai-blogger' ),
+					'mon' => __( 'Mon', 'auto-ai-blogger' ),
+					'tue' => __( 'Tue', 'auto-ai-blogger' ),
+					'wed' => __( 'Wed', 'auto-ai-blogger' ),
+					'thu' => __( 'Thu', 'auto-ai-blogger' ),
+					'fri' => __( 'Fri', 'auto-ai-blogger' ),
+					'sat' => __( 'Sat', 'auto-ai-blogger' ),
+					'sun' => __( 'Sun', 'auto-ai-blogger' ),
 				];
 
 				$selected_day_names = [];
@@ -590,7 +590,7 @@ class Metadata {
 		if ( ! empty( $metadata['lastRun'] ) ) {
 			$metadata['lastRun'] = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $metadata['lastRun'] ) );
 		} else {
-			$metadata['lastRun'] = __( 'Not Started Yet.', 'wp-ai-blogger' );
+			$metadata['lastRun'] = __( 'Not Started Yet.', 'auto-ai-blogger' );
 		}
 
 		return array_merge(

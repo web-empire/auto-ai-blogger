@@ -14,7 +14,7 @@ export default function MainNav() {
 
 	// Redux selectors for dynamic data
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
-	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'wp-ai-blogger';
+	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'auto-ai-blogger';
 	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
 	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
@@ -27,26 +27,26 @@ export default function MainNav() {
 	const navMenus = useMemo( () => {
 		const baseMenus = [
 			{
-				name: __( 'Welcome', 'wp-ai-blogger' ),
+				name: __( 'Welcome', 'auto-ai-blogger' ),
 				slug: homeSlug,
 				path: '',
 				icon: null,
 			},
 			{
-				name: __( 'Campaigns', 'wp-ai-blogger' ),
+				name: __( 'Campaigns', 'auto-ai-blogger' ),
 				slug: homeSlug,
 				path: 'campaigns',
 				icon: null,
 				requiresLicense: true,
 			},
 			{
-				name: __( 'Settings', 'wp-ai-blogger' ),
+				name: __( 'Settings', 'auto-ai-blogger' ),
 				slug: homeSlug,
 				path: 'settings',
 				icon: null,
 			},
 			{
-				name: __( 'Free vs Pro', 'wp-ai-blogger' ),
+				name: __( 'Free vs Pro', 'auto-ai-blogger' ),
 				slug: homeSlug,
 				path: 'free-vs-pro',
 				icon: null,
@@ -100,7 +100,7 @@ export default function MainNav() {
 							<img
 								className="block h-[30px] w-[30px]"
 								src={ BrandIcon }
-								alt="WP AI Blogger"
+								alt="Auto AI Blogger"
 								loading="lazy"
 								decoding="async"
 							/>
@@ -145,11 +145,11 @@ export default function MainNav() {
 								<button
 									onClick={ handleProPurchase }
 									className="inline-flex items-center cursor-pointer text-[#9138c8] hover:text-[#7c2fb0] focus-visible:text-[#7c2fb0] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded px-3 py-2 transition-colors duration-200 gap-2"
-									aria-label={ __( 'Unlock Pro Features - Opens in new tab', 'wp-ai-blogger' ) }
+									aria-label={ __( 'Unlock Pro Features - Opens in new tab', 'auto-ai-blogger' ) }
 									type="button"
 								>
 									<Crown className="w-4 h-4" />
-									{ __( 'Unlock Pro Features', 'wp-ai-blogger' ) }
+									{ __( 'Unlock Pro Features', 'auto-ai-blogger' ) }
 								</button>
 							</div>
 						) }

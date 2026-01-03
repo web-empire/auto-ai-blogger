@@ -1,4 +1,4 @@
-*** WP AI Blogger Changelog ***
+*** Auto AI Blogger Changelog ***
 
 Unreleased - 0.0.1
 * Initial Release.

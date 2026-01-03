@@ -2,7 +2,7 @@
 /**
  * Frontend.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since x.x.x
  */
 

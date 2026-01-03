@@ -1,12 +1,12 @@
 <?php
 /**
- * Licensing Class for WP AI Blogger.
+ * Licensing Class for Auto AI Blogger.
  *
  * This class handles all licensing related operations with security measures.
  * Implements comprehensive input validation, data sanitization, rate limiting,
  * and secure license management.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
  * This class provides license management including activation, deactivation,
  * validation, and status checking with security measures.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
@@ -137,7 +137,7 @@ class Licensing {
 				WP_AI_BLOGGER_PRODUCT_FILE
 			);
 
-			$client->set_textdomain( 'wp-ai-blogger' );
+			$client->set_textdomain( 'auto-ai-blogger' );
 
 			return $client;
 		} catch ( \Exception $e ) {
@@ -176,7 +176,7 @@ class Licensing {
 		}
 
 		// Input validation and sanitization.
-		$license_key = $this->sanitize_license_key( $_POST['license_key'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
+		$license_key = $this->sanitize_license_key( wp_unslash( $_POST['license_key'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
 		if ( is_wp_error( $license_key ) ) {
 			wp_send_json_error( [ 'message' => $license_key->get_error_message() ] );
 		}
@@ -223,7 +223,7 @@ class Licensing {
 
 			wp_send_json_success(
 				[
-					'message' => __( 'License activated successfully.', 'wp-ai-blogger' ),
+					'message' => __( 'License activated successfully.', 'auto-ai-blogger' ),
 					'status'  => 'licensed',
 				]
 			);
@@ -289,7 +289,7 @@ class Licensing {
 
 			wp_send_json_success(
 				[
-					'message' => __( 'License deactivated successfully.', 'wp-ai-blogger' ),
+					'message' => __( 'License deactivated successfully.', 'auto-ai-blogger' ),
 					'status'  => 'unlicensed',
 				]
 			);
@@ -394,7 +394,7 @@ class Licensing {
 		// Secure notice message with proper escaping.
 		$notice_message = sprintf(
 			/* translators: %1$s: opening link tag, %2$s: closing link tag, %3$s: product name, %4$s: opening emphasis tag, %5$s: closing emphasis tag */
-			__( 'Please %1$sactivate%2$s your copy to claim tokens %4$s%3$s%5$s to generate blog posts.', 'wp-ai-blogger' ),
+			__( 'Please %1$sactivate%2$s your copy to claim tokens %4$s%3$s%5$s to generate blog posts.', 'auto-ai-blogger' ),
 			'<a href="' . $cta_url . '">',
 			'</a>',
 			esc_html( WP_AI_BLOGGER_PRODUCT_NAME ),
@@ -406,7 +406,7 @@ class Licensing {
 		if ( class_exists( 'Web_Notices' ) ) {
 			\Web_Notices::add_notice(
 				[
-					'id'                         => 'wp-ai-blogger-activation-notice',
+					'id'                         => 'auto-ai-blogger-activation-notice',
 					'type'                       => 'error',
 					'message'                    => sprintf(
 						'<div class="notice-content" style="margin: 0;">%s</div>',
@@ -453,19 +453,19 @@ class Licensing {
 	 */
 	private function set_error_messages(): void {
 		$this->error_messages = [
-			'nonce'                    => esc_html__( 'Security verification failed. Please refresh the page and try again.', 'wp-ai-blogger' ),
-			'permission'               => esc_html__( 'Sorry, you are not allowed to manage licenses.', 'wp-ai-blogger' ),
-			'invalid_license'          => esc_html__( 'Please enter a valid license key.', 'wp-ai-blogger' ),
-			'invalid_license_format'   => esc_html__( 'The license key format is invalid. Please check and try again.', 'wp-ai-blogger' ),
-			'license_too_long'         => esc_html__( 'License key is too long. Please check and try again.', 'wp-ai-blogger' ),
-			'rate_limit'               => esc_html__( 'Too many license requests. Please wait a moment and try again.', 'wp-ai-blogger' ),
-			'client_error'             => esc_html__( 'License service is temporarily unavailable. Please try again later.', 'wp-ai-blogger' ),
-			'license_retrieval_failed' => esc_html__( 'Unable to verify license. Please check your internet connection and try again.', 'wp-ai-blogger' ),
-			'incorrect_product'        => esc_html__( 'This license key is not valid for this plugin.', 'wp-ai-blogger' ),
-			'activation_failed'        => esc_html__( 'License activation failed. Please verify your license key and try again.', 'wp-ai-blogger' ),
-			'deactivation_failed'      => esc_html__( 'License deactivation failed. Please try again or contact support.', 'wp-ai-blogger' ),
-			'activation_exception'     => esc_html__( 'An unexpected error occurred during license activation. Please try again.', 'wp-ai-blogger' ),
-			'deactivation_exception'   => esc_html__( 'An unexpected error occurred during license deactivation. Please try again.', 'wp-ai-blogger' ),
+			'nonce'                    => esc_html__( 'Security verification failed. Please refresh the page and try again.', 'auto-ai-blogger' ),
+			'permission'               => esc_html__( 'Sorry, you are not allowed to manage licenses.', 'auto-ai-blogger' ),
+			'invalid_license'          => esc_html__( 'Please enter a valid license key.', 'auto-ai-blogger' ),
+			'invalid_license_format'   => esc_html__( 'The license key format is invalid. Please check and try again.', 'auto-ai-blogger' ),
+			'license_too_long'         => esc_html__( 'License key is too long. Please check and try again.', 'auto-ai-blogger' ),
+			'rate_limit'               => esc_html__( 'Too many license requests. Please wait a moment and try again.', 'auto-ai-blogger' ),
+			'client_error'             => esc_html__( 'License service is temporarily unavailable. Please try again later.', 'auto-ai-blogger' ),
+			'license_retrieval_failed' => esc_html__( 'Unable to verify license. Please check your internet connection and try again.', 'auto-ai-blogger' ),
+			'incorrect_product'        => esc_html__( 'This license key is not valid for this plugin.', 'auto-ai-blogger' ),
+			'activation_failed'        => esc_html__( 'License activation failed. Please verify your license key and try again.', 'auto-ai-blogger' ),
+			'deactivation_failed'      => esc_html__( 'License deactivation failed. Please try again or contact support.', 'auto-ai-blogger' ),
+			'activation_exception'     => esc_html__( 'An unexpected error occurred during license activation. Please try again.', 'auto-ai-blogger' ),
+			'deactivation_exception'   => esc_html__( 'An unexpected error occurred during license deactivation. Please try again.', 'auto-ai-blogger' ),
 		];
 	}
 
@@ -483,7 +483,7 @@ class Licensing {
 		if ( ! wp_doing_ajax() || ! is_admin() ) {
 			return new \WP_Error(
 				'invalid_context',
-				esc_html__( 'License operations are only allowed in admin AJAX context.', 'wp-ai-blogger' )
+				esc_html__( 'License operations are only allowed in admin AJAX context.', 'auto-ai-blogger' )
 			);
 		}
 
@@ -504,7 +504,7 @@ class Licensing {
 		if ( ! is_user_logged_in() ) {
 			return new \WP_Error(
 				'not_logged_in',
-				esc_html__( 'You must be logged in to perform this action.', 'wp-ai-blogger' )
+				esc_html__( 'You must be logged in to perform this action.', 'auto-ai-blogger' )
 			);
 		}
 

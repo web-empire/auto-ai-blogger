@@ -1,12 +1,12 @@
 <?php
 /**
- * Admin Menu class for WP AI Blogger.
+ * Admin Menu class for Auto AI Blogger.
  *
  * This class handles secure admin menu setup, script loading, and data localization.
  * Implements comprehensive security measures including input validation,
  * data sanitization, and secure script loading.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
@@ -21,13 +21,13 @@ use WPAIBlogger\Inc\Utils\Sanitizer;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Admin Menu class for WP AI Blogger.
+ * Admin Menu class for Auto AI Blogger.
  *
  * This class handles secure admin menu setup, script loading, and data localization.
  * Implements comprehensive security measures including input validation,
  * data sanitization, and secure script loading.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
@@ -132,13 +132,13 @@ class Menu {
 	public function render_settings_page(): void {
 		// Security validation before rendering.
 		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-ai-blogger' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'auto-ai-blogger' ) );
 		}
 
 		// Additional CSRF protection.
 		$nonce = wp_create_nonce( 'wp_ai_blogger_admin_page' );
 
-		echo '<div id="wp-ai-blogger-main-page--wrapper" data-nonce="' . esc_attr( $nonce ) . '"></div>';
+		echo '<div id="auto-ai-blogger-main-page--wrapper" data-nonce="' . esc_attr( $nonce ) . '"></div>';
 	}
 
 	/**
@@ -214,7 +214,7 @@ class Menu {
 				'pro_purchase_url'           => esc_url( WP_AI_BLOGGER_UPGRADE_LINK ),
 				'pro_available'              => defined( 'WP_AI_BLOGGER_PRO_VERSION' ),
 				'pro_version'                => defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ? WP_AI_BLOGGER_PRO_VERSION : '',
-				'pro_plugin_name'            => defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? str_replace( 'WP AI Blogger ', '', WP_AI_BLOGGER_PRO_PRODUCT_NAME ) : '',
+				'pro_plugin_name'            => defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? str_replace( 'Auto AI Blogger ', '', WP_AI_BLOGGER_PRO_PRODUCT_NAME ) : '',
 				'edit_post_link'             => esc_url(
 					add_query_arg(
 						[
@@ -305,7 +305,7 @@ class Menu {
 
 		wp_localize_script( $handle, 'wpaib_localized_data', $localized_data );
 
-		wp_set_script_translations( $handle, 'wp-ai-blogger', WP_AI_BLOGGER_DIR . 'languages' );
+		wp_set_script_translations( $handle, 'auto-ai-blogger', WP_AI_BLOGGER_DIR . 'languages' );
 
 		// Validate and enqueue styles.
 		$style_file = is_rtl() ? $build_path . 'blog-app-rtl.css' : $build_path . 'blog-app.css';
@@ -334,8 +334,8 @@ class Menu {
 		if ( current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
 			add_submenu_page(
 				'edit.php',
-				__( 'AI Blogger', 'wp-ai-blogger' ),
-				__( 'AI Blogger', 'wp-ai-blogger' ),
+				__( 'Auto AI Blogger', 'auto-ai-blogger' ),
+				__( 'Auto AI Blogger', 'auto-ai-blogger' ),
 				WP_AI_BLOGGER_CAPABILITY,
 				self::PAGE_ID,
 				[ $this, 'render_settings_page' ]

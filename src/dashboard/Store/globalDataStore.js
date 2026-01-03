@@ -94,7 +94,7 @@ const getInitialState = () => {
 		license_status: safeParseLocalizedData( wpaib_localized_data.license_status, 'string', 'inactive' ),
 
 		// Static configuration data that doesn't change during app lifecycle.
-		homeSlug: safeParseLocalizedData( wpaib_localized_data.home_slug, 'string', 'wp-ai-blogger' ),
+		homeSlug: safeParseLocalizedData( wpaib_localized_data.home_slug, 'string', 'auto-ai-blogger' ),
 		adminNonce: safeParseLocalizedData( wpaib_localized_data.admin_nonce, 'string', '' ),
 		ajaxUrl: safeParseLocalizedData( wpaib_localized_data.ajax_url, 'string', '/wp-admin/admin-ajax.php' ),
 		editPostLink: safeParseLocalizedData( wpaib_localized_data.edit_post_link, 'string', '/wp-admin/post.php?post={{POST_ID}}&action=edit' ),

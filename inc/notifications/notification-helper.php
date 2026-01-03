@@ -1,10 +1,10 @@
 <?php
 /**
- * Notification Helper class for WP AI Blogger.
+ * Notification Helper class for Auto AI Blogger.
  *
  * Handles sending notifications via email for campaign events.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Notifications
  * @since 1.0.0
  */
@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Notification Helper class.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Notifications
  * @since 1.0.0
  */
@@ -57,7 +57,7 @@ class Notification_Helper {
 			'target_posts'  => $campaign_data['postsTarget'] ?? 0,
 			'frequency'     => $this->format_frequency( $campaign_data ),
 			'keywords'      => is_array( $campaign_data['keywords'] ?? null ) ? implode( ', ', $campaign_data['keywords'] ) : ( $campaign_data['keywords'] ?? '' ),
-			'campaign_url'  => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_url'  => admin_url( 'admin.php?page=auto-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'campaign_started', $data );
@@ -93,7 +93,7 @@ class Notification_Helper {
 			'posts_target'  => $post_data['posts_target'] ?? 0,
 			'post_url'      => get_permalink( $post_id ),
 			'edit_url'      => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
-			'campaign_url'  => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_url'  => admin_url( 'admin.php?page=auto-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'post_created', $data );
@@ -124,7 +124,7 @@ class Notification_Helper {
 			'posts_target'      => $campaign_data['posts_target'] ?? 0,
 			'completion_reason' => $reason,
 			'completion_time'   => current_time( 'mysql' ),
-			'campaign_url'      => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_url'      => admin_url( 'admin.php?page=auto-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'campaign_completed', $data );
@@ -156,7 +156,7 @@ class Notification_Helper {
 			'posts_failed'   => $campaign_data['posts_failed'] ?? 0,
 			'failure_reason' => $reason,
 			'failure_time'   => current_time( 'mysql' ),
-			'campaign_url'   => admin_url( 'admin.php?page=wp-ai-blogger&path=campaigns&id=' . $campaign_id ),
+			'campaign_url'   => admin_url( 'admin.php?page=auto-ai-blogger&path=campaigns&id=' . $campaign_id ),
 		];
 
 		$this->send_notification( 'campaign_failed', $data );
@@ -281,17 +281,17 @@ class Notification_Helper {
 		$unit     = $campaign_data['repeatUnit'] ?? 'day';
 
 		$unit_labels = [
-			'hour'  => _n( 'hour', 'hours', $interval, 'wp-ai-blogger' ),
-			'day'   => _n( 'day', 'days', $interval, 'wp-ai-blogger' ),
-			'week'  => _n( 'week', 'weeks', $interval, 'wp-ai-blogger' ),
-			'month' => _n( 'month', 'months', $interval, 'wp-ai-blogger' ),
+			'hour'  => _n( 'hour', 'hours', $interval, 'auto-ai-blogger' ),
+			'day'   => _n( 'day', 'days', $interval, 'auto-ai-blogger' ),
+			'week'  => _n( 'week', 'weeks', $interval, 'auto-ai-blogger' ),
+			'month' => _n( 'month', 'months', $interval, 'auto-ai-blogger' ),
 		];
 
 		$unit_label = $unit_labels[ $unit ] ?? $unit;
 
 		return sprintf(
 			/* translators: 1: interval number, 2: unit label */
-			__( 'Every %1$d %2$s', 'wp-ai-blogger' ),
+			__( 'Every %1$d %2$s', 'auto-ai-blogger' ),
 			$interval,
 			$unit_label
 		);

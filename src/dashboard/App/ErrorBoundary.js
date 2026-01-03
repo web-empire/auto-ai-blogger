@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component {
 
 		// Log to WordPress if available.
 		if ( window.console && window.console.error ) {
-			console.error( 'WP AI Blogger React Error:', {
+			console.error( 'Auto AI Blogger React Error:', {
 				error: error.toString(),
 				errorInfo: errorInfo.componentStack,
 				props: this.props,
@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component {
 					margin: '20px',
 				} }>
 					<h3>Something went wrong</h3>
-					<p>The WP AI Blogger interface encountered an error. Please try refreshing the page.</p>
+					<p>The Auto AI Blogger interface encountered an error. Please try refreshing the page.</p>
 
 					{ process.env.NODE_ENV === 'development' && this.state.error && (
 						<details style={ { marginTop: '10px' } }>

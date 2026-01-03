@@ -111,9 +111,9 @@ namespace WPAIBlogger\Inc\Traits {
 }
 namespace WPAIBlogger\Inc {
     /**
-     * Cron Handler class for WP AI Blogger.
+     * Cron Handler class for Auto AI Blogger.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Inc\Cron
      * @since 1.0.0
      */
@@ -520,7 +520,7 @@ namespace WPAIBlogger\Inc\Utils {
      * This class provides utility functions for managing plugin settings
      * with validation, sanitization, and access control.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Utils
      * @since 1.0.0
      */
@@ -1177,7 +1177,7 @@ namespace WPAIBlogger\Inc\Notifications {
     /**
      * Email Templates class.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Inc\Notifications
      * @since 1.0.0
      */
@@ -1199,7 +1199,7 @@ namespace WPAIBlogger\Inc\Notifications {
     /**
      * Notification Helper class.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Inc\Notifications
      * @since 1.0.0
      */
@@ -1259,7 +1259,7 @@ namespace WPAIBlogger\Inc\Notifications {
     /**
      * WhatsApp Handler class.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Inc\Notifications
      * @since 1.0.0
      */
@@ -1294,7 +1294,7 @@ namespace WPAIBlogger\Core {
     /**
      * Update Compatibility
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      */
     /**
      * Update initial setup
@@ -1480,9 +1480,9 @@ namespace WPAIBlogger\Admin {
         }
     }
     /**
-     * Admin AJAX class for WP AI Blogger.
+     * Admin AJAX class for Auto AI Blogger.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Admin
      * @since 1.0.0
      */
@@ -1654,13 +1654,13 @@ namespace WPAIBlogger\Admin {
         }
     }
     /**
-     * Admin Menu class for WP AI Blogger.
+     * Admin Menu class for Auto AI Blogger.
      *
      * This class handles secure admin menu setup, script loading, and data localization.
      * Implements comprehensive security measures including input validation,
      * data sanitization, and secure script loading.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Admin
      * @since 1.0.0
      */
@@ -1730,13 +1730,13 @@ namespace WPAIBlogger\Admin {
         }
     }
     /**
-     * Admin API class for WP AI Blogger.
+     * Admin API class for Auto AI Blogger.
      *
      * This class handles REST API endpoints for admin settings and operations.
      * Implements security measures including rate limiting, input validation,
      * and proper authentication.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Admin
      * @since 1.0.0
      */
@@ -1889,7 +1889,7 @@ namespace WPAIBlogger\Admin {
      * This class provides license management including activation, deactivation,
      * validation, and status checking with security measures.
      *
-     * @package wp-ai-blogger
+     * @package auto-ai-blogger
      * @subpackage Admin
      * @since 1.0.0
      */
@@ -2232,11 +2232,11 @@ namespace {
     \define('WP_AI_BLOGGER_BASE_PATH', \plugin_basename(\WP_AI_BLOGGER_FILE));
     \define('WP_AI_BLOGGER_BASE_URL', \plugins_url('/', \WP_AI_BLOGGER_FILE));
     // Define Plugin Option.
-    \define('WP_AI_BLOGGER_SLUG', 'wp-ai-blogger');
+    \define('WP_AI_BLOGGER_SLUG', 'auto-ai-blogger');
     \define('WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings');
     \define('WP_AI_BLOGGER_CAPABILITY', 'manage_options');
     // Store Linking.
-    \define('WP_AI_BLOGGER_PRODUCT_NAME', 'WP AI Blogger');
+    \define('WP_AI_BLOGGER_PRODUCT_NAME', 'Auto AI Blogger');
     \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
     \define('WP_AI_BLOGGER_PRODUCT_ID', '2effb53f-1066-40d3-9667-ef9f09f91db1');
     \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post');

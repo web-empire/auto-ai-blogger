@@ -1,16 +1,17 @@
 <?php
 /**
- * Plugin Name: WP AI Blogger
+ * Plugin Name: Auto AI Blogger
  * Plugin URI: https://wpaiblogger.com/
  * Author: WP Solvex
  * Author URI: https://wpsolvex.com/
  * Version: 0.0.1
+ * License: GPLv2 or later
  * Requires at least: 5.6
  * Requires PHP: 5.6
- * Description: WP AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging.
- * Text Domain: wp-ai-blogger
+ * Description: Auto AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging.
+ * Text Domain: auto-ai-blogger
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  */
 
 // Exit if accessed directly.
@@ -26,9 +27,12 @@ define( 'WP_AI_BLOGGER_BASE_PATH', plugin_basename( WP_AI_BLOGGER_FILE ) );
 define( 'WP_AI_BLOGGER_BASE_URL', plugins_url( '/', WP_AI_BLOGGER_FILE ) );
 
 // Define Plugin Option.
-define( 'WP_AI_BLOGGER_SLUG', 'wp-ai-blogger' );
+define( 'WP_AI_BLOGGER_SLUG', 'auto-ai-blogger' );
 define( 'WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings' );
 define( 'WP_AI_BLOGGER_CAPABILITY', 'manage_options' );
+
+// Disable custom updater for WordPress.org (updates handled by WordPress.org).
+define( 'WPAIB_DISABLE_UPDATER', true );
 
 // Store Linking.
 define( 'WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );

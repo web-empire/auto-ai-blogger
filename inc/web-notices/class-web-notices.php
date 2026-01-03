@@ -88,12 +88,12 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 			$notice              = $this->get_notice_by_id( $notice_id );
 			$capability          = $notice['capability'] ?? 'manage_options';
 
-			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) {
+			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 				return;
 			}
 
 			if ( false === wp_verify_nonce( $nonce, 'web-notices' ) ) {
-				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'wp-ai-blogger' ) );
+				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'auto-ai-blogger' ) );
 			}
 
 			// Valid inputs?
@@ -213,22 +213,22 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		public static function markup( $notice = [] ): void {
 			wp_enqueue_script( 'web-notices' );
 
-			do_action( 'web_notice_before_markup' );
+			do_action( 'web_notice_before_markup' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 
-			do_action( "web_notice_before_markup_{$notice['id']}" );
+			do_action( "web_notice_before_markup_{$notice['id']}" ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 
 			?>
 			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
 				<div class="notice-container">
-					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?>
+					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?> // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 					<?php echo wp_kses_post( $notice['message'] ); ?>
 				</div>
 			</div>
 			<?php
 
-			do_action( "web_notice_after_markup_{$notice['id']}" );
+			do_action( "web_notice_after_markup_{$notice['id']}" ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 
-			do_action( 'web_notice_after_markup' );
+			do_action( 'web_notice_after_markup' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 		}
 
 		/**

@@ -231,7 +231,7 @@ export default function PostIdeas() {
 		if ( error === 'Token exhausted: Insufficient tokens for this request.' ) {
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
-					<p> { __( 'Error while loading post ideas:', 'wp-ai-blogger' ) } { error } </p>
+					<p> { __( 'Error while loading post ideas:', 'auto-ai-blogger' ) } { error } </p>
 					<ProButton
 						url="https://wpaiblogger.com/pricing/"
 						variant="primary"
@@ -239,15 +239,15 @@ export default function PostIdeas() {
 						icon={ <MoveRight className="h-5 w-5" /> }
 						className="mt-5"
 					>
-						{ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+						{ __( 'Upgrade Now', 'auto-ai-blogger' ) }
 					</ProButton>
 				</div>
 			);
 		}
 
 		if ( error === 'Missing required fields' ) {
-			const title = __( 'Please fill out the general settings to see post ideas.', 'wp-ai-blogger' );
-			const buttonText = __( 'Go to General Settings', 'wp-ai-blogger' );
+			const title = __( 'Please fill out the general settings to see post ideas.', 'auto-ai-blogger' );
+			const buttonText = __( 'Go to General Settings', 'auto-ai-blogger' );
 
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
@@ -266,8 +266,8 @@ export default function PostIdeas() {
 		}
 
 		if ( error === 'License key is not available. Please check your license configuration.' ) {
-			const title = __( 'License key is missing. Please activate your license to use this feature.', 'wp-ai-blogger' );
-			const buttonText = __( 'Go to License Settings', 'wp-ai-blogger' );
+			const title = __( 'License key is missing. Please activate your license to use this feature.', 'auto-ai-blogger' );
+			const buttonText = __( 'Go to License Settings', 'auto-ai-blogger' );
 
 			return (
 				<div className="p-4 text-red-500 flex flex-col items-center">
@@ -290,14 +290,14 @@ export default function PostIdeas() {
 
 		return (
 			<div className="p-4 text-red-500 flex flex-col items-center">
-				<p> { __( 'Error while loading post ideas:', 'wp-ai-blogger' ) } { error } </p>
+				<p> { __( 'Error while loading post ideas:', 'auto-ai-blogger' ) } { error } </p>
 				{ isApiError && (
 					<button
 						onClick={ handleRefresh }
 						className="mt-4 flex items-center gap-2 bg-brand-600 text-white rounded px-4 py-2 hover:bg-brand-500"
 					>
 						<RotateCw className="h-4 w-4" />
-						{ __( 'Retry', 'wp-ai-blogger' ) }
+						{ __( 'Retry', 'auto-ai-blogger' ) }
 					</button>
 				) }
 			</div>
@@ -354,11 +354,11 @@ export default function PostIdeas() {
 			.then( async ( response ) => {
 				// Check if response exists and has the expected structure
 				if ( ! response || typeof response !== 'object' ) {
-					console.error( __( 'Invalid response received from server.', 'wp-ai-blogger' ) );
+					console.error( __( 'Invalid response received from server.', 'auto-ai-blogger' ) );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: {
-							message: __( 'Error: Invalid response from server.', 'wp-ai-blogger' ),
+							message: __( 'Error: Invalid response from server.', 'auto-ai-blogger' ),
 							type: 'error',
 							duration: 5000,
 						},
@@ -368,12 +368,12 @@ export default function PostIdeas() {
 
 				// Check if the request was successful
 				if ( ! response.success ) {
-					const errorMessage = response.data?.message || __( 'Failed to create post.', 'wp-ai-blogger' );
-					console.error( __( 'Failed to create post:', 'wp-ai-blogger' ), errorMessage );
+					const errorMessage = response.data?.message || __( 'Failed to create post.', 'auto-ai-blogger' );
+					console.error( __( 'Failed to create post:', 'auto-ai-blogger' ), errorMessage );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: {
-							message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+							message: __( 'Error: ', 'auto-ai-blogger' ) + errorMessage,
 							type: 'error',
 							duration: 5000,
 						},
@@ -383,11 +383,11 @@ export default function PostIdeas() {
 
 				// Validate that we have the required data
 				if ( ! response.data || ! response.data.post_id || ! response.data.edit_link ) {
-					console.error( __( 'Post created but no post ID or edit link received.', 'wp-ai-blogger' ) );
+					console.error( __( 'Post created but no post ID or edit link received.', 'auto-ai-blogger' ) );
 					dispatch( {
 						type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 						payload: {
-							message: __( 'Error: Post created but unable to get post details.', 'wp-ai-blogger' ),
+							message: __( 'Error: Post created but unable to get post details.', 'auto-ai-blogger' ),
 							type: 'error',
 							duration: 5000,
 						},
@@ -449,17 +449,17 @@ export default function PostIdeas() {
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Post created successfully! Click "Edit" to edit it.', 'wp-ai-blogger' ),
+					payload: __( 'Post created successfully! Click "Edit" to edit it.', 'auto-ai-blogger' ),
 				} );
 			} )
 			.catch( ( newError ) => {
 				// Handle network errors or other exceptions
-				const errorMessage = newError?.message || __( 'Network error occurred while creating post.', 'wp-ai-blogger' );
-				console.error( __( 'Error creating post:', 'wp-ai-blogger' ), newError );
+				const errorMessage = newError?.message || __( 'Network error occurred while creating post.', 'auto-ai-blogger' );
+				console.error( __( 'Error creating post:', 'auto-ai-blogger' ), newError );
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
 					payload: {
-						message: __( 'Error: ', 'wp-ai-blogger' ) + errorMessage,
+						message: __( 'Error: ', 'auto-ai-blogger' ) + errorMessage,
 						type: 'error',
 						duration: 5000,
 					},
@@ -481,11 +481,11 @@ export default function PostIdeas() {
 			<div className="sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-col gap-2">
 					<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-4 p-0 m-0">
-						{ __( 'Blog Post Suggestions', 'wp-ai-blogger' ) }
+						{ __( 'Blog Post Suggestions', 'auto-ai-blogger' ) }
 					</h2>
 
 					<p className="mt-4 text-sm text-gray-700">
-						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'wp-ai-blogger' ) }
+						{ __( 'A list of some new blog post ideas that you can use to grow your blog.', 'auto-ai-blogger' ) }
 					</p>
 				</div>
 
@@ -496,16 +496,16 @@ export default function PostIdeas() {
 						icon={ proAvailable ? <WandSparkles className="w-4 h-4" /> : <Crown className="w-4 h-4" /> }
 						url={ proAvailable ? '' : proPurchaseUrl } // Only provide URL when pro is not available
 						onClick={ proAvailable ? handleRefresh : null } // Only provide onClick when pro is available
-						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'wp-ai-blogger' ) : __( '⚡ Limited to 5 Suggestions, Upgrade to Pro', 'wp-ai-blogger' ) }
+						tooltip={ proAvailable ? __( 'Refresh Post Ideas', 'auto-ai-blogger' ) : __( '⚡ Limited to 5 Suggestions, Upgrade to Pro', 'auto-ai-blogger' ) }
 						tooltipPosition="left"
 						iconPosition="left"
 					>
-						{ proAvailable ? __( 'Refresh', 'wp-ai-blogger' )
+						{ proAvailable ? __( 'Refresh', 'auto-ai-blogger' )
 							: ( postIdeasFromRedux === '-1'
-								? __( 'Refresh (0/5)', 'wp-ai-blogger' )
+								? __( 'Refresh (0/5)', 'auto-ai-blogger' )
 								: ( ! postIdeasFromRedux || postIdeasFromRedux.trim() === ''
-									? __( 'Refresh', 'wp-ai-blogger' )
-									: `${ __( 'Refresh', 'wp-ai-blogger' ) } (${ Math.min( postIdeasArr.length, 5 ) }/5)`
+									? __( 'Refresh', 'auto-ai-blogger' )
+									: `${ __( 'Refresh', 'auto-ai-blogger' ) } (${ Math.min( postIdeasArr.length, 5 ) }/5)`
 								)
 							)
 						}
@@ -521,10 +521,10 @@ export default function PostIdeas() {
 								<thead className="bg-gradient-to-r from-brand-50 to-indigo-50 header-nav">
 									<tr>
 										<th scope="col" className="w-3/5 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-											{ __( 'Title', 'wp-ai-blogger' ) }
+											{ __( 'Title', 'auto-ai-blogger' ) }
 										</th>
 										<th scope="col" className="w-2/5 px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
-											{ __( 'Write Post', 'wp-ai-blogger' ) }
+											{ __( 'Write Post', 'auto-ai-blogger' ) }
 										</th>
 									</tr>
 								</thead>
@@ -535,7 +535,7 @@ export default function PostIdeas() {
 										<Suspense fallback={
 											<tr>
 												<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
-													{ __( 'Loading…', 'wp-ai-blogger' ) }
+													{ __( 'Loading…', 'auto-ai-blogger' ) }
 												</td>
 											</tr>
 										}>
@@ -545,7 +545,7 @@ export default function PostIdeas() {
 										// Special case for when postIdeasFromRedux is "-1"
 										<tr>
 											<td colSpan="2" className="px-6 py-4 text-center text-amber-600 font-medium">
-												{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'wp-ai-blogger' ) }
+												{ __( '🚀 Want more post ideas? Pro users get unlimited suggestions', 'auto-ai-blogger' ) }
 											</td>
 										</tr>
 									) : postIdeasArr && Array.isArray( postIdeasArr ) && postIdeasArr.length > 0 ? (
@@ -579,7 +579,7 @@ export default function PostIdeas() {
 																} } rel="noreferrer"
 															>
 																<Edit className="w-5 h-5" />
-																{ __( 'Edit', 'wp-ai-blogger' ) }
+																{ __( 'Edit', 'auto-ai-blogger' ) }
 															</a>
 														) : (
 															// Show "Create" or loading state
@@ -627,13 +627,13 @@ export default function PostIdeas() {
 																			<circle className="opacity-30" cx="12" cy="12" r="10" stroke="rgb(34, 197, 94)" strokeWidth="3"></circle>
 																			<path className="opacity-90" fill="rgb(34, 197, 94)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 																		</svg>
-																		{ __( 'Creating…', 'wp-ai-blogger' ) }
+																		{ __( 'Creating…', 'auto-ai-blogger' ) }
 																	</>
 																) : (
 																	// Show normal or disabled state
 																	<>
 																		<Plus className="w-5 h-5" />
-																		{ __( 'Create', 'wp-ai-blogger' ) }
+																		{ __( 'Create', 'auto-ai-blogger' ) }
 																	</>
 																) }
 															</a>
@@ -648,7 +648,7 @@ export default function PostIdeas() {
 													<td colSpan="2" className="px-6 py-6 text-center">
 														<div className="flex flex-col items-center space-y-3">
 															<div className="text-amber-700 font-semibold text-sm">
-																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'wp-ai-blogger' ) }` }
+																🔒 { `${ postIdeasArr.length - 5 } ${ __( 'more post ideas available with Pro!', 'auto-ai-blogger' ) }` }
 															</div>
 															<ProButton
 																url={ proPurchaseUrl }
@@ -656,7 +656,7 @@ export default function PostIdeas() {
 																size="small"
 																icon={ <MoveRight className="w-4 h-4" /> }
 															>
-																{ __( 'Unlock All Ideas - Upgrade Now', 'wp-ai-blogger' ) }
+																{ __( 'Unlock All Ideas - Upgrade Now', 'auto-ai-blogger' ) }
 															</ProButton>
 														</div>
 													</td>
@@ -666,7 +666,7 @@ export default function PostIdeas() {
 									) : (
 										<tr>
 											<td colSpan="2" className="px-6 py-4 text-center text-gray-500">
-												{ __( 'No post ideas available.', 'wp-ai-blogger' ) }
+												{ __( 'No post ideas available.', 'auto-ai-blogger' ) }
 											</td>
 										</tr>
 									) }
@@ -683,7 +683,7 @@ export default function PostIdeas() {
 														size="default"
 														icon={ <MoveRight className="w-5 h-5" /> }
 													>
-														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'wp-ai-blogger' ) }
+														{ __( 'Upgrade to Pro - Get Unlimited Ideas', 'auto-ai-blogger' ) }
 													</ProButton>
 												</div>
 											</td>

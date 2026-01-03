@@ -6,7 +6,7 @@ on:
       - master
     paths:
       # Release happens only if the version number in main file is updated.
-      - 'wp-ai-blogger.php'
+      - 'auto-ai-blogger.php'
 
 jobs:
   build-artifact:
@@ -40,8 +40,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wp-ai-blogger
-          path: ./artifact/wp-ai-blogger.zip
+          name: auto-ai-blogger
+          path: ./artifact/auto-ai-blogger.zip
 
   create-release:
     name: Create Release Draft and Attach Asset
@@ -57,7 +57,7 @@ jobs:
       - name: Download Plugin Zip Artifact
         uses: actions/download-artifact@v4
         with:
-          name: wp-ai-blogger
+          name: auto-ai-blogger
 
       - name: Create Release Draft
         id: create_release
@@ -71,4 +71,4 @@ jobs:
           draft: true
           prerelease: false
           body: 'Replace changelog here'
-          files: ./wp-ai-blogger.zip
+          files: ./auto-ai-blogger.zip

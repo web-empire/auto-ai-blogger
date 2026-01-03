@@ -2,7 +2,7 @@
 /**
  * Loader.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
@@ -122,7 +122,7 @@ class Loader {
 	 */
 	public function define_store_constants(): void {
 		define( 'WP_AI_BLOGGER_PRODUCT_ID', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_ID' ) ? WP_AI_BLOGGER_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
-		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'WP AI Blogger' );
+		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'Auto AI Blogger' );
 		define( 'WP_AI_BLOGGER_PRODUCT_FILE', defined( 'WP_AI_BLOGGER_PRO_FILE' ) ? WP_AI_BLOGGER_PRO_FILE : WP_AI_BLOGGER_FILE );
 	}
 
@@ -137,7 +137,7 @@ class Loader {
 	 * @return bool
 	 */
 	public function suppress_translation_error( $status, $function_name, $message, $version ) {
-		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'wp-ai-blogger' ) !== false ) {
+		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'auto-ai-blogger' ) !== false ) {
 			return false;
 		}
 		return $status;
@@ -275,7 +275,7 @@ class Loader {
 	public function plugin_action_links( $links ) {
 		return array_merge(
 			[
-				'<a href="' . esc_url( admin_url( 'edit.php?page=wp-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'wp-ai-blogger' ) . '</a>',
+				'<a href="' . esc_url( admin_url( 'edit.php?page=auto-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'auto-ai-blogger' ) . '</a>',
 			],
 			$links
 		);

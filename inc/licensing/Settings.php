@@ -1,6 +1,8 @@
 <?php
 
-namespace SureCart\Licensing;
+namespace SureCart\Licensing; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * The settings class.
@@ -195,14 +197,14 @@ class Settings {
 
 					<h2><?php echo esc_html( $this->menu_args['page_title'] ); ?></h2>
 					<label for="license_key">
-						<?php if ( $action === 'activate' ) { ?> 
+						<?php if ( $action === 'activate' ) { ?>
 							<?php echo esc_html( sprintf( $this->client->__( 'Enter your license key to activate %s.', 'surecart' ), $this->client->name ) ); ?>
 						<?php } else { ?>
 							<?php echo esc_html( sprintf( $this->client->__( 'Your license is succesfully activated for this site.', 'surecart' ), $this->client->name ) ); ?>
 						<?php } ?>
 					</label>
 
-					<?php if ( $action === 'activate' ) { ?> 
+					<?php if ( $action === 'activate' ) { ?>
 						<input class="widefat" type="password" autocomplete="off" name="license_key" id="license_key" value="<?php echo esc_attr( $this->license_key ); ?>" autofocus>
 					<?php } ?>
 
@@ -292,14 +294,18 @@ class Settings {
 		}
 
 		// Cerify nonce.
-		if ( ! wp_verify_nonce( $_POST['_nonce'], $this->client->name ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_nonce'] ) ), $this->client->name ) ) {
 			$this->add_error( 'unauthorized', $this->client->__( "You don't have permission to manage licenses." ) );
 			return;
 		}
 
 		// handle activation.
 		if ( $_POST['_action'] === 'activate' ) {
-			$activated = $this->client->license()->activate( sanitize_text_field( $_POST['license_key'] ) );
+			if ( ! isset( $_POST['license_key'] ) ) {
+				$this->add_error( 'missing_license_key', $this->client->__( 'Please enter a license key.' ) );
+				return;
+			}
+			$activated = $this->client->license()->activate( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) );
 			if ( is_wp_error( $activated ) ) {
 				$this->add_error( $activated->get_error_code(), $activated->get_error_message() );
 				return;
@@ -315,7 +321,11 @@ class Settings {
 
 		// handle deactivation.
 		if ( $_POST['_action'] === 'deactivate' ) {
-			$deactivated = $this->client->license()->deactivate( sanitize_text_field( $_POST['activation_id'] ) );
+			if ( ! isset( $_POST['activation_id'] ) ) {
+				$this->add_error( 'missing_activation_id', $this->client->__( 'Activation ID is missing.' ) );
+				return;
+			}
+			$deactivated = $this->client->license()->deactivate( sanitize_text_field( wp_unslash( $_POST['activation_id'] ) ) );
 			if ( is_wp_error( $deactivated ) ) {
 				$this->add_error( $deactivated->get_error_code(), $deactivated->get_error_message() );
 			}
@@ -392,7 +402,7 @@ class Settings {
 	 * Form action URL
 	 */
 	private function form_action_url() {
-		return apply_filters( 'surecart_client_license_form_action', '' );
+		return apply_filters( 'surecart_client_license_form_action', '' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 	}
 
 	/**

@@ -1,11 +1,11 @@
 <?php
 /**
- * Helper Class for WP AI Blogger.
+ * Helper Class for Auto AI Blogger.
  *
  * This class provides utility functions for settings management
  * with input validation, data sanitization, and security checks.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Utils
  * @since 1.0.0
  */
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
  * This class provides utility functions for managing plugin settings
  * with validation, sanitization, and access control.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Utils
  * @since 1.0.0
  */
@@ -120,7 +120,7 @@ class Helper {
 		if ( ! is_string( $key ) || empty( $key ) ) {
 			return [
 				'success' => false,
-				'error'   => __( 'Invalid key parameter', 'wp-ai-blogger' ),
+				'error'   => __( 'Invalid key parameter', 'auto-ai-blogger' ),
 			];
 		}
 

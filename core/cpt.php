@@ -5,7 +5,7 @@
  * This class will holds the Campaigns related to the admin area modification
  * along with the plugin functionalities.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
@@ -58,18 +58,18 @@ class CPT {
 		$this->post_type_labels = apply_filters(
 			'wp_ai_blogger_cpt_labels',
 			[
-				'name'               => esc_html_x( 'Campaigns', 'campaigns general name', 'wp-ai-blogger' ),
-				'singular_name'      => esc_html_x( 'Campaign', 'campaign singular name', 'wp-ai-blogger' ),
-				'search_items'       => esc_html__( 'Search Campaign', 'wp-ai-blogger' ),
-				'all_items'          => esc_html__( 'Campaigns', 'wp-ai-blogger' ),
-				'edit_item'          => esc_html__( 'Edit Campaign', 'wp-ai-blogger' ),
-				'view_item'          => esc_html__( 'View Campaign', 'wp-ai-blogger' ),
-				'add_new'            => esc_html__( 'Add New', 'wp-ai-blogger' ),
-				'update_item'        => esc_html__( 'Update Campaign', 'wp-ai-blogger' ),
-				'add_new_item'       => esc_html__( 'Add New', 'wp-ai-blogger' ),
-				'new_item_name'      => esc_html__( 'New Campaign Name', 'wp-ai-blogger' ),
-				'not_found'          => esc_html__( 'No space found', 'wp-ai-blogger' ),
-				'not_found_in_trash' => esc_html__( 'No space found', 'wp-ai-blogger' ),
+				'name'               => esc_html_x( 'Campaigns', 'campaigns general name', 'auto-ai-blogger' ),
+				'singular_name'      => esc_html_x( 'Campaign', 'campaign singular name', 'auto-ai-blogger' ),
+				'search_items'       => esc_html__( 'Search Campaign', 'auto-ai-blogger' ),
+				'all_items'          => esc_html__( 'Campaigns', 'auto-ai-blogger' ),
+				'edit_item'          => esc_html__( 'Edit Campaign', 'auto-ai-blogger' ),
+				'view_item'          => esc_html__( 'View Campaign', 'auto-ai-blogger' ),
+				'add_new'            => esc_html__( 'Add New', 'auto-ai-blogger' ),
+				'update_item'        => esc_html__( 'Update Campaign', 'auto-ai-blogger' ),
+				'add_new_item'       => esc_html__( 'Add New', 'auto-ai-blogger' ),
+				'new_item_name'      => esc_html__( 'New Campaign Name', 'auto-ai-blogger' ),
+				'not_found'          => esc_html__( 'No space found', 'auto-ai-blogger' ),
+				'not_found_in_trash' => esc_html__( 'No space found', 'auto-ai-blogger' ),
 			]
 		);
 

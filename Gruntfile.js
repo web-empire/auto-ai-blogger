@@ -50,24 +50,24 @@ module.exports = function (grunt) {
 					'!src/**',
 					'!copilot_readme/**',
 				],
-				dest: 'wp-ai-blogger/',
+				dest: 'auto-ai-blogger/',
 			},
 		},
 		compress: {
 			main: {
 				options: {
-					archive: 'wp-ai-blogger-<%= pkg.version %>.zip',
+					archive: 'auto-ai-blogger-<%= pkg.version %>.zip',
 					mode: 'zip',
 				},
 				files: [
 					{
-						src: ['./wp-ai-blogger/**'],
+						src: ['./auto-ai-blogger/**'],
 					},
 				],
 			},
 		},
 		clean: {
-			main: ['wp-ai-blogger'],
+			main: ['auto-ai-blogger'],
 			zip: ['*.zip'],
 			concat: ['assets/js/unminified/main.js', 'assets/css/unminified/main.css'],
 		},
@@ -81,7 +81,7 @@ module.exports = function (grunt) {
 		},
 		replace: {
 			plugin_main: {
-				src: ['wp-ai-blogger.php'],
+				src: ['auto-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{
@@ -101,7 +101,7 @@ module.exports = function (grunt) {
 				]
 			},
 			plugin_const: {
-				src: ['wp-ai-blogger.php'],
+				src: ['auto-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{

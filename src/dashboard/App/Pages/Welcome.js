@@ -32,20 +32,20 @@ class WelcomeErrorBoundary extends React.Component {
 					<AlertCircle className="w-12 h-12 text-red-500" aria-hidden="true" />
 
 					<h2 className="text-lg font-semibold text-red-800 m-0 p-0">
-						{ __( 'Something went wrong', 'wp-ai-blogger' ) }
+						{ __( 'Something went wrong', 'auto-ai-blogger' ) }
 					</h2>
 
 					<p id="error-description" className="text-red-600">
-						{ __( 'We encountered an error loading the welcome page. Please try refreshing.', 'wp-ai-blogger' ) }
+						{ __( 'We encountered an error loading the welcome page. Please try refreshing.', 'auto-ai-blogger' ) }
 					</p>
 
 					<button
 						onClick={ () => this.setState( { hasError: false, error: null } ) }
 						className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-						aria-label={ __( 'Retry loading welcome page', 'wp-ai-blogger' ) }
+						aria-label={ __( 'Retry loading welcome page', 'auto-ai-blogger' ) }
 					>
 						<RefreshCw className="w-4 h-4" aria-hidden="true" />
-						{ __( 'Try Again', 'wp-ai-blogger' ) }
+						{ __( 'Try Again', 'auto-ai-blogger' ) }
 					</button>
 				</div>
 			);
@@ -67,11 +67,11 @@ function Welcome() {
 			<main
 				className="welcome-page"
 				role="main"
-				aria-label={ __( 'Welcome dashboard', 'wp-ai-blogger' ) }
+				aria-label={ __( 'Welcome dashboard', 'auto-ai-blogger' ) }
 			>
 				{ /* Screen reader announcement for dynamic content */ }
 				<div className="sr-only" aria-live="polite" aria-atomic="true">
-					{ __( 'Welcome page content loaded', 'wp-ai-blogger' ) }
+					{ __( 'Welcome page content loaded', 'auto-ai-blogger' ) }
 				</div>
 
 				{ /* Campaigns insights section */ }
@@ -79,7 +79,7 @@ function Welcome() {
 					aria-labelledby="campaigns-heading"
 				>
 					<h2 id="campaigns-heading" className="sr-only">
-						{ __( 'Campaigns Insights', 'wp-ai-blogger' ) }
+						{ __( 'Campaigns Insights', 'auto-ai-blogger' ) }
 					</h2>
 					<CampaignsInsights onError={ handleComponentError } />
 				</section>

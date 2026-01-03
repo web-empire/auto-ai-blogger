@@ -31,11 +31,11 @@ const NotificationCard = memo( ( {
 		if ( enabled && ( ! value || ! value.trim() ) ) {
 			setIsValid( false );
 			if ( inputType === 'email' ) {
-				setValidationMessage( __( 'Email address is required when notifications are enabled', 'wp-ai-blogger' ) );
+				setValidationMessage( __( 'Email address is required when notifications are enabled', 'auto-ai-blogger' ) );
 			} else if ( inputType === 'tel' ) {
-				setValidationMessage( __( 'Phone number is required when notifications are enabled', 'wp-ai-blogger' ) );
+				setValidationMessage( __( 'Phone number is required when notifications are enabled', 'auto-ai-blogger' ) );
 			} else {
-				setValidationMessage( __( 'This field is required when notifications are enabled', 'wp-ai-blogger' ) );
+				setValidationMessage( __( 'This field is required when notifications are enabled', 'auto-ai-blogger' ) );
 			}
 			return false;
 		}
@@ -53,11 +53,11 @@ const NotificationCard = memo( ( {
 
 			if ( ! isValidPattern ) {
 				if ( inputType === 'email' ) {
-					setValidationMessage( __( 'Please enter valid email address(es)', 'wp-ai-blogger' ) );
+					setValidationMessage( __( 'Please enter valid email address(es)', 'auto-ai-blogger' ) );
 				} else if ( inputType === 'tel' ) {
-					setValidationMessage( __( 'Please enter a valid phone number', 'wp-ai-blogger' ) );
+					setValidationMessage( __( 'Please enter a valid phone number', 'auto-ai-blogger' ) );
 				} else {
-					setValidationMessage( __( 'Invalid format', 'wp-ai-blogger' ) );
+					setValidationMessage( __( 'Invalid format', 'auto-ai-blogger' ) );
 				}
 			} else {
 				setValidationMessage( '' );
@@ -113,7 +113,7 @@ const NotificationCard = memo( ( {
 					checked={ enabled }
 					onChange={ onToggle }
 					disabled={ disabled }
-					aria-label={ __( 'Toggle', 'wp-ai-blogger' ) + ` ${ title }` }
+					aria-label={ __( 'Toggle', 'auto-ai-blogger' ) + ` ${ title }` }
 				/>
 			</div>
 
@@ -258,30 +258,30 @@ const Notifications = memo( () => {
 						{ /* Email notifications */ }
 						<NotificationCard
 							icon={ <Mail /> }
-							title={ __( 'Email Notifications', 'wp-ai-blogger' ) }
-							description={ __( 'Receive notifications via email.', 'wp-ai-blogger' ) }
+							title={ __( 'Email Notifications', 'auto-ai-blogger' ) }
+							description={ __( 'Receive notifications via email.', 'auto-ai-blogger' ) }
 							enabled={ notifications.email.enabled }
 							onToggle={ toggleEmail }
 							inputValue={ notifications.email.value }
 							onInputChange={ updateEmail }
-							inputPlaceholder={ __( 'admin@example.com, editor@example.com', 'wp-ai-blogger' ) }
+							inputPlaceholder={ __( 'admin@example.com, editor@example.com', 'auto-ai-blogger' ) }
 							inputType="email"
-							helpText={ __( 'Enter multiple email addresses separated by commas for team notifications.', 'wp-ai-blogger' ) }
+							helpText={ __( 'Enter multiple email addresses separated by commas for team notifications.', 'auto-ai-blogger' ) }
 							validationPattern={ emailPattern }
 						/>
 
 						{ /* Information box */ }
 						<InfoCard
 							icon={ Bell }
-							title={ __( 'Notification Types', 'wp-ai-blogger' ) }
+							title={ __( 'Notification Types', 'auto-ai-blogger' ) }
 							items={ [
-								__( 'Campaign started', 'wp-ai-blogger' ),
-								__( 'New post created', 'wp-ai-blogger' ),
-								__( 'Campaign completed', 'wp-ai-blogger' ),
+								__( 'Campaign started', 'auto-ai-blogger' ),
+								__( 'New post created', 'auto-ai-blogger' ),
+								__( 'Campaign completed', 'auto-ai-blogger' ),
 							] }
 							colorScheme="blue"
 							className="mt-6"
-							ariaLabel={ __( 'Types of notifications you can receive', 'wp-ai-blogger' ) }
+							ariaLabel={ __( 'Types of notifications you can receive', 'auto-ai-blogger' ) }
 						/>
 					</div>
 				}

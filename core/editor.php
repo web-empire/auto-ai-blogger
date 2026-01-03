@@ -2,7 +2,7 @@
 /**
  * Editor Handles
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 

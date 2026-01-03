@@ -2,7 +2,7 @@
 /**
  * Admin Filters.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since x.x.x
  */
 
@@ -47,7 +47,7 @@ class Filters {
 		$current_post_type = $typenow;
 
 		if ( empty( $current_post_type ) && isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
-			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.
@@ -65,7 +65,7 @@ class Filters {
 
 		if ( ! empty( $campaigns ) ) {
 			echo '<select name="wp_aib_campaign_id">';
-			echo '<option value="">' . esc_html__( 'All Campaigns', 'wp-ai-blogger' ) . '</option>';
+			echo '<option value="">' . esc_html__( 'All Campaigns', 'auto-ai-blogger' ) . '</option>';
 
 			foreach ( $campaigns as $campaign_id => $campaign_data ) {
 				$selected = selected( $selected_campaign, $campaign_id, false );
@@ -93,7 +93,7 @@ class Filters {
 		// Check if we're filtering a supported post type.
 		$current_post_type = $typenow;
 		if ( empty( $current_post_type ) && ! empty( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
-			$current_post_type = sanitize_text_field( $_GET['post_type'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
+			$current_post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required as it's in admin.
 		}
 		if ( empty( $current_post_type ) ) {
 			$current_post_type = 'post'; // Default to post if no post_type is specified.
@@ -139,7 +139,7 @@ class Filters {
 	public function add_campaign_column( $columns ) {
 		// Since we're already filtering by post type in the hook registration,.
 		// we can directly add the column.
-		$columns['wp_aib_campaign'] = __( 'Campaign', 'wp-ai-blogger' );
+		$columns['wp_aib_campaign'] = __( 'Campaign', 'auto-ai-blogger' );
 		return $columns;
 	}
 
