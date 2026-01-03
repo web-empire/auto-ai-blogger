@@ -45,7 +45,6 @@ class Updater {
 	 * @return void
 	 */
 	public function run_plugin_hooks(): void {
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_plugin_update' ] );
 		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
 	}
 
@@ -55,53 +54,6 @@ class Updater {
 	 * @return void
 	 */
 	public function run_theme_hooks(): void {
-		add_filter( 'pre_set_site_transient_update_themes', [ $this, 'check_theme_update' ] );
-	}
-
-	/**
-	 * Check for Update for this specific project.
-	 *
-	 * @param Object $transient_data Transient data for update.
-	 */
-	public function check_plugin_update( $transient_data ) {
-		global $pagenow;
-
-		if ( ! is_object( $transient_data ) ) {
-			$transient_data = new \stdClass();
-		}
-
-		if ( $pagenow === 'plugins.php' && is_multisite() ) {
-			return $transient_data;
-		}
-
-		if ( ! empty( $transient_data->response ) && ! empty( $transient_data->response[ $this->client->basename ] ) ) {
-			return $transient_data;
-		}
-
-		$version_info = $this->get_version_info();
-
-		if ( $version_info !== false && is_object( $version_info ) && isset( $version_info->new_version ) ) {
-
-			unset( $version_info->sections );
-
-			// Ensure the 'plugin' property is set.
-			if ( ! isset( $version_info->plugin ) ) {
-				$version_info->plugin = $this->client->basename;
-			}
-
-			// If new version available then set to `response`.
-			if ( version_compare( $this->client->project_version, $version_info->new_version, '<' ) ) {
-				$transient_data->response[ $this->client->basename ] = $version_info;
-			} else {
-				// If new version is not available then set to `no_update`.
-				$transient_data->no_update[ $this->client->basename ] = $version_info;
-			}
-
-			$transient_data->last_checked                       = time();
-			$transient_data->checked[ $this->client->basename ] = $this->client->project_version;
-		}
-
-		return $transient_data;
 	}
 
 	/**
@@ -126,50 +78,6 @@ class Updater {
 
 		// get the version info.
 		return $this->get_version_info();
-	}
-
-	/**
-	 * Check theme update.
-	 *
-	 * @param Object $transient_data Transient data for the update.
-	 */
-	public function check_theme_update( $transient_data ) {
-		global $pagenow;
-
-		if ( ! is_object( $transient_data ) ) {
-			$transient_data = new \stdClass();
-		}
-
-		if ( $pagenow === 'themes.php' && is_multisite() ) {
-			return $transient_data;
-		}
-
-		if ( ! empty( $transient_data->response ) && ! empty( $transient_data->response[ $this->client->slug ] ) ) {
-			return $transient_data;
-		}
-
-		$version_info = $this->get_version_info();
-
-		if ( $version_info !== false && is_object( $version_info ) && isset( $version_info->new_version ) ) {
-
-			// Ensure the 'theme' property is set.
-			if ( ! isset( $version_info->theme ) ) {
-				$version_info->theme = $this->client->slug;
-			}
-
-			// If new version available then set to `response`.
-			if ( version_compare( $this->client->project_version, $version_info->new_version, '<' ) ) {
-				$transient_data->response[ $this->client->slug ] = (array) $version_info;
-			} else {
-				// If new version is not available then set to `no_update`.
-				$transient_data->no_update[ $this->client->slug ] = (array) $version_info;
-			}
-
-			$transient_data->last_checked                   = time();
-			$transient_data->checked[ $this->client->slug ] = $this->client->project_version;
-		}
-
-		return $transient_data;
 	}
 
 	/**

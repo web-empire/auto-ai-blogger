@@ -492,7 +492,7 @@ class Metadata {
 			[
 				'post_type'              => 'any',
 				'post_status'            => 'any',
-				'meta_query'             => [
+				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 					[
 						'key'     => 'wp_aib_campaign_id',
 						'value'   => $campaign_id,

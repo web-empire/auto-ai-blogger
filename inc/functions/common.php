@@ -153,7 +153,7 @@ function wpaib_get_generated_posts() {
 				'order'                  => 'DESC',
 				'update_post_term_cache' => false,
 				'update_post_meta_cache' => false,
-				'meta_query'             => [
+				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign generated posts.
 					[
 						'key'     => 'wp_aib_reference',
 						'value'   => 1,
@@ -536,7 +536,7 @@ function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
 				'order'                  => 'DESC',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'meta_query'             => [
+				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 					[
 						'key'   => 'wp_aib_campaign_id',
 						'value' => $campaign_id,
@@ -627,7 +627,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 				[
 					'post_type'              => 'post',
 					'posts_per_page'         => -1,
-					'meta_query'             => [
+					'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 						[
 							'key'   => 'wp_aib_campaign_id',
 							'value' => $campaign_id,
