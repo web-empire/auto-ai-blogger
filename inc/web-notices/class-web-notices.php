@@ -88,7 +88,7 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 			$notice              = $this->get_notice_by_id( $notice_id );
 			$capability          = $notice['capability'] ?? 'manage_options';
 
-			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) { //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 				return;
 			}
 
@@ -213,22 +213,22 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		public static function markup( $notice = [] ): void {
 			wp_enqueue_script( 'web-notices' );
 
-			do_action( 'web_notice_before_markup' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+			do_action( 'web_notice_before_markup' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
-			do_action( "web_notice_before_markup_{$notice['id']}" ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+			do_action( "web_notice_before_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
 			?>
 			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
 				<div class="notice-container">
-					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?> // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook ?>
 					<?php echo wp_kses_post( $notice['message'] ); ?>
 				</div>
 			</div>
 			<?php
 
-			do_action( "web_notice_after_markup_{$notice['id']}" ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+			do_action( "web_notice_after_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
-			do_action( 'web_notice_after_markup' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+			do_action( 'web_notice_after_markup' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 		}
 
 		/**

@@ -224,7 +224,7 @@ class Client {
 		}
 
 		// filterable endpoint.
-		return trailingslashit( apply_filters( 'surecart_licensing_endpoint', 'https://api.surecart.com' ) );
+		return trailingslashit( apply_filters( 'surecart_licensing_endpoint', 'https://api.surecart.com' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -287,7 +287,7 @@ class Client {
 	public function is_local_server() {
 		$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 		$is_local    = in_array( $remote_addr, [ '127.0.0.1', '::1' ], true );
-		return apply_filters( 'surecart_licensing_is_local', $is_local );
+		return apply_filters( 'surecart_licensing_is_local', $is_local ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**

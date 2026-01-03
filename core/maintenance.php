@@ -8,6 +8,10 @@
 
 namespace WPAIBlogger\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use WPAIBlogger\Inc\Traits\Get_Instance;
 
 /**
