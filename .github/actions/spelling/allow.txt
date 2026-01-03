@@ -193,3 +193,5 @@ HOMELINK
 LINKID
 fafb
 wpwrap
+GPLv
+Hookname

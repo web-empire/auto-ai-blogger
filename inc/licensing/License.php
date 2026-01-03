@@ -1,6 +1,8 @@
 <?php
 
-namespace SureCart\Licensing; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+namespace SureCart\Licensing;
+
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
 
 defined( 'ABSPATH' ) || exit;
 
