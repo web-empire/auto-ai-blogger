@@ -321,6 +321,16 @@ parameters:
 			path: admin/licensing.php
 
 		-
+			message: "#^Constant WP_AI_BLOGGER_PRODUCT_ID not found\\.$#"
+			count: 2
+			path: admin/licensing.php
+
+		-
+			message: "#^Constant WP_AI_BLOGGER_PRODUCT_NAME not found\\.$#"
+			count: 1
+			path: admin/licensing.php
+
+		-
 			message: "#^Method WPAIBlogger\\\\Admin\\\\Licensing\\:\\:fetch_and_save_token_data\\(\\) is unused\\.$#"
 			count: 1
 			path: admin/licensing.php
@@ -721,7 +731,7 @@ parameters:
 			path: inc/functions/common.php
 
 		-
-			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 150, redirection\\: 5, httpversion\\: '1\\.1', blocking\\: true, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'WP\\-AI\\-Blogger/0\\.0\\.1'\\}, body\\: non\\-empty\\-string\\|false, cookies\\: array\\{\\}, \\.\\.\\.\\} given\\.$#"
+			message: "#^Parameter \\#2 \\$args of function wp_remote_post expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{method\\: 'POST', timeout\\: 150, redirection\\: 5, httpversion\\: '1\\.1', blocking\\: true, headers\\: array\\{Content\\-Type\\: 'application/json', User\\-Agent\\: 'Auto\\-AI\\-Blogger/0\\.0…'\\}, body\\: non\\-empty\\-string\\|false, cookies\\: array\\{\\}, \\.\\.\\.\\} given\\.$#"
 			count: 1
 			path: inc/functions/common.php
 
@@ -851,12 +861,17 @@ parameters:
 			path: inc/licensing/Client.php
 
 		-
-			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:updater\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Updater but returns object\\.$#"
+			message: "#^Method SureCart\\\\Licensing\\\\Client\\:\\:updater\\(\\) should return SureCart\\\\Licensing\\\\SureCart\\\\Updater\\|null but returns object\\.$#"
 			count: 1
 			path: inc/licensing/Client.php
 
 		-
 			message: "#^Parameter \\#2 \\$args of function wp_remote_request expects array\\{method\\?\\: string, timeout\\?\\: float, redirection\\?\\: int, httpversion\\?\\: string, user\\-agent\\?\\: string, reject_unsafe_urls\\?\\: bool, blocking\\?\\: bool, headers\\?\\: array\\|string, \\.\\.\\.\\}, array\\{headers\\: array\\{X\\-SURECART\\-WP\\-LICENSING\\-SDK\\-VERSION\\: string, Accept\\: 'application/json', Authorization\\?\\: non\\-falsy\\-string\\}, method\\: array, timeout\\: 30, blocking\\: bool, body\\: array\\|null\\} given\\.$#"
+			count: 1
+			path: inc/licensing/Client.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: inc/licensing/Client.php
 
@@ -952,7 +967,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method object\\:\\:__\\(\\)\\.$#"
-			count: 11
+			count: 13
 			path: inc/licensing/Settings.php
 
 		-
@@ -1026,21 +1041,6 @@ parameters:
 			path: inc/licensing/Settings.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$basename\\.$#"
-			count: 5
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$checked\\.$#"
-			count: 2
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$last_checked\\.$#"
-			count: 2
-			path: inc/licensing/Updater.php
-
-		-
 			message: "#^Access to an undefined property object\\:\\:\\$last_updated\\.$#"
 			count: 1
 			path: inc/licensing/Updater.php
@@ -1051,37 +1051,12 @@ parameters:
 			path: inc/licensing/Updater.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$no_update\\.$#"
-			count: 2
-			path: inc/licensing/Updater.php
-
-		-
 			message: "#^Access to an undefined property object\\:\\:\\$package\\.$#"
 			count: 1
 			path: inc/licensing/Updater.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$plugin\\.$#"
-			count: 1
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$project_version\\.$#"
-			count: 4
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$response\\.$#"
-			count: 2
-			path: inc/licensing/Updater.php
-
-		-
 			message: "#^Access to an undefined property object\\:\\:\\$slug\\.$#"
-			count: 6
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$theme\\.$#"
 			count: 1
 			path: inc/licensing/Updater.php
 
@@ -1092,16 +1067,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method object\\:\\:license\\(\\)\\.$#"
-			count: 1
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:check_plugin_update\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: inc/licensing/Updater.php
-
-		-
-			message: "#^Method SureCart\\\\Licensing\\\\Updater\\:\\:check_theme_update\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: inc/licensing/Updater.php
 
