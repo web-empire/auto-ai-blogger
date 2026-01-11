@@ -231,36 +231,25 @@ class Settings {
 	 * @return void
 	 */
 	public function print_css(): void {
-		?>
-		<style>
-			.spinner {
-				float: none;
-			}
-			<?php echo '.' . esc_attr( $this->name ) . '-form-container'; ?> form {
+		wp_enqueue_style( 'surecart-licensing-style', WP_AI_BLOGGER_BASE_URL . 'inc/licensing/assets/style.css', [], WP_AI_BLOGGER_VERSION );
+		wp_add_inline_style( 'surecart-licensing-style', $this->get_css() );
+	}
+
+	/**
+	 * Get the css for the form.
+	 *
+	 * @return string
+	 */
+	public function get_css() {
+		return '
+			.' . esc_attr( $this->name ) . '-form-container form {
 				padding:30px;
 				background: #fff;
 				display: grid;
 				gap: 1em;
 				max-width: 600px;
 			}
-			h2 {
-				padding: 0;
-				margin: 0;
-			}
-			label {
-				display: block;
-				font-size: 1.1em;
-				margin-bottom: 5px;
-			}
-			label[hidden] {
-				display: none;
-			}
-			p.submit {
-				margin: 0;
-				padding: 0;
-			}
-		</style>
-		<?php
+		';
 	}
 
 	/**
@@ -313,11 +302,6 @@ class Settings {
 				return;
 			}
 
-			if ( ! empty( $this->menu_args['activated_redirect'] ) ) {
-				$this->redirect( $this->menu_args['activated_redirect'] );
-				exit;
-			}
-
 			return $this->add_success( 'activated', $this->client->__( 'This site was successfully activated.', 'surecart' ) );
 		}
 
@@ -332,30 +316,8 @@ class Settings {
 				$this->add_error( $deactivated->get_error_code(), $deactivated->get_error_message() );
 			}
 
-			if ( ! empty( $this->menu_args['deactivated_redirect'] ) ) {
-				$this->redirect( $this->menu_args['deactivated_redirect'] );
-				exit;
-			}
-
 			return $this->add_success( 'deactivated', $this->client->__( 'This site was successfully deactivated.', 'surecart' ) );
 		}
-	}
-
-	/**
-	 * Redirect to a url client-side.
-	 * We need to do this to avoid "headers already sent" messages.
-	 *
-	 * @param string $url Url to redirect.
-	 *
-	 * @return void
-	 */
-	public function redirect( $url ): void {
-		?>
-		<div class="spinner is-active"></div>
-		<script>
-			window.location.assign("<?php echo esc_url( $url ); ?>");
-		</script>
-		<?php
 	}
 
 	/**

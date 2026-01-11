@@ -57,7 +57,6 @@ artifacts
 admin/assets/src
 wordpress
 sass
-src
 unminified
 coverage-report
 phpinsights.php

@@ -1668,7 +1668,7 @@ class Ajax {
 			}
 
 			// Make API request.
-			$api_url = 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title';
+			$api_url = WP_AI_BLOGGER_CAMPAIGN_FROM_TITLE_POST_API;
 
 			$response = wp_remote_post(
 				$api_url,

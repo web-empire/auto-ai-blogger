@@ -176,10 +176,7 @@ class Licensing {
 		}
 
 		// Input validation and sanitization.
-		$license_key = $this->sanitize_license_key( wp_unslash( $_POST['license_key'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
-		if ( is_wp_error( $license_key ) ) {
-			wp_send_json_error( [ 'message' => $license_key->get_error_message() ] );
-		}
+		$license_key = sanitize_text_field( wp_unslash( $_POST['license_key'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
 
 		// Additional Check if license key format is valid.
 		if ( ! $this->validate_license_key_format( $license_key ) ) {
@@ -787,7 +784,7 @@ class Licensing {
 			add_query_arg(
 				'license',
 				urlencode( $sanitized_key ),
-				'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data'
+				WP_AI_BLOGGER_TOKEN_USAGE_API
 			)
 		);
 

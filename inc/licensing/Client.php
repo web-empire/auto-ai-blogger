@@ -151,11 +151,6 @@ class Client {
 	 * @return SureCart\Updater|null
 	 */
 	public function updater() {
-		// Skip updater for WordPress.org hosted version (updates handled by WordPress.org).
-		if ( defined( 'WPAIB_DISABLE_UPDATER' ) && constant( 'WPAIB_DISABLE_UPDATER' ) ) {
-			return null;
-		}
-
 		if ( ! class_exists( __NAMESPACE__ . '\Updater' ) ) {
 			require_once __DIR__ . '/Updater.php';
 		}
@@ -308,48 +303,25 @@ class Client {
 	 */
 	protected function set_basename_and_slug(): void {
 		// it's a plugin.
-		if ( strpos( $this->file, WP_CONTENT_DIR . '/themes/' ) === false ) {
-			$this->basename = plugin_basename( $this->file );
+		$this->basename = WP_AI_BLOGGER_BASE_PATH;
 
-			[ $this->slug ] = explode( '/', $this->basename );
+		[ $this->slug ] = explode( '/', $this->basename );
 
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-			$plugin_data = get_plugin_data( $this->file );
+		$plugin_data = get_plugin_data( $this->file );
 
-			if ( empty( $plugin_data['Version'] ) ) {
-				add_action(
-					'admin_notices',
-					function(): void {
-						printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your plugin.</p></div>' );
-					}
-				);
-			}
-
-			$this->project_version = $plugin_data['Version'];
-			$this->type            = 'plugin';
-
-			// it's a theme.
-		} else {
-			$this->basename = str_replace( WP_CONTENT_DIR . '/themes/', '', $this->file );
-
-			[ $this->slug ] = explode( '/', $this->basename );
-
-			$theme = wp_get_theme( $this->slug );
-
-			$this->project_version = $theme->version;
-
-			if ( empty( $theme->version ) ) {
-				add_action(
-					'admin_notices',
-					function(): void {
-						printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your theme.</p></div>' );
-					}
-				);
-			}
-
-			$this->type = 'theme';
+		if ( empty( $plugin_data['Version'] ) ) {
+			add_action(
+				'admin_notices',
+				function(): void {
+					printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your plugin.</p></div>' );
+				}
+			);
 		}
+
+		$this->project_version = $plugin_data['Version'];
+		$this->type            = 'plugin';
 
 		$this->textdomain = $this->slug;
 	}

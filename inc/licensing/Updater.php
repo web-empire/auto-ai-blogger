@@ -47,7 +47,6 @@ class Updater {
 	 * @return void
 	 */
 	public function run_plugin_hooks(): void {
-		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
 	}
 
 	/**
@@ -56,30 +55,6 @@ class Updater {
 	 * @return void
 	 */
 	public function run_theme_hooks(): void {
-	}
-
-	/**
-	 * Updates information on the "View version x.x details" page with custom data.
-	 *
-	 * @param mixed  $data Plugin data.
-	 * @param string $action The action type.
-	 * @param object $args Arguments.
-	 *
-	 * @return object $data
-	 */
-	public function plugins_api_filter( $data, $action = '', $args = null ) {
-		// must be requesting plugin info.
-		if ( $action !== 'plugin_information' ) {
-			return $data;
-		}
-
-		// slug must match.
-		if ( ! isset( $args->slug ) || ( $args->slug !== $this->client->slug ) ) {
-			return $data;
-		}
-
-		// get the version info.
-		return $this->get_version_info();
 	}
 
 	/**

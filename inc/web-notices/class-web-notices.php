@@ -82,18 +82,18 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		 * @return void
 		 */
 		public function dismiss_notice(): void {
+			// Verify nonce first before processing any input.
+			if ( ! isset( $_POST['nonce'] ) || false === wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'web-notices' ) ) {
+				wp_send_json_error( esc_html__( 'WordPress Nonce not validated.', 'auto-ai-blogger' ) );
+			}
+
 			$notice_id           = isset( $_POST['notice_id'] ) ? sanitize_key( $_POST['notice_id'] ) : '';
 			$repeat_notice_after = isset( $_POST['repeat_notice_after'] ) ? absint( $_POST['repeat_notice_after'] ) : '';
-			$nonce               = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
 			$notice              = $this->get_notice_by_id( $notice_id );
 			$capability          = $notice['capability'] ?? 'manage_options';
 
 			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) { //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 				return;
-			}
-
-			if ( false === wp_verify_nonce( $nonce, 'web-notices' ) ) {
-				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'auto-ai-blogger' ) );
 			}
 
 			// Valid inputs?

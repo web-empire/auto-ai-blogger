@@ -47,7 +47,7 @@ module.exports = function (grunt) {
 					'!postcss.config.js',
 					'!.DS_Store',
 					'!phpinsights.php',
-					'!src/**',
+					// '!src/**',
 					'!copilot_readme/**',
 				],
 				dest: 'auto-ai-blogger/',

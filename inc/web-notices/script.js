@@ -1,7 +1,7 @@
 /**
  * Web Admin Notices Trigger.
  *
- * @author WebEmpire
+ * @author WPSolvex
  */
 
 ( function( $ ) {

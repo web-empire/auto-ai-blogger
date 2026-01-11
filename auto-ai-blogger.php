@@ -6,8 +6,8 @@
  * Author URI: https://wpsolvex.com/
  * Version: 0.0.1
  * License: GPLv2 or later
- * Requires at least: 5.6
- * Requires PHP: 5.6
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
  * Description: Auto AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging.
  * Text Domain: auto-ai-blogger
  *
@@ -31,13 +31,12 @@ define( 'WP_AI_BLOGGER_SLUG', 'auto-ai-blogger' );
 define( 'WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings' );
 define( 'WP_AI_BLOGGER_CAPABILITY', 'manage_options' );
 
-// Disable custom updater for WordPress.org (updates handled by WordPress.org).
-define( 'WPAIB_DISABLE_UPDATER', true );
-
 // Store Linking.
 define( 'WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );
 define( 'WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post' );
 define( 'WP_AI_BLOGGER_CAMPAIGN_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-campaign-post' );
+define( 'WP_AI_BLOGGER_CAMPAIGN_FROM_TITLE_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title' );
+define( 'WP_AI_BLOGGER_TOKEN_USAGE_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data' );
 
 // CPT Constants.
 define( 'WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign' );
