@@ -13,20 +13,38 @@ This is not just a content creator, its beyond the auto-blogging.
 
 This is not just a content creator, its beyond the auto-blogging.
 
-## External services ##
+## External Services ##
 
-This plugin connects to an remote AI Blogger API for following purposes.
+This plugin relies on an external service operated by WP AI Blogger (WP Solvex) to provide AI-powered content generation features.
 
-1. Generate a post: It sends the selected featured post title and accordingly get a post content to generate a post.
-2. Generate a campaign post: It sends the user's campaign post's data like campaign title, keywords and campaign meta to generate a post according to this configuration.
-3. Generate a post content from provided title: It sends the selected featured post title and accordingly get a post content to generate a post.
-4. Get the token usage data: This API basically gives tokens usage data to user.
+The external service is required for the core functionality of the plugin, including generating blog posts and managing token usage.
 
-These APIs also included Auto AI Blogger site persona settings, such as Site Title, Site Description, Site For to increase better results. We do understand the user site's privacy, we are not collecting anything that affect on policy.
+### What the service is used for
+- Generating AI-based blog post content from post titles
+- Generating campaign-based blog posts using user-defined keywords and configurations
+- Generating post content from a provided title
+- Retrieving token usage and license-related data
 
-This service is provided by "WP AI Blogger":
-<a href="#" target="_blank" rel="">Terms of Use</a>
-<a href="#" target="_blank" rel="">Privacy Policy</a>
+### What data is sent and when
+The plugin sends data to the external service only when initiated by the site administrator. Depending on the feature used, this may include:
+- Post titles, keywords, and campaign configuration entered by the user
+- Site metadata such as site title and site description (used to improve content relevance)
+- Plugin license key and token usage identifiers
+- Technical information such as plugin version and WordPress version
+
+User name and email address are collected only when the user explicitly provides consent.
+If consent is not provided, we do not collect or process any personal user data.
+
+### Service provider
+The external service is provided by:
+
+WP AI Blogger (WP Solvex)
+API domain: https://wpaiblogger.com
+
+### Terms and Privacy Policy
+- Terms of Service: https://wpaiblogger.com/terms-and-conditions/
+- Privacy Policy: https://wpaiblogger.com/privacy-policy/
+
 
 ## Screenshots ##
 1. Admin screen.
