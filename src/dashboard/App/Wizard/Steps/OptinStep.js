@@ -327,7 +327,7 @@ const OptinStep = memo( () => {
 
 								<form className="space-y-5" onSubmit={ submitOptinForm }>
 									<FormField
-										id="wpaib-user-name"
+										id="autoaib-user-name"
 										label={ __( 'First Name', 'auto-ai-blogger' ) }
 										type="text"
 										value={ name }
@@ -339,7 +339,7 @@ const OptinStep = memo( () => {
 									/>
 
 									<FormField
-										id="wpaib-user-email"
+										id="autoaib-user-email"
 										label={ __( 'Email Address', 'auto-ai-blogger' ) }
 										type="email"
 										value={ email }

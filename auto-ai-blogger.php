@@ -20,29 +20,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define Constants.
-define( 'WP_AI_BLOGGER_FILE', __FILE__ );
-define( 'WP_AI_BLOGGER_VERSION', '0.0.2' );
-define( 'WP_AI_BLOGGER_DIR', plugin_dir_path( WP_AI_BLOGGER_FILE ) );
-define( 'WP_AI_BLOGGER_BASE_PATH', plugin_basename( WP_AI_BLOGGER_FILE ) );
-define( 'WP_AI_BLOGGER_BASE_URL', plugins_url( '/', WP_AI_BLOGGER_FILE ) );
+define( 'AUTOAIB_FILE', __FILE__ );
+define( 'AUTOAIB_VERSION', '0.0.2' );
+define( 'AUTOAIB_DIR', plugin_dir_path( AUTOAIB_FILE ) );
+define( 'AUTOAIB_BASE_PATH', plugin_basename( AUTOAIB_FILE ) );
+define( 'AUTOAIB_BASE_URL', plugins_url( '/', AUTOAIB_FILE ) );
 
 // Define Plugin Option.
-define( 'WP_AI_BLOGGER_SLUG', 'auto-ai-blogger' );
-define( 'WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings' );
-define( 'WP_AI_BLOGGER_CAPABILITY', 'manage_options' );
+define( 'AUTOAIB_SLUG', 'auto-ai-blogger' );
+define( 'AUTOAIB_DB_OPTION', 'autoaib_settings' );
+define( 'AUTOAIB_CAPABILITY', 'manage_options' );
 
 // Store Linking.
-define( 'WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );
-define( 'WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post' );
-define( 'WP_AI_BLOGGER_CAMPAIGN_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-campaign-post' );
-define( 'WP_AI_BLOGGER_CAMPAIGN_FROM_TITLE_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title' );
-define( 'WP_AI_BLOGGER_TOKEN_USAGE_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data' );
+define( 'AUTOAIB_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq' );
+define( 'AUTOAIB_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post' );
+define( 'AUTOAIB_CAMPAIGN_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-campaign-post' );
+define( 'AUTOAIB_CAMPAIGN_FROM_TITLE_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title' );
+define( 'AUTOAIB_TOKEN_USAGE_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data' );
 
 // CPT Constants.
-define( 'WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign' );
+define( 'AUTOAIB_CPT_CAMPAIGN', 'campaign' );
 
 // Define Upgrade Link.
-define( 'WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/' );
+define( 'AUTOAIB_UPGRADE_LINK', 'https://wpaiblogger.com/' );
 
 // Include required files.
 require_once 'inc/functions/common.php';

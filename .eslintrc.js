@@ -41,7 +41,7 @@ module.exports = {
 		navigator: true,
 		docsMenuChange: true,
 		hub_admin_nav_menu_data: true,
-		wpaib_localized_data: true,
+		autoaib_localized_data: true,
 		WebNotices: true,
 	},
 };

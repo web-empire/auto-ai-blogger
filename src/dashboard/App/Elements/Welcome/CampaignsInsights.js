@@ -69,7 +69,7 @@ const formatLastPostRun = ( lastRun ) => {
 // Enhanced campaign card component with better UX.
 const CampaignCard = memo( ( { campaign } ) => {
 	const navigate = useNavigate();
-	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
+	const defaultMetaDefaults = autoaib_localized_data.postmeta_defaults;
 
 	const campaigns = useSelector( ( state ) => state.allCampaigns ) || {};
 	const isPerformant = ( campaign?.postsVisit || 0 ) > 100;
@@ -83,12 +83,12 @@ const CampaignCard = memo( ( { campaign } ) => {
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
 
-		formData.append( 'action', 'wpaib_get_campaign_metadata' );
-		formData.append( 'security', wpaib_localized_data.admin_nonce );
+		formData.append( 'action', 'autoaib_get_campaign_metadata' );
+		formData.append( 'security', autoaib_localized_data.admin_nonce );
 		formData.append( 'campaign_id', campaignId );
 
 		const response = await apiFetch( {
-			url: wpaib_localized_data.ajax_url,
+			url: autoaib_localized_data.ajax_url,
 			method: 'POST',
 			body: formData,
 		} )
@@ -140,14 +140,14 @@ const CampaignCard = memo( ( { campaign } ) => {
 		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found.
 
 		// Redirect to All Posts page with campaign filter
-		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		const adminUrl = autoaib_localized_data.admin_url || '/wp-admin/';
 		let filterUrl;
 
 		// For 'post' type, we don't need to specify post_type parameter
 		if ( postType === 'post' ) {
-			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+			filterUrl = `${ adminUrl }edit.php?autoaib_campaign_id=${ campaignId }`;
 		} else {
-			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&autoaib_campaign_id=${ campaignId }`;
 		}
 
 		window.open( filterUrl, '_blank' );

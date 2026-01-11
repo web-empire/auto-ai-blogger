@@ -49,6 +49,7 @@ module.exports = function (grunt) {
 					'!phpinsights.php',
 					// '!src/**',
 					'!copilot_readme/**',
+					'!debug_tokens.js'
 				],
 				dest: 'auto-ai-blogger/',
 			},
@@ -105,8 +106,8 @@ module.exports = function (grunt) {
 				overwrite: true,
 				replacements: [
 					{
-						from: /WP_AI_BLOGGER_VERSION', '.*?'/g,
-						to: 'WP_AI_BLOGGER_VERSION\', \'<%= pkg.version %>\''
+						from: /AUTOAIB_VERSION', '.*?'/g,
+						to: 'AUTOAIB_VERSION\', \'<%= pkg.version %>\''
 					}
 				]
 			},

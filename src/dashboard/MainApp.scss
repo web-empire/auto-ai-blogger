@@ -31,7 +31,7 @@
 	background: #f9fafb;
 }
 
-.wpaib-vertical-divider {
+.autoaib-vertical-divider {
 	width: 1px;
 	height: 24px;
 	border-left: 1px solid #e5e7eb;
@@ -51,7 +51,7 @@
 	cursor: pointer;
 	border: none;
 }
-.wpaib-content-header {
+.autoaib-content-header {
 	border-bottom: 1px solid #e5e7eb;
 }
 .campaign-settings-tab {
@@ -59,7 +59,7 @@
 }
 
 #headlessui-portal-root select,
-.posts_page_auto-ai-blogger select.wpaib-select-control {
+.posts_page_auto-ai-blogger select.autoaib-select-control {
 	@apply col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-brand-600 sm:text-sm/6;
 }
 
@@ -114,8 +114,8 @@
 #headlessui-portal-root input[type="week"]:focus,
 #headlessui-portal-root select:focus,
 #headlessui-portal-root textarea:focus {
-	border-color: var( --wpaib-brand-600 ) !important;
-	box-shadow: 0 0 0 1px var( --wpaib-brand-600 ) !important;
+	border-color: var( --autoaib-brand-600 ) !important;
+	box-shadow: 0 0 0 1px var( --autoaib-brand-600 ) !important;
 	outline: 2px solid transparent !important;
 }
 
@@ -127,7 +127,7 @@
 #auto-ai-blogger-main-page--wrapper p {
 	margin: 0;
 	padding: 0;
-	&.wpaib-step-text {
+	&.autoaib-step-text {
 		margin-bottom: 2rem;
 	}
 }
@@ -150,7 +150,7 @@
 	left: 50%;
 }
 
-#wpaib-confetti-wrapper {
+#autoaib-confetti-wrapper {
 	pointer-events: none;
 	position: fixed;
 	z-index: 2;
@@ -178,22 +178,22 @@
 }
 
 @media ( max-width: 960px ) {
-	.wpaib-setup-header,
-	.wpaib-setup-footer {
+	.autoaib-setup-header,
+	.autoaib-setup-footer {
 		left: 36px;
 	}
 }
 @media ( max-width: 782px ) {
-	.wpaib-setup-header,
-	.wpaib-setup-footer {
+	.autoaib-setup-header,
+	.autoaib-setup-footer {
 		left: 0px;
 	}
 }
 
-.wpaib-container {
+.autoaib-container {
 	@apply max-w-7xl mx-auto  p-4;
 
-	.wpaib-row {
+	.autoaib-row {
 		@apply mx-auto max-w-md;
 	}
 }
@@ -229,21 +229,21 @@
 	box-shadow: none;
 }
 
-.posts_page_auto-ai-blogger #wpbody-content a:active:not( .wpaib-menu ):not( .campaign-settings-tab ),
-.posts_page_auto-ai-blogger #wpbody-content a:hover:not( .wpaib-menu ):not( .campaign-settings-tab ) {
-	color: var( --wpaib-brand-primary-hover );
+.posts_page_auto-ai-blogger #wpbody-content a:active:not( .autoaib-menu ):not( .campaign-settings-tab ),
+.posts_page_auto-ai-blogger #wpbody-content a:hover:not( .autoaib-menu ):not( .campaign-settings-tab ) {
+	color: var( --autoaib-brand-primary-hover );
 }
 
-.wpaib-button {
-	@apply bg-[var(--wpaib-brand-primary)] text-white hover:bg-[var(--wpaib-brand-primary-hover)] rounded-s p-2 text-sm font-semibold;
+.autoaib-button {
+	@apply bg-[var(--autoaib-brand-primary)] text-white hover:bg-[var(--autoaib-brand-primary-hover)] rounded-s p-2 text-sm font-semibold;
 }
 
-.wpaib-active-state-button {
-	border-bottom: 2px solid var( --wpaib-brand-primary );
+.autoaib-active-state-button {
+	border-bottom: 2px solid var( --autoaib-brand-primary );
 }
 
 .lucide-loader-pinwheel {
-	color: var( --wpaib-brand-primary );
+	color: var( --autoaib-brand-primary );
 }
 
 #auto-ai-blogger-main-page--wrapper a {
@@ -257,19 +257,19 @@
 	border-bottom: 1px solid #e5e7eb;
 }
 
-.wpaib-menu {
+.autoaib-menu {
 	border-bottom: 2px solid transparent;
 }
-.wpaib-menu.wpaib-active-menu {
-	border-color: var( --wpaib-brand-primary ) !important;
-	color: var( --wpaib-brand-primary ) !important;
+.autoaib-menu.autoaib-active-menu {
+	border-color: var( --autoaib-brand-primary ) !important;
+	color: var( --autoaib-brand-primary ) !important;
 }
 
-.wpaib-wizard--button {
-	@apply rounded border border-transparent px-5 py-2.5 bg-[var(--wpaib-brand-primary)] cursor-pointer text-[15px] justify-center text-center font-medium text-white shadow flex-shrink-0 flex items-center;
+.autoaib-wizard--button {
+	@apply rounded border border-transparent px-5 py-2.5 bg-[var(--autoaib-brand-primary)] cursor-pointer text-[15px] justify-center text-center font-medium text-white shadow flex-shrink-0 flex items-center;
 
 	&:hover {
-		@apply hover:bg-[var(--wpaib-brand-primary-hover)];
+		@apply hover:bg-[var(--autoaib-brand-primary-hover)];
 	}
 	&:focus {
 		@apply outline-none ring-2 ring-white ring-offset-2 ring-offset-purple-400;
@@ -288,26 +288,26 @@
 	}
 }
 
-.wpaib-step-heading {
+.autoaib-step-heading {
 	@apply text-center text-4xl font-semibold text-slate-800;
 }
 
 @screen sm {
-	.wpaib-container {
+	.autoaib-container {
 		@apply p-4;
 
-		.wpaib-row {
+		.autoaib-row {
 			@apply max-w-4xl;
 		}
 	}
 
-	.wpaib-wizard--button {
+	.autoaib-wizard--button {
 		@apply px-8;
 	}
 }
 
 @screen lg {
-	.wpaib-row {
+	.autoaib-row {
 		@apply max-w-4xl;
 	}
 }

@@ -38,7 +38,7 @@ class Activation {
 	 */
 	public function __construct( Client $client ) {
 		$this->client     = $client;
-		$this->option_key = 'surecart_' . md5( $this->client->slug ) . '_license_activation_id';
+		$this->option_key = 'autoaib_' . md5( $this->client->slug ) . '_license_activation_id';
 	}
 
 	/**
@@ -73,7 +73,7 @@ class Activation {
 
 		// no id.
 		if ( empty( $activation->id ) ) {
-			return new \WP_Error( 'could_not_activate', $this->client->__( 'Could not activate the license.', 'surecart' ) );
+			return new \WP_Error( 'could_not_activate', $this->client->__( 'Could not activate the license.', 'auto-ai-blogger' ) );
 		}
 
 		// return the activation.

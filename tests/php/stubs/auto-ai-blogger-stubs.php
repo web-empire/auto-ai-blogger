@@ -1,6 +1,6 @@
 <?php
 
-namespace WPAIBlogger {
+namespace WPSolvex\AutoAIBlogger {
     /**
      * Plugin_Loader
      *
@@ -100,7 +100,7 @@ namespace WPAIBlogger {
          * @param int $max_words   The maximum words from campaign settings.
          * @param int $campaign_id The campaign ID.
          * @return int The enforced maximum words value.
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function enforce_free_max_words_limit($max_words, $campaign_id) : int
         {
@@ -111,7 +111,7 @@ namespace WPAIBlogger {
          * @param int $image_count The number of images from campaign settings.
          * @param int $campaign_id The campaign ID.
          * @return int The enforced image count (always 1 for free users).
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function enforce_free_image_limit($image_count, $campaign_id) : int
         {
@@ -121,14 +121,14 @@ namespace WPAIBlogger {
          *
          * @param  array $links links.
          * @return array
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function plugin_action_links($links)
         {
         }
     }
 }
-namespace WPAIBlogger\Inc\Traits {
+namespace WPSolvex\AutoAIBlogger\Inc\Traits {
     /**
      * Trait Get_Instance.
      *
@@ -153,7 +153,7 @@ namespace WPAIBlogger\Inc\Traits {
         }
     }
 }
-namespace WPAIBlogger\Inc {
+namespace WPSolvex\AutoAIBlogger\Inc {
     /**
      * Cron Handler class for Auto AI Blogger.
      *
@@ -163,7 +163,7 @@ namespace WPAIBlogger\Inc {
      */
     class Cron_Handler
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Initialize cron hooks.
          */
@@ -174,7 +174,7 @@ namespace WPAIBlogger\Inc {
          * Create a single post from campaign (cron callback).
          *
          * @param int $campaign_id The ID of the campaign.
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function create_single_post_from_campaign($campaign_id) : void
         {
@@ -186,7 +186,7 @@ namespace WPAIBlogger\Inc {
          * @param int $target_post_number The post number being attempted.
          * @param int $current_attempt The attempt number for this post.
          * @return array An array containing the success status and message.
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function generate_post_from_campaign($campaign_id, $target_post_number = 0, $current_attempt = 0) : array
         {
@@ -195,11 +195,11 @@ namespace WPAIBlogger\Inc {
 }
 namespace {
     /**
-     * Web_Notices
+     * Autoaib_Notices
      *
      * @since 1.0.0
      */
-    class Web_Notices
+    class Autoaib_Notices
     {
         /**
          * Constructor
@@ -289,7 +289,7 @@ namespace {
         }
     }
 }
-namespace WPAIBlogger\Inc\Utils {
+namespace WPSolvex\AutoAIBlogger\Inc\Utils {
     /**
      * This class will holds the code related to the managing of settings of the plugin.
      *
@@ -822,6 +822,14 @@ namespace SureCart\Licensing {
         {
         }
         /**
+         * Get the css for the form.
+         *
+         * @return string
+         */
+        public function get_css()
+        {
+        }
+        /**
          * Get the activation.
          *
          * @return Object|false
@@ -833,17 +841,6 @@ namespace SureCart\Licensing {
          * License form submit
          */
         public function license_form_submit()
-        {
-        }
-        /**
-         * Redirect to a url client-side.
-         * We need to do this to avoid "headers already sent" messages.
-         *
-         * @param string $url Url to redirect.
-         *
-         * @return void
-         */
-        public function redirect($url) : void
         {
         }
         /**
@@ -1032,18 +1029,6 @@ namespace SureCart\Licensing {
         public function run_theme_hooks() : void
         {
         }
-        /**
-         * Updates information on the "View version x.x details" page with custom data.
-         *
-         * @param mixed  $data Plugin data.
-         * @param string $action The action type.
-         * @param object $args Arguments.
-         *
-         * @return object $data
-         */
-        public function plugins_api_filter($data, $action = '', $args = null)
-        {
-        }
     }
     /**
      * SureCart Client
@@ -1211,7 +1196,7 @@ namespace SureCart\Licensing {
         }
     }
 }
-namespace WPAIBlogger\Inc\Notifications {
+namespace WPSolvex\AutoAIBlogger\Inc\Notifications {
     /**
      * Email Templates class.
      *
@@ -1221,7 +1206,7 @@ namespace WPAIBlogger\Inc\Notifications {
      */
     class Email_Templates
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Get email template for notification type.
          *
@@ -1243,7 +1228,7 @@ namespace WPAIBlogger\Inc\Notifications {
      */
     class Notification_Helper
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Constructor.
          */
@@ -1295,7 +1280,7 @@ namespace WPAIBlogger\Inc\Notifications {
         }
     }
 }
-namespace WPAIBlogger\Core {
+namespace WPSolvex\AutoAIBlogger\Core {
     /**
      * Update Compatibility
      *
@@ -1308,7 +1293,7 @@ namespace WPAIBlogger\Core {
      */
     class Maintenance
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          *  Constructor
          */
@@ -1332,7 +1317,7 @@ namespace WPAIBlogger\Core {
      */
     class CPT
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Post type name.
          *
@@ -1388,7 +1373,7 @@ namespace WPAIBlogger\Core {
      */
     class Editor
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Constructor
          *
@@ -1406,11 +1391,11 @@ namespace WPAIBlogger\Core {
      */
     class Frontend
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Constructor
          *
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function __construct()
         {
@@ -1419,14 +1404,14 @@ namespace WPAIBlogger\Core {
          * Track post views.
          *
          * @return void
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function track_post_views() : void
         {
         }
     }
 }
-namespace WPAIBlogger\Admin {
+namespace WPSolvex\AutoAIBlogger\Admin {
     /**
      * This class handles admin filters for posts
      *
@@ -1434,11 +1419,11 @@ namespace WPAIBlogger\Admin {
      */
     class Filters
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Constructor
          *
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function __construct()
         {
@@ -1446,7 +1431,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Add campaign filter dropdown to posts admin page.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
         public function add_campaign_filter() : void
@@ -1456,7 +1441,7 @@ namespace WPAIBlogger\Admin {
          * Filter posts by campaign when campaign filter is applied.
          *
          * @param \WP_Query $query The WP_Query instance.
-         * @since x.x.x
+         * @since 0.0.2
          * @return \WP_Query $query The WP_Query instance.
          */
         public function filter_posts_by_campaign($query)
@@ -1466,7 +1451,7 @@ namespace WPAIBlogger\Admin {
          * Add campaign column to posts admin page.
          *
          * @param array<string, string> $columns Existing columns.
-         * @since x.x.x
+         * @since 0.0.2
          * @return array<string, string> Modified columns.
          */
         public function add_campaign_column($columns)
@@ -1477,7 +1462,7 @@ namespace WPAIBlogger\Admin {
          *
          * @param string $column  Column name.
          * @param int    $post_id Post ID.
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
         public function show_campaign_column_content($column, $post_id) : void
@@ -1493,7 +1478,7 @@ namespace WPAIBlogger\Admin {
      */
     class Ajax
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Holds all AJAX action events.
          *
@@ -1502,7 +1487,7 @@ namespace WPAIBlogger\Admin {
          *
          * @var array<string>
          */
-        public $ajax_events = ['wpaib_update_admin_setting', 'wpaib_create_campaign', 'wpaib_update_campaign', 'wpaib_get_campaign_metadata', 'wpaib_create_post', 'wpaib_run_campaign', 'wpaib_get_campaign_analytics', 'wpaib_delete_campaign', 'wpaib_get_campaign_logs', 'wpaib_pause_campaign', 'wpaib_resume_campaign', 'wpaib_reschedule_campaign'];
+        public $ajax_events = ['autoaib_update_admin_setting', 'autoaib_create_campaign', 'autoaib_update_campaign', 'autoaib_get_campaign_metadata', 'autoaib_create_post', 'autoaib_run_campaign', 'autoaib_get_campaign_analytics', 'autoaib_delete_campaign', 'autoaib_get_campaign_logs', 'autoaib_pause_campaign', 'autoaib_resume_campaign', 'autoaib_reschedule_campaign'];
         /**
          * Holds all nonce for AJAX events.
          *
@@ -1534,7 +1519,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Add security headers to AJAX responses.
          *
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function add_security_headers() : void
         {
@@ -1545,7 +1530,7 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_update_admin_setting() : void
+        public function autoaib_update_admin_setting() : void
         {
         }
         /**
@@ -1554,7 +1539,7 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_create_campaign() : void
+        public function autoaib_create_campaign() : void
         {
         }
         /**
@@ -1563,7 +1548,7 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_update_campaign() : void
+        public function autoaib_update_campaign() : void
         {
         }
         /**
@@ -1572,7 +1557,7 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_get_campaign_metadata() : void
+        public function autoaib_get_campaign_metadata() : void
         {
         }
         /**
@@ -1581,7 +1566,7 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_create_post() : void
+        public function autoaib_create_post() : void
         {
         }
         /**
@@ -1590,16 +1575,16 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_run_campaign() : void
+        public function autoaib_run_campaign() : void
         {
         }
         /**
          * Handler to get campaign analytics data.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
-        public function wpaib_get_campaign_analytics() : void
+        public function autoaib_get_campaign_analytics() : void
         {
         }
         /**
@@ -1608,43 +1593,43 @@ namespace WPAIBlogger\Admin {
          * @since 1.0.0
          * @return void
          */
-        public function wpaib_delete_campaign() : void
+        public function autoaib_delete_campaign() : void
         {
         }
         /**
          * Handler to get campaign logs with security.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
-        public function wpaib_get_campaign_logs() : void
+        public function autoaib_get_campaign_logs() : void
         {
         }
         /**
          * Handler to pause campaign with security.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
-        public function wpaib_pause_campaign() : void
+        public function autoaib_pause_campaign() : void
         {
         }
         /**
          * Handler to resume campaign with security.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
-        public function wpaib_resume_campaign() : void
+        public function autoaib_resume_campaign() : void
         {
         }
         /**
          * Reschedule a campaign's cron jobs (debug utility).
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
-        public function wpaib_reschedule_campaign() : void
+        public function autoaib_reschedule_campaign() : void
         {
         }
     }
@@ -1661,11 +1646,11 @@ namespace WPAIBlogger\Admin {
      */
     class Menu
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Settings page ID for Plugin settings.
          */
-        public const PAGE_ID = WP_AI_BLOGGER_SLUG;
+        public const PAGE_ID = AUTOAIB_SLUG;
         /**
          * Constructor with security setup.
          *
@@ -1678,7 +1663,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Add security headers for admin pages.
          *
-         * @since x.x.x
+         * @since 0.0.2
          */
         public function add_admin_security_headers() : void
         {
@@ -1737,13 +1722,13 @@ namespace WPAIBlogger\Admin {
      */
     class API extends \WP_REST_Controller
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Namespace.
          *
          * @var string
          */
-        protected $namespace = WP_AI_BLOGGER_SLUG . '/v1';
+        protected $namespace = AUTOAIB_SLUG . '/v1';
         /**
          * Route base.
          *
@@ -1890,7 +1875,7 @@ namespace WPAIBlogger\Admin {
      */
     class Licensing
     {
-        use \WPAIBlogger\Inc\Traits\Get_Instance;
+        use \WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
         /**
          * Error messages.
          *
@@ -1945,7 +1930,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Activate license with security validation.
          *
-         * @hooked wp_ajax_wp_ai_blogger_activate_license
+         * @hooked wp_ajax_autoaib_activate_license
          * @since 1.0.0
          * @return void
          */
@@ -1955,7 +1940,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Deactivate license with security validation.
          *
-         * @hooked wp_ajax_wp_ai_blogger_deactivate_license
+         * @hooked wp_ajax_autoaib_deactivate_license
          * @since 1.0.0
          * @return void
          */
@@ -1982,7 +1967,7 @@ namespace WPAIBlogger\Admin {
         /**
          * Validates license periodically for security.
          *
-         * @since x.x.x
+         * @since 0.0.2
          * @return void
          */
         public function validate_license_periodically() : void
@@ -1998,7 +1983,7 @@ namespace {
      * @return string User detail or empty string on failure.
      * @since 1.0.0
      */
-    function wpaib_get_user_detail($detail)
+    function autoaib_get_user_detail($detail)
     {
     }
     /**
@@ -2008,7 +1993,7 @@ namespace {
      * @return mixed Cleaned data.
      * @since 1.0.0
      */
-    function wpaib_clean_data($data)
+    function autoaib_clean_data($data)
     {
     }
     /**
@@ -2017,7 +2002,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized campaigns data.
      */
-    function wpaib_get_all_campaigns()
+    function autoaib_get_all_campaigns()
     {
     }
     /**
@@ -2026,17 +2011,17 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized generated posts data.
      */
-    function wpaib_get_generated_posts()
+    function autoaib_get_generated_posts()
     {
     }
     /**
      * Get array depth safely to prevent memory issues.
      *
-     * @since x.x.x
+     * @since 0.0.2
      * @param array $array Array to check depth.
      * @return int Array depth.
      */
-    function wpaib_get_array_depth(array $array) : int
+    function autoaib_get_array_depth(array $array) : int
     {
     }
     /**
@@ -2045,7 +2030,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized post statuses.
      */
-    function wpaib_get_post_statuses()
+    function autoaib_get_post_statuses()
     {
     }
     /**
@@ -2054,7 +2039,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized post types.
      */
-    function wpaib_get_post_types()
+    function autoaib_get_post_types()
     {
     }
     /**
@@ -2063,7 +2048,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized categories.
      */
-    function wpaib_get_categories()
+    function autoaib_get_categories()
     {
     }
     /**
@@ -2072,7 +2057,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized tags.
      */
-    function wpaib_get_tags()
+    function autoaib_get_tags()
     {
     }
     /**
@@ -2081,7 +2066,7 @@ namespace {
      * @since 1.0.0
      * @return array Sanitized authors list.
      */
-    function wpaib_get_authors()
+    function autoaib_get_authors()
     {
     }
     /**
@@ -2091,7 +2076,7 @@ namespace {
      * @return bool Target achievement status.
      * @since 1.0.0
      */
-    function wpaib_is_campaign_posts_target_achieved($campaign_id)
+    function autoaib_is_campaign_posts_target_achieved($campaign_id)
     {
     }
     /**
@@ -2102,7 +2087,7 @@ namespace {
      * @since 1.0.0
      * @return array Array of previous posts with id, title, url.
      */
-    function wpaib_get_previous_campaign_posts($campaign_id, $limit = 5)
+    function autoaib_get_previous_campaign_posts($campaign_id, $limit = 5)
     {
     }
     /**
@@ -2117,7 +2102,7 @@ namespace {
      * @since 1.0.0
      * @return array|WP_Error Sanitized API response or error.
      */
-    function wpaib_get_post_creation_api_response($keywords, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1)
+    function autoaib_get_post_creation_api_response($keywords, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1)
     {
     }
     /**
@@ -2126,7 +2111,7 @@ namespace {
      * @param array $data API response data.
      * @return array Sanitized data.
      */
-    function wpaib_sanitize_api_response($data)
+    function autoaib_sanitize_api_response($data)
     {
     }
     /**
@@ -2136,7 +2121,7 @@ namespace {
      * @return array Sanitized site persona details.
      * @since 1.0.0
      */
-    function wpaib_get_site_persona_details($campaign_id = 0)
+    function autoaib_get_site_persona_details($campaign_id = 0)
     {
     }
     /**
@@ -2151,9 +2136,9 @@ namespace {
      *
      * @param int $post_id Post ID.
      * @return void
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_track_post_view($post_id) : void
+    function autoaib_track_post_view($post_id) : void
     {
     }
     /**
@@ -2164,9 +2149,9 @@ namespace {
      * @param string $error_message Detailed error message.
      * @param array  $context Additional context data.
      * @return void
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_log_campaign_error($campaign_id, $error_type, $error_message, $context = []) : void
+    function autoaib_log_campaign_error($campaign_id, $error_type, $error_message, $context = []) : void
     {
     }
     /**
@@ -2176,9 +2161,9 @@ namespace {
      * @param int   $post_id Created post ID.
      * @param array $context Additional context data.
      * @return void
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_log_campaign_success($campaign_id, $post_id, $context = []) : void
+    function autoaib_log_campaign_success($campaign_id, $post_id, $context = []) : void
     {
     }
     /**
@@ -2187,9 +2172,9 @@ namespace {
      * @param int $campaign_id Campaign ID.
      * @param int $limit Maximum number of logs to return.
      * @return array Formatted success logs.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_get_campaign_success_logs($campaign_id, $limit = 20) : array
+    function autoaib_get_campaign_success_logs($campaign_id, $limit = 20) : array
     {
     }
     /**
@@ -2198,9 +2183,9 @@ namespace {
      * @param int $campaign_id Campaign ID.
      * @param int $limit Maximum number of logs to return.
      * @return array Formatted error logs.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_get_campaign_error_logs($campaign_id, $limit = 20) : array
+    function autoaib_get_campaign_error_logs($campaign_id, $limit = 20) : array
     {
     }
     /**
@@ -2209,9 +2194,9 @@ namespace {
      * @param string $error_type The error type.
      * @param string $original_message The original error message.
      * @return string User-friendly error message.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_get_user_friendly_error_message($error_type, $original_message) : string
+    function autoaib_get_user_friendly_error_message($error_type, $original_message) : string
     {
     }
     /**
@@ -2219,18 +2204,18 @@ namespace {
      *
      * @param string $error_type The error type.
      * @return string Solution suggestion.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_get_error_solution_suggestion($error_type) : string
+    function autoaib_get_error_solution_suggestion($error_type) : string
     {
     }
     /**
      * Create standardized timestamp data for logging.
      *
      * @return array Array containing various timestamp formats.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_create_timestamp_data() : array
+    function autoaib_create_timestamp_data() : array
     {
     }
     /**
@@ -2242,9 +2227,9 @@ namespace {
      *
      * @param array $token_data Token data containing 'total' and 'remaining' keys.
      * @return bool True if update was successful, false otherwise.
-     * @since x.x.x
+     * @since 0.0.2
      */
-    function wpaib_update_token_data($token_data) : bool
+    function autoaib_update_token_data($token_data) : bool
     {
     }
     /**
@@ -2258,27 +2243,27 @@ namespace {
      * @return string Content with placeholders replaced.
      * @since 1.0.0
      */
-    function wpaib_replace_internal_link_placeholders($content, $previous_posts = [])
+    function autoaib_replace_internal_link_placeholders($content, $previous_posts = [])
     {
     }
     // Define Constants.
-    \define('WP_AI_BLOGGER_FILE', __FILE__);
-    \define('WP_AI_BLOGGER_VERSION', '0.0.1');
-    \define('WP_AI_BLOGGER_DIR', \plugin_dir_path(\WP_AI_BLOGGER_FILE));
-    \define('WP_AI_BLOGGER_BASE_PATH', \plugin_basename(\WP_AI_BLOGGER_FILE));
-    \define('WP_AI_BLOGGER_BASE_URL', \plugins_url('/', \WP_AI_BLOGGER_FILE));
+    \define('AUTOAIB_FILE', __FILE__);
+    \define('AUTOAIB_VERSION', '0.0.2');
+    \define('AUTOAIB_DIR', \plugin_dir_path(\AUTOAIB_FILE));
+    \define('AUTOAIB_BASE_PATH', \plugin_basename(\AUTOAIB_FILE));
+    \define('AUTOAIB_BASE_URL', \plugins_url('/', \AUTOAIB_FILE));
     // Define Plugin Option.
-    \define('WP_AI_BLOGGER_SLUG', 'auto-ai-blogger');
-    \define('WP_AI_BLOGGER_DB_OPTION', 'wp_ai_blogger_settings');
-    \define('WP_AI_BLOGGER_CAPABILITY', 'manage_options');
-    // Disable custom updater for WordPress.org (updates handled by WordPress.org).
-    \define('WPAIB_DISABLE_UPDATER', \true);
+    \define('AUTOAIB_SLUG', 'auto-ai-blogger');
+    \define('AUTOAIB_DB_OPTION', 'autoaib_settings');
+    \define('AUTOAIB_CAPABILITY', 'manage_options');
     // Store Linking.
-    \define('WP_AI_BLOGGER_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
-    \define('WP_AI_BLOGGER_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post');
-    \define('WP_AI_BLOGGER_CAMPAIGN_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-campaign-post');
+    \define('AUTOAIB_PUBLIC_TOKEN', 'pt_YA4aSFMwU9stG91RYGGfV7aq');
+    \define('AUTOAIB_POST_CREATION_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-post');
+    \define('AUTOAIB_CAMPAIGN_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-campaign-post');
+    \define('AUTOAIB_CAMPAIGN_FROM_TITLE_POST_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title');
+    \define('AUTOAIB_TOKEN_USAGE_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/get-token-data');
     // CPT Constants.
-    \define('WP_AI_BLOGGER_CPT_CAMPAIGN', 'campaign');
+    \define('AUTOAIB_CPT_CAMPAIGN', 'campaign');
     // Define Upgrade Link.
-    \define('WP_AI_BLOGGER_UPGRADE_LINK', 'https://wpaiblogger.com/');
+    \define('AUTOAIB_UPGRADE_LINK', 'https://wpaiblogger.com/');
 }

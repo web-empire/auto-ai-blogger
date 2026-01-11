@@ -27,7 +27,7 @@ const ProButton = forwardRef( ( {
 	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	// Get pro purchase URL from Redux store.
-	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || wpaib_localized_data.pro_purchase_url;
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || autoaib_localized_data.pro_purchase_url;
 
 	// Determine the URL to use
 	const proUrl = useMemo( () => {

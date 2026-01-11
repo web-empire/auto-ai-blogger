@@ -50,12 +50,12 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wpaib_get_campaign_logs' );
-			formData.append( 'security', wpaib_localized_data.admin_nonce );
+			formData.append( 'action', 'autoaib_get_campaign_logs' );
+			formData.append( 'security', autoaib_localized_data.admin_nonce );
 			formData.append( 'campaign_id', campaignId );
 
 			const response = await apiFetch( {
-				url: wpaib_localized_data.ajax_url,
+				url: autoaib_localized_data.ajax_url,
 				method: 'POST',
 				body: formData,
 			} );
@@ -459,7 +459,7 @@ const CampaignLogsModal = ( { isOpen, onClose, campaignId, campaignData } ) => {
 																					<ScrollText className="w-3 h-3 mr-1" />
 																					{ log.post_id && log.status === 'success' ? (
 																						<a
-																							href={ `${ wpaib_localized_data.admin_url || '/wp-admin/' }post.php?post=${ log.post_id }&action=edit` }
+																							href={ `${ autoaib_localized_data.admin_url || '/wp-admin/' }post.php?post=${ log.post_id }&action=edit` }
 																							target="_blank"
 																							rel="noopener noreferrer"
 																							className="text-green-700 no-underline hover:cursor-pointer"

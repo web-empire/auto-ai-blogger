@@ -6,9 +6,9 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Core;
+namespace WPSolvex\AutoAIBlogger\Core;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
 
 defined( 'ABSPATH' ) || exit;
 

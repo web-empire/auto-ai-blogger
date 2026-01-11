@@ -17,7 +17,7 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 	return (
 		<div className="space-y-2">
 			<label
-				htmlFor="wpaib-license"
+				htmlFor="autoaib-license"
 				className="flex items-center text-[13px] font-semibold text-gray-900 relative"
 			>
 				<Key className="w-3.5 h-3.5 text-gray-600 mr-1.5" aria-hidden="true" />
@@ -27,7 +27,7 @@ const LicenseInput = memo( ( { value, onChange, error, disabled, processing } ) 
 
 			<div className="relative">
 				<input
-					id="wpaib-license"
+					id="autoaib-license"
 					type="text"
 					value={ value }
 					onChange={ ( e ) => onChange( e.target.value ) }
@@ -240,9 +240,9 @@ const LicenseStep = memo( () => {
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wp_ai_blogger_activate_license' );
+			formData.append( 'action', 'autoaib_activate_license' );
 			formData.append( 'license_key', licenseValue );
-			formData.append( 'wp_ai_blogger_licensing_nonce', licensingNonce );
+			formData.append( 'autoaib_licensing_nonce', licensingNonce );
 
 			const response = await apiFetch( {
 				url: ajaxUrl,

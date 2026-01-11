@@ -200,9 +200,9 @@ const License = memo( () => {
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wp_ai_blogger_activate_license' );
+			formData.append( 'action', 'autoaib_activate_license' );
 			formData.append( 'license_key', licenseKey );
-			formData.append( 'wp_ai_blogger_licensing_nonce', licensingNonce );
+			formData.append( 'autoaib_licensing_nonce', licensingNonce );
 
 			const response = await apiFetch( {
 				url: ajaxUrl,
@@ -329,8 +329,8 @@ const License = memo( () => {
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wp_ai_blogger_deactivate_license' );
-			formData.append( 'wp_ai_blogger_licensing_nonce', licensingNonce );
+			formData.append( 'action', 'autoaib_deactivate_license' );
+			formData.append( 'autoaib_licensing_nonce', licensingNonce );
 
 			const response = await apiFetch( {
 				url: ajaxUrl,

@@ -12,13 +12,13 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Admin;
+namespace WPSolvex\AutoAIBlogger\Admin;
 
-use WPAIBlogger\Inc\Cron_Handler;
-use WPAIBlogger\Inc\Traits\Get_Instance;
-use WPAIBlogger\Inc\Utils\Helper;
-use WPAIBlogger\Inc\Utils\Metadata;
-use WPAIBlogger\Inc\Utils\Settings;
+use WPSolvex\AutoAIBlogger\Inc\Cron_Handler;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Helper;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Metadata;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -51,18 +51,18 @@ class Ajax {
 	 * @var array<string>
 	 */
 	public $ajax_events = [
-		'wpaib_update_admin_setting',
-		'wpaib_create_campaign',
-		'wpaib_update_campaign',
-		'wpaib_get_campaign_metadata',
-		'wpaib_create_post',
-		'wpaib_run_campaign',
-		'wpaib_get_campaign_analytics',
-		'wpaib_delete_campaign',
-		'wpaib_get_campaign_logs',
-		'wpaib_pause_campaign',
-		'wpaib_resume_campaign',
-		'wpaib_reschedule_campaign',
+		'autoaib_update_admin_setting',
+		'autoaib_create_campaign',
+		'autoaib_update_campaign',
+		'autoaib_get_campaign_metadata',
+		'autoaib_create_post',
+		'autoaib_run_campaign',
+		'autoaib_get_campaign_analytics',
+		'autoaib_delete_campaign',
+		'autoaib_get_campaign_logs',
+		'autoaib_pause_campaign',
+		'autoaib_resume_campaign',
+		'autoaib_reschedule_campaign',
 	];
 
 	/**
@@ -108,16 +108,16 @@ class Ajax {
 		}
 
 		// Add security headers for AJAX responses.
-		add_action( 'wp_ajax_wpaib_update_admin_setting', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_create_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_update_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_get_campaign_metadata', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_create_post', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_get_campaign_logs', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_pause_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_resume_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_update_admin_setting', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_create_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_update_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_get_campaign_metadata', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_create_post', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_get_campaign_logs', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_pause_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_resume_campaign', [ $this, 'add_security_headers' ], 1 );
 	}
 
 	/**
@@ -157,7 +157,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_update_admin_setting(): void {
+	public function autoaib_update_admin_setting(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'update_admin_setting' );
@@ -167,7 +167,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -223,7 +223,7 @@ class Ajax {
 		 * @since 1.0.0
 		 * @return void
 		 */
-	public function wpaib_create_campaign(): void {
+	public function autoaib_create_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'create_campaign' );
@@ -233,7 +233,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -276,7 +276,7 @@ class Ajax {
 					'post_title'   => $formatted_campaign_data['title'],
 					'post_content' => $formatted_campaign_data['content'] ?? '',
 					'post_status'  => $formatted_campaign_data['status'] ?? 'draft',
-					'post_type'    => WP_AI_BLOGGER_CPT_CAMPAIGN,
+					'post_type'    => AUTOAIB_CPT_CAMPAIGN,
 					'meta_input'   => $formatted_campaign_data['meta_input'] ?? [],
 				]
 			);
@@ -314,7 +314,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_update_campaign(): void {
+	public function autoaib_update_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'update_campaign' );
@@ -324,7 +324,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -357,7 +357,7 @@ class Ajax {
 
 			// Check if campaign exists and user can edit it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
@@ -428,7 +428,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_get_campaign_metadata(): void {
+	public function autoaib_get_campaign_metadata(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_metadata' );
@@ -438,7 +438,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -452,7 +452,7 @@ class Ajax {
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
@@ -497,7 +497,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_create_post(): void {
+	public function autoaib_create_post(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'create_post' );
@@ -507,7 +507,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -677,7 +677,7 @@ class Ajax {
 
 			// Update token data if available from API response.
 			if ( is_array( $token_data ) && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
-				wpaib_update_token_data( $token_data );
+				autoaib_update_token_data( $token_data );
 			}
 
 			$success_response = [
@@ -710,7 +710,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_run_campaign(): void {
+	public function autoaib_run_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'run_campaign' );
@@ -720,7 +720,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -741,7 +741,7 @@ class Ajax {
 
 			// Check if campaign exists and user can edit it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
@@ -812,7 +812,7 @@ class Ajax {
 	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_get_campaign_analytics(): void {
+	public function autoaib_get_campaign_analytics(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_analytics' );
@@ -822,7 +822,7 @@ class Ajax {
 			}
 
 			// Validate nonce.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -842,7 +842,7 @@ class Ajax {
 					'post_status'            => 'any',
 					'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 						[
-							'key'     => 'wp_aib_campaign_id',
+							'key'     => 'autoaib_campaign_id',
 							'value'   => $campaign_id,
 							'compare' => '=',
 						],
@@ -949,7 +949,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_delete_campaign(): void {
+	public function autoaib_delete_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'delete_campaign' );
@@ -959,7 +959,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -971,7 +971,7 @@ class Ajax {
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
@@ -980,7 +980,7 @@ class Ajax {
 			}
 
 			// Clear scheduled events for this campaign.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 			wp_delete_post( $campaign_id, true );
 			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'auto-ai-blogger' ) ] );
 		} catch ( \Exception $e ) {
@@ -994,7 +994,7 @@ class Ajax {
 	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_get_campaign_logs(): void {
+	public function autoaib_get_campaign_logs(): void {
 		try {
 			// Security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_logs' );
@@ -1004,7 +1004,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -1018,7 +1018,7 @@ class Ajax {
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
@@ -1050,7 +1050,7 @@ class Ajax {
 	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_pause_campaign(): void {
+	public function autoaib_pause_campaign(): void {
 		try {
 			// Validate security.
 			$security_check = $this->validate_ajax_security( 'pause_campaign' );
@@ -1059,7 +1059,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -1072,7 +1072,7 @@ class Ajax {
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
@@ -1098,7 +1098,7 @@ class Ajax {
 			Metadata::update_campaign_meta( $campaign_id, 'pausedAt', current_time( 'mysql' ) );
 
 			// Clear scheduled events.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 
 			wp_send_json_success(
 				[
@@ -1118,7 +1118,7 @@ class Ajax {
 	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_resume_campaign(): void {
+	public function autoaib_resume_campaign(): void {
 		try {
 			// Validate security.
 			$security_check = $this->validate_ajax_security( 'resume_campaign' );
@@ -1127,7 +1127,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -1140,7 +1140,7 @@ class Ajax {
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
@@ -1185,7 +1185,7 @@ class Ajax {
 
 			// Schedule the next post immediately (or after a short delay).
 			$next_run = time() + 60; // Start in 1 minute.
-			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_schedule_single_event( $next_run, 'autoaib_create_single_post', [ $campaign_id ] );
 
 			wp_send_json_success(
 				[
@@ -1205,10 +1205,10 @@ class Ajax {
 	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_reschedule_campaign(): void {
+	public function autoaib_reschedule_campaign(): void {
 		try {
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_reschedule_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_reschedule_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => __( 'Security check failed', 'auto-ai-blogger' ) ] );
 			}
 
@@ -1264,7 +1264,7 @@ class Ajax {
 	private function validate_ajax_security( $action = '' ) {
 		try {
 			// Check user capabilities.
-			if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
+			if ( ! current_user_can( AUTOAIB_CAPABILITY ) ) {
 				return new \WP_Error( 'permission_denied', $this->get_error_msg( 'permission' ) );
 			}
 
@@ -1518,7 +1518,7 @@ class Ajax {
 	 * @since 0.0.2
 	 */
 	private function remove_post_idea_from_db( $post_title ): void {
-		$lock_key = 'wp_ai_blogger_postideas_lock'; // Define early to avoid undefined variable issues.
+		$lock_key = 'autoaib_postideas_lock'; // Define early to avoid undefined variable issues.
 
 		try {
 			// Sanitize the title.
@@ -1566,7 +1566,7 @@ class Ajax {
 			// Now we have the lock, perform the operation.
 			try {
 				// Get current post ideas from database (fresh read).
-				$current_post_ideas = \WPAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
+				$current_post_ideas = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
 
 				if ( empty( $current_post_ideas ) || ! is_string( $current_post_ideas ) ) {
 					return;
@@ -1592,10 +1592,10 @@ class Ajax {
 					// Check if this was the last post idea.
 					if ( empty( $updated_ideas ) ) {
 						// Set to "-1" to indicate post ideas are exhausted.
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+						\WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
 					} else {
 						$updated_post_ideas_string = implode( "\n", $updated_ideas );
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+						\WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
 					}
 				}
 			} finally {
@@ -1630,7 +1630,7 @@ class Ajax {
 				$api_data['license'] = sanitize_text_field( $post_data['license'] );
 			} else {
 				// Get license from plugin settings if not provided.
-				$api_data['license'] = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
+				$api_data['license'] = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 			}
 
 			if ( ! empty( $post_data['site_title'] ) && is_string( $post_data['site_title'] ) ) {
@@ -1668,7 +1668,7 @@ class Ajax {
 			}
 
 			// Make API request.
-			$api_url = WP_AI_BLOGGER_CAMPAIGN_FROM_TITLE_POST_API;
+			$api_url = AUTOAIB_CAMPAIGN_FROM_TITLE_POST_API;
 
 			$response = wp_remote_post(
 				$api_url,
@@ -1676,7 +1676,7 @@ class Ajax {
 					'timeout' => 90,
 					'headers' => [
 						'Content-Type' => 'application/json',
-						'User-Agent'   => 'Auto-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent'   => 'Auto-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 					'body'    => $api_data ? wp_json_encode( $api_data ) : '',
 				]
@@ -2069,7 +2069,7 @@ class Ajax {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'Auto-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Auto-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);
@@ -2178,7 +2178,7 @@ class Ajax {
 			}
 
 			// Clear any existing scheduled events for this campaign.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 
 			// Check if campaign post is published (active).
 			$campaign_post = get_post( $campaign_id );
@@ -2192,13 +2192,13 @@ class Ajax {
 			}
 
 			// Check if campaign is already completed.
-			$campaign_completed = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
+			$campaign_completed = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
 				return;
 			}
 
 			// Check if campaign is paused.
-			$is_paused = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
+			$is_paused = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( $is_paused ) {
 				return;
 			}
@@ -2235,7 +2235,7 @@ class Ajax {
 			// Schedule the first post at the user-defined start date/time using single event.
 			// The cron handler will self-schedule subsequent posts after each execution.
 			// This matches the pause/resume pattern where we schedule one event at a time.
-			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_schedule_single_event( $start_timestamp, 'autoaib_create_single_post', [ $campaign_id ] );
 		} catch ( \Exception $e ) {
 			return;
 		}
@@ -2261,7 +2261,7 @@ class Ajax {
 		$seconds = $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
 
 		// Allow testing plugins to modify intervals.
-		return apply_filters( 'wpaib_campaign_interval_seconds', $seconds, $interval, $unit );
+		return apply_filters( 'autoaib_campaign_interval_seconds', $seconds, $interval, $unit );
 	}
 
 	/**
@@ -2282,11 +2282,11 @@ class Ajax {
 		}
 
 		// Create custom schedule name.
-		$schedule_name = "wpaib_{$interval}_{$unit}";
+		$schedule_name = "autoaib_{$interval}_{$unit}";
 
 		// Register custom schedule dynamically using a globally registered filter.
 		// We store the schedule info in an option so the filter can pick it up.
-		$custom_schedules = get_option( 'wpaib_custom_cron_schedules', [] );
+		$custom_schedules = get_option( 'autoaib_custom_cron_schedules', [] );
 		if ( ! isset( $custom_schedules[ $schedule_name ] ) ) {
 			$custom_schedules[ $schedule_name ] = [
 				'interval' => $this->calculate_interval_seconds( $interval, $unit ),
@@ -2298,7 +2298,7 @@ class Ajax {
 					$interval > 1 ? 's' : ''
 				),
 			];
-			update_option( 'wpaib_custom_cron_schedules', $custom_schedules );
+			update_option( 'autoaib_custom_cron_schedules', $custom_schedules );
 		}
 
 		return $schedule_name;
@@ -2315,7 +2315,7 @@ class Ajax {
 		$logs = [];
 
 		// Get real success logs using the helper function.
-		$success_logs = wpaib_get_campaign_success_logs( $campaign_id, 20 );
+		$success_logs = autoaib_get_campaign_success_logs( $campaign_id, 20 );
 
 		foreach ( $success_logs as $index => $log ) {
 			// Use stored timestamp data directly (no backward compatibility needed).
@@ -2366,7 +2366,7 @@ class Ajax {
 		}
 
 		// Get real error logs using our new function.
-		$error_logs = wpaib_get_campaign_error_logs( $campaign_id, 50 );
+		$error_logs = autoaib_get_campaign_error_logs( $campaign_id, 50 );
 
 		// Merge success and error logs.
 		$logs = array_merge( $logs, $error_logs );
@@ -2392,7 +2392,7 @@ class Ajax {
 	 * @since 0.0.2
 	 */
 	private function generate_sample_campaign_logs( $campaign_id ): array {
-		$campaign_data   = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );
+		$campaign_data   = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );
 		$posts_created   = intval( $campaign_data['postsCreated'] ?? 0 );
 		$posts_failed    = intval( $campaign_data['postsFailed'] ?? 0 );
 		$posts_scheduled = intval( $campaign_data['postsScheduled'] ?? 0 );

@@ -183,7 +183,7 @@ const FooterNavigationBar = memo( ( props ) => {
 
 	return (
 		<footer
-			className="wpaib-setup-footer bg-white shadow-lg border-t border-gray-200 fixed right-0 left-[160px] bottom-0 h-[80px] z-20"
+			className="autoaib-setup-footer bg-white shadow-lg border-t border-gray-200 fixed right-0 left-[160px] bottom-0 h-[80px] z-20"
 			role="contentinfo"
 			aria-label={ __( 'Setup wizard navigation', 'auto-ai-blogger' ) }
 		>

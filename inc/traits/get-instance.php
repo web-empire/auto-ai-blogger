@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc\Traits;
+namespace WPSolvex\AutoAIBlogger\Inc\Traits;
 
 /**
  * Trait Get_Instance.

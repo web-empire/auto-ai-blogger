@@ -158,7 +158,7 @@ const NavigationBar = memo( () => {
 			await updateApiData( 'userOnboarded', true, dispatch, abortControllerRef );
 
 			// Navigate to dashboard or show success message
-			window.location.href = wpaib_localized_data.admin_app_url;
+			window.location.href = autoaib_localized_data.admin_app_url;
 		} catch ( error ) {
 			console.error( 'Failed to exit wizard:', error );
 		}
@@ -173,7 +173,7 @@ const NavigationBar = memo( () => {
 
 	return (
 		<header
-			className="wpaib-setup-header bg-white border-b border-gray-200 shadow-sm"
+			className="autoaib-setup-header bg-white border-b border-gray-200 shadow-sm"
 			role="banner"
 			aria-label={ __( 'Setup wizard navigation', 'auto-ai-blogger' ) }
 		>

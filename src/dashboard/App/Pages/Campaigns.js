@@ -10,9 +10,9 @@ import CampaignFilters from '@Components/CampaignFilters';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function Campaigns() {
-	const initialCampaigns = wpaib_localized_data.all_campaigns;
-	const defaultMetaDefaults = wpaib_localized_data.postmeta_defaults;
-	const isTestingMode = wpaib_localized_data.campaign_testing_mode || false;
+	const initialCampaigns = autoaib_localized_data.all_campaigns;
+	const defaultMetaDefaults = autoaib_localized_data.postmeta_defaults;
+	const isTestingMode = autoaib_localized_data.campaign_testing_mode || false;
 
 	const [ campaigns, setCampaigns ] = useState( initialCampaigns ); // Make campaigns stateful
 	const [ configureData, setConfigureData ] = useState( defaultMetaDefaults );
@@ -179,12 +179,12 @@ export default function Campaigns() {
 	const fetchCampaignMetaData = async ( campaignId ) => {
 		const formData = new window.FormData();
 
-		formData.append( 'action', 'wpaib_get_campaign_metadata' );
-		formData.append( 'security', wpaib_localized_data.admin_nonce );
+		formData.append( 'action', 'autoaib_get_campaign_metadata' );
+		formData.append( 'security', autoaib_localized_data.admin_nonce );
 		formData.append( 'campaign_id', campaignId );
 
 		const response = await apiFetch( {
-			url: wpaib_localized_data.ajax_url,
+			url: autoaib_localized_data.ajax_url,
 			method: 'POST',
 			body: formData,
 		} )
@@ -268,14 +268,14 @@ export default function Campaigns() {
 		const postType = campaignData?.postType || 'post'; // Default to 'post' if not found
 
 		// Redirect to All Posts page with campaign filter
-		const adminUrl = wpaib_localized_data.admin_url || '/wp-admin/';
+		const adminUrl = autoaib_localized_data.admin_url || '/wp-admin/';
 		let filterUrl;
 
 		// For 'post' type, we don't need to specify post_type parameter
 		if ( postType === 'post' ) {
-			filterUrl = `${ adminUrl }edit.php?wp_aib_campaign_id=${ campaignId }`;
+			filterUrl = `${ adminUrl }edit.php?autoaib_campaign_id=${ campaignId }`;
 		} else {
-			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&wp_aib_campaign_id=${ campaignId }`;
+			filterUrl = `${ adminUrl }edit.php?post_type=${ postType }&autoaib_campaign_id=${ campaignId }`;
 		}
 
 		window.open( filterUrl, '_blank' );
@@ -316,15 +316,15 @@ export default function Campaigns() {
 			const isPaused = campaignData.isPaused || false;
 
 			// Determine action: pause or resume.
-			const action = isPaused ? 'wpaib_resume_campaign' : 'wpaib_pause_campaign';
+			const action = isPaused ? 'autoaib_resume_campaign' : 'autoaib_pause_campaign';
 
 			const formData = new window.FormData();
 			formData.append( 'action', action );
-			formData.append( 'security', wpaib_localized_data.admin_nonce );
+			formData.append( 'security', autoaib_localized_data.admin_nonce );
 			formData.append( 'campaign_id', campaignId );
 
 			const response = await apiFetch( {
-				url: wpaib_localized_data.ajax_url,
+				url: autoaib_localized_data.ajax_url,
 				method: 'POST',
 				body: formData,
 			} );

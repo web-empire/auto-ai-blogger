@@ -391,7 +391,7 @@ const PersonaFormStep = memo( () => {
 					<form className="p-5 md:p-7" onSubmit={ handleSubmit } noValidate>
 						<div className="space-y-5">
 							<FormField
-								id="wpaib-site-title"
+								id="autoaib-site-title"
 								label={ __( 'Site Title', 'auto-ai-blogger' ) }
 								value={ formData.siteTitle }
 								onChange={ handleFieldChange( 'siteTitle' ) }
@@ -404,7 +404,7 @@ const PersonaFormStep = memo( () => {
 							/>
 
 							<FormField
-								id="wpaib-site-for"
+								id="autoaib-site-for"
 								label={ __( 'Site Purpose', 'auto-ai-blogger' ) }
 								value={ formData.siteFor }
 								onChange={ handleFieldChange( 'siteFor' ) }
@@ -417,7 +417,7 @@ const PersonaFormStep = memo( () => {
 							/>
 
 							<FormField
-								id="wpaib-site-description"
+								id="autoaib-site-description"
 								label={ __( 'Detailed Description', 'auto-ai-blogger' ) }
 								type="textarea"
 								value={ formData.siteDescription }

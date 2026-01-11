@@ -9,9 +9,9 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Core;
+namespace WPSolvex\AutoAIBlogger\Core;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -53,10 +53,10 @@ class CPT {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->post_type = WP_AI_BLOGGER_CPT_CAMPAIGN;
+		$this->post_type = AUTOAIB_CPT_CAMPAIGN;
 
 		$this->post_type_labels = apply_filters(
-			'wp_ai_blogger_cpt_labels',
+			'autoaib_cpt_labels',
 			[
 				'name'               => esc_html_x( 'Campaigns', 'campaigns general name', 'auto-ai-blogger' ),
 				'singular_name'      => esc_html_x( 'Campaign', 'campaign singular name', 'auto-ai-blogger' ),
@@ -74,7 +74,7 @@ class CPT {
 		);
 
 		$this->post_type_args = apply_filters(
-			'wp_ai_blogger_cpt_args',
+			'autoaib_cpt_args',
 			[
 				'labels'              => $this->post_type_labels,
 				'public'              => true,
@@ -114,12 +114,12 @@ class CPT {
 	 * @return void
 	 */
 	public function register_post_type(): void {
-		do_action( 'wp_ai_blogger_before_register_' . $this->post_type . '_post_type' );
+		do_action( 'autoaib_before_register_' . $this->post_type . '_post_type' );
 
 		$args = $this->post_type_args;
 
 		register_post_type( $this->post_type, $args ); // @phpstan-ignore-line
 
-		do_action( 'wp_ai_blogger_after_register_' . $this->post_type . '_post_type' );
+		do_action( 'autoaib_after_register_' . $this->post_type . '_post_type' );
 	}
 }

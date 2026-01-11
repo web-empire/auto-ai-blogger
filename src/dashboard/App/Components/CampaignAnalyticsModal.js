@@ -38,12 +38,12 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wpaib_get_campaign_analytics' );
-			formData.append( 'security', wpaib_localized_data.admin_nonce );
+			formData.append( 'action', 'autoaib_get_campaign_analytics' );
+			formData.append( 'security', autoaib_localized_data.admin_nonce );
 			formData.append( 'campaign_id', campaignId );
 
 			const response = await apiFetch( {
-				url: wpaib_localized_data.ajax_url,
+				url: autoaib_localized_data.ajax_url,
 				method: 'POST',
 				body: formData,
 			} );
@@ -72,14 +72,14 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 	};
 
 	const onUpgradePro = ( e ) => {
-		if ( wpaib_localized_data.pro_available ) {
+		if ( autoaib_localized_data.pro_available ) {
 			return;
 		}
 
 		e.preventDefault();
 		e.stopPropagation();
 
-		window.open( wpaib_localized_data.pro_purchase_url, '_blank' );
+		window.open( autoaib_localized_data.pro_purchase_url, '_blank' );
 	};
 
 	return (
@@ -239,7 +239,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 													<Zap className="w-4 h-4" />
 													<span>
 														{
-															wpaib_localized_data.pro_available ? __( 'Soon', 'auto-ai-blogger' ) : __( 'Upgrade', 'auto-ai-blogger' )
+															autoaib_localized_data.pro_available ? __( 'Soon', 'auto-ai-blogger' ) : __( 'Upgrade', 'auto-ai-blogger' )
 														}
 													</span>
 												</button>

@@ -50,7 +50,7 @@ class ErrorBoundary extends React.Component {
 
 			// Default error UI
 			return (
-				<div className="wpaib-error-boundary" style={ {
+				<div className="autoaib-error-boundary" style={ {
 					padding: '20px',
 					border: '1px solid #dc3545',
 					borderRadius: '4px',

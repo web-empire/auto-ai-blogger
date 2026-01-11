@@ -58,13 +58,13 @@ export default function MainNav() {
 			return ! menu.requiresLicense || licenseEnabled;
 		} );
 
-		// Let's remove Free vs Pro tab if premium is already enabled as per wpaib_localized_data.pro_available.
+		// Let's remove Free vs Pro tab if premium is already enabled as per autoaib_localized_data.pro_available.
 		if ( proAvailable ) {
 			filteredMenus.splice( 3, 1 );
 		}
 
 		// Apply WordPress hooks filter
-		return wp?.hooks?.applyFilters?.( 'wp_ai_blogger_dashboard.main_navigation', filteredMenus ) || filteredMenus;
+		return wp?.hooks?.applyFilters?.( 'autoaib_dashboard.main_navigation', filteredMenus ) || filteredMenus;
 	}, [ licenseEnabled, homeSlug ] );
 
 	// Memoize URL query parsing
@@ -113,8 +113,8 @@ export default function MainNav() {
 							{ navMenus.map( ( menu ) => {
 								const isActive = activePage === menu.slug && activePath === menu.path;
 								const linkClasses = isActive
-									? 'mb-4 sm:mb-0 border-brand text-brand hover:text-brand hover:border-brand inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu wpaib-active-menu'
-									: 'mb-4 sm:mb-0 border-slate-600 text-slate-600 hover:border-slate-500 hover:text-slate-500 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer wpaib-menu';
+									? 'mb-4 sm:mb-0 border-brand text-brand hover:text-brand hover:border-brand inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer autoaib-menu autoaib-active-menu'
+									: 'mb-4 sm:mb-0 border-slate-600 text-slate-600 hover:border-slate-500 hover:text-slate-500 inline-flex items-center px-1 border-b-2 text-sm leading-[0.875rem] font-medium cursor-pointer autoaib-menu';
 
 								return (
 									<Fragment key={ `${ menu.slug }-${ menu.path || 'home' }` }>
@@ -154,7 +154,7 @@ export default function MainNav() {
 							</div>
 						) }
 
-						{ ! proAvailable && <span className="wpaib-vertical-divider" /> }
+						{ ! proAvailable && <span className="autoaib-vertical-divider" /> }
 
 						<TokenDisplayAndRefresh />
 

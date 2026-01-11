@@ -9,9 +9,9 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc\Notifications;
+namespace WPSolvex\AutoAIBlogger\Inc\Notifications;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
 
 defined( 'ABSPATH' ) || exit;
 

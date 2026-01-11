@@ -7,44 +7,44 @@
 
 :root {
 	/* Primary Brand Colors */
-	--wpaib-brand-primary: #9138c8;
-	--wpaib-brand-primary-hover: #7c2fb0;
-	--wpaib-brand-primary-light: #b565db;
-	--wpaib-brand-primary-dark: #7c2fb0;
+	--autoaib-brand-primary: #9138c8;
+	--autoaib-brand-primary-hover: #7c2fb0;
+	--autoaib-brand-primary-light: #b565db;
+	--autoaib-brand-primary-dark: #7c2fb0;
 
 	/* Brand Color Tints (for backgrounds, borders, etc.) */
-	--wpaib-brand-50: #f9f5fc;
-	--wpaib-brand-100: #f3eaf8;
-	--wpaib-brand-200: #e7d4f1;
-	--wpaib-brand-300: #d0abe3;
-	--wpaib-brand-400: #b565db;
-	--wpaib-brand-500: #9f48d0;
-	--wpaib-brand-600: #9138c8;
-	--wpaib-brand-700: #7c2fb0;
-	--wpaib-brand-800: #672898;
-	--wpaib-brand-900: #3d1954;
+	--autoaib-brand-50: #f9f5fc;
+	--autoaib-brand-100: #f3eaf8;
+	--autoaib-brand-200: #e7d4f1;
+	--autoaib-brand-300: #d0abe3;
+	--autoaib-brand-400: #b565db;
+	--autoaib-brand-500: #9f48d0;
+	--autoaib-brand-600: #9138c8;
+	--autoaib-brand-700: #7c2fb0;
+	--autoaib-brand-800: #672898;
+	--autoaib-brand-900: #3d1954;
 
 	/* RGB values for opacity usage */
-	--wpaib-brand-rgb: 145, 56, 200;
+	--autoaib-brand-rgb: 145, 56, 200;
 }
 
 /* Utility classes for brand colors */
-.wpaib-bg-brand {
-	background-color: var( --wpaib-brand-primary );
+.autoaib-bg-brand {
+	background-color: var( --autoaib-brand-primary );
 }
 
-.wpaib-bg-brand-hover:hover {
-	background-color: var( --wpaib-brand-primary-hover );
+.autoaib-bg-brand-hover:hover {
+	background-color: var( --autoaib-brand-primary-hover );
 }
 
-.wpaib-text-brand {
-	color: var( --wpaib-brand-primary );
+.autoaib-text-brand {
+	color: var( --autoaib-brand-primary );
 }
 
-.wpaib-border-brand {
-	border-color: var( --wpaib-brand-primary );
+.autoaib-border-brand {
+	border-color: var( --autoaib-brand-primary );
 }
 
-.wpaib-gradient-brand {
-	background: linear-gradient( 135deg, var( --wpaib-brand-500 ) 0%, var( --wpaib-brand-700 ) 100% );
+.autoaib-gradient-brand {
+	background: linear-gradient( 135deg, var( --autoaib-brand-500 ) 0%, var( --autoaib-brand-700 ) 100% );
 }

@@ -35,12 +35,12 @@ const CampaignDeleteModal = ( { isOpen, onClose, campaignId, onDeleted } ) => {
 
 		try {
 			const formData = new FormData();
-			formData.append( 'action', 'wpaib_delete_campaign' );
-			formData.append( 'security', wpaib_localized_data.admin_nonce );
+			formData.append( 'action', 'autoaib_delete_campaign' );
+			formData.append( 'security', autoaib_localized_data.admin_nonce );
 			formData.append( 'campaign_id', campaignId );
 
 			const response = await apiFetch( {
-				url: wpaib_localized_data.ajax_url,
+				url: autoaib_localized_data.ajax_url,
 				method: 'POST',
 				body: formData,
 			} );

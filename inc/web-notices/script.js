@@ -75,7 +75,7 @@
 				url: ajaxurl,
 				type: 'POST',
 				data: {
-					action: 'web-notice-dismiss',
+					action: 'autoaib-notice-dismiss',
 					nonce: webNotices._notice_nonce,
 					notice_id,
 					repeat_notice_after: parseInt( repeat_notice_after ),

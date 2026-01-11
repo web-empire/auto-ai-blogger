@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc\Utils;
+namespace WPSolvex\AutoAIBlogger\Inc\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -167,7 +167,7 @@ class Helper {
 			];
 		}
 
-		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+		$settings = get_option( AUTOAIB_DB_OPTION, [] );
 
 		// Validate settings is array.
 		if ( ! is_array( $settings ) ) {
@@ -191,7 +191,7 @@ class Helper {
 		// Validate final settings array.
 		$validated_settings = self::validate_settings_array( $settings );
 
-		update_option( WP_AI_BLOGGER_DB_OPTION, $validated_settings );
+		update_option( AUTOAIB_DB_OPTION, $validated_settings );
 
 		// Return success with the sanitized value.
 		return [
@@ -232,7 +232,7 @@ class Helper {
 			return false;
 		}
 
-		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+		$settings = get_option( AUTOAIB_DB_OPTION, [] );
 
 		// Validate settings is array.
 		if ( ! is_array( $settings ) ) {
@@ -248,7 +248,7 @@ class Helper {
 		// Validate final settings array.
 		$settings = self::validate_settings_array( $settings );
 
-		return update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
+		return update_option( AUTOAIB_DB_OPTION, $settings );
 	}
 
 	/**
@@ -264,7 +264,7 @@ class Helper {
 			return false;
 		}
 
-		$settings = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+		$settings = get_option( AUTOAIB_DB_OPTION, [] );
 
 		if ( ! is_array( $settings ) ) {
 			$settings = [];
@@ -299,7 +299,7 @@ class Helper {
 
 		if ( $updated ) {
 			$settings = self::validate_settings_array( $settings );
-			return update_option( WP_AI_BLOGGER_DB_OPTION, $settings );
+			return update_option( AUTOAIB_DB_OPTION, $settings );
 		}
 
 		return true;

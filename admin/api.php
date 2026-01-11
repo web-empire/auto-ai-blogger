@@ -11,10 +11,10 @@
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Admin;
+namespace WPSolvex\AutoAIBlogger\Admin;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
-use WPAIBlogger\Inc\Utils\Settings;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -42,7 +42,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @var string
 	 */
-	protected $namespace = WP_AI_BLOGGER_SLUG . '/v1';
+	protected $namespace = AUTOAIB_SLUG . '/v1';
 
 	/**
 	 * Route base.
@@ -72,7 +72,7 @@ class API extends \WP_REST_Controller {
 	 * @var string $option_name DB option name.
 	 * @since 1.0.0
 	 */
-	private static $option_name = WP_AI_BLOGGER_DB_OPTION;
+	private static $option_name = AUTOAIB_DB_OPTION;
 
 	/**
 	 * Admin settings dataset
@@ -272,7 +272,7 @@ class API extends \WP_REST_Controller {
 		// Update settings using update_option directly for settings array.
 		$current_settings = Settings::get_ai_blogger_settings();
 		$merged_settings  = array_merge( $current_settings, $sanitized_settings );
-		$updated          = update_option( WP_AI_BLOGGER_DB_OPTION, $merged_settings );
+		$updated          = update_option( AUTOAIB_DB_OPTION, $merged_settings );
 
 		if ( ! $updated ) {
 			return new \WP_Error(
@@ -304,9 +304,9 @@ class API extends \WP_REST_Controller {
 	 */
 	public function get_permissions_check( \WP_REST_Request $request ): \WP_Error|bool {
 		// Basic capability check.
-		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
+		if ( ! current_user_can( AUTOAIB_CAPABILITY ) ) {
 			return new \WP_Error(
-				'wp_ai_blogger_rest_cannot_view',
+				'autoaib_rest_cannot_view',
 				__( 'Sorry, you cannot access this resource.', 'auto-ai-blogger' ),
 				[ 'status' => rest_authorization_required_code() ]
 			);
@@ -330,9 +330,9 @@ class API extends \WP_REST_Controller {
 	 */
 	public function update_permissions_check( \WP_REST_Request $request ): \WP_Error|bool {
 		// capability check for updates.
-		if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) || ! current_user_can( 'edit_posts' ) ) {
+		if ( ! current_user_can( AUTOAIB_CAPABILITY ) || ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error(
-				'wp_ai_blogger_rest_cannot_update',
+				'autoaib_rest_cannot_update',
 				__( 'Sorry, you cannot update this resource.', 'auto-ai-blogger' ),
 				[ 'status' => rest_authorization_required_code() ]
 			);
@@ -368,7 +368,7 @@ class API extends \WP_REST_Controller {
 		// Admin-only capability for license management.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new \WP_Error(
-				'wp_ai_blogger_rest_cannot_manage_license',
+				'autoaib_rest_cannot_manage_license',
 				__( 'Sorry, you cannot manage licenses.', 'auto-ai-blogger' ),
 				[ 'status' => rest_authorization_required_code() ]
 			);

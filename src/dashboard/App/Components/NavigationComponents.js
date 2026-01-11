@@ -34,7 +34,7 @@ export const CoreVersion = () => {
 				<>
 					<span>-</span>
 					<Tooltip
-						text={ wpaib_localized_data?.pro_plugin_name || 'PRO' }
+						text={ autoaib_localized_data?.pro_plugin_name || 'PRO' }
 						delay={ 100 }
 						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md uppercase"
 					>
@@ -49,7 +49,7 @@ export const CoreVersion = () => {
 			) }
 
 			{ wp?.hooks?.applyFilters?.(
-				'wp_ai_blogger_dashboard.after_navigation_version',
+				'autoaib_dashboard.after_navigation_version',
 				<span />
 			) }
 		</>
@@ -213,7 +213,7 @@ export const TokenDisplayAndRefresh = () => {
 				</Tooltip>
 			</button>
 
-			<span className="wpaib-vertical-divider" />
+			<span className="autoaib-vertical-divider" />
 		</div>
 	);
 };
