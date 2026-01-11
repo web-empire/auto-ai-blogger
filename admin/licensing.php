@@ -421,7 +421,7 @@ class Licensing {
 	/**
 	 * Validates license periodically for security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function validate_license_periodically(): void {
@@ -472,7 +472,7 @@ class Licensing {
 	 * Performs comprehensive security checks including nonce validation,
 	 * capability checks, and context validation.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return bool|\WP_Error True if valid, WP_Error on failure.
 	 */
 	private function validate_license_security() {
@@ -511,7 +511,7 @@ class Licensing {
 	/**
 	 * Check rate limiting for license operations.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param string $operation The operation type (activate/deactivate).
 	 * @return bool|\WP_Error True if allowed, WP_Error if rate limited.
 	 */
@@ -553,7 +553,7 @@ class Licensing {
 	 * Performs comprehensive sanitization and validation of license key input
 	 * following WordPress security standards.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param mixed $license_key Raw license key input from user.
 	 * @return string|\WP_Error Sanitized license key or WP_Error on failure.
 	 */
@@ -598,7 +598,7 @@ class Licensing {
 	 * Additional format validation for license keys to ensure they match
 	 * expected patterns for the licensing system.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param string $license_key License key to validate.
 	 * @return bool True if format is valid, false otherwise.
 	 */
@@ -632,7 +632,7 @@ class Licensing {
 	/**
 	 * Securely updates license status in database.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param string $license_key License key to store.
 	 * @param string $status License status.
 	 * @return void
@@ -660,7 +660,7 @@ class Licensing {
 	/**
 	 * Logs license activity for security auditing.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param string $action The action performed.
 	 * @param string $license_key License key (masked).
 	 * @param int    $user_id User ID who performed action.
@@ -684,7 +684,7 @@ class Licensing {
 	 *
 	 * @param string $license_key License key to mask.
 	 * @return string Masked license key.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function mask_license_key( string $license_key ): string {
 		if ( strlen( $license_key ) <= 8 ) {
@@ -701,7 +701,7 @@ class Licensing {
 	/**
 	 * Gets client IP address securely.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return string Client IP address.
 	 */
 	private function get_client_ip(): string {
@@ -726,7 +726,7 @@ class Licensing {
 	/**
 	 * Updates license cache for performance.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @param string $license_key License key.
 	 * @param string $status License status.
 	 * @return void
@@ -745,7 +745,7 @@ class Licensing {
 	/**
 	 * Gets cached license status.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return string License status.
 	 */
 	private function get_cached_license_status(): string {
@@ -767,7 +767,7 @@ class Licensing {
 	 * with proper error handling and data validation.
 	 *
 	 * @param string $license_key The sanitized license key.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return bool True on success, false on failure.
 	 */
 	private function fetch_and_save_token_data( $license_key ) {

@@ -57,7 +57,7 @@ class Menu {
 	/**
 	 * Add security headers for admin pages.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function add_admin_security_headers(): void {
 		// Only add headers on our plugin pages.
@@ -347,7 +347,7 @@ class Menu {
 	 * Check if current page is our plugin admin page.
 	 *
 	 * @return bool
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function is_plugin_admin_page(): bool {
 		$page = ! empty( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here as this is a static check.

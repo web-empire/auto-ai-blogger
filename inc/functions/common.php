@@ -200,7 +200,7 @@ function wpaib_get_generated_posts() {
 /**
  * Get array depth safely to prevent memory issues.
  *
- * @since x.x.x
+ * @since 0.0.2
  * @param array $array Array to check depth.
  * @return int Array depth.
  */
@@ -883,7 +883,7 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  *
  * @param int $post_id Post ID.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_track_post_view( $post_id ): void {
 	// Only track for campaign posts.
@@ -915,7 +915,7 @@ function wpaib_track_post_view( $post_id ): void {
  * @param string $error_message Detailed error message.
  * @param array  $context Additional context data.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $context = [] ): void {
 	// Validate campaign ID.
@@ -976,7 +976,7 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
  * @param int   $post_id Created post ID.
  * @param array $context Additional context data.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): void {
 	// Validate inputs.
@@ -1037,7 +1037,7 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
  * @param int $campaign_id Campaign ID.
  * @param int $limit Maximum number of logs to return.
  * @return array Formatted success logs.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
 	$campaign_id = absint( $campaign_id );
@@ -1060,7 +1060,7 @@ function wpaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
  * @param int $campaign_id Campaign ID.
  * @param int $limit Maximum number of logs to return.
  * @return array Formatted error logs.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 	$campaign_id = absint( $campaign_id );
@@ -1136,7 +1136,7 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
  * @param string $error_type The error type.
  * @param string $original_message The original error message.
  * @return string User-friendly error message.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_get_user_friendly_error_message( $error_type, $original_message ): string {
 	switch ( $error_type ) {
@@ -1186,7 +1186,7 @@ function wpaib_get_user_friendly_error_message( $error_type, $original_message )
  *
  * @param string $error_type The error type.
  * @return string Solution suggestion.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_get_error_solution_suggestion( $error_type ): string {
 	switch ( $error_type ) {
@@ -1224,7 +1224,7 @@ function wpaib_get_error_solution_suggestion( $error_type ): string {
  * Create standardized timestamp data for logging.
  *
  * @return array Array containing various timestamp formats.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_create_timestamp_data(): array {
 	$unix_timestamp  = current_time( 'timestamp' ); // phpcs:ignore -- It is safe.
@@ -1247,7 +1247,7 @@ function wpaib_create_timestamp_data(): array {
  *
  * @param array $token_data Token data containing 'total' and 'remaining' keys.
  * @return bool True if update was successful, false otherwise.
- * @since x.x.x
+ * @since 0.0.2
  */
 function wpaib_update_token_data( $token_data ): bool {
 	try {

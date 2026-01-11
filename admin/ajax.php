@@ -140,7 +140,7 @@ class Ajax {
 	/**
 	 * Add security headers to AJAX responses.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function add_security_headers(): void {
 		if ( ! headers_sent() ) {
@@ -809,7 +809,7 @@ class Ajax {
 	/**
 	 * Handler to get campaign analytics data.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function wpaib_get_campaign_analytics(): void {
@@ -991,7 +991,7 @@ class Ajax {
 	/**
 	 * Handler to get campaign logs with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function wpaib_get_campaign_logs(): void {
@@ -1047,7 +1047,7 @@ class Ajax {
 	/**
 	 * Handler to pause campaign with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function wpaib_pause_campaign(): void {
@@ -1115,7 +1115,7 @@ class Ajax {
 	/**
 	 * Handler to resume campaign with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function wpaib_resume_campaign(): void {
@@ -1202,7 +1202,7 @@ class Ajax {
 	/**
 	 * Reschedule a campaign's cron jobs (debug utility).
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function wpaib_reschedule_campaign(): void {
@@ -1259,7 +1259,7 @@ class Ajax {
 	 *
 	 * @param string $action The AJAX action being performed.
 	 * @return bool|\WP_Error True if valid, WP_Error if security check fails.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_ajax_security( $action = '' ) {
 		try {
@@ -1297,7 +1297,7 @@ class Ajax {
 	 * Validate AJAX request size.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if too large.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_ajax_request_size() {
 		$content_length = isset( $_SERVER['CONTENT_LENGTH'] ) ? absint( $_SERVER['CONTENT_LENGTH'] ) : 0;
@@ -1313,7 +1313,7 @@ class Ajax {
 	 * Validate User-Agent header.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if suspicious.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_user_agent() {
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
@@ -1353,7 +1353,7 @@ class Ajax {
 	 * Validate admin referer.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if invalid.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_admin_referer() {
 		$referer = isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
@@ -1375,7 +1375,7 @@ class Ajax {
 	 *
 	 * @param array<string, mixed> $campaign_data Raw campaign data.
 	 * @return array<string, mixed>|\WP_Error Sanitized data or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function sanitize_campaign_data( $campaign_data ) {
 		if ( ! is_array( $campaign_data ) ) {
@@ -1458,7 +1458,7 @@ class Ajax {
 	 *
 	 * @param array<string, mixed> $meta_data Raw meta data.
 	 * @return array<string, mixed> Sanitized meta data.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function sanitize_meta_input( $meta_data ) {
 		$sanitized         = [];
@@ -1515,7 +1515,7 @@ class Ajax {
 	 * Uses atomic operations to prevent race conditions when multiple posts are created quickly.
 	 *
 	 * @param string $post_title The title of the post that was created.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function remove_post_idea_from_db( $post_title ): void {
 		$lock_key = 'wp_ai_blogger_postideas_lock'; // Define early to avoid undefined variable issues.
@@ -1616,7 +1616,7 @@ class Ajax {
 	 * @param string               $title The post title.
 	 * @param array<string, mixed> $post_data Additional post data.
 	 * @return array<string, mixed>|\WP_Error Generated content or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function generate_content_from_title_api( $title, $post_data = [] ) {
 		try {
@@ -1786,7 +1786,7 @@ class Ajax {
 	 * @param string                           $content The post content with placeholders.
 	 * @param array<int, array<string, mixed>> $images Array of image data from API.
 	 * @return array<string, mixed>|\WP_Error Processed data with content and featured image ID or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	/**
 	 * Processes images and replaces placeholders in content according to image placement rules.
@@ -2059,7 +2059,7 @@ class Ajax {
 	 * @param string $image_url The image URL to upload.
 	 * @param string $alt_text The alt text for the image.
 	 * @return int|\WP_Error The attachment ID or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
 		try {
@@ -2162,7 +2162,7 @@ class Ajax {
 	 * @param int   $campaign_id Campaign ID.
 	 * @param array $meta_input  Campaign metadata.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function schedule_campaign_posts( $campaign_id, $meta_input ): void {
 		try {
@@ -2247,7 +2247,7 @@ class Ajax {
 	 * @param int    $interval Interval number.
 	 * @param string $unit     Time unit (day, week, month, year).
 	 * @return int Interval in seconds.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function calculate_interval_seconds( $interval, $unit ): int {
 		// Production mode: Normal intervals.
@@ -2270,7 +2270,7 @@ class Ajax {
 	 * @param int    $interval Interval number.
 	 * @param string $unit     Time unit.
 	 * @return string Schedule name.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_wp_cron_schedule( $interval, $unit ): string {
 		// Use built-in schedules when possible.
@@ -2309,7 +2309,7 @@ class Ajax {
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 * @return array<mixed> Campaign creation logs.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_campaign_creation_logs( $campaign_id ): array {
 		$logs = [];
@@ -2389,7 +2389,7 @@ class Ajax {
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 * @return array<mixed> Sample campaign logs.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function generate_sample_campaign_logs( $campaign_id ): array {
 		$campaign_data   = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );

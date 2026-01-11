@@ -3,7 +3,7 @@
  * Frontend.
  *
  * @package auto-ai-blogger
- * @since x.x.x
+ * @since 0.0.2
  */
 
 namespace WPAIBlogger\Core;
@@ -23,7 +23,7 @@ class Frontend {
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function __construct() {
 		// Hook into the_content to track views when posts are displayed.
@@ -34,7 +34,7 @@ class Frontend {
 	 * Track post views.
 	 *
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function track_post_views(): void {
 		if ( is_singular() ) {

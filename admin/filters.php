@@ -3,7 +3,7 @@
  * Admin Filters.
  *
  * @package auto-ai-blogger
- * @since x.x.x
+ * @since 0.0.2
  */
 
 namespace WPAIBlogger\Admin;
@@ -24,7 +24,7 @@ class Filters {
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function __construct() {
 		add_action( 'restrict_manage_posts', [ $this, 'add_campaign_filter' ] );
@@ -37,7 +37,7 @@ class Filters {
 	/**
 	 * Add campaign filter dropdown to posts admin page.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function add_campaign_filter(): void {
@@ -80,7 +80,7 @@ class Filters {
 	 * Filter posts by campaign when campaign filter is applied.
 	 *
 	 * @param \WP_Query $query The WP_Query instance.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return \WP_Query $query The WP_Query instance.
 	 */
 	public function filter_posts_by_campaign( $query ) {
@@ -133,7 +133,7 @@ class Filters {
 	 * Add campaign column to posts admin page.
 	 *
 	 * @param array<string, string> $columns Existing columns.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return array<string, string> Modified columns.
 	 */
 	public function add_campaign_column( $columns ) {
@@ -148,7 +148,7 @@ class Filters {
 	 *
 	 * @param string $column  Column name.
 	 * @param int    $post_id Post ID.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	public function show_campaign_column_content( $column, $post_id ): void {
@@ -183,7 +183,7 @@ class Filters {
 	/**
 	 * Add column hooks for supported post types.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
 	private function add_column_hooks(): void {

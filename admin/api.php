@@ -475,7 +475,7 @@ class API extends \WP_REST_Controller {
 	 *
 	 * @param string|null $user_agent The User-Agent header.
 	 * @return bool True if suspicious, false otherwise.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function is_suspicious_user_agent( ?string $user_agent ): bool {
 		if ( empty( $user_agent ) ) {

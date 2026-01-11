@@ -39,7 +39,7 @@ class Cron_Handler {
 	 * Create a single post from campaign (cron callback).
 	 *
 	 * @param int $campaign_id The ID of the campaign.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function create_single_post_from_campaign( $campaign_id ): void {
 		try {
@@ -217,7 +217,7 @@ class Cron_Handler {
 	 * @param int $target_post_number The post number being attempted.
 	 * @param int $current_attempt The attempt number for this post.
 	 * @return array An array containing the success status and message.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function generate_post_from_campaign( $campaign_id, $target_post_number = 0, $current_attempt = 0 ): array {
 		try {
@@ -381,7 +381,7 @@ class Cron_Handler {
 	 * @param string $keywords The keywords for the post.
 	 * @param int    $max_words The maximum number of words for the post.
 	 * @return array An array containing the API response data.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function call_post_creation_api( $campaign_id, $keywords, $max_words ): array {
 		try {
@@ -483,7 +483,7 @@ class Cron_Handler {
 	 * @param int  $campaign_id Campaign ID.
 	 * @param bool $is_retry Whether this is a retry after failure.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function schedule_next_post( $campaign_id, $is_retry = false ): void {
 		try {
@@ -550,7 +550,7 @@ class Cron_Handler {
 	 * @param int    $interval Repeat interval.
 	 * @param string $unit Repeat unit.
 	 * @return int Interval in seconds.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
@@ -583,7 +583,7 @@ class Cron_Handler {
 	 * @param array $selected_days Array of selected weekday abbreviations (e.g., ['mon', 'wed', 'fri']).
 	 * @param int   $campaign_id Campaign ID for filter context.
 	 * @return int Timestamp of next occurrence.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function calculate_next_weekday( $selected_days, $campaign_id ): int {
 		if ( empty( $selected_days ) || ! is_array( $selected_days ) ) {
@@ -660,7 +660,7 @@ class Cron_Handler {
 	 *
 	 * @param string $error_message The error message.
 	 * @return string The error type.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function determine_error_type( $error_message ): string {
 		$error_message = strtolower( $error_message );
@@ -726,7 +726,7 @@ class Cron_Handler {
 	 * @param int    $campaign_id Campaign ID.
 	 * @param string $reason Completion reason.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function mark_campaign_completed( $campaign_id, $reason ): void {
 		// Mark campaign as completed.
@@ -791,7 +791,7 @@ class Cron_Handler {
 	 * @param string $content HTML content with image placeholders.
 	 * @param array  $images  Array of image data from API.
 	 * @return array|WP_Error Array with 'content' and 'featured_image_id' or WP_Error on failure.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		if ( empty( $images ) || ! is_array( $images ) ) {
@@ -892,7 +892,7 @@ class Cron_Handler {
 	 * @param string $image_url Image URL to download and upload.
 	 * @param string $alt_text  Alt text for the image.
 	 * @return int|WP_Error Attachment ID on success, WP_Error on failure.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
 		try {

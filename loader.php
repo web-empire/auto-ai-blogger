@@ -233,7 +233,7 @@ class Loader {
 	 * @param int $max_words   The maximum words from campaign settings.
 	 * @param int $campaign_id The campaign ID.
 	 * @return int The enforced maximum words value.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function enforce_free_max_words_limit( $max_words, $campaign_id ): int {
 		// Free users are limited to 1000 words max.
@@ -258,7 +258,7 @@ class Loader {
 	 * @param int $image_count The number of images from campaign settings.
 	 * @param int $campaign_id The campaign ID.
 	 * @return int The enforced image count (always 1 for free users).
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function enforce_free_image_limit( $image_count, $campaign_id ): int {
 		// Free users are limited to 1 image per post.
@@ -270,7 +270,7 @@ class Loader {
 	 *
 	 * @param  array $links links.
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function plugin_action_links( $links ) {
 		return array_merge(
