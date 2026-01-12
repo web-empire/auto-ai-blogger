@@ -1668,7 +1668,7 @@ class Ajax {
 			}
 
 			// Make API request.
-			$api_url = AUTOAIB_CAMPAIGN_FROM_TITLE_POST_API;
+			$api_url = AUTOAIB_CONTENT_FROM_TITLE_POST_API;
 
 			$response = wp_remote_post(
 				$api_url,
