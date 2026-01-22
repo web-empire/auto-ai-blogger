@@ -32,29 +32,6 @@ class Updater {
 	public function __construct( Client $client ) {
 		$this->client    = $client;
 		$this->cache_key = 'autoaib_' . md5( $this->client->slug ) . '_version_info';
-
-		// Run hooks.
-		if ( $this->client->type === 'plugin' ) {
-			$this->run_plugin_hooks();
-		} elseif ( $this->client->type === 'theme' ) {
-			$this->run_theme_hooks();
-		}
-	}
-
-	/**
-	 * Set up WordPress filter to hooks to get update.
-	 *
-	 * @return void
-	 */
-	public function run_plugin_hooks(): void {
-	}
-
-	/**
-	 * Set up WordPress filter to hooks to get update.
-	 *
-	 * @return void
-	 */
-	public function run_theme_hooks(): void {
 	}
 
 	/**
