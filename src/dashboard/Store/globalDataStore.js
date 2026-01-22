@@ -102,6 +102,7 @@ const getInitialState = () => {
 		postmetaDefaults: safeParseLocalizedData( autoaib_localized_data.postmeta_defaults, 'object', {} ),
 		licensingNonce: safeParseLocalizedData( autoaib_localized_data.licensing_nonce, 'string', '' ),
 		upgradeLink: safeParseLocalizedData( autoaib_localized_data.upgrade_link, 'string', '#' ),
+		noLicenseKeyUrl: safeParseLocalizedData( autoaib_localized_data.registration_url, 'string', '#' ),
 		adminEmail: safeParseLocalizedData( autoaib_localized_data.admin_email, 'string', '' ),
 		adminAppUrl: safeParseLocalizedData( autoaib_localized_data.admin_app_url, 'string', '' ),
 		adminBaseUrl: safeParseLocalizedData( autoaib_localized_data.admin_base_url, 'string', '' ),

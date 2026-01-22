@@ -211,6 +211,7 @@ class Menu {
 				'admin_base_url'             => esc_url( admin_url( 'edit.php' ) ),
 				'admin_app_url'              => esc_url( admin_url( 'edit.php?page=' . self::PAGE_ID ) ),
 				'upgrade_link'               => defined( 'AUTOAIB_UPGRADE_LINK' ) ? esc_url( AUTOAIB_UPGRADE_LINK ) : '#',
+				'registration_url'           => defined( 'AUTOAIB_REGISTRATION_URL' ) ? esc_url( AUTOAIB_REGISTRATION_URL ) : '#',
 				'pro_purchase_url'           => esc_url( AUTOAIB_UPGRADE_LINK ),
 				'pro_available'              => defined( 'AUTOAIB_PRO_VERSION' ),
 				'pro_version'                => defined( 'AUTOAIB_PRO_VERSION' ) ? AUTOAIB_PRO_VERSION : '',

@@ -122,8 +122,8 @@ const LicenseStep = memo( () => {
 	const reduxLicense = useSelector( ( state ) => state.license );
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce );
-	const upgradeLink = useSelector( ( state ) => state.upgradeLink );
 	const licenseStatusFromRedux = useSelector( ( state ) => state.licenseStatus );
+	const noLicenseKeyUrl = useSelector( ( state ) => state.noLicenseKeyUrl ) || '#';
 
 	// Component state
 	const [ license, setLicense ] = useState( () => {
@@ -370,7 +370,7 @@ const LicenseStep = memo( () => {
 								heading={ __( 'No License Key?', 'auto-ai-blogger' ) }
 								subHeading={ __( 'Get started with free credits today..', 'auto-ai-blogger' ) }
 								linkText={ __( 'Claim Free Credits', 'auto-ai-blogger' ) }
-								linkUrl={ upgradeLink }
+								linkUrl={ noLicenseKeyUrl }
 								colorScheme="brand"
 								size="medium"
 								ariaLabel={ __( 'Get free credits - opens in new tab', 'auto-ai-blogger' ) }
@@ -405,7 +405,7 @@ const LicenseStep = memo( () => {
 							<p className="text-[13px] text-gray-600 leading-relaxed">
 								{ __( 'Your license key connects your site to our AI services and allocates content generation tokens. ', 'auto-ai-blogger' ) }
 								<a
-									href={ upgradeLink }
+									href={ noLicenseKeyUrl }
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-indigo-600 hover:text-indigo-700 underline"

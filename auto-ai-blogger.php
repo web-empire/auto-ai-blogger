@@ -42,6 +42,8 @@ define( 'AUTOAIB_CPT_CAMPAIGN', 'campaign' );
 
 // Define Upgrade Link.
 define( 'AUTOAIB_UPGRADE_LINK', 'https://wpaiblogger.com/' );
+// Define Registration Link.
+define( 'AUTOAIB_REGISTRATION_URL', 'https://wpaiblogger.com/register/' );
 
 // Include required files.
 require_once 'inc/functions/common.php';

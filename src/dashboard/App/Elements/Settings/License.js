@@ -19,7 +19,7 @@ const LicenseForm = memo( ( {
 	deactivationText,
 	onActivate,
 	onDeactivate,
-	upgradeLink,
+	noLicenseKeyUrl,
 } ) => {
 	const handleKeyPress = useCallback( ( e ) => {
 		if ( e.key === 'Enter' && ! activated && licenseKey.trim() && ! processing ) {
@@ -125,7 +125,7 @@ const LicenseForm = memo( ( {
 					heading={ __( 'No License Key?', 'auto-ai-blogger' ) }
 					subHeading={ __( 'Get started with free credits today.', 'auto-ai-blogger' ) }
 					linkText={ __( 'Get Free Credits', 'auto-ai-blogger' ) }
-					linkUrl={ upgradeLink }
+					linkUrl={ noLicenseKeyUrl }
 					colorScheme="brand"
 					size="medium"
 					ariaLabel={ __( 'Get free credits - opens in new tab', 'auto-ai-blogger' ) }
@@ -159,7 +159,7 @@ const License = memo( () => {
 
 	// Redux selectors with fallbacks.
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
-	const upgradeLink = useSelector( ( state ) => state.upgradeLink ) || '#';
+	const noLicenseKeyUrl = useSelector( ( state ) => state.noLicenseKeyUrl ) || '#';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce ) || '';
 	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
 
@@ -392,7 +392,7 @@ const License = memo( () => {
 	return (
 		<div className="space-y-6 min-h-full">
 			{ /* Settings container */ }
-			<SettingsContainer
+				<SettingsContainer
 				element={
 					<LicenseForm
 						licenseKey={ licenseKey }
@@ -404,7 +404,7 @@ const License = memo( () => {
 						deactivationText={ deactivationText }
 						onActivate={ activateLicense }
 						onDeactivate={ deactivateLicense }
-						upgradeLink={ upgradeLink }
+							noLicenseKeyUrl={ noLicenseKeyUrl }
 					/>
 				}
 				className="bg-white shadow-sm rounded-lg border border-gray-200"

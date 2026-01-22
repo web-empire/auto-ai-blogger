@@ -229,10 +229,16 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 														<Crown className="w-5 h-5 text-white" />
 													</div>
 													<div>
+														<h4 className="text-base font-bold m-0">{ __( 'Get more features with Pro', 'auto-ai-blogger' ) }</h4>
+														<p className="text-indigo-100 text-sm m-0">
+															{ __( 'Unlock premium tools, advanced controls, and more automation.', 'auto-ai-blogger' ) }
+														</p>
+														{ /*
 														<h4 className="text-base font-bold m-0">{ __( 'Unlock AI Backed Analytics', 'auto-ai-blogger' ) }</h4>
 														<p className="text-indigo-100 text-sm m-0">
 															{ __( 'Boost results with smart AI insights, keyword tracking, and real-time analytics.', 'auto-ai-blogger' ) }
 														</p>
+														*/ }
 													</div>
 												</div>
 												<button className="bg-white text-indigo-600 px-4 py-2 rounded font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-1 text-sm" onClick={ onUpgradePro }>
@@ -248,6 +254,19 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 											<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
 												<div className="flex items-center space-x-1">
 													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'Unlimited Ideas', 'auto-ai-blogger' ) }</span>
+												</div>
+												<div className="flex items-center justify-center space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'More tokens', 'auto-ai-blogger' ) }</span>
+												</div>
+												<div className="flex items-center justify-end space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
+													<span className="text-sm">{ __( 'Up to 5000 words per post', 'auto-ai-blogger' ) }</span>
+												</div>
+												{ /*
+												<div className="flex items-center space-x-1">
+													<CheckCircle className="w-4 h-4 text-green-300" />
 													<span className="text-sm">{ __( 'AI Based Content Quality Score', 'auto-ai-blogger' ) }</span>
 												</div>
 												<div className="flex items-center justify-center space-x-1">
@@ -258,6 +277,7 @@ const CampaignAnalyticsModal = ( { isOpen, onClose, campaignId, campaignData } )
 													<CheckCircle className="w-4 h-4 text-green-300" />
 													<span className="text-sm">{ __( 'Reviews & Recommendations', 'auto-ai-blogger' ) }</span>
 												</div>
+												*/ }
 											</div>
 										</div>
 									</div>
