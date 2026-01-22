@@ -184,20 +184,22 @@ class Loader {
 	 * @return void
 	 */
 	public function autoload( $class ): void {
-		if ( strpos( $class, __NAMESPACE__ ) !== 0 ) {
+		$namespace = __NAMESPACE__;
+		$namespace_prefix = $namespace . '\\';
+		if ( stripos( $class, $namespace_prefix ) !== 0 ) {
 			return;
 		}
 
-		$class_to_load = $class;
+		$class_to_load = substr( $class, strlen( $namespace_prefix ) );
 
 		$filename = preg_replace(
-			[ '/^' . __NAMESPACE__ . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
-			[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
+			[ '/([a-z])([A-Z])/', '/_/' ],
+			[ '$1-$2', '-' ],
 			$class_to_load
 		);
 
 		if ( is_string( $filename ) ) {
-			$filename = strtolower( $filename );
+			$filename = strtolower( str_replace( '\\', DIRECTORY_SEPARATOR, $filename ) );
 
 			$file = AUTOAIB_DIR . $filename . '.php';
 
