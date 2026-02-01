@@ -195,3 +195,5 @@ fafb
 wpwrap
 GPLv
 Hookname
+autoaib
+stripos

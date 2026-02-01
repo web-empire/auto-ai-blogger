@@ -8,7 +8,7 @@
  * License: GPLv2 or later
  * Requires at least: 6.0
  * Requires PHP: 7.4
- * Description: Auto AI Blogger is a plugin that helps you to create a blog post automatically. It's beyond blogging.
+ * Description: AI‑powered auto‑blogging that creates high‑quality, optimized posts automatically, delivering smarter content beyond traditional blogging tools.
  * Text Domain: auto-ai-blogger
  *
  * @package auto-ai-blogger

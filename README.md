@@ -1,17 +1,17 @@
 # Auto AI Blogger #
 
 **Contributors:** [wpsolvex](https://profiles.wordpress.org/wpsolvex/)  
-**Tags:** blog, blogging, content creation, auto blogging, seo  
+**Tags:** blog, blogging, content creation, auto blogging, ai  
 **Tested up to:** 6.9  
 **Stable tag:** 0.0.2  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
-This is not just a content creator, its beyond the auto-blogging.
+Beyond ordinary content creators — experience true AI‑driven auto‑blogging.
 
 ## Description ##
 
-This is not just a content creator, its beyond the auto-blogging.
+Not just another content creator — experience AI‑powered auto‑blogging like never before.
 
 ## External Services ##
 
@@ -23,7 +23,7 @@ The external service is required for the core functionality of the plugin, inclu
 - Generating AI-based blog post content from post titles
 - Generating campaign-based blog posts using user-defined keywords and configurations
 - Generating post content from a provided title
-- Retrieving token usage and license-related data
+- Retrieving token usage and license detail
 
 ### What data is sent and when
 The plugin sends data to the external service only when initiated by the site administrator. Depending on the feature used, this may include:
