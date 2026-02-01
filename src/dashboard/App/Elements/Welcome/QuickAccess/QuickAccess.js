@@ -1,6 +1,6 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { Ticket, FileText, Users } from 'lucide-react';
+import { Ticket, FileText, User } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 export default function QuickAccess() {
@@ -16,7 +16,7 @@ export default function QuickAccess() {
 		{
 			icon: <Ticket className="w-5 h-5" />,
 			title: __( 'Open Support Ticket', 'auto-ai-blogger' ),
-			url: 'https://wpaiblogger.com/support/',
+			url: 'https://wpaiblogger.com/comtact/',
 		},
 		{
 			icon: <FileText className="w-5 h-5" />,
@@ -24,9 +24,9 @@ export default function QuickAccess() {
 			url: 'https://wpaiblogger.com/docs/',
 		},
 		{
-			icon: <Users className="w-5 h-5" />,
-			title: __( 'Join our Community on Facebook', 'auto-ai-blogger' ),
-			url: 'https://www.facebook.com/groups/wpaiblogger',
+			icon: <User className="w-5 h-5" />,
+			title: __( 'Access Dashboard', 'auto-ai-blogger' ),
+			url: 'https://wpaiblogger.com/customer-dashboard/',
 		},
 	];
 
