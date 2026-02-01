@@ -106,7 +106,7 @@ const getInitialState = () => {
 		adminEmail: safeParseLocalizedData( autoaib_localized_data.admin_email, 'string', '' ),
 		adminAppUrl: safeParseLocalizedData( autoaib_localized_data.admin_app_url, 'string', '' ),
 		adminBaseUrl: safeParseLocalizedData( autoaib_localized_data.admin_base_url, 'string', '' ),
-		proPurchaseUrl: safeParseLocalizedData( autoaib_localized_data.pro_purchase_url, 'string', 'https://wpaiblogger.com/' ),
+		proPurchaseUrl: safeParseLocalizedData( autoaib_localized_data.pro_purchase_url, 'string', 'https://wpaiblogger.com/#pricing' ),
 		proAvailable: safeParseLocalizedData( autoaib_localized_data.pro_available, 'boolean', false ),
 		version: safeParseLocalizedData( autoaib_localized_data.version, 'string', '1.0.0' ),
 		proVersion: safeParseLocalizedData( autoaib_localized_data.pro_version, 'string', '' ),

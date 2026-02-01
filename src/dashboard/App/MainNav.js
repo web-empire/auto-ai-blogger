@@ -15,7 +15,7 @@ export default function MainNav() {
 	// Redux selectors for dynamic data
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
 	const homeSlug = useSelector( ( state ) => state.homeSlug ) || 'auto-ai-blogger';
-	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/';
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || 'https://wpaiblogger.com/#pricing';
 	const proAvailable = useSelector( ( state ) => state.proAvailable ) || false;
 
 	// Memoize license status to prevent unnecessary recalculations

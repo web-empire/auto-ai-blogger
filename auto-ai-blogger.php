@@ -41,7 +41,7 @@ define( 'AUTOAIB_TOKEN_USAGE_API', 'https://wpaiblogger.com/wp-json/wp-ai-blogge
 define( 'AUTOAIB_CPT_CAMPAIGN', 'campaign' );
 
 // Define Upgrade Link.
-define( 'AUTOAIB_UPGRADE_LINK', 'https://wpaiblogger.com/' );
+define( 'AUTOAIB_UPGRADE_LINK', 'https://wpaiblogger.com/#pricing' );
 // Define Registration Link.
 define( 'AUTOAIB_REGISTRATION_URL', 'https://wpaiblogger.com/register/' );
 
