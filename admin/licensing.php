@@ -164,7 +164,37 @@ class Licensing {
 	 */
 	public function activate_license(): void {
 		// security validation.
-		$security_check = $this->validate_license_security();
+		$security_check = null;
+
+		// Check if we're in the correct context.
+		if ( ! wp_doing_ajax() || ! is_admin() ) {
+			$security_check = new \WP_Error(
+				'invalid_context',
+				esc_html__( 'License operations are only allowed in admin AJAX context.', 'auto-ai-blogger' )
+			);
+		}
+
+		// Verify user capabilities.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$security_check = new \WP_Error( 'insufficient_permissions', $this->error_messages['permission'] );
+		}
+
+		// CSRF protection - check nonce.
+		$nonce_field = 'autoaib_licensing_nonce';
+		$nonce_value = sanitize_text_field( wp_unslash( $_POST[ $nonce_field ] ?? '' ) );
+
+		if ( empty( $nonce_value ) || ! wp_verify_nonce( $nonce_value, $nonce_field ) ) {
+			$security_check = new \WP_Error( 'invalid_nonce', $this->error_messages['nonce'] );
+		}
+
+		// Check if user session is valid.
+		if ( ! is_user_logged_in() ) {
+			$security_check = new \WP_Error(
+				'not_logged_in',
+				esc_html__( 'You must be logged in to perform this action.', 'auto-ai-blogger' )
+			);
+		}
+
 		if ( is_wp_error( $security_check ) ) {
 			wp_send_json_error( [ 'message' => $security_check->get_error_message() ] );
 		}
@@ -176,7 +206,7 @@ class Licensing {
 		}
 
 		// Input validation and sanitization.
-		$license_key = sanitize_text_field( wp_unslash( $_POST['license_key'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Input is sanitized in the method.
+		$license_key = sanitize_text_field( wp_unslash( $_POST['license_key'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Input is sanitized in the method.
 
 		// Additional Check if license key format is valid.
 		if ( ! $this->validate_license_key_format( $license_key ) ) {

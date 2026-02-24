@@ -96,7 +96,7 @@ const getInitialState = () => {
 		// Static configuration data that doesn't change during app lifecycle.
 		homeSlug: safeParseLocalizedData( autoaib_localized_data.home_slug, 'string', 'auto-ai-blogger' ),
 		adminNonce: safeParseLocalizedData( autoaib_localized_data.admin_nonce, 'string', '' ),
-		ajaxUrl: safeParseLocalizedData( autoaib_localized_data.ajax_url, 'string', '/wp-admin/admin-ajax.php' ),
+		ajaxUrl: safeParseLocalizedData( autoaib_localized_data.ajax_url, 'string', '' ),
 		editPostLink: safeParseLocalizedData( autoaib_localized_data.edit_post_link, 'string', '/wp-admin/post.php?post={{POST_ID}}&action=edit' ),
 		allCampaigns: safeParseLocalizedData( autoaib_localized_data.all_campaigns, 'object', {} ),
 		postmetaDefaults: safeParseLocalizedData( autoaib_localized_data.postmeta_defaults, 'object', {} ),
