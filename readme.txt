@@ -94,14 +94,14 @@ The plugin uses `@wordpress/scripts` (webpack) as its build tool.
 == Changelog ==
 
 = 0.0.3 =
+* Improvement: Documented SureCart licensing service and third-party libraries in readme.
+* Improvement: Added source code repository link and build instructions in readme.
 * Security: Improved nonce verification flow in license activation with early returns.
 * Security: Enhanced input sanitization for AJAX settings and campaign handlers.
 * Security: Added json_last_error() checks for all JSON decode operations.
 * Security: Improved CSS output escaping in licensing settings.
 * Fix: Removed hardcoded AJAX URL fallbacks in JavaScript source files.
 * Fix: Renamed generic JavaScript object name to use plugin prefix.
-* Improvement: Documented SureCart licensing service and third-party libraries in readme.
-* Improvement: Added source code repository link and build instructions in readme.
 
 = 0.0.2 =
 * Improvement: Feedback as per WordPress plugin review team has been implemented.
