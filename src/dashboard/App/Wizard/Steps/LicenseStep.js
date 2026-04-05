@@ -120,7 +120,7 @@ const LicenseStep = memo( () => {
 
 	// Redux state
 	const reduxLicense = useSelector( ( state ) => state.license );
-	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
+	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce );
 	const licenseStatusFromRedux = useSelector( ( state ) => state.licenseStatus );
 	const noLicenseKeyUrl = useSelector( ( state ) => state.noLicenseKeyUrl ) || '#';

@@ -161,7 +161,7 @@ const License = memo( () => {
 	const licenseStatus = useSelector( ( state ) => state.license_status ) || 'unlicensed';
 	const noLicenseKeyUrl = useSelector( ( state ) => state.noLicenseKeyUrl ) || '#';
 	const licensingNonce = useSelector( ( state ) => state.licensingNonce ) || '';
-	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '/wp-admin/admin-ajax.php';
+	const ajaxUrl = useSelector( ( state ) => state.ajaxUrl ) || '';
 
 	// Local state
 	const [ processing, setProcessing ] = useState( false );

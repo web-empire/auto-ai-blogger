@@ -76,7 +76,7 @@
 				type: 'POST',
 				data: {
 					action: 'autoaib-notice-dismiss',
-					nonce: webNotices._notice_nonce,
+					nonce: autoaib_web_notices._notice_nonce,
 					notice_id,
 					repeat_notice_after: parseInt( repeat_notice_after ),
 				},

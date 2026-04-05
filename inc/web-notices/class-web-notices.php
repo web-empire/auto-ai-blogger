@@ -121,7 +121,7 @@ if ( ! class_exists( 'Autoaib_Notices' ) ) {
 			wp_register_script( 'autoaib-notices', self::get_url() . 'script.js', [ 'jquery' ], self::$version, true );
 			wp_localize_script(
 				'autoaib-notices',
-				'webNotices',
+				'autoaib_web_notices',
 				[
 					'_notice_nonce' => wp_create_nonce( 'autoaib-notices' ),
 				]

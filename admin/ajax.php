@@ -191,10 +191,11 @@ class Ajax {
 
 			$sub_option_value = '';
 			if ( isset( $_POST['value'] ) ) {
+				$raw_value = sanitize_text_field( wp_unslash( $_POST['value'] ) );
 				if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
-					$sub_option_value = Settings::sanitize_data( wp_unslash( $_POST['value'] ), $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( $raw_value, $type_settings[ $sub_option_key ] );
 				} else {
-					$sub_option_value = Settings::sanitize_data( wp_unslash( $_POST['value'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( $raw_value );
 				}
 			}
 
@@ -238,17 +239,17 @@ class Ajax {
 				return;
 			}
 
-			// Validate and sanitize input.
-			$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON string decoded then each field sanitized individually.
+			$campaign_raw = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-			if ( empty( $campaign_details ) ) {
+			if ( empty( $campaign_raw ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
 
 			// Decode and validate JSON.
-			$campaign_details = json_decode( $campaign_details, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
+			$campaign_details = json_decode( $campaign_raw, true );
+			if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $campaign_details ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
@@ -329,23 +330,17 @@ class Ajax {
 				return;
 			}
 
-			// Validate and sanitize input.
-			$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON string decoded then each field sanitized individually.
+			$campaign_raw = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-			if ( empty( $campaign_details ) ) {
+			if ( empty( $campaign_raw ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
 
 			// Decode and validate JSON.
-			$campaign_details = json_decode( $campaign_details, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
-				return;
-			}
-
-			// Validate campaign ID.
-			if ( ! is_array( $campaign_details ) ) {
+			$campaign_details = json_decode( $campaign_raw, true );
+			if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $campaign_details ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
@@ -518,8 +513,8 @@ class Ajax {
 				return;
 			}
 
-			// Validate and sanitize input.
-			$post_data = isset( $_POST['post_data'] ) ? wp_unslash( $_POST['post_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON containing HTML post_content; individual fields sanitized after json_decode via Metadata::sanitize_data().
+			$post_data = isset( $_POST['post_data'] ) && is_string( $_POST['post_data'] ) ? wp_unslash( $_POST['post_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON with HTML content; each field sanitized individually after decode via Metadata::sanitize_data().
 
 			if ( empty( $post_data ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
@@ -2003,7 +1998,7 @@ class Ajax {
 				if ( isset( $matches[1] ) ) {
 					$attrs_json    = $matches[1];
 					$attrs         = json_decode( $attrs_json, true );
-					$heading_level = $attrs['level'] ?? 2;
+					$heading_level = ( json_last_error() === JSON_ERROR_NONE && is_array( $attrs ) ) ? ( $attrs['level'] ?? 2 ) : 2;
 				} else {
 					$heading_level = 2; // Default level.
 				}

@@ -239,7 +239,7 @@ const createPostDraft = async ( title, response, options = {} ) => {
 
 	try {
 		const result = await apiFetch( {
-			url: options.ajaxUrl || autoaib_localized_data?.ajax_url || '/wp-admin/admin-ajax.php',
+			url: options.ajaxUrl || autoaib_localized_data?.ajax_url || '',
 			method: 'POST',
 			body: formData,
 		} );

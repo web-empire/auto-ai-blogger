@@ -232,7 +232,7 @@ class Settings {
 	 */
 	public function print_css(): void {
 		wp_enqueue_style( 'autoaib-sc-licensing-style', AUTOAIB_BASE_URL . 'inc/licensing/assets/style.css', [], AUTOAIB_VERSION );
-		wp_add_inline_style( 'autoaib-sc-licensing-style', do_shortcode( $this->get_css() ) );
+		wp_add_inline_style( 'autoaib-sc-licensing-style', $this->get_css() );
 	}
 
 	/**
@@ -242,7 +242,7 @@ class Settings {
 	 */
 	public function get_css() {
 		return '
-			.' . esc_attr( $this->name ) . '-form-container form {
+			.' . sanitize_html_class( $this->name ) . '-form-container form {
 				padding:30px;
 				background: #fff;
 				display: grid;

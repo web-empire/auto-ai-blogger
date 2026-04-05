@@ -73,7 +73,7 @@ const updateApiData = async ( key, value, dispatch, config = {} ) => {
 		const formData = createSecureFormData( 'autoaib_update_admin_setting', key, value, config );
 
 		const response = await apiFetch( {
-			url: config.ajaxUrl || ( typeof autoaib_localized_data !== 'undefined' && autoaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || ( typeof autoaib_localized_data !== 'undefined' && autoaib_localized_data?.ajax_url ) || '',
 			method: 'POST',
 			body: formData,
 			timeout: 30000, // 30 second timeout
@@ -140,7 +140,7 @@ const updateCampaign = async ( value, isNew, abortControllerRef = null, config =
 		const formData = createSecureFormData( action, 'campaign_details', value, config );
 
 		const response = await apiFetch( {
-			url: config.ajaxUrl || ( typeof autoaib_localized_data !== 'undefined' && autoaib_localized_data?.ajax_url ) || '/wp-admin/admin-ajax.php',
+			url: config.ajaxUrl || ( typeof autoaib_localized_data !== 'undefined' && autoaib_localized_data?.ajax_url ) || '',
 			method: 'POST',
 			body: formData,
 			signal: abortController.signal,
