@@ -35,6 +35,8 @@ module.exports = function (grunt) {
 					'!config/**',
 					'!tests/**',
 					'!bin/**',
+					'!claude/**',
+					'!claudeignore/**',
 					'!artifact/**',
 					'!assets/css/unminified/**',
 					'!assets/js/unminified/**',

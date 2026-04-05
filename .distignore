@@ -61,3 +61,5 @@ unminified
 coverage-report
 phpinsights.php
 playwright-report
+.claude
+.claudeignore
