@@ -176,7 +176,7 @@ class Licensing {
 		}
 
 		// Input validation and sanitization.
-		$license_key = isset( $_POST['license_key'] ) ? sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) : '';
+		$license_key = isset( $_POST['license_key'] ) ? sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified already in above validate_license_security().
 
 		// Additional Check if license key format is valid.
 		if ( ! $this->validate_license_key_format( $license_key ) ) {
