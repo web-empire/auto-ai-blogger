@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin Menu class for Auto AI Blogger.
+ * Admin Menu class for Solvex AI Blogger.
  *
  * This class handles secure admin menu setup, script loading, and data localization.
  * Implements comprehensive security measures including input validation,
@@ -21,7 +21,7 @@ use WPSolvex\AutoAIBlogger\Inc\Utils\Sanitizer;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Admin Menu class for Auto AI Blogger.
+ * Admin Menu class for Solvex AI Blogger.
  *
  * This class handles secure admin menu setup, script loading, and data localization.
  * Implements comprehensive security measures including input validation,
@@ -215,7 +215,7 @@ class Menu {
 				'pro_purchase_url'           => esc_url( AUTOAIB_UPGRADE_LINK ),
 				'pro_available'              => defined( 'AUTOAIB_PRO_VERSION' ),
 				'pro_version'                => defined( 'AUTOAIB_PRO_VERSION' ) ? AUTOAIB_PRO_VERSION : '',
-				'pro_plugin_name'            => defined( 'AUTOAIB_PRO_PRODUCT_NAME' ) ? str_replace( 'Auto AI Blogger ', '', AUTOAIB_PRO_PRODUCT_NAME ) : '',
+				'pro_plugin_name'            => defined( 'AUTOAIB_PRO_PRODUCT_NAME' ) ? str_replace( 'Solvex AI Blogger ', '', AUTOAIB_PRO_PRODUCT_NAME ) : '',
 				'edit_post_link'             => esc_url(
 					add_query_arg(
 						[
@@ -335,8 +335,8 @@ class Menu {
 		if ( current_user_can( AUTOAIB_CAPABILITY ) ) {
 			add_submenu_page(
 				'edit.php',
-				__( 'Auto AI Blogger', 'auto-ai-blogger' ),
-				__( 'Auto AI Blogger', 'auto-ai-blogger' ),
+				__( 'Solvex AI Blogger', 'auto-ai-blogger' ),
+				__( 'Solvex AI Blogger', 'auto-ai-blogger' ),
 				AUTOAIB_CAPABILITY,
 				self::PAGE_ID,
 				[ $this, 'render_settings_page' ]

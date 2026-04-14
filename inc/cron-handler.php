@@ -1,6 +1,6 @@
 <?php
 /**
- * Cron Handler class for Auto AI Blogger.
+ * Cron Handler class for Solvex AI Blogger.
  *
  * This class handles cron-related functionality including
  * post creation hooks and scheduling operations.
@@ -19,7 +19,7 @@ use WPSolvex\AutoAIBlogger\Inc\Utils\Metadata;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Cron Handler class for Auto AI Blogger.
+ * Cron Handler class for Solvex AI Blogger.
  *
  * @package auto-ai-blogger
  * @subpackage Inc\Cron
@@ -902,7 +902,7 @@ class Cron_Handler {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'Auto-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);

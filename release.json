@@ -1,9 +1,9 @@
 {
-  "name": "Auto AI Blogger",
+  "name": "Solvex AI Blogger",
   "slug": "auto-ai-blogger",
   "author": "<a href='https://wpsolvex.com/'>WP Solvex</a>",
   "author_profile": "https://wpaiblogger.com/",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "requires": "6.0",
   "tested": "6.9",
   "requires_php": "7.4",

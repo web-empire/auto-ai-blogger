@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin API class for Auto AI Blogger.
+ * Admin API class for Solvex AI Blogger.
  *
  * This class handles REST API endpoints for admin settings and operations.
  * Implements security measures including rate limiting, input validation,
@@ -19,7 +19,7 @@ use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Admin API class for Auto AI Blogger.
+ * Admin API class for Solvex AI Blogger.
  *
  * This class handles REST API endpoints for admin settings and operations.
  * Implements security measures including rate limiting, input validation,

@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin AJAX class for Auto AI Blogger.
+ * Admin AJAX class for Solvex AI Blogger.
  *
  * This class handles AJAX requests for admin operations including
  * settings management, campaign operations, and post creation.
@@ -23,7 +23,7 @@ use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Admin AJAX class for Auto AI Blogger.
+ * Admin AJAX class for Solvex AI Blogger.
  *
  * @package auto-ai-blogger
  * @subpackage Admin
@@ -1671,7 +1671,7 @@ class Ajax {
 					'timeout' => 90,
 					'headers' => [
 						'Content-Type' => 'application/json',
-						'User-Agent'   => 'Auto-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent'   => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 					'body'    => $api_data ? wp_json_encode( $api_data ) : '',
 				]
@@ -2064,7 +2064,7 @@ class Ajax {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'Auto-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);

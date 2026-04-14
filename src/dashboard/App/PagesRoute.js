@@ -167,7 +167,7 @@ const PagesRoute = () => {
 		try {
 			if ( title ) {
 				const originalTitle = document.title;
-				document.title = `${ title } - Auto AI Blogger`;
+				document.title = `${ title } - Solvex AI Blogger`;
 
 				// Cleanup on unmount
 				return () => {

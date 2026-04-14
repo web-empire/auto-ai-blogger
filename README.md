@@ -1,9 +1,9 @@
-# Auto AI Blogger #
+# Solvex AI Blogger #
 
 **Contributors:** [wpsolvex](https://profiles.wordpress.org/wpsolvex/)  
 **Tags:** blog, blogging, content creation, auto blogging, ai  
 **Tested up to:** 6.9  
-**Stable tag:** 0.0.3  
+**Stable tag:** 0.0.4  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -92,6 +92,9 @@ To build the plugin assets from source:
 The plugin uses `@wordpress/scripts` (webpack) as its build tool.
 
 ## Changelog ##
+
+### 0.0.4 ###
+* Improvement: Renamed plugin from "Auto AI Blogger" to "Solvex AI Blogger" per WordPress Plugin Review Team feedback.
 
 ### 0.0.3 ###
 * Improvement: Documented SureCart licensing service and third-party libraries in readme.

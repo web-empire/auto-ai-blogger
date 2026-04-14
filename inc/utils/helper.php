@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper Class for Auto AI Blogger.
+ * Helper Class for Solvex AI Blogger.
  *
  * This class provides utility functions for settings management
  * with input validation, data sanitization, and security checks.

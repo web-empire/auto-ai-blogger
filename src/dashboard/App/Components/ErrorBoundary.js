@@ -17,7 +17,7 @@ class ErrorBoundary extends React.Component {
 
 	componentDidCatch( error, errorInfo ) {
 		// Log the error for debugging
-		console.error( 'Auto AI Blogger Error Boundary caught an error:', error, errorInfo );
+		console.error( 'Solvex AI Blogger Error Boundary caught an error:', error, errorInfo );
 
 		this.setState( {
 			error,

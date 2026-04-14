@@ -100,7 +100,7 @@ export default function MainNav() {
 							<img
 								className="block h-[30px] w-[30px]"
 								src={ BrandIcon }
-								alt="Auto AI Blogger"
+								alt="Solvex AI Blogger"
 								loading="lazy"
 								decoding="async"
 							/>

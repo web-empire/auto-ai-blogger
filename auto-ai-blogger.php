@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Auto AI Blogger
+ * Plugin Name: Solvex AI Blogger
  * Plugin URI: https://wpaiblogger.com/
  * Author: WP Solvex
  * Author URI: https://wpsolvex.com/
- * Version: 0.0.3
+ * Version: 0.0.4
  * License: GPLv2 or later
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Constants.
 define( 'AUTOAIB_FILE', __FILE__ );
-define( 'AUTOAIB_VERSION', '0.0.3' );
+define( 'AUTOAIB_VERSION', '0.0.4' );
 define( 'AUTOAIB_DIR', plugin_dir_path( AUTOAIB_FILE ) );
 define( 'AUTOAIB_BASE_PATH', plugin_basename( AUTOAIB_FILE ) );
 define( 'AUTOAIB_BASE_URL', plugins_url( '/', AUTOAIB_FILE ) );

@@ -1,6 +1,6 @@
 <?php
 /**
- * Notification Helper class for Auto AI Blogger.
+ * Notification Helper class for Solvex AI Blogger.
  *
  * Handles sending notifications via email for campaign events.
  *

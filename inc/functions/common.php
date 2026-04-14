@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Common Functions for Auto AI Blogger.
+ * Plugin Common Functions for Solvex AI Blogger.
  *
  * This file contains common utility functions with security measures.
  * All functions implement proper input validation, data sanitization, and
@@ -705,7 +705,7 @@ function autoaib_get_post_creation_api_response( $keywords, $max_content_words, 
 			'blocking'    => true,
 			'headers'     => [
 				'Content-Type' => 'application/json',
-				'User-Agent'   => 'Auto-AI-Blogger/' . AUTOAIB_VERSION,
+				'User-Agent'   => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION,
 			],
 			'body'        => wp_json_encode( $body_args ),
 			'cookies'     => [],

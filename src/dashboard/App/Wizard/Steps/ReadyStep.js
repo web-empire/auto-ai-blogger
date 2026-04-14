@@ -57,7 +57,7 @@ const NextStepsCard = memo( () => (
 					{ __( 'What\'s Next?', 'auto-ai-blogger' ) }
 				</h3>
 				<p className="text-sm text-gray-600">
-					{ __( 'Learn how to get the most out of Auto AI Blogger', 'auto-ai-blogger' ) }
+					{ __( 'Learn how to get the most out of Solvex AI Blogger', 'auto-ai-blogger' ) }
 				</p>
 			</div>
 		</div>
@@ -288,7 +288,7 @@ const ReadyStep = memo( () => {
 							{ __( '🎉 Congratulations!', 'auto-ai-blogger' ) }
 						</h1>
 						<p className="text-green-100 text-xl max-w-2xl mx-auto">
-							{ __( 'Auto AI Blogger is now ready to transform your content creation process with the power of artificial intelligence.', 'auto-ai-blogger' ) }
+							{ __( 'Solvex AI Blogger is now ready to transform your content creation process with the power of artificial intelligence.', 'auto-ai-blogger' ) }
 						</p>
 					</div>
 

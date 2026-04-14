@@ -1,6 +1,6 @@
 <?php
 /**
- * Licensing Class for Auto AI Blogger.
+ * Licensing Class for Solvex AI Blogger.
  *
  * This class handles all licensing related operations with security measures.
  * Implements comprehensive input validation, data sanitization, rate limiting,

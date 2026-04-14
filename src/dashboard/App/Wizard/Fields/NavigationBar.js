@@ -185,7 +185,7 @@ const NavigationBar = memo( () => {
 							<img
 								className="h-8 w-auto"
 								src={ BrandIcon }
-								alt="Auto AI Blogger"
+								alt="Solvex AI Blogger"
 							/>
 						</div>
 						<div className="hidden sm:block">

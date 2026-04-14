@@ -1,4 +1,4 @@
-*** Auto AI Blogger Changelog ***
+*** Solvex AI Blogger Changelog ***
 
 0.0.2
 * Improvement: Feedback as per WordPress plugin review team has been implemented.

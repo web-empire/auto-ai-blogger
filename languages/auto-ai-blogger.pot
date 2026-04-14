@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Auto AI Blogger 0.0.2\n"
+"Project-Id-Version: Solvex AI Blogger 0.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/auto-ai-blogger\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: admin/menu.php:338
 #: admin/menu.php:339
 #: inc/notifications/email-templates.php:294
-msgid "Auto AI Blogger"
+msgid "Solvex AI Blogger"
 msgstr ""
 
 #. Plugin URI of the plugin
@@ -990,11 +990,11 @@ msgid "Review Campaign"
 msgstr ""
 
 #: inc/notifications/email-templates.php:284
-msgid "Auto AI Blogger Notification"
+msgid "Solvex AI Blogger Notification"
 msgstr ""
 
 #: inc/notifications/email-templates.php:317
-msgid "You are receiving this notification because you have enabled notifications for Auto AI Blogger."
+msgid "You are receiving this notification because you have enabled notifications for Solvex AI Blogger."
 msgstr ""
 
 #: inc/notifications/email-templates.php:319
@@ -1127,7 +1127,7 @@ msgid "Start Building"
 msgstr ""
 
 #: assets/build/9.js:2
-msgid "Welcome to Auto AI Blogger setup wizard. Use the Start Building button to begin."
+msgid "Welcome to Solvex AI Blogger setup wizard. Use the Start Building button to begin."
 msgstr ""
 
 #: assets/build/51.js:2
@@ -1358,7 +1358,7 @@ msgid "What's Next?"
 msgstr ""
 
 #: assets/build/610.js:2
-msgid "Learn how to get the most out of Auto AI Blogger"
+msgid "Learn how to get the most out of Solvex AI Blogger"
 msgstr ""
 
 #: assets/build/610.js:2
@@ -1414,7 +1414,7 @@ msgid "🎉 Congratulations!"
 msgstr ""
 
 #: assets/build/610.js:2
-msgid "Auto AI Blogger is now ready to transform your content creation process with the power of artificial intelligence."
+msgid "Solvex AI Blogger is now ready to transform your content creation process with the power of artificial intelligence."
 msgstr ""
 
 #: assets/build/610.js:2

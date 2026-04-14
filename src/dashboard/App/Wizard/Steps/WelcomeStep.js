@@ -177,7 +177,7 @@ const WelcomeStep = memo( () => {
 
 			{ /* Screen reader announcements */ }
 			<div className="sr-only" aria-live="polite">
-				{ __( 'Welcome to Auto AI Blogger setup wizard. Use the Start Building button to begin.', 'auto-ai-blogger' ) }
+				{ __( 'Welcome to Solvex AI Blogger setup wizard. Use the Start Building button to begin.', 'auto-ai-blogger' ) }
 			</div>
 		</main>
 	);

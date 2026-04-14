@@ -122,7 +122,7 @@ class Loader {
 	 */
 	public function define_store_constants(): void {
 		define( 'AUTOAIB_PRODUCT_ID', defined( 'AUTOAIB_PRO_PRODUCT_ID' ) ? AUTOAIB_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
-		define( 'AUTOAIB_PRODUCT_NAME', defined( 'AUTOAIB_PRO_PRODUCT_NAME' ) ? AUTOAIB_PRO_PRODUCT_NAME : 'Auto AI Blogger' );
+		define( 'AUTOAIB_PRODUCT_NAME', defined( 'AUTOAIB_PRO_PRODUCT_NAME' ) ? AUTOAIB_PRO_PRODUCT_NAME : 'Solvex AI Blogger' );
 		define( 'AUTOAIB_PRODUCT_FILE', defined( 'AUTOAIB_PRO_FILE' ) ? AUTOAIB_PRO_FILE : AUTOAIB_FILE );
 	}
 

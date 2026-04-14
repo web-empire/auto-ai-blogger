@@ -1,6 +1,6 @@
 <?php
 /**
- * Email Templates for Auto AI Blogger Notifications.
+ * Email Templates for Solvex AI Blogger Notifications.
  *
  * Provides HTML email templates for various notification types.
  *
@@ -281,7 +281,7 @@ class Email_Templates {
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>' . esc_html( $site_name ) . ' - ' . __( 'Auto AI Blogger Notification', 'auto-ai-blogger' ) . '</title>
+			<title>' . esc_html( $site_name ) . ' - ' . __( 'Solvex AI Blogger Notification', 'auto-ai-blogger' ) . '</title>
 		</head>
 		<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #F9FAFB;">
 			<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #F9FAFB;">
@@ -291,7 +291,7 @@ class Email_Templates {
 							<tr>
 								<td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px 40px; text-align: center;">
 									<h1 style="margin: 0; color: #FFFFFF; font-size: 24px; font-weight: 700;">' . esc_html( $site_name ) . '</h1>
-									<p style="margin: 8px 0 0 0; color: #E0E7FF; font-size: 14px;">' . __( 'Auto AI Blogger', 'auto-ai-blogger' ) . '</p>
+									<p style="margin: 8px 0 0 0; color: #E0E7FF; font-size: 14px;">' . __( 'Solvex AI Blogger', 'auto-ai-blogger' ) . '</p>
 								</td>
 							</tr>
 							<tr>
@@ -314,7 +314,7 @@ class Email_Templates {
 							</tr>
 							<tr>
 								<td style="background-color: #F9FAFB; padding: 32px 40px; border-top: 1px solid #E5E7EB;">
-									<p style="margin: 0 0 12px 0; font-size: 14px; color: #6B7280; text-align: center;">' . __( 'You are receiving this notification because you have enabled notifications for Auto AI Blogger.', 'auto-ai-blogger' ) . '</p>
+									<p style="margin: 0 0 12px 0; font-size: 14px; color: #6B7280; text-align: center;">' . __( 'You are receiving this notification because you have enabled notifications for Solvex AI Blogger.', 'auto-ai-blogger' ) . '</p>
 									<p style="margin: 0; font-size: 12px; color: #9CA3AF; text-align: center;">
 										© ' . gmdate( 'Y' ) . ' <a href="' . esc_url( $site_url ) . '" style="color: #4F46E5; text-decoration: none;">' . esc_html( $site_name ) . '</a>. ' . __( 'All rights reserved.', 'auto-ai-blogger' ) . '
 									</p>

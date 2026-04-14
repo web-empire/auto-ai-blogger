@@ -155,7 +155,7 @@ namespace WPSolvex\AutoAIBlogger\Inc\Traits {
 }
 namespace WPSolvex\AutoAIBlogger\Inc {
     /**
-     * Cron Handler class for Auto AI Blogger.
+     * Cron Handler class for Solvex AI Blogger.
      *
      * @package auto-ai-blogger
      * @subpackage Inc\Cron
@@ -1470,7 +1470,7 @@ namespace WPSolvex\AutoAIBlogger\Admin {
         }
     }
     /**
-     * Admin AJAX class for Auto AI Blogger.
+     * Admin AJAX class for Solvex AI Blogger.
      *
      * @package auto-ai-blogger
      * @subpackage Admin
@@ -1634,7 +1634,7 @@ namespace WPSolvex\AutoAIBlogger\Admin {
         }
     }
     /**
-     * Admin Menu class for Auto AI Blogger.
+     * Admin Menu class for Solvex AI Blogger.
      *
      * This class handles secure admin menu setup, script loading, and data localization.
      * Implements comprehensive security measures including input validation,
@@ -1710,7 +1710,7 @@ namespace WPSolvex\AutoAIBlogger\Admin {
         }
     }
     /**
-     * Admin API class for Auto AI Blogger.
+     * Admin API class for Solvex AI Blogger.
      *
      * This class handles REST API endpoints for admin settings and operations.
      * Implements security measures including rate limiting, input validation,
