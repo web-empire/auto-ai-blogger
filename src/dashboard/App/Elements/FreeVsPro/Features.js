@@ -6,33 +6,33 @@ import { Check, X, Crown, BarChart3, Calendar, Sparkles, Target, Shield, Headpho
 export const FeatureCategories = {
 	CONTENT: {
 		id: 'content',
-		label: __( 'Content Generation', 'wp-ai-blogger' ),
+		label: __( 'Content Generation', 'auto-ai-blogger' ),
 		icon: <Sparkles className="w-5 h-5" />,
-		description: __( 'AI-powered content creation capabilities', 'wp-ai-blogger' ),
+		description: __( 'AI-powered content creation capabilities', 'auto-ai-blogger' ),
 	},
 	AUTOMATION: {
 		id: 'automation',
-		label: __( 'Automation & Scheduling', 'wp-ai-blogger' ),
+		label: __( 'Automation & Scheduling', 'auto-ai-blogger' ),
 		icon: <Calendar className="w-5 h-5" />,
-		description: __( 'Automated publishing and management features', 'wp-ai-blogger' ),
+		description: __( 'Automated publishing and management features', 'auto-ai-blogger' ),
 	},
 	SEO: {
 		id: 'seo',
-		label: __( 'SEO & Optimization', 'wp-ai-blogger' ),
+		label: __( 'SEO & Optimization', 'auto-ai-blogger' ),
 		icon: <Target className="w-5 h-5" />,
-		description: __( 'Search engine optimization tools', 'wp-ai-blogger' ),
+		description: __( 'Search engine optimization tools', 'auto-ai-blogger' ),
 	},
 	ANALYTICS: {
 		id: 'analytics',
-		label: __( 'Analytics & Insights', 'wp-ai-blogger' ),
+		label: __( 'Analytics & Insights', 'auto-ai-blogger' ),
 		icon: <BarChart3 className="w-5 h-5" />,
-		description: __( 'Performance tracking and analytics', 'wp-ai-blogger' ),
+		description: __( 'Performance tracking and analytics', 'auto-ai-blogger' ),
 	},
 	SUPPORT: {
 		id: 'support',
-		label: __( 'Support & Updates', 'wp-ai-blogger' ),
+		label: __( 'Support & Updates', 'auto-ai-blogger' ),
 		icon: <Headphones className="w-5 h-5" />,
-		description: __( 'Customer support and product updates', 'wp-ai-blogger' ),
+		description: __( 'Customer support and product updates', 'auto-ai-blogger' ),
 	},
 };
 
@@ -40,98 +40,98 @@ export const FeatureCategories = {
 export const FeaturesList = [
 	{
 		id: 'ai-tokens',
-		name: __( 'Content Generation Tokens', 'wp-ai-blogger' ),
+		name: __( 'Content Generation Tokens', 'auto-ai-blogger' ),
 		category: 'content',
-		free: __( '30,000 Tokens/month', 'wp-ai-blogger' ),
-		pro: __( '75,000+ Tokens/month', 'wp-ai-blogger' ),
-		description: __( 'Token allocation for AI content generation', 'wp-ai-blogger' ),
+		free: __( '20,000 Tokens/month', 'auto-ai-blogger' ),
+		pro: __( '50,000+ Tokens/month', 'auto-ai-blogger' ),
+		description: __( 'Token allocation for AI content generation', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 	{
 		id: 'blog-topics',
-		name: __( 'Blog Post Suggestions', 'wp-ai-blogger' ),
+		name: __( 'Blog Post Suggestions', 'auto-ai-blogger' ),
 		category: 'content',
-		free: __( 'Upto 5 Ideas', 'wp-ai-blogger' ),
-		pro: __( 'Unlimited Ideas', 'wp-ai-blogger' ),
-		description: __( 'AI-generated blog post ideas tailored to your niche', 'wp-ai-blogger' ),
+		free: __( 'Upto 5 Ideas', 'auto-ai-blogger' ),
+		pro: __( 'Unlimited Ideas', 'auto-ai-blogger' ),
+		description: __( 'AI-generated blog post ideas tailored to your niche', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 	{
 		id: 'content-generation',
-		name: __( 'Post Content Words', 'wp-ai-blogger' ),
+		name: __( 'Post Content Words', 'auto-ai-blogger' ),
 		category: 'content',
-		free: __( 'Upto 1000 Words/post', 'wp-ai-blogger' ),
-		pro: __( 'Upto 5000 Words/post', 'wp-ai-blogger' ),
-		description: __( 'Full-length article generation with advanced AI models', 'wp-ai-blogger' ),
+		free: __( 'Upto 1000 Words/post', 'auto-ai-blogger' ),
+		pro: __( 'Upto 5000 Words/post', 'auto-ai-blogger' ),
+		description: __( 'Full-length article generation with advanced AI models', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 	{
 		id: 'content-images',
-		name: __( 'Content Images', 'wp-ai-blogger' ),
+		name: __( 'Content Images', 'auto-ai-blogger' ),
 		category: 'content',
-		free: __( '1 Image/post', 'wp-ai-blogger' ),
-		pro: __( 'Upto 5 Images/post', 'wp-ai-blogger' ),
-		description: __( 'Make AI content sound natural and engaging', 'wp-ai-blogger' ),
+		free: __( '1 Image/post', 'auto-ai-blogger' ),
+		pro: __( 'Upto 5 Images/post', 'auto-ai-blogger' ),
+		description: __( 'Make AI content sound natural and engaging', 'auto-ai-blogger' ),
 		priority: 'medium',
 	},
 	{
 		id: 'featured-image',
-		name: __( 'Featured Image', 'wp-ai-blogger' ),
+		name: __( 'Featured Image', 'auto-ai-blogger' ),
 		category: 'automation',
 		free: 'yes',
 		pro: 'yes',
-		description: __( 'Automatically schedule and publish content', 'wp-ai-blogger' ),
+		description: __( 'Automatically schedule and publish content', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 	{
 		id: 'campaigns',
-		name: __( 'Campaigns', 'wp-ai-blogger' ),
+		name: __( 'Campaigns', 'auto-ai-blogger' ),
 		category: 'seo',
-		free: __( 'Unlimited', 'wp-ai-blogger' ),
-		pro: __( 'Unlimited', 'wp-ai-blogger' ),
-		description: __( 'Target high-ranking keywords for better SEO', 'wp-ai-blogger' ),
+		free: __( 'Unlimited', 'auto-ai-blogger' ),
+		pro: __( 'Unlimited', 'auto-ai-blogger' ),
+		description: __( 'Target high-ranking keywords for better SEO', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 
 	// Automation Features
 	{
 		id: 'analytics',
-		name: __( 'Analytics', 'wp-ai-blogger' ),
+		name: __( 'Analytics', 'auto-ai-blogger' ),
 		category: 'seo',
-		free: __( 'Basic Campaign Analytics', 'wp-ai-blogger' ),
-		pro: __( 'Basic + AI Backed Campaign Analytics [Soon]', 'wp-ai-blogger' ),
-		description: __( 'Target high-ranking keywords for better SEO', 'wp-ai-blogger' ),
+		free: __( 'Basic Campaign Analytics', 'auto-ai-blogger' ),
+		pro: __( 'Basic + AI Backed Campaign Analytics [Soon]', 'auto-ai-blogger' ),
+		description: __( 'Target high-ranking keywords for better SEO', 'auto-ai-blogger' ),
 		priority: 'high',
 	},
 
 	// Notification
 	{
 		id: 'notifications',
-		name: __( 'Notifications', 'wp-ai-blogger' ),
+		name: __( 'Notifications', 'auto-ai-blogger' ),
 		category: 'notifications',
-		free: __( 'Email Based', 'wp-ai-blogger' ),
-		pro: __( 'Email + WhatsApp [Soon]', 'wp-ai-blogger' ),
-		description: __( 'Get help when you need it most', 'wp-ai-blogger' ),
+		free: __( 'Email Based', 'auto-ai-blogger' ),
+		pro: __( 'Email + WhatsApp [Soon]', 'auto-ai-blogger' ),
+		description: __( 'Get help when you need it most', 'auto-ai-blogger' ),
 		priority: 'medium',
 	},
 
 	// Support Features
 	{
 		id: 'support',
-		name: __( 'Support', 'wp-ai-blogger' ),
+		name: __( 'Support', 'auto-ai-blogger' ),
 		category: 'support',
-		free: __( 'Free Basic Support', 'wp-ai-blogger' ),
-		pro: __( 'One Year Premium Support', 'wp-ai-blogger' ),
-		description: __( 'Get help when you need it most', 'wp-ai-blogger' ),
+		free: __( 'Free Basic Support', 'auto-ai-blogger' ),
+		pro: __( 'One Year Premium Support', 'auto-ai-blogger' ),
+		description: __( 'Get help when you need it most', 'auto-ai-blogger' ),
 		priority: 'medium',
 	},
 	{
 		id: 'updates',
-		name: __( 'Updates & Features', 'wp-ai-blogger' ),
+		name: __( 'Updates & Features', 'auto-ai-blogger' ),
 		category: 'support',
-		free: __( 'Free Product Updates', 'wp-ai-blogger' ),
-		pro: __( 'One Year Premium Updates', 'wp-ai-blogger' ),
-		description: __( 'Access to the latest features and improvements', 'wp-ai-blogger' ),
+		free: __( 'Free Product Updates', 'auto-ai-blogger' ),
+		pro: __( 'One Year Premium Updates', 'auto-ai-blogger' ),
+		description: __( 'Access to the latest features and improvements', 'auto-ai-blogger' ),
 		priority: 'low',
 	},
 ];
@@ -156,7 +156,7 @@ export const FeatureComparisonTable = memo( () => {
 			if ( status === 'yes' ) {
 				return {
 					icon: <Check className="w-4 h-4 text-green-600" />,
-					text: __( 'Included', 'wp-ai-blogger' ),
+					text: __( 'Included', 'auto-ai-blogger' ),
 					className: 'text-green-600 bg-green-50 border-green-200',
 				};
 			}
@@ -164,7 +164,7 @@ export const FeatureComparisonTable = memo( () => {
 			if ( status === 'no' ) {
 				return {
 					icon: <X className="w-4 h-4 text-red-500" />,
-					text: __( 'Not included', 'wp-ai-blogger' ),
+					text: __( 'Not included', 'auto-ai-blogger' ),
 					className: 'text-red-500 bg-red-50 border-red-200',
 				};
 			}
@@ -220,13 +220,13 @@ export const FeatureComparisonTable = memo( () => {
 								<thead className="bg-gradient-to-r from-brand-50 to-indigo-50">
 									<tr>
 										<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											{ __( 'Feature', 'wp-ai-blogger' ) }
+											{ __( 'Feature', 'auto-ai-blogger' ) }
 										</th>
 										<th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-											{ __( 'Free Version', 'wp-ai-blogger' ) }
+											{ __( 'Free Version', 'auto-ai-blogger' ) }
 										</th>
 										<th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-											{ __( 'Pro Version', 'wp-ai-blogger' ) }
+											{ __( 'Pro Version', 'auto-ai-blogger' ) }
 										</th>
 									</tr>
 								</thead>

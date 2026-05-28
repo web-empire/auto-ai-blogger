@@ -2,6 +2,10 @@
 
 namespace SureCart\Licensing;
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The settings class.
  */
@@ -195,22 +199,22 @@ class Settings {
 
 					<h2><?php echo esc_html( $this->menu_args['page_title'] ); ?></h2>
 					<label for="license_key">
-						<?php if ( $action === 'activate' ) { ?> 
-							<?php echo esc_html( sprintf( $this->client->__( 'Enter your license key to activate %s.', 'surecart' ), $this->client->name ) ); ?>
+						<?php if ( $action === 'activate' ) { ?>
+							<?php echo esc_html( sprintf( $this->client->__( 'Enter your license key to activate %s.', 'auto-ai-blogger' ), $this->client->name ) ); ?>
 						<?php } else { ?>
-							<?php echo esc_html( sprintf( $this->client->__( 'Your license is succesfully activated for this site.', 'surecart' ), $this->client->name ) ); ?>
+							<?php echo esc_html( sprintf( $this->client->__( 'Your license is succesfully activated for this site.', 'auto-ai-blogger' ), $this->client->name ) ); ?>
 						<?php } ?>
 					</label>
 
-					<?php if ( $action === 'activate' ) { ?> 
+					<?php if ( $action === 'activate' ) { ?>
 						<input class="widefat" type="password" autocomplete="off" name="license_key" id="license_key" value="<?php echo esc_attr( $this->license_key ); ?>" autofocus>
 					<?php } ?>
 
 					<?php if ( isset( $_GET['debug'] ) ) { // phpcs:ignore?>
-						<label for="license_id"><?php echo esc_html( sprintf( $this->client->__( 'License ID', 'surecart' ), $this->client->name ) ); ?></label>
+						<label for="license_id"><?php echo esc_html( sprintf( $this->client->__( 'License ID', 'auto-ai-blogger' ), $this->client->name ) ); ?></label>
 						<input class="widefat" type="text" autocomplete="off" name="license_id" id="license_id" value="<?php echo esc_attr( $this->license_id ); ?>" autofocus>
 
-						<label for="activation_id"><?php echo esc_html( sprintf( $this->client->__( 'Activation ID', 'surecart' ), $this->client->name ) ); ?></label>
+						<label for="activation_id"><?php echo esc_html( sprintf( $this->client->__( 'Activation ID', 'auto-ai-blogger' ), $this->client->name ) ); ?></label>
 						<input class="widefat" type="text" autocomplete="off" name="activation_id" id="activation_id" value="<?php echo esc_attr( $this->activation_id ); ?>" autofocus>
 					<?php } ?>
 
@@ -227,36 +231,25 @@ class Settings {
 	 * @return void
 	 */
 	public function print_css(): void {
-		?>
-		<style>
-			.spinner {
-				float: none;
-			}
-			<?php echo '.' . esc_attr( $this->name ) . '-form-container'; ?> form {
+		wp_enqueue_style( 'autoaib-sc-licensing-style', AUTOAIB_BASE_URL . 'inc/licensing/assets/style.css', [], AUTOAIB_VERSION );
+		wp_add_inline_style( 'autoaib-sc-licensing-style', $this->get_css() );
+	}
+
+	/**
+	 * Get the css for the form.
+	 *
+	 * @return string
+	 */
+	public function get_css() {
+		return '
+			.' . sanitize_html_class( $this->name ) . '-form-container form {
 				padding:30px;
 				background: #fff;
 				display: grid;
 				gap: 1em;
 				max-width: 600px;
 			}
-			h2 {
-				padding: 0;
-				margin: 0;
-			}
-			label {
-				display: block;
-				font-size: 1.1em;
-				margin-bottom: 5px;
-			}
-			label[hidden] {
-				display: none;
-			}
-			p.submit {
-				margin: 0;
-				padding: 0;
-			}
-		</style>
-		<?php
+		';
 	}
 
 	/**
@@ -269,7 +262,7 @@ class Settings {
 		if ( $this->activation_id ) {
 			$activation = $this->client->activation()->get( $this->activation_id );
 			if ( is_wp_error( $activation ) ) {
-				$this->add_error( 'deactivaed', $this->client->__( 'Your license has been deactivated for this site.', 'surecart' ) );
+				$this->add_error( 'deactivaed', $this->client->__( 'Your license has been deactivated for this site.', 'auto-ai-blogger' ) );
 				$this->clear_options();
 			}
 		}
@@ -292,58 +285,39 @@ class Settings {
 		}
 
 		// Cerify nonce.
-		if ( ! wp_verify_nonce( $_POST['_nonce'], $this->client->name ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_nonce'] ) ), $this->client->name ) ) {
 			$this->add_error( 'unauthorized', $this->client->__( "You don't have permission to manage licenses." ) );
 			return;
 		}
 
 		// handle activation.
 		if ( $_POST['_action'] === 'activate' ) {
-			$activated = $this->client->license()->activate( sanitize_text_field( $_POST['license_key'] ) );
+			if ( ! isset( $_POST['license_key'] ) ) {
+				$this->add_error( 'missing_license_key', $this->client->__( 'Please enter a license key.' ) );
+				return;
+			}
+			$activated = $this->client->license()->activate( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) );
 			if ( is_wp_error( $activated ) ) {
 				$this->add_error( $activated->get_error_code(), $activated->get_error_message() );
 				return;
 			}
 
-			if ( ! empty( $this->menu_args['activated_redirect'] ) ) {
-				$this->redirect( $this->menu_args['activated_redirect'] );
-				exit;
-			}
-
-			return $this->add_success( 'activated', $this->client->__( 'This site was successfully activated.', 'surecart' ) );
+			return $this->add_success( 'activated', $this->client->__( 'This site was successfully activated.', 'auto-ai-blogger' ) );
 		}
 
 		// handle deactivation.
 		if ( $_POST['_action'] === 'deactivate' ) {
-			$deactivated = $this->client->license()->deactivate( sanitize_text_field( $_POST['activation_id'] ) );
+			if ( ! isset( $_POST['activation_id'] ) ) {
+				$this->add_error( 'missing_activation_id', $this->client->__( 'Activation ID is missing.' ) );
+				return;
+			}
+			$deactivated = $this->client->license()->deactivate( sanitize_text_field( wp_unslash( $_POST['activation_id'] ) ) );
 			if ( is_wp_error( $deactivated ) ) {
 				$this->add_error( $deactivated->get_error_code(), $deactivated->get_error_message() );
 			}
 
-			if ( ! empty( $this->menu_args['deactivated_redirect'] ) ) {
-				$this->redirect( $this->menu_args['deactivated_redirect'] );
-				exit;
-			}
-
-			return $this->add_success( 'deactivated', $this->client->__( 'This site was successfully deactivated.', 'surecart' ) );
+			return $this->add_success( 'deactivated', $this->client->__( 'This site was successfully deactivated.', 'auto-ai-blogger' ) );
 		}
-	}
-
-	/**
-	 * Redirect to a url client-side.
-	 * We need to do this to avoid "headers already sent" messages.
-	 *
-	 * @param string $url Url to redirect.
-	 *
-	 * @return void
-	 */
-	public function redirect( $url ): void {
-		?>
-		<div class="spinner is-active"></div>
-		<script>
-			window.location.assign("<?php echo esc_url( $url ); ?>");
-		</script>
-		<?php
 	}
 
 	/**
@@ -392,7 +366,7 @@ class Settings {
 	 * Form action URL
 	 */
 	private function form_action_url() {
-		return apply_filters( 'surecart_client_license_form_action', '' );
+		return apply_filters( 'autoaib_client_license_form_action', '' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**

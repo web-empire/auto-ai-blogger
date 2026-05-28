@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component {
 
 		// Log to WordPress if available.
 		if ( window.console && window.console.error ) {
-			console.error( 'WP AI Blogger React Error:', {
+			console.error( 'Solvex AI Blogger React Error:', {
 				error: error.toString(),
 				errorInfo: errorInfo.componentStack,
 				props: this.props,
@@ -50,7 +50,7 @@ class ErrorBoundary extends React.Component {
 
 			// Default error UI
 			return (
-				<div className="wpaib-error-boundary" style={ {
+				<div className="autoaib-error-boundary" style={ {
 					padding: '20px',
 					border: '1px solid #dc3545',
 					borderRadius: '4px',
@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component {
 					margin: '20px',
 				} }>
 					<h3>Something went wrong</h3>
-					<p>The WP AI Blogger interface encountered an error. Please try refreshing the page.</p>
+					<p>The Solvex AI Blogger interface encountered an error. Please try refreshing the page.</p>
 
 					{ process.env.NODE_ENV === 'development' && this.state.error && (
 						<details style={ { marginTop: '10px' } }>

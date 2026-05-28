@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-if ( ! class_exists( 'Web_Notices' ) ) {
+if ( ! class_exists( 'Autoaib_Notices' ) ) {
 
 	/**
-	 * Web_Notices
+	 * Autoaib_Notices
 	 *
 	 * @since 1.0.0
 	 */
-	class Web_Notices {
+	class Autoaib_Notices {
 		/**
 		 * Notices
 		 *
@@ -46,7 +46,7 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		public function __construct() {
 			add_action( 'admin_notices', [ $this, 'show_notices' ], 30 );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-			add_action( 'wp_ajax_web-notice-dismiss', [ $this, 'dismiss_notice' ] );
+			add_action( 'wp_ajax_autoaib-notice-dismiss', [ $this, 'dismiss_notice' ] );
 			add_filter( 'wp_kses_allowed_html', [ $this, 'add_data_attributes' ], 10, 2 );
 		}
 
@@ -82,18 +82,18 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		 * @return void
 		 */
 		public function dismiss_notice(): void {
+			// Verify nonce first before processing any input.
+			if ( ! isset( $_POST['nonce'] ) || false === wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'autoaib-notices' ) ) {
+				wp_send_json_error( esc_html__( 'WordPress Nonce not validated.', 'auto-ai-blogger' ) );
+			}
+
 			$notice_id           = isset( $_POST['notice_id'] ) ? sanitize_key( $_POST['notice_id'] ) : '';
 			$repeat_notice_after = isset( $_POST['repeat_notice_after'] ) ? absint( $_POST['repeat_notice_after'] ) : '';
-			$nonce               = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
 			$notice              = $this->get_notice_by_id( $notice_id );
 			$capability          = $notice['capability'] ?? 'manage_options';
 
-			if ( ! apply_filters( 'web_notices_user_cap_check', current_user_can( $capability ) ) ) {
+			if ( ! apply_filters( 'autoaib_notices_user_cap_check', current_user_can( $capability ) ) ) { //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 				return;
-			}
-
-			if ( false === wp_verify_nonce( $nonce, 'web-notices' ) ) {
-				wp_send_json_error( esc_html_e( 'WordPress Nonce not validated.', 'wp-ai-blogger' ) );
 			}
 
 			// Valid inputs?
@@ -118,16 +118,16 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		 * @return void
 		 */
 		public function enqueue_scripts(): void {
-			wp_register_script( 'web-notices', self::get_url() . 'script.js', [ 'jquery' ], self::$version, true );
+			wp_register_script( 'autoaib-notices', self::get_url() . 'script.js', [ 'jquery' ], self::$version, true );
 			wp_localize_script(
-				'web-notices',
-				'webNotices',
+				'autoaib-notices',
+				'autoaib_web_notices',
 				[
-					'_notice_nonce' => wp_create_nonce( 'web-notices' ),
+					'_notice_nonce' => wp_create_nonce( 'autoaib-notices' ),
 				]
 			);
 
-			wp_enqueue_style( 'web-notices', self::get_url() . 'style.css', [], self::$version );
+			wp_enqueue_style( 'autoaib-notices', self::get_url() . 'style.css', [], self::$version );
 		}
 
 		/**
@@ -166,7 +166,7 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 				'display-notice-after'       => false,      // Optional, Dismiss-able notice time. It'll auto show after given time.
 				'class'                      => '',      // Optional, Additional notice wrapper class.
 				'priority'                   => 10,      // Priority of the notice.
-				'display-with-other-notices' => true,    // Should the notice be displayed if other notices  are being displayed from Web_Notices.
+				'display-with-other-notices' => true,    // Should the notice be displayed if other notices  are being displayed from Autoaib_Notices.
 				'is_dismissible'             => true,
 				'capability'                 => 'manage_options', // User capability - This capability is required for the current user to see this notice.
 			];
@@ -211,24 +211,24 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 		 * @return void
 		 */
 		public static function markup( $notice = [] ): void {
-			wp_enqueue_script( 'web-notices' );
+			wp_enqueue_script( 'autoaib-notices' );
 
-			do_action( 'web_notice_before_markup' );
+			do_action( 'autoaib_notice_before_markup' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
-			do_action( "web_notice_before_markup_{$notice['id']}" );
+			do_action( "autoaib_notice_before_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
 			?>
 			<div id="<?php echo esc_attr( $notice['id'] ); ?>" class="<?php echo esc_attr( $notice['classes'] ); ?>" data-repeat-notice-after="<?php echo esc_attr( $notice['repeat-notice-after'] ); ?>">
 				<div class="notice-container">
-					<?php do_action( "web_notice_inside_markup_{$notice['id']}" ); ?>
+					<?php do_action( "autoaib_notice_inside_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook ?>
 					<?php echo wp_kses_post( $notice['message'] ); ?>
 				</div>
 			</div>
 			<?php
 
-			do_action( "web_notice_after_markup_{$notice['id']}" );
+			do_action( "autoaib_notice_after_markup_{$notice['id']}" ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 
-			do_action( 'web_notice_after_markup' );
+			do_action( 'autoaib_notice_after_markup' ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- wordpress hook
 		}
 
 		/**
@@ -361,7 +361,7 @@ if ( ! class_exists( 'Web_Notices' ) ) {
 	/**
 	 * Kicking this off by creating 'new' instance.
 	 */
-	new Web_Notices();
+	new Autoaib_Notices();
 
 }
 

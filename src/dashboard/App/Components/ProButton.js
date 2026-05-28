@@ -19,7 +19,7 @@ const ProButton = forwardRef( ( {
 	iconPosition = 'right',
 	tooltip = null,
 	tooltipPosition = 'top',
-	children = __( 'Upgrade to Pro', 'wp-ai-blogger' ),
+	children = __( 'Upgrade to Pro', 'auto-ai-blogger' ),
 	onClick,
 	'aria-label': ariaLabel,
 	...props
@@ -27,7 +27,7 @@ const ProButton = forwardRef( ( {
 	const [ showTooltip, setShowTooltip ] = useState( false );
 
 	// Get pro purchase URL from Redux store.
-	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || wpaib_localized_data.pro_purchase_url;
+	const proPurchaseUrl = useSelector( ( state ) => state.proPurchaseUrl ) || autoaib_localized_data.pro_purchase_url;
 
 	// Determine the URL to use
 	const proUrl = useMemo( () => {
@@ -136,7 +136,7 @@ const ProButton = forwardRef( ( {
 			return (
 				<>
 					<Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />
-					{ __( 'Loading…', 'wp-ai-blogger' ) }
+					{ __( 'Loading…', 'auto-ai-blogger' ) }
 				</>
 			);
 		}
@@ -195,7 +195,7 @@ const ProButton = forwardRef( ( {
 				onMouseOut={ variant === 'primary' ? ( e ) => {
 					e.currentTarget.style.background = 'linear-gradient(to right, #9138c8, #d42ec1)';
 				} : undefined }
-				aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'wp-ai-blogger' ) ) }
+				aria-label={ ariaLabel || ( typeof children === 'string' ? children : __( 'Upgrade to Pro', 'auto-ai-blogger' ) ) }
 				aria-disabled={ disabled || loading }
 				{ ...elementProps }
 				{ ...( shouldRenderAsLink ? props : buttonSafeProps ) }

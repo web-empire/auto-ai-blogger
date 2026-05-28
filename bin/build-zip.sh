@@ -31,17 +31,17 @@ fi
 
 
 # Copy files for zip.
-rsync -rc --delete --exclude-from ".distignore" "./" "artifact/wp-ai-blogger"
+rsync -rc --delete --exclude-from ".distignore" "./" "artifact/auto-ai-blogger"
 
 # Go to directory
 cd artifact
 
 # Create a zip copied files.
-zip -r wp-ai-blogger.zip "./wp-ai-blogger"
+zip -r auto-ai-blogger.zip "./auto-ai-blogger"
 
 if [ "no-clean" != "$1" ]; then
 	# Removed copied files folder.
-	rm -rf wp-ai-blogger
+	rm -rf auto-ai-blogger
 fi
 
-success "Done. Your WP AI Blogger zip is ready..! 🎉"
+success "Done. Your Auto AI Blogger zip is ready..! 🎉"

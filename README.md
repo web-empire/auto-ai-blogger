@@ -1,19 +1,19 @@
-=== Solvex AI Blogger ===
+# Solvex AI Blogger #
 
-Contributors: wpsolvex
-Tags: blog, blogging, content creation, auto blogging, ai
-Tested up to: 6.9
-Stable tag: 0.0.4
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+**Contributors:** [wpsolvex](https://profiles.wordpress.org/wpsolvex/)  
+**Tags:** blog, blogging, content creation, auto blogging, ai  
+**Tested up to:** 6.9  
+**Stable tag:** 0.0.4  
+**License:** GPLv2 or later  
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
 Beyond ordinary content creators — experience true AI‑driven auto‑blogging.
 
-== Description ==
+## Description ##
 
 Not just another content creator — experience AI‑powered auto‑blogging like never before.
 
-== External Services ==
+## External Services ##
 
 This plugin relies on an external service operated by WP AI Blogger (WP Solvex) to provide AI-powered content generation features.
 
@@ -64,21 +64,21 @@ API domain: https://api.surecart.com
 - Terms and Conditions: https://surecart.com/terms-and-conditions/
 - Privacy Policy: https://surecart.com/privacy-policy/
 
-== Third-Party Libraries ==
+## Third-Party Libraries ##
 
 This plugin bundles the following JavaScript libraries for its admin dashboard interface:
 
 - **React Router** — Used for client-side navigation within the plugin's single-page admin dashboard. Any references to `reactrouter.com` found in the compiled JavaScript files are documentation URLs embedded within the library source code and are not runtime API calls or external service connections.
 
-== Screenshots ==
+## Screenshots ##
 1. Admin screen.
 
-== Installation ==
+## Installation ##
 
 1. Upload the plugin files to the `/wp-content/plugins/auto-ai-blogger` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 
-== Source Code ==
+## Source Code ##
 
 The uncompiled source code for the plugin's JavaScript and CSS is located in the `src/` directory. The compiled output is in `assets/build/`.
 
@@ -91,12 +91,12 @@ To build the plugin assets from source:
 
 The plugin uses `@wordpress/scripts` (webpack) as its build tool.
 
-== Changelog ==
+## Changelog ##
 
-= 0.0.4 =
+### 0.0.4 ###
 * Improvement: Renamed plugin from "Auto AI Blogger" to "Solvex AI Blogger" per WordPress Plugin Review Team feedback.
 
-= 0.0.3 =
+### 0.0.3 ###
 * Improvement: Documented SureCart licensing service and third-party libraries in readme.
 * Improvement: Added source code repository link and build instructions in readme.
 * Security: Improved nonce verification flow in license activation with early returns.
@@ -106,8 +106,8 @@ The plugin uses `@wordpress/scripts` (webpack) as its build tool.
 * Fix: Removed hardcoded AJAX URL fallbacks in JavaScript source files.
 * Fix: Renamed generic JavaScript object name to use plugin prefix.
 
-= 0.0.2 =
+### 0.0.2 ###
 * Improvement: Feedback as per WordPress plugin review team has been implemented.
 
-= 0.0.1 =
+### 0.0.1 ###
 * Initial release

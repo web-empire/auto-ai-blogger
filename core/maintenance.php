@@ -2,18 +2,22 @@
 /**
  * Maintenance.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Core;
+namespace WPSolvex\AutoAIBlogger\Core;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
 
 /**
  * Update Compatibility
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  */
 
 /**
@@ -42,24 +46,24 @@ class Maintenance {
 	 * @return void
 	 */
 	public static function init(): void {
-		do_action( 'wp_ai_blogger_update_before' );
+		do_action( 'autoaib_update_before' );
 
 		// Get auto saved version number.
-		$saved_version = get_option( 'wp_ai_blogger_saved_version', false );
+		$saved_version = get_option( 'autoaib_saved_version', false );
 
 		// Update auto saved version number.
 		if ( ! $saved_version ) {
-			update_option( 'wp_ai_blogger_saved_version', WP_AI_BLOGGER_VERSION );
+			update_option( 'autoaib_saved_version', AUTOAIB_VERSION );
 		}
 
 		// If equals then return.
-		if ( version_compare( strval( $saved_version ), WP_AI_BLOGGER_VERSION, '=' ) ) {
+		if ( version_compare( strval( $saved_version ), AUTOAIB_VERSION, '=' ) ) {
 			return;
 		}
 
 		// Update auto saved version number.
-		update_option( 'wp_ai_blogger_saved_version', WP_AI_BLOGGER_VERSION );
+		update_option( 'autoaib_saved_version', AUTOAIB_VERSION );
 
-		do_action( 'wp_ai_blogger_update_after' );
+		do_action( 'autoaib_update_after' );
 	}
 }

@@ -16,11 +16,11 @@ const SafetyFilterControl = memo( ( {
 	disabled = false,
 } ) => {
 	const blockLabels = useMemo( () => [
-		__( 'Off', 'wp-ai-blogger' ),
-		__( 'Block none', 'wp-ai-blogger' ),
-		__( 'Block few', 'wp-ai-blogger' ),
-		__( 'Block some', 'wp-ai-blogger' ),
-		__( 'Block most', 'wp-ai-blogger' ),
+		__( 'Off', 'auto-ai-blogger' ),
+		__( 'Block none', 'auto-ai-blogger' ),
+		__( 'Block few', 'auto-ai-blogger' ),
+		__( 'Block some', 'auto-ai-blogger' ),
+		__( 'Block most', 'auto-ai-blogger' ),
 	], [] );
 
 	const getSeverityColor = ( severityValue ) => {
@@ -52,7 +52,7 @@ const SafetyFilterControl = memo( ( {
 				<div className="flex-1 flex justify-between items-center">
 					<h3 className="text-sm font-semibold text-gray-900 p- m-0">{ title }</h3>
 					<div className={ `px-2 py-1 rounded-full text-xs font-medium ${ getSeverityColor( value ) }` }>
-						{ blockLabels[ value ] || __( 'Unknown', 'wp-ai-blogger' ) }
+						{ blockLabels[ value ] || __( 'Unknown', 'auto-ai-blogger' ) }
 					</div>
 				</div>
 			</div>
@@ -89,18 +89,18 @@ SafetyFilterControl.displayName = 'SafetyFilterControl';
 const TemperatureControl = memo( ( { value, onChange, disabled = false } ) => {
 	const getTemperatureLabel = ( temp ) => {
 		if ( temp <= 0.3 ) {
-			return __( 'Conservative', 'wp-ai-blogger' );
+			return __( 'Conservative', 'auto-ai-blogger' );
 		}
 		if ( temp <= 0.7 ) {
-			return __( 'Balanced', 'wp-ai-blogger' );
+			return __( 'Balanced', 'auto-ai-blogger' );
 		}
 		if ( temp <= 1.2 ) {
-			return __( 'Creative', 'wp-ai-blogger' );
+			return __( 'Creative', 'auto-ai-blogger' );
 		}
 		if ( temp <= 1.6 ) {
-			return __( 'Very Creative', 'wp-ai-blogger' );
+			return __( 'Very Creative', 'auto-ai-blogger' );
 		}
-		return __( 'Experimental', 'wp-ai-blogger' );
+		return __( 'Experimental', 'auto-ai-blogger' );
 	};
 
 	const getTemperatureColor = ( temp ) => {
@@ -127,10 +127,10 @@ const TemperatureControl = memo( ( { value, onChange, disabled = false } ) => {
 				</div>
 				<div className="flex-1">
 					<h3 className="text-sm font-semibold text-gray-900">
-						{ __( 'Creativity Temperature', 'wp-ai-blogger' ) }
+						{ __( 'Creativity Temperature', 'auto-ai-blogger' ) }
 					</h3>
 					<p className="text-xs text-gray-600">
-						{ __( 'Controls randomness and creativity in content generation.', 'wp-ai-blogger' ) }
+						{ __( 'Controls randomness and creativity in content generation.', 'auto-ai-blogger' ) }
 					</p>
 				</div>
 				<div className={ `px-2 py-1 rounded-full text-xs font-medium ${ getTemperatureColor( value ) }` }>
@@ -159,15 +159,15 @@ const TemperatureControl = memo( ( { value, onChange, disabled = false } ) => {
 						{ value: 1.5, label: '1.5' },
 						{ value: 2, label: '2' },
 					] }
-					aria-label={ __( 'Content creativity level', 'wp-ai-blogger' ) }
+					aria-label={ __( 'Content creativity level', 'auto-ai-blogger' ) }
 				/>
 			</div>
 
 			{ /* Temperature guide */ }
 			<div className="mt-3 text-xs text-gray-500 space-y-1">
 				<div className="flex justify-between">
-					<span>{ __( 'More predictable', 'wp-ai-blogger' ) }</span>
-					<span>{ __( 'More creative', 'wp-ai-blogger' ) }</span>
+					<span>{ __( 'More predictable', 'auto-ai-blogger' ) }</span>
+					<span>{ __( 'More creative', 'auto-ai-blogger' ) }</span>
 				</div>
 			</div>
 		</div>
@@ -231,10 +231,10 @@ const AdvancedSettings = memo( () => {
 						</div>
 						<div>
 							<h3 className="text-lg font-semibold text-gray-900 mb-2 mt-0">
-								{ __( 'Advanced AI Settings', 'wp-ai-blogger' ) }
+								{ __( 'Advanced AI Settings', 'auto-ai-blogger' ) }
 							</h3>
 							<p className="text-sm text-gray-600">
-								{ __( 'Configure creativity temperature and content safety filters.', 'wp-ai-blogger' ) }
+								{ __( 'Configure creativity temperature and content safety filters.', 'auto-ai-blogger' ) }
 							</p>
 						</div>
 					</div>
@@ -264,14 +264,14 @@ const AdvancedSettings = memo( () => {
 						{ /* Safety filters */ }
 						<div className="space-y-4">
 							<h4 className="text-md font-semibold text-gray-900 flex items-center gap-2">
-								{ __( 'Content Safety Filters', 'wp-ai-blogger' ) }
+								{ __( 'Content Safety Filters', 'auto-ai-blogger' ) }
 							</h4>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<SafetyFilterControl
 									id="harassment"
-									title={ __( 'Harassment Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks harassing or bullying content.', 'wp-ai-blogger' ) }
+									title={ __( 'Harassment Filter', 'auto-ai-blogger' ) }
+									description={ __( 'Blocks harassing or bullying content.', 'auto-ai-blogger' ) }
 									value={ harassment }
 									onChange={ handleHarassmentChange }
 									icon={ Shield }
@@ -279,8 +279,8 @@ const AdvancedSettings = memo( () => {
 
 								<SafetyFilterControl
 									id="hate"
-									title={ __( 'Hate Speech Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks hateful or discriminatory content.', 'wp-ai-blogger' ) }
+									title={ __( 'Hate Speech Filter', 'auto-ai-blogger' ) }
+									description={ __( 'Blocks hateful or discriminatory content.', 'auto-ai-blogger' ) }
 									value={ hate }
 									onChange={ handleHateChange }
 									icon={ AlertTriangle }
@@ -288,8 +288,8 @@ const AdvancedSettings = memo( () => {
 
 								<SafetyFilterControl
 									id="sexually-explicit"
-									title={ __( 'Adult Content Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks sexually explicit content.', 'wp-ai-blogger' ) }
+									title={ __( 'Adult Content Filter', 'auto-ai-blogger' ) }
+									description={ __( 'Blocks sexually explicit content.', 'auto-ai-blogger' ) }
 									value={ sexuallyExplicit }
 									onChange={ handleSexuallyExplicitChange }
 									icon={ Shield }
@@ -297,8 +297,8 @@ const AdvancedSettings = memo( () => {
 
 								<SafetyFilterControl
 									id="dangerous-content"
-									title={ __( 'Dangerous Content Filter', 'wp-ai-blogger' ) }
-									description={ __( 'Blocks potentially harmful instructions.', 'wp-ai-blogger' ) }
+									title={ __( 'Dangerous Content Filter', 'auto-ai-blogger' ) }
+									description={ __( 'Blocks potentially harmful instructions.', 'auto-ai-blogger' ) }
 									value={ dangerousContent }
 									onChange={ handleDangerousContentChange }
 									icon={ AlertTriangle }
@@ -308,10 +308,10 @@ const AdvancedSettings = memo( () => {
 							{ /* Safety info box */ }
 							<InfoCard
 								icon={ Shield }
-								title={ __( 'Safety Filter Guidelines', 'wp-ai-blogger' ) }
-								description={ __( 'Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'wp-ai-blogger' ) }
+								title={ __( 'Safety Filter Guidelines', 'auto-ai-blogger' ) }
+								description={ __( 'Higher filter levels provide stronger content moderation but may be more restrictive. Adjust based on your content requirements and audience.', 'auto-ai-blogger' ) }
 								colorScheme="green"
-								ariaLabel={ __( 'Safety filter configuration guidelines', 'wp-ai-blogger' ) }
+								ariaLabel={ __( 'Safety filter configuration guidelines', 'auto-ai-blogger' ) }
 							/>
 						</div>
 					</div>

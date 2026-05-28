@@ -1,20 +1,20 @@
 <?php
 /**
- * Plugin Common Functions for WP AI Blogger.
+ * Plugin Common Functions for Solvex AI Blogger.
  *
  * This file contains common utility functions with security measures.
  * All functions implement proper input validation, data sanitization, and
  * security checks to prevent unauthorized access and data manipulation.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Functions
  * @since 1.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-use WPAIBlogger\Inc\Utils\Metadata;
-use WPAIBlogger\Inc\Utils\Settings;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Metadata;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 
 /**
  * Get user details with security validation.
@@ -23,7 +23,7 @@ use WPAIBlogger\Inc\Utils\Settings;
  * @return string User detail or empty string on failure.
  * @since 1.0.0
  */
-function wpaib_get_user_detail( $detail ) {
+function autoaib_get_user_detail( $detail ) {
 	// Validate input parameter.
 	if ( ! is_string( $detail ) || empty( $detail ) ) {
 		return '';
@@ -69,9 +69,9 @@ function wpaib_get_user_detail( $detail ) {
  * @return mixed Cleaned data.
  * @since 1.0.0
  */
-function wpaib_clean_data( $data ) {
+function autoaib_clean_data( $data ) {
 	if ( is_array( $data ) ) {
-		return array_map( 'wpaib_clean_data', $data );
+		return array_map( 'autoaib_clean_data', $data );
 	}
 	return is_scalar( $data ) ? sanitize_text_field( (string) $data ) : $data;
 }
@@ -82,7 +82,7 @@ function wpaib_clean_data( $data ) {
  * @since 1.0.0
  * @return array Sanitized campaigns data.
  */
-function wpaib_get_all_campaigns() {
+function autoaib_get_all_campaigns() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -91,7 +91,7 @@ function wpaib_get_all_campaigns() {
 	try {
 		$campaigns = get_posts(
 			[
-				'post_type'              => WP_AI_BLOGGER_CPT_CAMPAIGN,
+				'post_type'              => AUTOAIB_CPT_CAMPAIGN,
 				'posts_per_page'         => 100, // Limit for performance.
 				'post_status'            => [ 'publish', 'draft', 'private' ],
 				'orderby'                => 'date',
@@ -106,7 +106,7 @@ function wpaib_get_all_campaigns() {
 		if ( ! is_wp_error( $campaigns ) && ! empty( $campaigns ) ) {
 			foreach ( $campaigns as $campaign ) {
 				// Validate campaign object.
-				if ( ! $campaign instanceof WP_Post || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+				if ( ! $campaign instanceof WP_Post || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 					continue;
 				}
 
@@ -137,7 +137,7 @@ function wpaib_get_all_campaigns() {
  * @since 1.0.0
  * @return array Sanitized generated posts data.
  */
-function wpaib_get_generated_posts() {
+function autoaib_get_generated_posts() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -153,9 +153,9 @@ function wpaib_get_generated_posts() {
 				'order'                  => 'DESC',
 				'update_post_term_cache' => false,
 				'update_post_meta_cache' => false,
-				'meta_query'             => [
+				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign generated posts.
 					[
-						'key'     => 'wp_aib_reference',
+						'key'     => 'autoaib_reference',
 						'value'   => 1,
 						'compare' => '=',
 					],
@@ -200,16 +200,16 @@ function wpaib_get_generated_posts() {
 /**
  * Get array depth safely to prevent memory issues.
  *
- * @since x.x.x
+ * @since 0.0.2
  * @param array $array Array to check depth.
  * @return int Array depth.
  */
-function wpaib_get_array_depth( array $array ): int {
+function autoaib_get_array_depth( array $array ): int {
 	$max_depth = 1;
 
 	foreach ( $array as $value ) {
 		if ( is_array( $value ) ) {
-			$depth = wpaib_get_array_depth( $value ) + 1;
+			$depth = autoaib_get_array_depth( $value ) + 1;
 
 			if ( $depth > $max_depth ) {
 				$max_depth = $depth;
@@ -226,15 +226,15 @@ function wpaib_get_array_depth( array $array ): int {
  * @since 1.0.0
  * @return array Sanitized post statuses.
  */
-function wpaib_get_post_statuses() {
+function autoaib_get_post_statuses() {
 	return apply_filters(
-		'wpaib_post_statuses',
+		'autoaib_post_statuses',
 		[
-			'publish' => __( 'Published', 'wp-ai-blogger' ),
-			'future'  => __( 'Scheduled', 'wp-ai-blogger' ),
-			'draft'   => __( 'Draft', 'wp-ai-blogger' ),
-			'pending' => __( 'Pending Review', 'wp-ai-blogger' ),
-			'private' => __( 'Private', 'wp-ai-blogger' ),
+			'publish' => __( 'Published', 'auto-ai-blogger' ),
+			'future'  => __( 'Scheduled', 'auto-ai-blogger' ),
+			'draft'   => __( 'Draft', 'auto-ai-blogger' ),
+			'pending' => __( 'Pending Review', 'auto-ai-blogger' ),
+			'private' => __( 'Private', 'auto-ai-blogger' ),
 		]
 	);
 }
@@ -245,7 +245,7 @@ function wpaib_get_post_statuses() {
  * @since 1.0.0
  * @return array Sanitized post types.
  */
-function wpaib_get_post_types() {
+function autoaib_get_post_types() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -255,7 +255,7 @@ function wpaib_get_post_types() {
 		$queried_post_types = array_keys(
 			get_post_types(
 				apply_filters(
-					'wpaib_post_types_query_args',
+					'autoaib_post_types_query_args',
 					[
 						'public'   => true,
 						'_builtin' => false,
@@ -267,9 +267,9 @@ function wpaib_get_post_types() {
 
 		// Exclude sensitive post types.
 		$excluded_post_types = apply_filters(
-			'wpaib_excluded_post_types',
+			'autoaib_excluded_post_types',
 			[
-				WP_AI_BLOGGER_CPT_CAMPAIGN,
+				AUTOAIB_CPT_CAMPAIGN,
 				'sfwd-assignment',
 				'sfwd-essays',
 				'sfwd-transactions',
@@ -335,7 +335,7 @@ function wpaib_get_post_types() {
  * @since 1.0.0
  * @return array Sanitized categories.
  */
-function wpaib_get_categories() {
+function autoaib_get_categories() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -381,7 +381,7 @@ function wpaib_get_categories() {
  * @since 1.0.0
  * @return array Sanitized tags.
  */
-function wpaib_get_tags() {
+function autoaib_get_tags() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -428,7 +428,7 @@ function wpaib_get_tags() {
  * @since 1.0.0
  * @return array Sanitized authors list.
  */
-function wpaib_get_authors() {
+function autoaib_get_authors() {
 	// Check user capabilities.
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -476,7 +476,7 @@ function wpaib_get_authors() {
  * @return bool Target achievement status.
  * @since 1.0.0
  */
-function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
+function autoaib_is_campaign_posts_target_achieved( $campaign_id ) {
 	try {
 		// Validate campaign ID.
 		$campaign_id = absint( $campaign_id );
@@ -512,7 +512,7 @@ function wpaib_is_campaign_posts_target_achieved( $campaign_id ) {
  * @since 1.0.0
  * @return array Array of previous posts with id, title, url.
  */
-function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
+function autoaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
 	// Validate campaign ID.
 	$campaign_id = absint( $campaign_id );
 	if ( $campaign_id <= 0 ) {
@@ -536,9 +536,9 @@ function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
 				'order'                  => 'DESC',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'meta_query'             => [
+				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 					[
-						'key'   => 'wp_aib_campaign_id',
+						'key'   => 'autoaib_campaign_id',
 						'value' => $campaign_id,
 					],
 				],
@@ -578,7 +578,7 @@ function wpaib_get_previous_campaign_posts( $campaign_id, $limit = 5 ) {
  * @since 1.0.0
  * @return array|WP_Error Sanitized API response or error.
  */
-function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1 ) {
+function autoaib_get_post_creation_api_response( $keywords, $max_content_words, $site_persona_details, $campaign_id = 0, $campaign_name = '', $image_count = 1 ) {
 	// Check user capabilities (skip during cron execution).
 	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return new WP_Error( 'insufficient_permissions', 'Insufficient permissions to create posts.' );
@@ -612,7 +612,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 		}
 
 		// Validate license token.
-		$license = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
+		$license = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 		if ( empty( $license ) ) {
 			return new WP_Error( 'missing_license', 'License token is required.' );
 		}
@@ -627,9 +627,9 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 				[
 					'post_type'              => 'post',
 					'posts_per_page'         => -1,
-					'meta_query'             => [
+					'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 						[
-							'key'   => 'wp_aib_campaign_id',
+							'key'   => 'autoaib_campaign_id',
 							'value' => $campaign_id,
 						],
 					],
@@ -660,7 +660,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 		// Get previous campaign posts for internal linking (if campaign_id is provided).
 		$previous_posts = [];
 		if ( $campaign_id > 0 ) {
-			$previous_posts = wpaib_get_previous_campaign_posts( $campaign_id, 5 );
+			$previous_posts = autoaib_get_previous_campaign_posts( $campaign_id, 5 );
 		}
 
 		// Prepare request body to match the server API generate_campaign_post method exactly.
@@ -692,7 +692,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 			// Previous posts for internal linking.
 			'previous_posts'    => $previous_posts,
 		];      // Validate API endpoint - use new campaign post API.
-		$api_url   = WP_AI_BLOGGER_CAMPAIGN_POST_API;
+		$api_url   = AUTOAIB_CAMPAIGN_POST_API;
 		if ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
 			return new WP_Error( 'invalid_api_url', 'Invalid API endpoint.' );
 		}
@@ -705,7 +705,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 			'blocking'    => true,
 			'headers'     => [
 				'Content-Type' => 'application/json',
-				'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION,
+				'User-Agent'   => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION,
 			],
 			'body'        => wp_json_encode( $body_args ),
 			'cookies'     => [],
@@ -754,7 +754,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
 
 		// Sanitize response data.
 		if ( is_array( $data ) ) {
-			$data = wpaib_sanitize_api_response( $data );
+			$data = autoaib_sanitize_api_response( $data );
 		}
 
 		// Log successful API call (without sensitive data).
@@ -772,7 +772,7 @@ function wpaib_get_post_creation_api_response( $keywords, $max_content_words, $s
  * @param array $data API response data.
  * @return array Sanitized data.
  */
-function wpaib_sanitize_api_response( $data ) {
+function autoaib_sanitize_api_response( $data ) {
 	if ( ! is_array( $data ) ) {
 		return sanitize_text_field( $data );
 	}
@@ -782,7 +782,7 @@ function wpaib_sanitize_api_response( $data ) {
 		$clean_key = sanitize_key( $key );
 
 		if ( is_array( $value ) ) {
-			$sanitized[ $clean_key ] = wpaib_sanitize_api_response( $value );
+			$sanitized[ $clean_key ] = autoaib_sanitize_api_response( $value );
 		} elseif ( is_string( $value ) ) {
 			// Preserve HTML/Gutenberg blocks for content fields.
 			// Don't use wp_kses_post as it strips HTML comments needed for Gutenberg blocks.
@@ -806,7 +806,7 @@ function wpaib_sanitize_api_response( $data ) {
  * @return array Sanitized site persona details.
  * @since 1.0.0
  */
-function wpaib_get_site_persona_details( $campaign_id = 0 ) {
+function autoaib_get_site_persona_details( $campaign_id = 0 ) {
 	// Check user capabilities (skip during cron execution).
 	if ( ! wp_doing_cron() && ! current_user_can( 'edit_posts' ) ) {
 		return [];
@@ -883,11 +883,11 @@ function wpaib_get_site_persona_details( $campaign_id = 0 ) {
  *
  * @param int $post_id Post ID.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_track_post_view( $post_id ): void {
+function autoaib_track_post_view( $post_id ): void {
 	// Only track for campaign posts.
-	$is_campaign_post = get_post_meta( $post_id, 'wp_aib_campaign_id', true );
+	$is_campaign_post = get_post_meta( $post_id, 'autoaib_campaign_id', true );
 	if ( ! $is_campaign_post ) {
 		return;
 	}
@@ -915,9 +915,9 @@ function wpaib_track_post_view( $post_id ): void {
  * @param string $error_message Detailed error message.
  * @param array  $context Additional context data.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $context = [] ): void {
+function autoaib_log_campaign_error( $campaign_id, $error_type, $error_message, $context = [] ): void {
 	// Validate campaign ID.
 	$campaign_id = absint( $campaign_id );
 	if ( $campaign_id <= 0 ) {
@@ -926,14 +926,14 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
 
 	// Verify campaign exists.
 	$campaign = get_post( $campaign_id );
-	if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+	if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 		return;
 	}
 
 	// Sanitize inputs.
 	$error_type     = sanitize_text_field( $error_type );
 	$error_message  = sanitize_textarea_field( $error_message );
-	$timestamp_data = wpaib_create_timestamp_data();
+	$timestamp_data = autoaib_create_timestamp_data();
 
 	// Get existing error logs (limit to last 50 entries to prevent bloat).
 	$existing_logs = Metadata::get_campaign_meta( $campaign_id, 'errorLogs' );
@@ -976,9 +976,9 @@ function wpaib_log_campaign_error( $campaign_id, $error_type, $error_message, $c
  * @param int   $post_id Created post ID.
  * @param array $context Additional context data.
  * @return void
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): void {
+function autoaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): void {
 	// Validate inputs.
 	$campaign_id = absint( $campaign_id );
 	$post_id     = absint( $post_id );
@@ -989,12 +989,12 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
 
 	// Verify campaign exists.
 	$campaign = get_post( $campaign_id );
-	if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+	if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 		return;
 	}
 
 	// Get timestamp data.
-	$timestamp_data = wpaib_create_timestamp_data();
+	$timestamp_data = autoaib_create_timestamp_data();
 
 	// Get existing success logs (limit to last 50 entries).
 	$existing_logs = Metadata::get_campaign_meta( $campaign_id, 'successLogs' );
@@ -1004,7 +1004,7 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
 
 	// Get post details.
 	$created_post = get_post( $post_id );
-	$post_title   = $created_post ? $created_post->post_title : ( $context['post_title'] ?? __( 'Generated Post', 'wp-ai-blogger' ) );
+	$post_title   = $created_post ? $created_post->post_title : ( $context['post_title'] ?? __( 'Generated Post', 'auto-ai-blogger' ) );
 
 	// Create success log entry.
 	$success_log_entry = array_merge(
@@ -1014,7 +1014,7 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
 			'type'           => 'success',
 			'post_id'        => $post_id,
 			'post_title'     => sanitize_text_field( $post_title ),
-			'message'        => $context['message'] ?? sprintf( /* translators: %d: Post number. */ __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $context['post_number'] ?? count( $existing_logs ) + 1 ),
+			'message'        => $context['message'] ?? sprintf( /* translators: %d: Post number. */ __( 'Post #%d was created successfully and published.', 'auto-ai-blogger' ), $context['post_number'] ?? count( $existing_logs ) + 1 ),
 			'context'        => array_map( 'sanitize_text_field', (array) $context ),
 			'post_number'    => $context['post_number'] ?? count( $existing_logs ) + 1,
 			'attempt_number' => $context['attempt_number'] ?? 1,
@@ -1037,9 +1037,9 @@ function wpaib_log_campaign_success( $campaign_id, $post_id, $context = [] ): vo
  * @param int $campaign_id Campaign ID.
  * @param int $limit Maximum number of logs to return.
  * @return array Formatted success logs.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
+function autoaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
 	$campaign_id = absint( $campaign_id );
 	if ( $campaign_id <= 0 ) {
 		return [];
@@ -1060,9 +1060,9 @@ function wpaib_get_campaign_success_logs( $campaign_id, $limit = 20 ): array {
  * @param int $campaign_id Campaign ID.
  * @param int $limit Maximum number of logs to return.
  * @return array Formatted error logs.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
+function autoaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 	$campaign_id = absint( $campaign_id );
 	if ( $campaign_id <= 0 ) {
 		return [];
@@ -1080,8 +1080,8 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 	$formatted_logs = [];
 	foreach ( $error_logs as $index => $log ) {
 		$error_type            = $log['type'] ?? 'unknown';
-		$user_friendly_message = wpaib_get_user_friendly_error_message( $error_type, $log['message'] ?? '' );
-		$error_solution        = wpaib_get_error_solution_suggestion( $error_type );
+		$user_friendly_message = autoaib_get_user_friendly_error_message( $error_type, $log['message'] ?? '' );
+		$error_solution        = autoaib_get_error_solution_suggestion( $error_type );
 
 		// Use stored timestamp data directly (no backward compatibility needed).
 		$mysql_timestamp   = $log['timestamp'] ?? '';
@@ -1091,7 +1091,7 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 		// Calculate time ago.
 		$time_ago = '';
 		if ( $unix_timestamp ) {
-			$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'wp-ai-blogger' ); // phpcs:ignore.
+			$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'auto-ai-blogger' ); // phpcs:ignore.
 		}
 
 		$formatted_logs[] = [
@@ -1101,7 +1101,7 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 			'time_ago'       => $time_ago,
 			'unix_timestamp' => $unix_timestamp,
 			'status'         => 'error',
-			'title'          => sprintf( /* translators: %1$d: Post number, %2$d: Attempt number. */ __( 'Post #%1$d Creation Failed - Attempt #%2$d', 'wp-ai-blogger' ), $log['post_number'] ?? 1, $log['attempt_number'] ?? 1 ),
+			'title'          => sprintf( /* translators: %1$d: Post number, %2$d: Attempt number. */ __( 'Post #%1$d Creation Failed - Attempt #%2$d', 'auto-ai-blogger' ), $log['post_number'] ?? 1, $log['attempt_number'] ?? 1 ),
 			'message'        => $user_friendly_message,
 			'error_type'     => $error_type,
 			'solution'       => $error_solution,
@@ -1110,12 +1110,12 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
 			'steps'          => [
 				[
 					'status'      => 'success',
-					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+					'description' => __( 'Campaign validation passed', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 50, 150 ),
 				],
 				[
 					'status'      => 'success',
-					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+					'description' => __( 'API request initiated', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 200, 500 ),
 				],
 				[
@@ -1136,46 +1136,46 @@ function wpaib_get_campaign_error_logs( $campaign_id, $limit = 20 ): array {
  * @param string $error_type The error type.
  * @param string $original_message The original error message.
  * @return string User-friendly error message.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_get_user_friendly_error_message( $error_type, $original_message ): string {
+function autoaib_get_user_friendly_error_message( $error_type, $original_message ): string {
 	switch ( $error_type ) {
 		case 'network_error':
-			return __( 'Network connection failed. Unable to reach the content generation server.', 'wp-ai-blogger' );
+			return __( 'Network connection failed. Unable to reach the content generation server.', 'auto-ai-blogger' );
 
 		case 'quota_error':
-			return __( 'API usage limit exceeded. You have reached your subscription quota for content generation.', 'wp-ai-blogger' );
+			return __( 'API usage limit exceeded. You have reached your subscription quota for content generation.', 'auto-ai-blogger' );
 
 		case 'content_filter_error':
-			return __( 'Content was blocked by safety filters. The generated content may contain inappropriate material.', 'wp-ai-blogger' );
+			return __( 'Content was blocked by safety filters. The generated content may contain inappropriate material.', 'auto-ai-blogger' );
 
 		case 'validation_error':
-			return __( 'Invalid campaign settings. Please check your keywords and campaign configuration.', 'wp-ai-blogger' );
+			return __( 'Invalid campaign settings. Please check your keywords and campaign configuration.', 'auto-ai-blogger' );
 
 		case 'auth_error':
-			return __( 'Authentication failed. Please check your license key and ensure it\'s valid and active.', 'wp-ai-blogger' );
+			return __( 'Authentication failed. Please check your license key and ensure it\'s valid and active.', 'auto-ai-blogger' );
 
 		case 'api_error':
 			if ( ! empty( $original_message ) ) {
 				return sprintf(
 					/* translators: %s: Original error message. */
-					__( 'Content generation service error: %s', 'wp-ai-blogger' ),
+					__( 'Content generation service error: %s', 'auto-ai-blogger' ),
 					$original_message
 				);
 			}
-			return __( 'Content generation service error. The API returned an unexpected response.', 'wp-ai-blogger' );
+			return __( 'Content generation service error. The API returned an unexpected response.', 'auto-ai-blogger' );
 
 		case 'database_error':
-			return __( 'Database error occurred while saving the post. Please check your WordPress database connection.', 'wp-ai-blogger' );
+			return __( 'Database error occurred while saving the post. Please check your WordPress database connection.', 'auto-ai-blogger' );
 
 		case 'campaign_terminated':
-			return __( 'Campaign was automatically terminated due to too many consecutive failures.', 'wp-ai-blogger' );
+			return __( 'Campaign was automatically terminated due to too many consecutive failures.', 'auto-ai-blogger' );
 
 		case 'unknown_error':
 		default:
 			return sprintf(
 				/* translators: %s: Original error message. */
-				__( 'An unexpected error occurred: %s', 'wp-ai-blogger' ),
+				__( 'An unexpected error occurred: %s', 'auto-ai-blogger' ),
 				$original_message
 			);
 	}
@@ -1186,37 +1186,37 @@ function wpaib_get_user_friendly_error_message( $error_type, $original_message )
  *
  * @param string $error_type The error type.
  * @return string Solution suggestion.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_get_error_solution_suggestion( $error_type ): string {
+function autoaib_get_error_solution_suggestion( $error_type ): string {
 	switch ( $error_type ) {
 		case 'network_error':
-			return __( 'Check your internet connection and try again. If the problem persists, contact your hosting provider.', 'wp-ai-blogger' );
+			return __( 'Check your internet connection and try again. If the problem persists, contact your hosting provider.', 'auto-ai-blogger' );
 
 		case 'quota_error':
-			return __( 'Upgrade your subscription plan or wait for your quota to reset. Check your account dashboard for usage details.', 'wp-ai-blogger' );
+			return __( 'Upgrade your subscription plan or wait for your quota to reset. Check your account dashboard for usage details.', 'auto-ai-blogger' );
 
 		case 'content_filter_error':
-			return __( 'Try using different keywords or adjust your safety filter settings in the plugin configuration.', 'wp-ai-blogger' );
+			return __( 'Try using different keywords or adjust your safety filter settings in the plugin configuration.', 'auto-ai-blogger' );
 
 		case 'validation_error':
-			return __( 'Review your campaign settings, ensure keywords are provided, and check all required fields.', 'wp-ai-blogger' );
+			return __( 'Review your campaign settings, ensure keywords are provided, and check all required fields.', 'auto-ai-blogger' );
 
 		case 'auth_error':
-			return __( 'Verify your license key in plugin settings. Contact support if your license should be valid.', 'wp-ai-blogger' );
+			return __( 'Verify your license key in plugin settings. Contact support if your license should be valid.', 'auto-ai-blogger' );
 
 		case 'api_error':
-			return __( 'This is usually temporary. Try again in a few minutes. If it continues, contact plugin support.', 'wp-ai-blogger' );
+			return __( 'This is usually temporary. Try again in a few minutes. If it continues, contact plugin support.', 'auto-ai-blogger' );
 
 		case 'database_error':
-			return __( 'Check your WordPress database connection and available disk space. Contact your hosting provider if needed.', 'wp-ai-blogger' );
+			return __( 'Check your WordPress database connection and available disk space. Contact your hosting provider if needed.', 'auto-ai-blogger' );
 
 		case 'campaign_terminated':
-			return __( 'Review your API settings, keywords, and license. Increase the failure threshold if needed, then restart the campaign.', 'wp-ai-blogger' );
+			return __( 'Review your API settings, keywords, and license. Increase the failure threshold if needed, then restart the campaign.', 'auto-ai-blogger' );
 
 		case 'unknown_error':
 		default:
-			return __( 'Try running the campaign again. If the error persists, contact plugin support with the error details.', 'wp-ai-blogger' );
+			return __( 'Try running the campaign again. If the error persists, contact plugin support with the error details.', 'auto-ai-blogger' );
 	}
 }
 
@@ -1224,9 +1224,9 @@ function wpaib_get_error_solution_suggestion( $error_type ): string {
  * Create standardized timestamp data for logging.
  *
  * @return array Array containing various timestamp formats.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_create_timestamp_data(): array {
+function autoaib_create_timestamp_data(): array {
 	$unix_timestamp  = current_time( 'timestamp' ); // phpcs:ignore -- It is safe.
 	$mysql_timestamp = current_time( 'mysql' );
 	$formatted_date  = current_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
@@ -1247,9 +1247,9 @@ function wpaib_create_timestamp_data(): array {
  *
  * @param array $token_data Token data containing 'total' and 'remaining' keys.
  * @return bool True if update was successful, false otherwise.
- * @since x.x.x
+ * @since 0.0.2
  */
-function wpaib_update_token_data( $token_data ): bool {
+function autoaib_update_token_data( $token_data ): bool {
 	try {
 		if ( ! is_array( $token_data ) ) {
 			return false;
@@ -1270,8 +1270,8 @@ function wpaib_update_token_data( $token_data ): bool {
 		}
 
 		// Update token data using Helper class.
-		$total_result     = \WPAIBlogger\Inc\Utils\Helper::update_option( 'tokenTotal', $token_total );
-		$remaining_result = \WPAIBlogger\Inc\Utils\Helper::update_option( 'tokenRemaining', $token_remaining );
+		$total_result     = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'tokenTotal', $token_total );
+		$remaining_result = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'tokenRemaining', $token_remaining );
 
 		// Return success status.
 		return $total_result['success'] && $remaining_result['success'];
@@ -1293,7 +1293,7 @@ function wpaib_update_token_data( $token_data ): bool {
  * @return string Content with placeholders replaced.
  * @since 1.0.0
  */
-function wpaib_replace_internal_link_placeholders( $content, $previous_posts = [] ) {
+function autoaib_replace_internal_link_placeholders( $content, $previous_posts = [] ) {
 	if ( empty( $content ) || ! is_string( $content ) ) {
 		return $content;
 	}

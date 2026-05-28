@@ -1,6 +1,6 @@
 {
-	"name": "wp-ai-blogger",
-	"version": "0.0.1",
+	"name": "auto-ai-blogger",
+	"version": "0.0.4",
 	"description": "This is not just a content creator, its beyond the blogging.",
 	"volta": {
 		"node": "18.15.0"
@@ -13,13 +13,13 @@
 		"portal",
 		"dashboard"
 	],
-	"homepage": "https://github.com/wp-solvex/wp-ai-blogger#readme",
+	"homepage": "https://github.com/wp-solvex/auto-ai-blogger#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/wp-solvex/wp-ai-blogger.git"
+		"url": "git+https://github.com/wp-solvex/auto-ai-blogger.git"
 	},
 	"bugs": {
-		"url": "https://github.com/wp-solvex/wp-ai-blogger/issues"
+		"url": "https://github.com/wp-solvex/auto-ai-blogger/issues"
 	},
 	"engines": {
 		"npm": ">=9.5.0 <10.4.0",
@@ -60,14 +60,15 @@
 		"grunt-contrib-compress": "^2.0.0",
 		"grunt-contrib-copy": "^1.0.0",
 		"grunt-wp-readme-to-markdown": "^2.1.0",
+		"postcss-flexibility": "^3.0.0",
 		"prettier": "npm:wp-prettier@2.6.2",
 		"tailwindcss": "^3.4.3"
 	},
 	"scripts": {
 		"start": "wp-scripts start",
 		"build": "wp-scripts build",
-		"makepot": "wp i18n make-pot . --skip-audit --exclude='.dev,.github,.wordpress-org,docs,src,node_modules,tests,vendor,wordpress,artifact,.browserslistrc,postcss.config.js,tailwind.config.js,webpack.restriction.config.js,.eslintrc.js,.prettierrc.js,package.json,package-lock.json,*.json' languages/wp-ai-blogger.pot",
-		"php-makepot": "php -d memory_limit=512M $(which wp) i18n make-pot wp-content/plugins/wp-ai-blogger wp-content/plugins/wp-ai-blogger/languages/wp-ai-blogger.pot --exclude='.dev,.github,.wordpress-org,docs,src,node_modules,tests,vendor,wordpress,artifact,.browserslistrc,postcss.config.js,tailwind.config.js,webpack.restriction.config.js,.eslintrc.js,.prettierrc.js,package.json,package-lock.json,*.json' --include='*.php,*/build/*.js'",
+		"makepot": "wp i18n make-pot . --skip-audit --exclude='.dev,.github,.wordpress-org,docs,src,node_modules,tests,vendor,wordpress,artifact,.browserslistrc,postcss.config.js,tailwind.config.js,webpack.restriction.config.js,.eslintrc.js,.prettierrc.js,package.json,package-lock.json,*.json' languages/auto-ai-blogger.pot",
+		"php-makepot": "php -d memory_limit=512M $(which wp) i18n make-pot wp-content/plugins/auto-ai-blogger wp-content/plugins/auto-ai-blogger/languages/auto-ai-blogger.pot --exclude='.dev,.github,.wordpress-org,docs,src,node_modules,tests,vendor,wordpress,artifact,.browserslistrc,postcss.config.js,tailwind.config.js,webpack.restriction.config.js,.eslintrc.js,.prettierrc.js,package.json,package-lock.json,*.json' --include='*.php,*/build/*.js'",
 		"pretty": "prettier --check .",
 		"pretty:fix": "prettier --write .",
 		"lint-js": "wp-scripts lint-js",

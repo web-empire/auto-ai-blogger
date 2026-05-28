@@ -2,11 +2,11 @@
 /**
  * Settings.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc\Utils;
+namespace WPSolvex\AutoAIBlogger\Inc\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,7 +33,7 @@ class Settings {
 	 */
 	public static function get_settings_dataset() {
 		return apply_filters(
-			'wp_ai_blogger_settings_dataset',
+			'autoaib_settings_dataset',
 			[
 				'userOnboarded'            => [
 					'default' => false,
@@ -44,11 +44,11 @@ class Settings {
 					'type'    => 'string',
 				],
 				'userName'                 => [
-					'default' => wpaib_get_user_detail( 'name' ),
+					'default' => autoaib_get_user_detail( 'name' ),
 					'type'    => 'name',
 				],
 				'userEmail'                => [
-					'default' => wpaib_get_user_detail( 'email' ),
+					'default' => autoaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
 				'siteTitle'                => [
@@ -113,7 +113,7 @@ class Settings {
 					'type'    => 'bool',
 				],
 				'emailNotificationValue'   => [
-					'default' => wpaib_get_user_detail( 'email' ),
+					'default' => autoaib_get_user_detail( 'email' ),
 					'type'    => 'email',
 				],
 			]
@@ -168,9 +168,9 @@ class Settings {
 			return self::$dashboard_options;
 		}
 
-		$db_option = get_option( WP_AI_BLOGGER_DB_OPTION, [] );
+		$db_option = get_option( AUTOAIB_DB_OPTION, [] );
 
-		$defaults = apply_filters( 'wp_ai_blogger_dashboard_rest_options', self::get_default_settings() );
+		$defaults = apply_filters( 'autoaib_dashboard_rest_options', self::get_default_settings() );
 
 		self::$dashboard_options = wp_parse_args( $db_option, $defaults );
 		return self::$dashboard_options;
@@ -213,11 +213,11 @@ class Settings {
 				break;
 
 			case 'email':
-				$output = isset( $value ) ? sanitize_email( wp_unslash( $value ) ) : wpaib_get_user_detail( 'email' );
+				$output = isset( $value ) ? sanitize_email( wp_unslash( $value ) ) : autoaib_get_user_detail( 'email' );
 				break;
 
 			case 'name':
-				$output = isset( $value ) ? sanitize_text_field( wp_unslash( $value ) ) : wpaib_get_user_detail( 'name' );
+				$output = isset( $value ) ? sanitize_text_field( wp_unslash( $value ) ) : autoaib_get_user_detail( 'name' );
 				break;
 
 			case 'int':
@@ -239,7 +239,7 @@ class Settings {
 				break;
 
 			case 'array':
-				$output = ! empty( $value ) ? wpaib_clean_data( $value ) : '';
+				$output = ! empty( $value ) ? autoaib_clean_data( $value ) : '';
 				break;
 
 			case 'textarea':

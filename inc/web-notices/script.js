@@ -1,7 +1,7 @@
 /**
  * Web Admin Notices Trigger.
  *
- * @author WebEmpire
+ * @author WPSolvex
  */
 
 ( function( $ ) {
@@ -75,8 +75,8 @@
 				url: ajaxurl,
 				type: 'POST',
 				data: {
-					action: 'web-notice-dismiss',
-					nonce: webNotices._notice_nonce,
+					action: 'autoaib-notice-dismiss',
+					nonce: autoaib_web_notices._notice_nonce,
 					notice_id,
 					repeat_notice_after: parseInt( repeat_notice_after ),
 				},

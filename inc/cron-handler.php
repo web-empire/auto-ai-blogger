@@ -1,27 +1,27 @@
 <?php
 /**
- * Cron Handler class for WP AI Blogger.
+ * Cron Handler class for Solvex AI Blogger.
  *
  * This class handles cron-related functionality including
  * post creation hooks and scheduling operations.
  * It's loaded on all requests to ensure cron hooks work properly.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc;
+namespace WPSolvex\AutoAIBlogger\Inc;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
-use WPAIBlogger\Inc\Utils\Metadata;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Metadata;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Cron Handler class for WP AI Blogger.
+ * Cron Handler class for Solvex AI Blogger.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Inc\Cron
  * @since 1.0.0
  */
@@ -39,7 +39,7 @@ class Cron_Handler {
 	 * Create a single post from campaign (cron callback).
 	 *
 	 * @param int $campaign_id The ID of the campaign.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function create_single_post_from_campaign( $campaign_id ): void {
 		try {
@@ -49,7 +49,7 @@ class Cron_Handler {
 			}
 
 			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
+			if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
 				return;
 			}
 
@@ -76,7 +76,7 @@ class Cron_Handler {
 			$started_notification_sent = Metadata::get_campaign_meta( $campaign_id, 'startedNotificationSent' );
 			if ( ! $started_notification_sent && $posts_created === 0 && $posts_scheduled === 0 ) {
 				do_action(
-					'wpaib_campaign_started',
+					'autoaib_campaign_started',
 					$campaign_id,
 					[
 						'postsTarget'    => Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ),
@@ -114,7 +114,7 @@ class Cron_Handler {
 				Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
 
 				// Log success with post and attempt information.
-				wpaib_log_campaign_success(
+				autoaib_log_campaign_success(
 					$campaign_id,
 					$result['post_id'],
 					[
@@ -131,7 +131,7 @@ class Cron_Handler {
 
 				// Trigger notification: Post Created Successfully.
 				do_action(
-					'wpaib_post_created_successfully',
+					'autoaib_post_created_successfully',
 					$campaign_id,
 					$result['post_id'],
 					[
@@ -165,7 +165,7 @@ class Cron_Handler {
 					$result['message'] ?? 'Unknown error'
 				);
 
-				wpaib_log_campaign_error(
+				autoaib_log_campaign_error(
 					$campaign_id,
 					$error_type,
 					$error_message,
@@ -183,7 +183,7 @@ class Cron_Handler {
 					Metadata::update_campaign_meta( $campaign_id, 'retryTracking', $retry_tracking );
 
 					// Log that we're giving up on this post.
-					wpaib_log_campaign_error(
+					autoaib_log_campaign_error(
 						$campaign_id,
 						'post_abandoned',
 						sprintf(
@@ -217,7 +217,7 @@ class Cron_Handler {
 	 * @param int $target_post_number The post number being attempted.
 	 * @param int $current_attempt The attempt number for this post.
 	 * @return array An array containing the success status and message.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function generate_post_from_campaign( $campaign_id, $target_post_number = 0, $current_attempt = 0 ): array {
 		try {
@@ -226,7 +226,7 @@ class Cron_Handler {
 
 			// Apply filter to allow Pro plugin to modify max_words.
 			// Free users are limited to 1000 words, Pro users can customize.
-			$max_words = apply_filters( 'wpaib_max_content_words', $max_words, $campaign_id );
+			$max_words = apply_filters( 'autoaib_max_content_words', $max_words, $campaign_id );
 
 			$post_type          = Metadata::get_campaign_meta( $campaign_id, 'postType' );
 			$post_status        = Metadata::get_campaign_meta( $campaign_id, 'postStatus' );
@@ -238,7 +238,7 @@ class Cron_Handler {
 			if ( empty( $keywords ) ) {
 				return [
 					'success'    => false,
-					'message'    => __( 'No keywords found for campaign', 'wp-ai-blogger' ),
+					'message'    => __( 'No keywords found for campaign', 'auto-ai-blogger' ),
 					'error_type' => 'validation_error',
 				];
 			}
@@ -257,7 +257,7 @@ class Cron_Handler {
 
 			// Update token data if present in the API response.
 			if ( isset( $api_data['token_data'] ) && is_array( $api_data['token_data'] ) ) {
-				wpaib_update_token_data( $api_data['token_data'] );
+				autoaib_update_token_data( $api_data['token_data'] );
 			}
 
 			// Process images if they exist in the API response.
@@ -276,8 +276,8 @@ class Cron_Handler {
 			}
 
 			// Replace internal link placeholders with actual WordPress URLs.
-			$previous_posts = wpaib_get_previous_campaign_posts( $campaign_id, 5 );
-			$post_content   = wpaib_replace_internal_link_placeholders( $post_content, $previous_posts );
+			$previous_posts = autoaib_get_previous_campaign_posts( $campaign_id, 5 );
+			$post_content   = autoaib_replace_internal_link_placeholders( $post_content, $previous_posts );
 
 			$post_data = [
 				'post_title'   => sanitize_text_field( $api_data['post_title'] ?? 'Generated Post' ),
@@ -318,8 +318,8 @@ class Cron_Handler {
 			}
 
 			// Add campaign reference meta to the post.
-			add_post_meta( $post_id, 'wp_aib_reference', 1 );
-			add_post_meta( $post_id, 'wp_aib_campaign_id', $campaign_id );
+			add_post_meta( $post_id, 'autoaib_reference', 1 );
+			add_post_meta( $post_id, 'autoaib_campaign_id', $campaign_id );
 			$posts_created     = Metadata::get_campaign_meta( $campaign_id, 'postsCreated' );
 			$new_posts_created = intval( $posts_created ) + 1;
 			Metadata::update_campaign_meta( $campaign_id, 'postsCreated', $new_posts_created );
@@ -334,7 +334,7 @@ class Cron_Handler {
 
 				// Trigger notification: Campaign Completed.
 				do_action(
-					'wpaib_campaign_completed',
+					'autoaib_campaign_completed',
 					$campaign_id,
 					'target_reached',
 					[
@@ -348,7 +348,7 @@ class Cron_Handler {
 				'success'        => true,
 				'message'        => sprintf(
 					/* translators: 1: Post number, 2: Post ID. */
-					__( 'Post #%1$d created successfully with ID: %2$s', 'wp-ai-blogger' ),
+					__( 'Post #%1$d created successfully with ID: %2$s', 'auto-ai-blogger' ),
 					$target_post_number,
 					$post_id
 				),
@@ -371,7 +371,7 @@ class Cron_Handler {
 	 * Register cron actions.
 	 */
 	private function init_hooks(): void {
-		add_action( 'wpaib_create_single_post', [ $this, 'create_single_post_from_campaign' ] );
+		add_action( 'autoaib_create_single_post', [ $this, 'create_single_post_from_campaign' ] );
 	}
 
 	/**
@@ -381,13 +381,13 @@ class Cron_Handler {
 	 * @param string $keywords The keywords for the post.
 	 * @param int    $max_words The maximum number of words for the post.
 	 * @return array An array containing the API response data.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function call_post_creation_api( $campaign_id, $keywords, $max_words ): array {
 		try {
 			$max_words = $max_words ? $max_words : 1000;
 
-			$site_persona_details = wpaib_get_site_persona_details( $campaign_id );
+			$site_persona_details = autoaib_get_site_persona_details( $campaign_id );
 
 			// Get campaign name for better context.
 			$campaign_post = get_post( $campaign_id );
@@ -398,7 +398,7 @@ class Cron_Handler {
 
 			// Apply filter to allow Pro plugin to modify image count.
 			// Free users are limited to 1 image, Pro users can customize 1-4.
-			$image_count = apply_filters( 'wpaib_campaign_image_count', $image_count, $campaign_id );
+			$image_count = apply_filters( 'autoaib_campaign_image_count', $image_count, $campaign_id );
 			$image_count = max( 1, min( 4, absint( $image_count ) ) ); // Limit: 1-4 content images.
 
 			// Add 1 for featured image (first image is always featured, rest go in content).
@@ -410,7 +410,7 @@ class Cron_Handler {
 			$response    = null;
 
 			for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
-				$response = wpaib_get_post_creation_api_response( $keywords, $max_words, $site_persona_details, $campaign_id, $campaign_name, $total_image_count );
+				$response = autoaib_get_post_creation_api_response( $keywords, $max_words, $site_persona_details, $campaign_id, $campaign_name, $total_image_count );
 
 				if ( ! is_wp_error( $response ) ) {
 					break;
@@ -442,7 +442,7 @@ class Cron_Handler {
 				// Enhance error message with more context.
 				$detailed_message = sprintf(
 					/* translators: 1: error code, 2: error message */
-					__( 'API Error (%1$s): %2$s', 'wp-ai-blogger' ),
+					__( 'API Error (%1$s): %2$s', 'auto-ai-blogger' ),
 					$error_code,
 					$error_message
 				);
@@ -451,7 +451,7 @@ class Cron_Handler {
 				if ( $attempt > 1 ) {
 					$detailed_message .= sprintf(
 						/* translators: %d: Attempt number. */
-						__( ' (Failed after %d attempts)', 'wp-ai-blogger' ),
+						__( ' (Failed after %d attempts)', 'auto-ai-blogger' ),
 						$attempt
 					);
 				}
@@ -483,7 +483,7 @@ class Cron_Handler {
 	 * @param int  $campaign_id Campaign ID.
 	 * @param bool $is_retry Whether this is a retry after failure.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function schedule_next_post( $campaign_id, $is_retry = false ): void {
 		try {
@@ -515,7 +515,7 @@ class Cron_Handler {
 			// Determine scheduling interval.
 			if ( $is_retry ) {
 				// For retries after failures, use a short interval (2 minutes).
-				$interval_seconds = apply_filters( 'wpaib_retry_interval_seconds', 120 ); // 2 minutes default.
+				$interval_seconds = apply_filters( 'autoaib_retry_interval_seconds', 120 ); // 2 minutes default.
 				$next_run         = time() + $interval_seconds;
 			} else {
 				// Check if this is a weekly campaign with specific days selected.
@@ -537,7 +537,7 @@ class Cron_Handler {
 				}
 			}
 
-			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_schedule_single_event( $next_run, 'autoaib_create_single_post', [ $campaign_id ] );
 
 		} catch ( \Exception $e ) {
 			return;
@@ -550,7 +550,7 @@ class Cron_Handler {
 	 * @param int    $interval Repeat interval.
 	 * @param string $unit Repeat unit.
 	 * @return int Interval in seconds.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_interval_seconds( $interval, $unit ): int {
 		$interval = max( 1, intval( $interval ) );
@@ -574,7 +574,7 @@ class Cron_Handler {
 		}
 
 		// Allow testing plugins to modify intervals.
-		return apply_filters( 'wpaib_cron_interval_seconds', $seconds, $interval, $unit );
+		return apply_filters( 'autoaib_cron_interval_seconds', $seconds, $interval, $unit );
 	}
 
 	/**
@@ -583,7 +583,7 @@ class Cron_Handler {
 	 * @param array $selected_days Array of selected weekday abbreviations (e.g., ['mon', 'wed', 'fri']).
 	 * @param int   $campaign_id Campaign ID for filter context.
 	 * @return int Timestamp of next occurrence.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function calculate_next_weekday( $selected_days, $campaign_id ): int {
 		if ( empty( $selected_days ) || ! is_array( $selected_days ) ) {
@@ -647,7 +647,7 @@ class Cron_Handler {
 		// Allow testing plugins to modify the weekday interval.
 		// Pass the days_to_add for context (testing plugins can use this).
 		return apply_filters(
-			'wpaib_weekday_next_occurrence',
+			'autoaib_weekday_next_occurrence',
 			$next_timestamp,
 			$selected_days,
 			$days_to_add,
@@ -660,7 +660,7 @@ class Cron_Handler {
 	 *
 	 * @param string $error_message The error message.
 	 * @return string The error type.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function determine_error_type( $error_message ): string {
 		$error_message = strtolower( $error_message );
@@ -726,7 +726,7 @@ class Cron_Handler {
 	 * @param int    $campaign_id Campaign ID.
 	 * @param string $reason Completion reason.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function mark_campaign_completed( $campaign_id, $reason ): void {
 		// Mark campaign as completed.
@@ -747,12 +747,12 @@ class Cron_Handler {
 			$posts_failed = Metadata::get_campaign_meta( $campaign_id, 'postsFailed' );
 			$max_failures = Metadata::get_campaign_meta( $campaign_id, 'maxFailures' );
 
-			wpaib_log_campaign_error(
+			autoaib_log_campaign_error(
 				$campaign_id,
 				'campaign_terminated',
 				sprintf(
 					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
-					__( 'Campaign terminated: Maximum failures reached (%1$d/%2$d). Please check your settings and try again.', 'wp-ai-blogger' ),
+					__( 'Campaign terminated: Maximum failures reached (%1$d/%2$d). Please check your settings and try again.', 'auto-ai-blogger' ),
 					$posts_failed,
 					$max_failures
 				),
@@ -765,11 +765,11 @@ class Cron_Handler {
 
 			// Trigger notification: Campaign Failed/Terminated.
 			do_action(
-				'wpaib_campaign_failed',
+				'autoaib_campaign_failed',
 				$campaign_id,
 				sprintf(
 					/* translators: %1$d is the number of posts failed, %2$d is the maximum number of failures. */
-					__( 'Maximum failures reached (%1$d/%2$d)', 'wp-ai-blogger' ),
+					__( 'Maximum failures reached (%1$d/%2$d)', 'auto-ai-blogger' ),
 					$posts_failed,
 					$max_failures
 				),
@@ -782,7 +782,7 @@ class Cron_Handler {
 		}
 
 		// Clear any scheduled events since campaign is now complete.
-		wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+		wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 	}
 
 	/**
@@ -791,7 +791,7 @@ class Cron_Handler {
 	 * @param string $content HTML content with image placeholders.
 	 * @param array  $images  Array of image data from API.
 	 * @return array|WP_Error Array with 'content' and 'featured_image_id' or WP_Error on failure.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function process_images_and_replace_placeholders( $content, $images ) {
 		if ( empty( $images ) || ! is_array( $images ) ) {
@@ -814,7 +814,7 @@ class Cron_Handler {
 			$attachment_id = $this->upload_image_to_media_library( $image['url'], $alt_text );
 
 			if ( is_wp_error( $attachment_id ) ) {
-				wpaib_log_error(
+				autoaib_log_error(
 					'image_upload_failed',
 					$attachment_id->get_error_message(),
 					[
@@ -892,7 +892,7 @@ class Cron_Handler {
 	 * @param string $image_url Image URL to download and upload.
 	 * @param string $alt_text  Alt text for the image.
 	 * @return int|WP_Error Attachment ID on success, WP_Error on failure.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
 		try {
@@ -902,7 +902,7 @@ class Cron_Handler {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);
@@ -910,7 +910,7 @@ class Cron_Handler {
 			if ( is_wp_error( $response ) ) {
 				return new \WP_Error(
 					'image_download_failed',
-					__( 'Failed to download image: ', 'wp-ai-blogger' ) . $response->get_error_message()
+					__( 'Failed to download image: ', 'auto-ai-blogger' ) . $response->get_error_message()
 				);
 			}
 
@@ -920,7 +920,7 @@ class Cron_Handler {
 					'image_download_http_error',
 					sprintf(
 						/* translators: %d is the HTTP status code */
-						__( 'Image download returned HTTP error %d', 'wp-ai-blogger' ),
+						__( 'Image download returned HTTP error %d', 'auto-ai-blogger' ),
 						$http_code
 					)
 				);
@@ -930,7 +930,7 @@ class Cron_Handler {
 			if ( empty( $image_data ) ) {
 				return new \WP_Error(
 					'image_download_empty',
-					__( 'Downloaded image data is empty', 'wp-ai-blogger' )
+					__( 'Downloaded image data is empty', 'auto-ai-blogger' )
 				);
 			}
 
@@ -952,7 +952,7 @@ class Cron_Handler {
 			if ( $upload['error'] ) {
 				return new \WP_Error(
 					'image_upload_failed',
-					__( 'Failed to upload image: ', 'wp-ai-blogger' ) . $upload['error']
+					__( 'Failed to upload image: ', 'auto-ai-blogger' ) . $upload['error']
 				);
 			}
 
@@ -984,7 +984,7 @@ class Cron_Handler {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'image_upload_exception',
-				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
+				__( 'Exception occurred during image upload: ', 'auto-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}

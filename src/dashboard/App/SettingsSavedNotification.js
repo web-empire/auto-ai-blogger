@@ -196,11 +196,11 @@ export default function SettingsSavedNotification() {
 											group
 										"
 										onClick={ dismissNotification }
-										aria-label={ __( 'Close notification', 'wp-ai-blogger' ) }
+										aria-label={ __( 'Close notification', 'auto-ai-blogger' ) }
 										aria-describedby="notification-message"
 									>
 										<span className="sr-only">
-											{ __( 'Close notification', 'wp-ai-blogger' ) }
+											{ __( 'Close notification', 'auto-ai-blogger' ) }
 										</span>
 										<XIcon
 											className="h-3 w-3 transition-transform duration-150 group-hover:scale-110"

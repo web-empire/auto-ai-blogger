@@ -17,7 +17,7 @@ export const CoreVersion = () => {
 		<>
 			<div className="flex items-center">
 				<Tooltip
-					text={ __( 'CORE', 'wp-ai-blogger' ) }
+					text={ __( 'CORE', 'auto-ai-blogger' ) }
 					delay={ 100 }
 					className="z-[99999] bg-black text-white shadow-md p-2 rounded-md uppercase"
 				>
@@ -34,7 +34,7 @@ export const CoreVersion = () => {
 				<>
 					<span>-</span>
 					<Tooltip
-						text={ wpaib_localized_data?.pro_plugin_name || 'PRO' }
+						text={ autoaib_localized_data?.pro_plugin_name || 'PRO' }
 						delay={ 100 }
 						className="z-[99999] bg-black text-white shadow-md p-2 rounded-md uppercase"
 					>
@@ -49,7 +49,7 @@ export const CoreVersion = () => {
 			) }
 
 			{ wp?.hooks?.applyFilters?.(
-				'wp_ai_blogger_dashboard.after_navigation_version',
+				'autoaib_dashboard.after_navigation_version',
 				<span />
 			) }
 		</>
@@ -111,7 +111,7 @@ export const TokenDisplayAndRefresh = () => {
 
 				dispatch( {
 					type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-					payload: __( 'Tokens refreshed successfully!', 'wp-ai-blogger' ),
+					payload: __( 'Tokens refreshed successfully!', 'auto-ai-blogger' ),
 				} );
 			} else {
 				throw new Error( 'Invalid response from token API.' );
@@ -120,7 +120,7 @@ export const TokenDisplayAndRefresh = () => {
 			console.error( 'Token refresh error:', error );
 			dispatch( {
 				type: 'UPDATE_SETTINGS_SAVED_NOTIFICATION',
-				payload: __( 'Failed to refresh token data', 'wp-ai-blogger' ),
+				payload: __( 'Failed to refresh token data', 'auto-ai-blogger' ),
 			} );
 		} finally {
 			setProcessing( false );
@@ -143,18 +143,18 @@ export const TokenDisplayAndRefresh = () => {
 		const remaining = tokenRemaining;
 		if ( remaining >= 2000 ) {
 			return {
-				text: __( 'Plenty of tokens', 'wp-ai-blogger' ),
+				text: __( 'Plenty of tokens', 'auto-ai-blogger' ),
 				color: 'bg-green-500',
 			};
 		}
 		if ( remaining >= 1000 ) {
 			return {
-				text: __( 'Moderate', 'wp-ai-blogger' ),
+				text: __( 'Moderate', 'auto-ai-blogger' ),
 				color: 'bg-amber-500',
 			};
 		}
 		return {
-			text: __( 'Low', 'wp-ai-blogger' ),
+			text: __( 'Low', 'auto-ai-blogger' ),
 			color: 'bg-red-500',
 		};
 	};
@@ -170,7 +170,7 @@ export const TokenDisplayAndRefresh = () => {
 					{ '/' }
 					{ formattedTotalTokens }
 					{ ' ' }
-					{ __( 'Tokens', 'wp-ai-blogger' ) }
+					{ __( 'Tokens', 'auto-ai-blogger' ) }
 				</p>
 
 				{ /* Progress bar */ }
@@ -204,16 +204,16 @@ export const TokenDisplayAndRefresh = () => {
 					${ processing ? 'pointer-events-none' : '' }
 				` }
 				onClick={ refreshTokens }
-				aria-label={ __( 'Refresh token data', 'wp-ai-blogger' ) }
+				aria-label={ __( 'Refresh token data', 'auto-ai-blogger' ) }
 			>
-				<Tooltip text={ __( 'Refresh', 'wp-ai-blogger' ) } delay={ 100 } className="z-[99999] bg-black text-xs text-white shadow-md p-2 rounded-md">
+				<Tooltip text={ __( 'Refresh', 'auto-ai-blogger' ) } delay={ 100 } className="z-[99999] bg-black text-xs text-white shadow-md p-2 rounded-md">
 					<div className="relative flex">
 						<RefreshCw className={ `w-4 h-4 ${ processing ? 'animate-spin' : '' }` } />
 					</div>
 				</Tooltip>
 			</button>
 
-			<span className="wpaib-vertical-divider" />
+			<span className="autoaib-vertical-divider" />
 		</div>
 	);
 };

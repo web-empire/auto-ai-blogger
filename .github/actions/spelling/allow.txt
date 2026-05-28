@@ -193,3 +193,7 @@ HOMELINK
 LINKID
 fafb
 wpwrap
+GPLv
+Hookname
+autoaib
+stripos

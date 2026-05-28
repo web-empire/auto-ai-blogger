@@ -17,11 +17,11 @@ export default function ConfigureDrawer( props ) {
 	const [ handlingCampaign, setHandlingCampaign ] = useState( false );
 	const [ open, setOpen ] = useState( openDrawer );
 	const [ drawerData, setDrawerData ] = useState( {} );
-	const postTypes = wpaib_localized_data?.post_types || {};
-	const authors = wpaib_localized_data?.authors || [];
-	const postStatuses = wpaib_localized_data?.post_statuses || {};
-	const categories = wpaib_localized_data?.categories || {};
-	const tags = wpaib_localized_data?.tags || {};
+	const postTypes = autoaib_localized_data?.post_types || {};
+	const authors = autoaib_localized_data?.authors || [];
+	const postStatuses = autoaib_localized_data?.post_statuses || {};
+	const categories = autoaib_localized_data?.categories || {};
+	const tags = autoaib_localized_data?.tags || {};
 	const isViewMode = mode === 'view';
 	const [ errorMessage, setErrorMessage ] = useState( '' );
 	const [ fieldErrors, setFieldErrors ] = useState( {} );
@@ -89,24 +89,24 @@ export default function ConfigureDrawer( props ) {
 		setErrorMessage( '' );
 
 		if ( ! drawerData.title ) {
-			showFieldError( 'project-name', __( 'Name should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			showFieldError( 'project-name', __( 'Name should not be empty.', 'auto-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.keywords ) {
-			showFieldError( 'campaign-keywords', __( 'Keywords should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			showFieldError( 'campaign-keywords', __( 'Keywords should not be empty.', 'auto-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.postsTarget ) {
-			showFieldError( 'campaign-target', __( 'Posts Target should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			showFieldError( 'campaign-target', __( 'Posts Target should not be empty.', 'auto-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( ! drawerData.startDate ) {
-			showFieldError( 'start-date', __( 'Start Date should not be empty.', 'wp-ai-blogger' ), 'campaign' );
+			showFieldError( 'start-date', __( 'Start Date should not be empty.', 'auto-ai-blogger' ), 'campaign' );
 			return;
 		}
 		if ( 'week' === drawerData.repeatUnit && drawerData.repeatWeeklyOn.length === 0 ) {
-			setErrorMessage( __( 'Week days should not be empty.', 'wp-ai-blogger' ) );
-			setFieldErrors( { 'weekly-days': __( 'Week days should not be empty.', 'wp-ai-blogger' ) } );
+			setErrorMessage( __( 'Week days should not be empty.', 'auto-ai-blogger' ) );
+			setFieldErrors( { 'weekly-days': __( 'Week days should not be empty.', 'auto-ai-blogger' ) } );
 			setTimeout( () => {
 				setFieldErrors( {} );
 				setErrorMessage( '' );
@@ -114,11 +114,11 @@ export default function ConfigureDrawer( props ) {
 			return;
 		}
 		if ( drawerData.overrideSitePersona && ! drawerData.overrideSiteFor ) {
-			showFieldError( 'blog-for', __( 'Campaign For should not be empty when override is enabled.', 'wp-ai-blogger' ), 'advanced' );
+			showFieldError( 'blog-for', __( 'Campaign For should not be empty when override is enabled.', 'auto-ai-blogger' ), 'advanced' );
 			return;
 		}
 		if ( drawerData.overrideSitePersona && ! drawerData.overrideSiteDescription ) {
-			showFieldError( 'more-about-blog', __( 'Campaign Description should not be empty when override is enabled.', 'wp-ai-blogger' ), 'advanced' );
+			showFieldError( 'more-about-blog', __( 'Campaign Description should not be empty when override is enabled.', 'auto-ai-blogger' ), 'advanced' );
 			return;
 		}
 
@@ -159,10 +159,10 @@ export default function ConfigureDrawer( props ) {
 											<h2 className="text-base font-semibold text-white m-0 p-0">
 												{
 													isViewMode
-														? __( 'Campaign Configuration', 'wp-ai-blogger' )
+														? __( 'Campaign Configuration', 'auto-ai-blogger' )
 														: ( drawerData.type === 'new' )
-															? __( 'New Campaign', 'wp-ai-blogger' )
-															: __( 'Edit Campaign', 'wp-ai-blogger' )
+															? __( 'New Campaign', 'auto-ai-blogger' )
+															: __( 'Edit Campaign', 'auto-ai-blogger' )
 												}
 											</h2>
 											<div className="ml-3 flex h-7 items-center">
@@ -179,25 +179,25 @@ export default function ConfigureDrawer( props ) {
 										</div>
 									</div>
 
-									<div className="bg-white px-4 sm:px-6 wpaib-campaign-nav">
+									<div className="bg-white px-4 sm:px-6 autoaib-campaign-nav">
 										<nav className="justify-between flex" aria-label="Tabs">
 											<a
 												onClick={ () => setActiveTab( 'campaign' ) }
 												className={ `w-full campaign-settings-tab text-left text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'campaign' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
-												{ __( 'General', 'wp-ai-blogger' ) }
+												{ __( 'General', 'auto-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'filters' ) }
 												className={ `w-full campaign-settings-tab text-center text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'filters' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
-												{ __( 'Filters', 'wp-ai-blogger' ) }
+												{ __( 'Filters', 'auto-ai-blogger' ) }
 											</a>
 											<a
 												onClick={ () => setActiveTab( 'advanced' ) }
 												className={ `w-full campaign-settings-tab text-right text-sm/6 cursor-pointer whitespace-nowrap py-4 border-b-2 bg-transparent ${ 'advanced' === activeTab ? 'font-medium border-brand text-brand hover:text-brand hover:border-brand' : 'text-slate-600 border-gray-200 hover:text-slate-500 hover:border-slate-500 font-normal' }` }
 											>
-												{ __( 'Advanced', 'wp-ai-blogger' ) }
+												{ __( 'Advanced', 'auto-ai-blogger' ) }
 											</a>
 										</nav>
 									</div>
@@ -209,7 +209,7 @@ export default function ConfigureDrawer( props ) {
 													<div className="space-y-6 pb-5 pt-6">
 														<div>
 															<label htmlFor="project-name" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Name', 'wp-ai-blogger' ) }
+																{ __( 'Name', 'auto-ai-blogger' ) }
 															</label>
 															<div className="mt-2">
 																<input
@@ -226,7 +226,7 @@ export default function ConfigureDrawer( props ) {
 																				? 'bg-gray-50 outline-gray-200'
 																				: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
 																	}` }
-																	placeholder={ __( '21 Week Fitness Plan', 'wp-ai-blogger' ) }
+																	placeholder={ __( '21 Week Fitness Plan', 'auto-ai-blogger' ) }
 																/>
 																{ fieldErrors[ 'project-name' ] && (
 																	<p className="mt-1 text-sm text-red-600">
@@ -238,7 +238,7 @@ export default function ConfigureDrawer( props ) {
 
 														<div>
 															<label htmlFor="campaign-keywords" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Keywords', 'wp-ai-blogger' ) }
+																{ __( 'Keywords', 'auto-ai-blogger' ) }
 															</label>
 															<div className="mt-2">
 																<textarea
@@ -255,7 +255,7 @@ export default function ConfigureDrawer( props ) {
 																	defaultValue={ drawerData.keywords }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, keywords: e.target.value } ) }
 																	readOnly={ isViewMode }
-																	placeholder={ __( 'Yoga, Fitness, Health', 'wp-ai-blogger' ) }
+																	placeholder={ __( 'Yoga, Fitness, Health', 'auto-ai-blogger' ) }
 																/>
 																{ fieldErrors[ 'campaign-keywords' ] && (
 																	<p className="mt-1 text-sm text-red-600">
@@ -268,11 +268,11 @@ export default function ConfigureDrawer( props ) {
 														<div className="grid grid-cols-1 gap-2">
 															<div className="flex items-center justify-between">
 																<label htmlFor="campaign-target" className="flex items-center text-sm/6 font-medium text-gray-900">
-																	{ __( 'Posts Target', 'wp-ai-blogger' ) }
+																	{ __( 'Posts Target', 'auto-ai-blogger' ) }
 																	<Tooltip
 																		text={ drawerData.type === 'edit'
-																			? __( 'Post Target can not be updated.', 'wp-ai-blogger' )
-																			: __( 'How many posts you expect from this campaign?', 'wp-ai-blogger' )
+																			? __( 'Post Target can not be updated.', 'auto-ai-blogger' )
+																			: __( 'How many posts you expect from this campaign?', 'auto-ai-blogger' )
 																		}
 																		delay={ 100 }
 																		className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
@@ -313,16 +313,16 @@ export default function ConfigureDrawer( props ) {
 															</div>
 															{ drawerData.type === 'new' && (
 																<div className="text-xs text-gray-500">
-																	{ __( 'Once set, campaign targets are unchangeable.', 'wp-ai-blogger' ) }
+																	{ __( 'Once set, campaign targets are unchangeable.', 'auto-ai-blogger' ) }
 																</div>
 															) }
 														</div>
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="campaign-repeat-after" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Repeat Every', 'wp-ai-blogger' ) }
+																{ __( 'Repeat Every', 'auto-ai-blogger' ) }
 																<Tooltip
-																	text={ __( 'Set how often the campaign should run automatically.', 'wp-ai-blogger' ) }
+																	text={ __( 'Set how often the campaign should run automatically.', 'auto-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																>
@@ -347,20 +347,20 @@ export default function ConfigureDrawer( props ) {
 																	className={ `block w-20 rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 																<select
-																	className={ `min-w-[100px] ${ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }` }
+																	className={ `min-w-[100px] ${ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }` }
 																	value={ drawerData.repeatUnit || 'day' }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, repeatUnit: e.target.value } ) }
 																	disabled={ isViewMode }
 																>
-																	<option value="day">{ __( 'Day(s)', 'wp-ai-blogger' ) }</option>
-																	<option value="week">{ __( 'Week(s)', 'wp-ai-blogger' ) }</option>
+																	<option value="day">{ __( 'Day(s)', 'auto-ai-blogger' ) }</option>
+																	<option value="week">{ __( 'Week(s)', 'auto-ai-blogger' ) }</option>
 																</select>
 															</div>
 														</div>
 														{ 'week' === drawerData.repeatUnit && (
 															<div className="flex items-center justify-between">
 																<label className={ `text-sm/6 font-medium ${ fieldErrors[ 'weekly-days' ] ? 'text-red-700' : 'text-gray-900' }` }> {/* eslint-disable-line */}
-																	{ __( 'On Days', 'wp-ai-blogger' ) }
+																	{ __( 'On Days', 'auto-ai-blogger' ) }
 																</label>
 																<div>
 																	<div className="flex flex-wrap gap-2 justify-end">
@@ -406,9 +406,9 @@ export default function ConfigureDrawer( props ) {
 															<label htmlFor="start-date" className={ `flex items-center text-sm/6 font-medium mb-2 ${
 																fieldErrors[ 'start-date' ] ? 'text-red-700' : 'text-gray-900'
 															}` }>
-																{ __( 'Start Date', 'wp-ai-blogger' ) }
+																{ __( 'Start Date', 'auto-ai-blogger' ) }
 																<Tooltip
-																	text={ __( 'Start Date can not be updated later.', 'wp-ai-blogger' ) }
+																	text={ __( 'Start Date can not be updated later.', 'auto-ai-blogger' ) }
 																	delay={ 100 }
 																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
 																>
@@ -425,14 +425,14 @@ export default function ConfigureDrawer( props ) {
 																onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, startDate: e.target.value } ) }
 																readOnly={ isViewMode }
 																disabled={ drawerData.type === 'edit' && hasStartDatePassed( drawerData.startDate ) }
-																placeholder={ __( 'Select campaign start date', 'wp-ai-blogger' ) }
+																placeholder={ __( 'Select campaign start date', 'auto-ai-blogger' ) }
 																error={ fieldErrors[ 'start-date' ] }
 															/>
 														</div>
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="use-summary-as-excerpt" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Use Summary as Excerpt?', 'wp-ai-blogger' ) }
+																{ __( 'Use Summary as Excerpt?', 'auto-ai-blogger' ) }
 															</label>
 															<div className="mt-2">
 																<SwitchControl
@@ -445,7 +445,7 @@ export default function ConfigureDrawer( props ) {
 														</div>
 
 														<fieldset>
-															<legend className="text-sm/6 font-medium text-gray-900"> { __( 'Campaign Status', 'wp-ai-blogger' ) } </legend>
+															<legend className="text-sm/6 font-medium text-gray-900"> { __( 'Campaign Status', 'auto-ai-blogger' ) } </legend>
 
 															<div className="mt-2 space-y-4">
 																<div className="relative flex items-start">
@@ -464,10 +464,10 @@ export default function ConfigureDrawer( props ) {
 																	</div>
 																	<div className="pl-7 text-sm/6">
 																		<label htmlFor="privacy-public" className="font-medium text-gray-900">
-																			{ __( 'On', 'wp-ai-blogger' ) }
+																			{ __( 'On', 'auto-ai-blogger' ) }
 																			{ ' ' }
 																			<span id="privacy-public-description" className="text-gray-500 text-normal">
-																				{ __( 'The campaign will be activated immediately and start running.', 'wp-ai-blogger' ) }
+																				{ __( 'The campaign will be activated immediately and start running.', 'auto-ai-blogger' ) }
 																			</span>
 																		</label>
 																	</div>
@@ -490,10 +490,10 @@ export default function ConfigureDrawer( props ) {
 																		</div>
 																		<div className="pl-7 text-sm/6">
 																			<label htmlFor="privacy-private-to-project" className="font-medium text-gray-900">
-																				{ __( 'Off', 'wp-ai-blogger' ) }
+																				{ __( 'Off', 'auto-ai-blogger' ) }
 																				{ ' ' }
 																				<span id="privacy-private-to-project-description" className="text-gray-500 text-normal">
-																					{ __( 'The campaign setup will be saved, but it won\'t run until you switch it ON.', 'wp-ai-blogger' ) }
+																					{ __( 'The campaign setup will be saved, but it won\'t run until you switch it ON.', 'auto-ai-blogger' ) }
 																				</span>
 																			</label>
 																		</div>
@@ -514,11 +514,11 @@ export default function ConfigureDrawer( props ) {
 													<div className="space-y-6 pb-5 pt-6">
 														<div className="flex items-center justify-between post-filters-option">
 															<label htmlFor="post-type" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Post Type', 'wp-ai-blogger' ) }
+																{ __( 'Post Type', 'auto-ai-blogger' ) }
 															</label>
 															<div>
 																<select
-																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	className={ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }
 																	id="post-type"
 																	value={ drawerData.postType }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postType: e.target.value } ) }
@@ -535,11 +535,11 @@ export default function ConfigureDrawer( props ) {
 
 														<div className="flex items-center justify-between post-filters-option">
 															<label htmlFor="post-author" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Post Author', 'wp-ai-blogger' ) }
+																{ __( 'Post Author', 'auto-ai-blogger' ) }
 															</label>
 															<div>
 																<select
-																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	className={ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }
 																	id="post-author"
 																	value={ drawerData.author }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, author: e.target.value } ) }
@@ -556,11 +556,11 @@ export default function ConfigureDrawer( props ) {
 
 														<div className="flex items-center justify-between post-filters-option">
 															<label htmlFor="post-status" className="block text-sm/6 font-medium text-gray-900">
-																{ __( 'Post Status', 'wp-ai-blogger' ) }
+																{ __( 'Post Status', 'auto-ai-blogger' ) }
 															</label>
 															<div>
 																<select
-																	className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																	className={ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }
 																	id="post-status"
 																	value={ drawerData.postStatus }
 																	onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, postStatus: e.target.value } ) }
@@ -580,17 +580,17 @@ export default function ConfigureDrawer( props ) {
 																<>
 																	<div className="flex items-center justify-between post-filters-option">
 																		<label htmlFor="post-category" className="block text-sm/6 font-medium text-gray-900">
-																			{ __( 'Post Category', 'wp-ai-blogger' ) }
+																			{ __( 'Post Category', 'auto-ai-blogger' ) }
 																		</label>
 																		<div>
 																			<select
-																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																				className={ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }
 																				id="post-category"
 																				value={ drawerData.category || '' }
 																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, category: e.target.value } ) }
 																				disabled={ isViewMode }
 																			>
-																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
+																				<option value=""> { __( '-- Select --', 'auto-ai-blogger' ) } </option>
 																				{ categories.map( ( category ) => (
 																					<option key={ category.id } value={ category.id }>
 																						{ category.name }
@@ -602,17 +602,17 @@ export default function ConfigureDrawer( props ) {
 
 																	<div className="flex items-center justify-between post-filters-option">
 																		<label htmlFor="post-tag" className="block text-sm/6 font-medium text-gray-900">
-																			{ __( 'Post Tag', 'wp-ai-blogger' ) }
+																			{ __( 'Post Tag', 'auto-ai-blogger' ) }
 																		</label>
 																		<div>
 																			<select
-																				className={ isViewMode ? 'wpaib-select-control-readonly' : 'wpaib-select-control' }
+																				className={ isViewMode ? 'autoaib-select-control-readonly' : 'autoaib-select-control' }
 																				id="post-tag"
 																				value={ drawerData.tag || '' }
 																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, tag: e.target.value } ) }
 																				disabled={ isViewMode }
 																			>
-																				<option value=""> { __( '-- Select --', 'wp-ai-blogger' ) } </option>
+																				<option value=""> { __( '-- Select --', 'auto-ai-blogger' ) } </option>
 																				{ tags.map( ( tag ) => (
 																					<option key={ tag.id } value={ tag.id }>
 																						{ tag.name }
@@ -637,11 +637,11 @@ export default function ConfigureDrawer( props ) {
 													<div className="space-y-6 pb-5 pt-6">
 														<div className="flex items-center justify-between">
 															<label htmlFor="maximum-words" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Maximum Content Words', 'wp-ai-blogger' ) }
+																{ __( 'Maximum Content Words', 'auto-ai-blogger' ) }
 																<Tooltip
-																	text={ wpaib_localized_data.pro_available
-																		? __( 'Set the maximum number of words for generated content (100-5000 words).', 'wp-ai-blogger' )
-																		: __( 'Free users are limited to 1000 words. Upgrade to Pro to customize up to 5000 words.', 'wp-ai-blogger' )
+																	text={ autoaib_localized_data.pro_available
+																		? __( 'Set the maximum number of words for generated content (100-5000 words).', 'auto-ai-blogger' )
+																		: __( 'Free users are limited to 1000 words. Upgrade to Pro to customize up to 5000 words.', 'auto-ai-blogger' )
 																	}
 																	delay={ 100 }
 																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
@@ -663,7 +663,7 @@ export default function ConfigureDrawer( props ) {
 																			return;
 																		}
 																		let value = parseInt( e.target.value ) || 0;
-																		const maxLimit = wpaib_localized_data.pro_available ? 5000 : 1000;
+																		const maxLimit = autoaib_localized_data.pro_available ? 5000 : 1000;
 
 																		// Enforce limits
 																		if ( value > maxLimit ) {
@@ -677,10 +677,10 @@ export default function ConfigureDrawer( props ) {
 																	onWheel={ ( e ) => e.target.blur() }
 																	type="number"
 																	min="100"
-																	max={ wpaib_localized_data.pro_available ? 5000 : 1000 }
+																	max={ autoaib_localized_data.pro_available ? 5000 : 1000 }
 																	readOnly={ isViewMode }
-																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	placeholder={ wpaib_localized_data.pro_available ? __( 'e.g., 1500', 'wp-ai-blogger' ) : __( '1000 (Free limit)', 'wp-ai-blogger' ) }
+																	disabled={ autoaib_localized_data.pro_available ? false : true }
+																	placeholder={ autoaib_localized_data.pro_available ? __( 'e.g., 1500', 'auto-ai-blogger' ) : __( '1000 (Free limit)', 'auto-ai-blogger' ) }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 															</div>
@@ -688,11 +688,11 @@ export default function ConfigureDrawer( props ) {
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="number-of-images" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Number of Content Images', 'wp-ai-blogger' ) }
+																{ __( 'Number of Content Images', 'auto-ai-blogger' ) }
 																<Tooltip
-																	text={ wpaib_localized_data.pro_available
-																		? __( 'Number of images in post content (1-5). A featured image is automatically included.', 'wp-ai-blogger' )
-																		: __( 'Free users are limited to 1 content image. Upgrade to Pro for up to 5. Featured image is always included.', 'wp-ai-blogger' )
+																	text={ autoaib_localized_data.pro_available
+																		? __( 'Number of images in post content (1-5). A featured image is automatically included.', 'auto-ai-blogger' )
+																		: __( 'Free users are limited to 1 content image. Upgrade to Pro for up to 5. Featured image is always included.', 'auto-ai-blogger' )
 																	}
 																	delay={ 100 }
 																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
@@ -714,7 +714,7 @@ export default function ConfigureDrawer( props ) {
 																			return;
 																		}
 																		let value = parseInt( e.target.value ) || 0;
-																		const maxLimit = wpaib_localized_data.pro_available ? 5 : 1;
+																		const maxLimit = autoaib_localized_data.pro_available ? 5 : 1;
 
 																		// Enforce limits
 																		if ( value > maxLimit ) {
@@ -728,10 +728,10 @@ export default function ConfigureDrawer( props ) {
 																	onWheel={ ( e ) => e.target.blur() }
 																	type="number"
 																	min="1"
-																	max={ wpaib_localized_data.pro_available ? 5 : 1 }
+																	max={ autoaib_localized_data.pro_available ? 5 : 1 }
 																	readOnly={ isViewMode }
-																	disabled={ wpaib_localized_data.pro_available ? false : true }
-																	placeholder={ wpaib_localized_data.pro_available ? __( 'e.g., 3', 'wp-ai-blogger' ) : __( '1 (Free limit)', 'wp-ai-blogger' ) }
+																	disabled={ autoaib_localized_data.pro_available ? false : true }
+																	placeholder={ autoaib_localized_data.pro_available ? __( 'e.g., 3', 'auto-ai-blogger' ) : __( '1 (Free limit)', 'auto-ai-blogger' ) }
 																	className={ `block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 sm:text-sm/6 ${ isViewMode ? 'bg-gray-50 outline-gray-200' : 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand' }` }
 																/>
 															</div>
@@ -739,11 +739,11 @@ export default function ConfigureDrawer( props ) {
 
 														<div className="flex items-center justify-between">
 															<label htmlFor="override-site-persona" className="flex items-center text-sm/6 font-medium text-gray-900">
-																{ __( 'Override Site Persona for this Campaign?', 'wp-ai-blogger' ) }
+																{ __( 'Override Site Persona for this Campaign?', 'auto-ai-blogger' ) }
 																<Tooltip
-																	text={ wpaib_localized_data.pro_available
-																		? __( 'Customize site persona specifically for this campaign. This overrides your global site settings.', 'wp-ai-blogger' )
-																		: __( 'Pro feature: Customize site persona per campaign. Upgrade to unlock.', 'wp-ai-blogger' )
+																	text={ autoaib_localized_data.pro_available
+																		? __( 'Customize site persona specifically for this campaign. This overrides your global site settings.', 'auto-ai-blogger' )
+																		: __( 'Pro feature: Customize site persona per campaign. Upgrade to unlock.', 'auto-ai-blogger' )
 																	}
 																	delay={ 100 }
 																	className="z-[99999] bg-black text-white shadow-md p-2 rounded-md"
@@ -759,7 +759,7 @@ export default function ConfigureDrawer( props ) {
 																	checked={ drawerData.overrideSitePersona }
 																	onChange={ () => ! isViewMode && setDrawerData( { ...drawerData, overrideSitePersona: ! drawerData.overrideSitePersona } ) }
 																	id="override-site-persona"
-																	disabled={ isViewMode || ! wpaib_localized_data.pro_available }
+																	disabled={ isViewMode || ! autoaib_localized_data.pro_available }
 																/>
 															</div>
 														</div>
@@ -769,7 +769,7 @@ export default function ConfigureDrawer( props ) {
 																<>
 																	<div>
 																		<label htmlFor="blog-for" className="block text-sm/6 font-medium text-gray-900">
-																			{ __( 'Campaign For', 'wp-ai-blogger' ) }
+																			{ __( 'Campaign For', 'auto-ai-blogger' ) }
 																		</label>
 																		<div className="mt-2">
 																			<input
@@ -786,7 +786,7 @@ export default function ConfigureDrawer( props ) {
 																							? 'bg-gray-50 outline-gray-200'
 																							: 'bg-white outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-brand'
 																				}` }
-																				placeholder={ __( 'e.g., Fitness enthusiasts and health-conscious individuals', 'wp-ai-blogger' ) }
+																				placeholder={ __( 'e.g., Fitness enthusiasts and health-conscious individuals', 'auto-ai-blogger' ) }
 																			/>
 																			{ fieldErrors[ 'blog-for' ] && (
 																				<p className="mt-1 text-sm text-red-600">
@@ -798,7 +798,7 @@ export default function ConfigureDrawer( props ) {
 
 																	<div>
 																		<label htmlFor="more-about-blog" className="block text-sm/6 font-medium text-gray-900">
-																			{ __( 'Campaign Description', 'wp-ai-blogger' ) }
+																			{ __( 'Campaign Description', 'auto-ai-blogger' ) }
 																		</label>
 																		<div className="mt-2">
 																			<textarea
@@ -815,7 +815,7 @@ export default function ConfigureDrawer( props ) {
 																				value={ drawerData.overrideSiteDescription }
 																				onChange={ ( e ) => ! isViewMode && setDrawerData( { ...drawerData, overrideSiteDescription: e.target.value } ) }
 																				readOnly={ isViewMode }
-																				placeholder={ __( 'e.g., A comprehensive guide to yoga and wellness practices', 'wp-ai-blogger' ) }
+																				placeholder={ __( 'e.g., A comprehensive guide to yoga and wellness practices', 'auto-ai-blogger' ) }
 																			/>
 																			{ fieldErrors[ 'more-about-blog' ] && (
 																				<p className="mt-1 text-sm text-red-600">
@@ -834,21 +834,21 @@ export default function ConfigureDrawer( props ) {
 																		className="size-5 text-gray-400 group-hover:text-gray-500"
 																	/>
 																	<span className="ml-2">
-																		{ __( 'Learn more about how to configure your campaign.', 'wp-ai-blogger' ) }
+																		{ __( 'Learn more about how to configure your campaign.', 'auto-ai-blogger' ) }
 																	</span>
 																</a>
 															</div>
 														</div>
 
-														{ ! wpaib_localized_data.pro_available &&
+														{ ! autoaib_localized_data.pro_available &&
 															<DynamicCard
-																heading={ __( 'Unlock Premium Features', 'wp-ai-blogger' ) }
-																subHeading={ __( 'Upgrade to Pro for more features and benefits.', 'wp-ai-blogger' ) }
-																linkText={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
-																linkUrl={ wpaib_localized_data.pro_purchase_url }
+																heading={ __( 'Unlock Premium Features', 'auto-ai-blogger' ) }
+																subHeading={ __( 'Upgrade to Pro for more features and benefits.', 'auto-ai-blogger' ) }
+																linkText={ __( 'Upgrade Now', 'auto-ai-blogger' ) }
+																linkUrl={ autoaib_localized_data.pro_purchase_url }
 																colorScheme="brand"
 																size="medium"
-																ariaLabel={ __( 'Upgrade Now', 'wp-ai-blogger' ) }
+																ariaLabel={ __( 'Upgrade Now', 'auto-ai-blogger' ) }
 															/>
 														}
 													</div>
@@ -876,7 +876,7 @@ export default function ConfigureDrawer( props ) {
 											onClick={ closePopup }
 											className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 										>
-											{ isViewMode ? __( 'Close', 'wp-ai-blogger' ) : __( 'Cancel', 'wp-ai-blogger' ) }
+											{ isViewMode ? __( 'Close', 'auto-ai-blogger' ) : __( 'Cancel', 'auto-ai-blogger' ) }
 										</button>
 
 										{ ! isViewMode && (
@@ -927,9 +927,9 @@ export default function ConfigureDrawer( props ) {
 													const isCompletedBase = drawerData.status === 'draft' || isTargetMet || isAllAttemptsCompleted;
 													const isAllAttemptsMadeWithFailures = postsTarget > 0 && postsRemaining > 0 && isCompletedBase && ( postsCreated + postsRemaining ) >= postsTarget;
 													return isCompletedBase || isAllAttemptsMadeWithFailures;
-												} )() ? __( 'Campaign completed - Updates disabled', 'wp-ai-blogger' ) : '' }
+												} )() ? __( 'Campaign completed - Updates disabled', 'auto-ai-blogger' ) : '' }
 											>
-												{ ( drawerData.type === 'new' ) ? __( 'Create', 'wp-ai-blogger' ) : __( 'Update', 'wp-ai-blogger' ) }
+												{ ( drawerData.type === 'new' ) ? __( 'Create', 'auto-ai-blogger' ) : __( 'Update', 'auto-ai-blogger' ) }
 											</button>
 										) }
 									</div>

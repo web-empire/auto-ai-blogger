@@ -38,6 +38,6 @@ fi
 cd ..
 
 # Copy files for zip.
-rsync -rc --exclude-from=".distignore" "./" "artifact/phpstan/wp-ai-blogger"
+rsync -rc --exclude-from=".distignore" "./" "artifact/phpstan/auto-ai-blogger"
 
 success "Done. Your WP Plugin Base Folder is copied for creating stubs..! 🎉"

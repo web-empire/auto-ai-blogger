@@ -1,31 +1,31 @@
 <?php
 /**
- * Admin AJAX class for WP AI Blogger.
+ * Admin AJAX class for Solvex AI Blogger.
  *
  * This class handles AJAX requests for admin operations including
  * settings management, campaign operations, and post creation.
  * Implements security measures including rate limiting,
  * input validation, and proper authentication.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Admin;
+namespace WPSolvex\AutoAIBlogger\Admin;
 
-use WPAIBlogger\Inc\Cron_Handler;
-use WPAIBlogger\Inc\Traits\Get_Instance;
-use WPAIBlogger\Inc\Utils\Helper;
-use WPAIBlogger\Inc\Utils\Metadata;
-use WPAIBlogger\Inc\Utils\Settings;
+use WPSolvex\AutoAIBlogger\Inc\Cron_Handler;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Helper;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Metadata;
+use WPSolvex\AutoAIBlogger\Inc\Utils\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Admin AJAX class for WP AI Blogger.
+ * Admin AJAX class for Solvex AI Blogger.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @subpackage Admin
  * @since 1.0.0
  */
@@ -51,18 +51,18 @@ class Ajax {
 	 * @var array<string>
 	 */
 	public $ajax_events = [
-		'wpaib_update_admin_setting',
-		'wpaib_create_campaign',
-		'wpaib_update_campaign',
-		'wpaib_get_campaign_metadata',
-		'wpaib_create_post',
-		'wpaib_run_campaign',
-		'wpaib_get_campaign_analytics',
-		'wpaib_delete_campaign',
-		'wpaib_get_campaign_logs',
-		'wpaib_pause_campaign',
-		'wpaib_resume_campaign',
-		'wpaib_reschedule_campaign',
+		'autoaib_update_admin_setting',
+		'autoaib_create_campaign',
+		'autoaib_update_campaign',
+		'autoaib_get_campaign_metadata',
+		'autoaib_create_post',
+		'autoaib_run_campaign',
+		'autoaib_get_campaign_analytics',
+		'autoaib_delete_campaign',
+		'autoaib_get_campaign_logs',
+		'autoaib_pause_campaign',
+		'autoaib_resume_campaign',
+		'autoaib_reschedule_campaign',
 	];
 
 	/**
@@ -91,15 +91,15 @@ class Ajax {
 	 */
 	public function __construct() {
 		$this->errors = [
-			'permission'         => __( 'Sorry, you are not allowed to do this operation.', 'wp-ai-blogger' ),
-			'nonce'              => __( 'Nonce validation failed', 'wp-ai-blogger' ),
-			'default'            => __( 'Sorry, something went wrong.', 'wp-ai-blogger' ),
-			'success'            => __( 'Successfully saved data!', 'wp-ai-blogger' ),
-			'rate_limit'         => __( 'Too many requests. Please try again later.', 'wp-ai-blogger' ),
-			'request_too_large'  => __( 'Request size exceeds maximum allowed limit.', 'wp-ai-blogger' ),
-			'invalid_data'       => __( 'Invalid or malformed data provided.', 'wp-ai-blogger' ),
-			'security_violation' => __( 'Security check failed. Request blocked.', 'wp-ai-blogger' ),
-			'content_too_long'   => __( 'Content exceeds maximum allowed length.', 'wp-ai-blogger' ),
+			'permission'         => __( 'Sorry, you are not allowed to do this operation.', 'auto-ai-blogger' ),
+			'nonce'              => __( 'Nonce validation failed', 'auto-ai-blogger' ),
+			'default'            => __( 'Sorry, something went wrong.', 'auto-ai-blogger' ),
+			'success'            => __( 'Successfully saved data!', 'auto-ai-blogger' ),
+			'rate_limit'         => __( 'Too many requests. Please try again later.', 'auto-ai-blogger' ),
+			'request_too_large'  => __( 'Request size exceeds maximum allowed limit.', 'auto-ai-blogger' ),
+			'invalid_data'       => __( 'Invalid or malformed data provided.', 'auto-ai-blogger' ),
+			'security_violation' => __( 'Security check failed. Request blocked.', 'auto-ai-blogger' ),
+			'content_too_long'   => __( 'Content exceeds maximum allowed length.', 'auto-ai-blogger' ),
 		];
 
 		/* Initialize AJAX events */
@@ -108,16 +108,16 @@ class Ajax {
 		}
 
 		// Add security headers for AJAX responses.
-		add_action( 'wp_ajax_wpaib_update_admin_setting', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_create_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_update_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_get_campaign_metadata', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_create_post', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_get_campaign_logs', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_pause_campaign', [ $this, 'add_security_headers' ], 1 );
-		add_action( 'wp_ajax_wpaib_resume_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_update_admin_setting', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_create_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_update_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_get_campaign_metadata', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_create_post', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_run_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_delete_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_get_campaign_logs', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_pause_campaign', [ $this, 'add_security_headers' ], 1 );
+		add_action( 'wp_ajax_autoaib_resume_campaign', [ $this, 'add_security_headers' ], 1 );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Ajax {
 	/**
 	 * Add security headers to AJAX responses.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function add_security_headers(): void {
 		if ( ! headers_sent() ) {
@@ -157,7 +157,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_update_admin_setting(): void {
+	public function autoaib_update_admin_setting(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'update_admin_setting' );
@@ -167,7 +167,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -191,10 +191,11 @@ class Ajax {
 
 			$sub_option_value = '';
 			if ( isset( $_POST['value'] ) ) {
+				$raw_value = sanitize_text_field( wp_unslash( $_POST['value'] ) );
 				if ( ! empty( $type_settings[ $sub_option_key ] ) ) {
-					$sub_option_value = Settings::sanitize_data( $_POST['value'], $type_settings[ $sub_option_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( $raw_value, $type_settings[ $sub_option_key ] );
 				} else {
-					$sub_option_value = Settings::sanitize_data( $_POST['value'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done in Settings::sanitize_data..
+					$sub_option_value = Settings::sanitize_data( $raw_value );
 				}
 			}
 
@@ -223,7 +224,7 @@ class Ajax {
 		 * @since 1.0.0
 		 * @return void
 		 */
-	public function wpaib_create_campaign(): void {
+	public function autoaib_create_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'create_campaign' );
@@ -233,22 +234,22 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
 
-			// Validate and sanitize input.
-			$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON string decoded then each field sanitized individually.
+			$campaign_raw = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-			if ( empty( $campaign_details ) ) {
+			if ( empty( $campaign_raw ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
 
 			// Decode and validate JSON.
-			$campaign_details = json_decode( $campaign_details, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
+			$campaign_details = json_decode( $campaign_raw, true );
+			if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $campaign_details ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
@@ -266,7 +267,7 @@ class Ajax {
 
 			// Validate required fields.
 			if ( ! is_array( $formatted_campaign_data ) || empty( $formatted_campaign_data['title'] ) ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -276,7 +277,7 @@ class Ajax {
 					'post_title'   => $formatted_campaign_data['title'],
 					'post_content' => $formatted_campaign_data['content'] ?? '',
 					'post_status'  => $formatted_campaign_data['status'] ?? 'draft',
-					'post_type'    => WP_AI_BLOGGER_CPT_CAMPAIGN,
+					'post_type'    => AUTOAIB_CPT_CAMPAIGN,
 					'meta_input'   => $formatted_campaign_data['meta_input'] ?? [],
 				]
 			);
@@ -314,7 +315,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_update_campaign(): void {
+	public function autoaib_update_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'update_campaign' );
@@ -324,41 +325,35 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
 
-			// Validate and sanitize input.
-			$campaign_details = isset( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON string decoded then each field sanitized individually.
+			$campaign_raw = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-			if ( empty( $campaign_details ) ) {
+			if ( empty( $campaign_raw ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
 
 			// Decode and validate JSON.
-			$campaign_details = json_decode( $campaign_details, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
-				return;
-			}
-
-			// Validate campaign ID.
-			if ( ! is_array( $campaign_details ) ) {
+			$campaign_details = json_decode( $campaign_raw, true );
+			if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $campaign_details ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
 				return;
 			}
 			$campaign_id = absint( $campaign_details['id'] ?? 0 );
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
 			// Check if campaign exists and user can edit it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -380,7 +375,7 @@ class Ajax {
 
 			// Validate required fields.
 			if ( ! is_array( $formatted_campaign_data ) || empty( $formatted_campaign_data['title'] ) ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign title is required.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -428,7 +423,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_get_campaign_metadata(): void {
+	public function autoaib_get_campaign_metadata(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_metadata' );
@@ -438,7 +433,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -446,14 +441,14 @@ class Ajax {
 			// Validate campaign ID.
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -466,7 +461,7 @@ class Ajax {
 			$campaign_data = Metadata::get_campaign_data( $campaign_id, true );
 
 			if ( empty( $campaign_data ) ) {
-				wp_send_json_error( [ 'message' => __( 'Failed to retrieve campaign data.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Failed to retrieve campaign data.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -482,7 +477,7 @@ class Ajax {
 				[
 					'data'        => $campaign_data,
 					'campaign_id' => $campaign_id,
-					'message'     => __( 'Campaign data retrieved successfully.', 'wp-ai-blogger' ),
+					'message'     => __( 'Campaign data retrieved successfully.', 'auto-ai-blogger' ),
 				]
 			);
 
@@ -497,7 +492,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_create_post(): void {
+	public function autoaib_create_post(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'create_post' );
@@ -507,7 +502,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -518,8 +513,8 @@ class Ajax {
 				return;
 			}
 
-			// Validate and sanitize input.
-			$post_data = isset( $_POST['post_data'] ) ? wp_unslash( $_POST['post_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is done below..
+			// Validate and sanitize input — JSON containing HTML post_content; individual fields sanitized after json_decode via Metadata::sanitize_data().
+			$post_data = isset( $_POST['post_data'] ) && is_string( $_POST['post_data'] ) ? wp_unslash( $_POST['post_data'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON with HTML content; each field sanitized individually after decode via Metadata::sanitize_data().
 
 			if ( empty( $post_data ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'invalid_data' ) ] );
@@ -534,7 +529,7 @@ class Ajax {
 			}
 
 			if ( ! is_array( $post_data ) || empty( $post_data['title'] ) ) {
-				wp_send_json_error( [ 'message' => __( 'Post title is required.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Post title is required.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -544,7 +539,7 @@ class Ajax {
 			// Validate and sanitize title.
 			$post_title = sanitize_text_field( (string) $post_data['title'] );
 			if ( strlen( $post_title ) > 200 ) {
-				wp_send_json_error( [ 'message' => __( 'Post title is too long (max 200 characters).', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Post title is too long (max 200 characters).', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -599,7 +594,7 @@ class Ajax {
 			// Validate and sanitize content.
 			$post_content = wp_kses_post( (string) $post_content );
 			if ( strlen( $post_content ) > 100000 ) { // 100KB limit.
-				wp_send_json_error( [ 'message' => __( 'Post content is too long.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Post content is too long.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -618,7 +613,7 @@ class Ajax {
 			// Check if user can create this post type.
 			$post_type_object = get_post_type_object( $post_type );
 			if ( ! $post_type_object || ! current_user_can( $post_type_object->cap->create_posts ) ) {
-				wp_send_json_error( [ 'message' => __( 'You do not have permission to create this type of post.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'You do not have permission to create this type of post.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -653,7 +648,7 @@ class Ajax {
 			if ( is_wp_error( $post_id ) || ! $post_id ) {
 				$error_message = is_wp_error( $post_id )
 					? $post_id->get_error_message()
-					: __( 'Failed to create post - unknown error occurred.', 'wp-ai-blogger' );
+					: __( 'Failed to create post - unknown error occurred.', 'auto-ai-blogger' );
 
 				wp_send_json_error(
 					[
@@ -677,7 +672,7 @@ class Ajax {
 
 			// Update token data if available from API response.
 			if ( is_array( $token_data ) && isset( $token_data['total'] ) && isset( $token_data['remaining'] ) ) {
-				wpaib_update_token_data( $token_data );
+				autoaib_update_token_data( $token_data );
 			}
 
 			$success_response = [
@@ -698,7 +693,7 @@ class Ajax {
 		} catch ( \Exception $e ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'An unexpected error occurred while creating the post. Please try again.', 'wp-ai-blogger' ),
+					'message' => __( 'An unexpected error occurred while creating the post. Please try again.', 'auto-ai-blogger' ),
 				]
 			);
 		}
@@ -710,7 +705,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_run_campaign(): void {
+	public function autoaib_run_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'run_campaign' );
@@ -720,14 +715,14 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
 
 			// Check if user can publish posts (required for running campaigns).
 			if ( ! current_user_can( 'publish_posts' ) ) {
-				wp_send_json_error( [ 'message' => __( 'You do not have permission to run campaigns.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'You do not have permission to run campaigns.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -735,14 +730,14 @@ class Ajax {
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
 			// Check if campaign exists and user can edit it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -753,7 +748,7 @@ class Ajax {
 
 			// Check if campaign is active/published.
 			if ( $campaign_post->post_status !== 'publish' ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign must be published to run.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign must be published to run.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -774,7 +769,7 @@ class Ajax {
 			if ( ! $post_id ) {
 				wp_send_json_error(
 					[
-						'message'     => __( 'Failed to create post from campaign.', 'wp-ai-blogger' ),
+						'message'     => __( 'Failed to create post from campaign.', 'auto-ai-blogger' ),
 						'campaign_id' => $campaign_id,
 					]
 				);
@@ -809,10 +804,10 @@ class Ajax {
 	/**
 	 * Handler to get campaign analytics data.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_get_campaign_analytics(): void {
+	public function autoaib_get_campaign_analytics(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_analytics' );
@@ -822,7 +817,7 @@ class Ajax {
 			}
 
 			// Validate nonce.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -840,9 +835,9 @@ class Ajax {
 				[
 					'post_type'              => 'any',
 					'post_status'            => 'any',
-					'meta_query'             => [
+					'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Using meta query for campaign posts.
 						[
-							'key'     => 'wp_aib_campaign_id',
+							'key'     => 'autoaib_campaign_id',
 							'value'   => $campaign_id,
 							'compare' => '=',
 						],
@@ -891,7 +886,7 @@ class Ajax {
 			// Get author name.
 			$author_id   = $campaign_meta['author'] ?? get_current_user_id();
 			$author_data = get_userdata( $author_id );
-			$author_name = $author_data ? $author_data->display_name : __( 'Unknown', 'wp-ai-blogger' );
+			$author_name = $author_data ? $author_data->display_name : __( 'Unknown', 'auto-ai-blogger' );
 
 			// Get top performing posts.
 			$top_posts = [];
@@ -949,7 +944,7 @@ class Ajax {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function wpaib_delete_campaign(): void {
+	public function autoaib_delete_campaign(): void {
 		try {
 			// security validation.
 			$security_check = $this->validate_ajax_security( 'delete_campaign' );
@@ -959,20 +954,20 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
 			// Validate campaign ID.
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
 			if ( ! current_user_can( 'delete_post', $campaign_id ) ) {
@@ -980,21 +975,21 @@ class Ajax {
 			}
 
 			// Clear scheduled events for this campaign.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 			wp_delete_post( $campaign_id, true );
-			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'wp-ai-blogger' ) ] );
+			wp_send_json_success( [ 'message' => __( 'Campaign deleted successfully.', 'auto-ai-blogger' ) ] );
 		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'wp-ai-blogger' ) . $e->getMessage() ] );
+			wp_send_json_error( [ 'message' => __( 'Error occurred while deleting campaign: ', 'auto-ai-blogger' ) . $e->getMessage() ] );
 		}
 	}
 
 	/**
 	 * Handler to get campaign logs with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_get_campaign_logs(): void {
+	public function autoaib_get_campaign_logs(): void {
 		try {
 			// Security validation.
 			$security_check = $this->validate_ajax_security( 'get_campaign_logs' );
@@ -1004,7 +999,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 				return;
 			}
@@ -1012,14 +1007,14 @@ class Ajax {
 			// Validate campaign ID.
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
 			// Check if campaign exists and user can read it.
 			$campaign_post = get_post( $campaign_id );
-			if ( ! $campaign_post || $campaign_post->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign_post || $campaign_post->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 				return;
 			}
 
@@ -1035,7 +1030,7 @@ class Ajax {
 				[
 					'logs'        => $logs,
 					'campaign_id' => $campaign_id,
-					'message'     => __( 'Logs retrieved successfully.', 'wp-ai-blogger' ),
+					'message'     => __( 'Logs retrieved successfully.', 'auto-ai-blogger' ),
 				]
 			);
 
@@ -1047,10 +1042,10 @@ class Ajax {
 	/**
 	 * Handler to pause campaign with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_pause_campaign(): void {
+	public function autoaib_pause_campaign(): void {
 		try {
 			// Validate security.
 			$security_check = $this->validate_ajax_security( 'pause_campaign' );
@@ -1059,7 +1054,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -1067,13 +1062,13 @@ class Ajax {
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 
 			if ( $campaign_id <= 0 ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check user permissions.
@@ -1084,13 +1079,13 @@ class Ajax {
 			// Check if campaign is already paused.
 			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( $is_paused ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign is already paused.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign is already paused.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check if campaign is already completed.
 			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
-				wp_send_json_error( [ 'message' => __( 'Cannot pause a completed campaign.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Cannot pause a completed campaign.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Pause the campaign.
@@ -1098,27 +1093,27 @@ class Ajax {
 			Metadata::update_campaign_meta( $campaign_id, 'pausedAt', current_time( 'mysql' ) );
 
 			// Clear scheduled events.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 
 			wp_send_json_success(
 				[
-					'message'  => __( 'Campaign paused successfully.', 'wp-ai-blogger' ),
+					'message'  => __( 'Campaign paused successfully.', 'auto-ai-blogger' ),
 					'isPaused' => true,
 				]
 			);
 
 		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'An error occurred while pausing the campaign.', 'wp-ai-blogger' ) ] );
+			wp_send_json_error( [ 'message' => __( 'An error occurred while pausing the campaign.', 'auto-ai-blogger' ) ] );
 		}
 	}
 
 	/**
 	 * Handler to resume campaign with security.
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_resume_campaign(): void {
+	public function autoaib_resume_campaign(): void {
 		try {
 			// Validate security.
 			$security_check = $this->validate_ajax_security( 'resume_campaign' );
@@ -1127,7 +1122,7 @@ class Ajax {
 			}
 
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_admin_nonce', 'security', false ) ) {
+			if ( ! check_ajax_referer( 'autoaib_admin_nonce', 'security', false ) ) {
 				wp_send_json_error( [ 'message' => $this->get_error_msg( 'nonce' ) ] );
 			}
 
@@ -1135,13 +1130,13 @@ class Ajax {
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 
 			if ( $campaign_id <= 0 ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Verify campaign exists.
 			$campaign = get_post( $campaign_id );
-			if ( ! $campaign || $campaign->post_type !== WP_AI_BLOGGER_CPT_CAMPAIGN ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'wp-ai-blogger' ) ] );
+			if ( ! $campaign || $campaign->post_type !== AUTOAIB_CPT_CAMPAIGN ) {
+				wp_send_json_error( [ 'message' => __( 'Campaign not found.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check user permissions.
@@ -1152,13 +1147,13 @@ class Ajax {
 			// Check if campaign is paused.
 			$is_paused = Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( ! $is_paused ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign is not paused.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign is not paused.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check if campaign is completed.
 			$campaign_completed = Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
-				wp_send_json_error( [ 'message' => __( 'Cannot resume a completed campaign.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Cannot resume a completed campaign.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Check if target is already reached.
@@ -1166,7 +1161,7 @@ class Ajax {
 			$posts_target  = absint( Metadata::get_campaign_meta( $campaign_id, 'postsTarget' ) );
 
 			if ( $posts_target > 0 && $posts_created >= $posts_target ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign target already reached.', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign target already reached.', 'auto-ai-blogger' ) ] );
 			}
 
 			// Resume the campaign.
@@ -1185,43 +1180,43 @@ class Ajax {
 
 			// Schedule the next post immediately (or after a short delay).
 			$next_run = time() + 60; // Start in 1 minute.
-			wp_schedule_single_event( $next_run, 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_schedule_single_event( $next_run, 'autoaib_create_single_post', [ $campaign_id ] );
 
 			wp_send_json_success(
 				[
-					'message'  => __( 'Campaign resumed successfully.', 'wp-ai-blogger' ),
+					'message'  => __( 'Campaign resumed successfully.', 'auto-ai-blogger' ),
 					'isPaused' => false,
 				]
 			);
 
 		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'An error occurred while resuming the campaign.', 'wp-ai-blogger' ) ] );
+			wp_send_json_error( [ 'message' => __( 'An error occurred while resuming the campaign.', 'auto-ai-blogger' ) ] );
 		}
 	}
 
 	/**
 	 * Reschedule a campaign's cron jobs (debug utility).
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 * @return void
 	 */
-	public function wpaib_reschedule_campaign(): void {
+	public function autoaib_reschedule_campaign(): void {
 		try {
 			// Nonce validation.
-			if ( ! check_ajax_referer( 'wpaib_reschedule_nonce', 'security', false ) ) {
-				wp_send_json_error( [ 'message' => __( 'Security check failed', 'wp-ai-blogger' ) ] );
+			if ( ! check_ajax_referer( 'autoaib_reschedule_nonce', 'security', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed', 'auto-ai-blogger' ) ] );
 			}
 
 			// Permission check.
 			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action', 'auto-ai-blogger' ) ] );
 			}
 
 			// Get campaign ID.
 			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : 0;
 
 			if ( ! $campaign_id ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Invalid campaign ID', 'auto-ai-blogger' ) ] );
 			}
 
 			// Get campaign metadata.
@@ -1230,7 +1225,7 @@ class Ajax {
 			$start_date      = get_post_meta( $campaign_id, 'startDate', true );
 
 			if ( empty( $repeat_interval ) || empty( $repeat_unit ) ) {
-				wp_send_json_error( [ 'message' => __( 'Campaign is missing repeat interval or unit', 'wp-ai-blogger' ) ] );
+				wp_send_json_error( [ 'message' => __( 'Campaign is missing repeat interval or unit', 'auto-ai-blogger' ) ] );
 			}
 
 			// Create meta_input array.
@@ -1245,12 +1240,12 @@ class Ajax {
 
 			wp_send_json_success(
 				[
-					'message' => __( 'Campaign cron jobs rescheduled successfully!', 'wp-ai-blogger' ),
+					'message' => __( 'Campaign cron jobs rescheduled successfully!', 'auto-ai-blogger' ),
 				]
 			);
 
 		} catch ( \Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'Failed to reschedule campaign', 'wp-ai-blogger' ) ] );
+			wp_send_json_error( [ 'message' => __( 'Failed to reschedule campaign', 'auto-ai-blogger' ) ] );
 		}
 	}
 
@@ -1259,12 +1254,12 @@ class Ajax {
 	 *
 	 * @param string $action The AJAX action being performed.
 	 * @return bool|\WP_Error True if valid, WP_Error if security check fails.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_ajax_security( $action = '' ) {
 		try {
 			// Check user capabilities.
-			if ( ! current_user_can( WP_AI_BLOGGER_CAPABILITY ) ) {
+			if ( ! current_user_can( AUTOAIB_CAPABILITY ) ) {
 				return new \WP_Error( 'permission_denied', $this->get_error_msg( 'permission' ) );
 			}
 
@@ -1297,7 +1292,7 @@ class Ajax {
 	 * Validate AJAX request size.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if too large.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_ajax_request_size() {
 		$content_length = isset( $_SERVER['CONTENT_LENGTH'] ) ? absint( $_SERVER['CONTENT_LENGTH'] ) : 0;
@@ -1313,10 +1308,10 @@ class Ajax {
 	 * Validate User-Agent header.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if suspicious.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_user_agent() {
-		$user_agent = sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 
 		if ( empty( $user_agent ) ) {
 			return new \WP_Error( 'invalid_user_agent', $this->get_error_msg( 'security_violation' ) );
@@ -1340,7 +1335,7 @@ class Ajax {
 		foreach ( $suspicious_patterns as $pattern ) {
 			if ( strpos( $user_agent_lower, $pattern ) !== false ) {
 				// Allow legitimate WordPress and plugin requests.
-				if ( strpos( $user_agent_lower, 'wordpress' ) === false && strpos( $user_agent_lower, 'wp-ai-blogger' ) === false ) {
+				if ( strpos( $user_agent_lower, 'wordpress' ) === false && strpos( $user_agent_lower, 'auto-ai-blogger' ) === false ) {
 					return new \WP_Error( 'suspicious_user_agent', $this->get_error_msg( 'security_violation' ) );
 				}
 			}
@@ -1353,10 +1348,10 @@ class Ajax {
 	 * Validate admin referer.
 	 *
 	 * @return bool|\WP_Error True if valid, WP_Error if invalid.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function validate_admin_referer() {
-		$referer = sanitize_text_field( (string) ( $_SERVER['HTTP_REFERER'] ?? '' ) );
+		$referer = isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
 		if ( ! empty( $referer ) ) {
 			$admin_url = admin_url();
@@ -1375,7 +1370,7 @@ class Ajax {
 	 *
 	 * @param array<string, mixed> $campaign_data Raw campaign data.
 	 * @return array<string, mixed>|\WP_Error Sanitized data or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function sanitize_campaign_data( $campaign_data ) {
 		if ( ! is_array( $campaign_data ) ) {
@@ -1415,7 +1410,7 @@ class Ajax {
 				case 'title':
 					$sanitized[ $key ] = sanitize_text_field( (string) $value );
 					if ( strlen( $sanitized[ $key ] ) > 200 ) {
-						return new \WP_Error( 'title_too_long', __( 'Campaign title is too long.', 'wp-ai-blogger' ) );
+						return new \WP_Error( 'title_too_long', __( 'Campaign title is too long.', 'auto-ai-blogger' ) );
 					}
 					break;
 				case 'content':
@@ -1458,7 +1453,7 @@ class Ajax {
 	 *
 	 * @param array<string, mixed> $meta_data Raw meta data.
 	 * @return array<string, mixed> Sanitized meta data.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function sanitize_meta_input( $meta_data ) {
 		$sanitized         = [];
@@ -1515,10 +1510,10 @@ class Ajax {
 	 * Uses atomic operations to prevent race conditions when multiple posts are created quickly.
 	 *
 	 * @param string $post_title The title of the post that was created.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function remove_post_idea_from_db( $post_title ): void {
-		$lock_key = 'wp_ai_blogger_postideas_lock'; // Define early to avoid undefined variable issues.
+		$lock_key = 'autoaib_postideas_lock'; // Define early to avoid undefined variable issues.
 
 		try {
 			// Sanitize the title.
@@ -1566,7 +1561,7 @@ class Ajax {
 			// Now we have the lock, perform the operation.
 			try {
 				// Get current post ideas from database (fresh read).
-				$current_post_ideas = \WPAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
+				$current_post_ideas = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::get_option( 'postIdeas', '' );
 
 				if ( empty( $current_post_ideas ) || ! is_string( $current_post_ideas ) ) {
 					return;
@@ -1592,10 +1587,10 @@ class Ajax {
 					// Check if this was the last post idea.
 					if ( empty( $updated_ideas ) ) {
 						// Set to "-1" to indicate post ideas are exhausted.
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
+						\WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', '-1' );
 					} else {
 						$updated_post_ideas_string = implode( "\n", $updated_ideas );
-						\WPAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
+						\WPSolvex\AutoAIBlogger\Inc\Utils\Helper::update_option( 'postIdeas', $updated_post_ideas_string );
 					}
 				}
 			} finally {
@@ -1616,7 +1611,7 @@ class Ajax {
 	 * @param string               $title The post title.
 	 * @param array<string, mixed> $post_data Additional post data.
 	 * @return array<string, mixed>|\WP_Error Generated content or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function generate_content_from_title_api( $title, $post_data = [] ) {
 		try {
@@ -1630,7 +1625,7 @@ class Ajax {
 				$api_data['license'] = sanitize_text_field( $post_data['license'] );
 			} else {
 				// Get license from plugin settings if not provided.
-				$api_data['license'] = \WPAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
+				$api_data['license'] = \WPSolvex\AutoAIBlogger\Inc\Utils\Helper::get_option( 'license', '' );
 			}
 
 			if ( ! empty( $post_data['site_title'] ) && is_string( $post_data['site_title'] ) ) {
@@ -1668,7 +1663,7 @@ class Ajax {
 			}
 
 			// Make API request.
-			$api_url = 'https://wpaiblogger.com/wp-json/wp-ai-blogger/v1/generate-content-from-title';
+			$api_url = AUTOAIB_CONTENT_FROM_TITLE_POST_API;
 
 			$response = wp_remote_post(
 				$api_url,
@@ -1676,7 +1671,7 @@ class Ajax {
 					'timeout' => 90,
 					'headers' => [
 						'Content-Type' => 'application/json',
-						'User-Agent'   => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent'   => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 					'body'    => $api_data ? wp_json_encode( $api_data ) : '',
 				]
@@ -1686,7 +1681,7 @@ class Ajax {
 			if ( is_wp_error( $response ) ) {
 				return new \WP_Error(
 					'api_request_failed',
-					__( 'Failed to connect to content generation API: ', 'wp-ai-blogger' ) . $response->get_error_message()
+					__( 'Failed to connect to content generation API: ', 'auto-ai-blogger' ) . $response->get_error_message()
 				);
 			}
 
@@ -1699,7 +1694,7 @@ class Ajax {
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
 				return new \WP_Error(
 					'api_json_error',
-					__( 'Invalid JSON response from API', 'wp-ai-blogger' )
+					__( 'Invalid JSON response from API', 'auto-ai-blogger' )
 				);
 			}
 
@@ -1718,7 +1713,7 @@ class Ajax {
 						'api_http_error',
 						sprintf(
 							/* translators: %d is the HTTP status code */
-							__( 'API returned HTTP error %d', 'wp-ai-blogger' ),
+							__( 'API returned HTTP error %d', 'auto-ai-blogger' ),
 							$http_code
 						),
 						[ 'status' => $http_code ]
@@ -1728,7 +1723,7 @@ class Ajax {
 
 			// Check API response status.
 			if ( is_array( $decoded_response ) && isset( $decoded_response['code'] ) && $decoded_response['code'] !== 'success' ) {
-				$error_message = (string) ( $decoded_response['message'] ?? __( 'Unknown API error', 'wp-ai-blogger' ) );
+				$error_message = (string) ( $decoded_response['message'] ?? __( 'Unknown API error', 'auto-ai-blogger' ) );
 				$error_code    = (string) ( $decoded_response['code'] ?? 'api_error' );
 
 				// Include HTTP status code if available.
@@ -1742,7 +1737,7 @@ class Ajax {
 			if ( ! is_array( $decoded_response ) || ! isset( $decoded_response['post_content'] ) ) {
 				return new \WP_Error(
 					'api_no_content',
-					__( 'API did not return generated content', 'wp-ai-blogger' )
+					__( 'API did not return generated content', 'auto-ai-blogger' )
 				);
 			}
 
@@ -1752,7 +1747,7 @@ class Ajax {
 			if ( empty( $generated_content ) || strlen( $generated_content ) < 50 ) {
 				return new \WP_Error(
 					'api_content_too_short',
-					__( 'Generated content is too short or empty', 'wp-ai-blogger' )
+					__( 'Generated content is too short or empty', 'auto-ai-blogger' )
 				);
 			}
 
@@ -1775,7 +1770,7 @@ class Ajax {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'api_exception',
-				__( 'Exception occurred during content generation: ', 'wp-ai-blogger' ) . $e->getMessage()
+				__( 'Exception occurred during content generation: ', 'auto-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}
@@ -1786,7 +1781,7 @@ class Ajax {
 	 * @param string                           $content The post content with placeholders.
 	 * @param array<int, array<string, mixed>> $images Array of image data from API.
 	 * @return array<string, mixed>|\WP_Error Processed data with content and featured image ID or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	/**
 	 * Processes images and replaces placeholders in content according to image placement rules.
@@ -1808,7 +1803,7 @@ class Ajax {
 			if ( ! is_string( $content ) ) {
 				return new \WP_Error(
 					'invalid_content',
-					__( 'Content must be a string.', 'wp-ai-blogger' )
+					__( 'Content must be a string.', 'auto-ai-blogger' )
 				);
 			}
 
@@ -1895,7 +1890,7 @@ class Ajax {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'image_processing_error',
-				__( 'Exception occurred during image processing: ', 'wp-ai-blogger' ) . $e->getMessage()
+				__( 'Exception occurred during image processing: ', 'auto-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}
@@ -2003,7 +1998,7 @@ class Ajax {
 				if ( isset( $matches[1] ) ) {
 					$attrs_json    = $matches[1];
 					$attrs         = json_decode( $attrs_json, true );
-					$heading_level = $attrs['level'] ?? 2;
+					$heading_level = ( json_last_error() === JSON_ERROR_NONE && is_array( $attrs ) ) ? ( $attrs['level'] ?? 2 ) : 2;
 				} else {
 					$heading_level = 2; // Default level.
 				}
@@ -2059,7 +2054,7 @@ class Ajax {
 	 * @param string $image_url The image URL to upload.
 	 * @param string $alt_text The alt text for the image.
 	 * @return int|\WP_Error The attachment ID or error.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function upload_image_to_media_library( $image_url, $alt_text = '' ) {
 		try {
@@ -2069,7 +2064,7 @@ class Ajax {
 				[
 					'timeout' => 30,
 					'headers' => [
-						'User-Agent' => 'WP-AI-Blogger/' . WP_AI_BLOGGER_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
+						'User-Agent' => 'Solvex-AI-Blogger/' . AUTOAIB_VERSION . ' WordPress/' . get_bloginfo( 'version' ),
 					],
 				]
 			);
@@ -2077,7 +2072,7 @@ class Ajax {
 			if ( is_wp_error( $response ) ) {
 				return new \WP_Error(
 					'image_download_failed',
-					__( 'Failed to download image: ', 'wp-ai-blogger' ) . $response->get_error_message()
+					__( 'Failed to download image: ', 'auto-ai-blogger' ) . $response->get_error_message()
 				);
 			}
 
@@ -2087,7 +2082,7 @@ class Ajax {
 					'image_download_http_error',
 					sprintf(
 						/* translators: %d is the HTTP status code */
-						__( 'Image download returned HTTP error %d', 'wp-ai-blogger' ),
+						__( 'Image download returned HTTP error %d', 'auto-ai-blogger' ),
 						$http_code
 					)
 				);
@@ -2097,7 +2092,7 @@ class Ajax {
 			if ( empty( $image_data ) ) {
 				return new \WP_Error(
 					'image_download_empty',
-					__( 'Downloaded image data is empty', 'wp-ai-blogger' )
+					__( 'Downloaded image data is empty', 'auto-ai-blogger' )
 				);
 			}
 
@@ -2119,7 +2114,7 @@ class Ajax {
 			if ( $upload['error'] ) {
 				return new \WP_Error(
 					'image_upload_failed',
-					__( 'Failed to upload image: ', 'wp-ai-blogger' ) . $upload['error']
+					__( 'Failed to upload image: ', 'auto-ai-blogger' ) . $upload['error']
 				);
 			}
 
@@ -2151,7 +2146,7 @@ class Ajax {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'image_upload_exception',
-				__( 'Exception occurred during image upload: ', 'wp-ai-blogger' ) . $e->getMessage()
+				__( 'Exception occurred during image upload: ', 'auto-ai-blogger' ) . $e->getMessage()
 			);
 		}
 	}
@@ -2162,7 +2157,7 @@ class Ajax {
 	 * @param int   $campaign_id Campaign ID.
 	 * @param array $meta_input  Campaign metadata.
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function schedule_campaign_posts( $campaign_id, $meta_input ): void {
 		try {
@@ -2178,7 +2173,7 @@ class Ajax {
 			}
 
 			// Clear any existing scheduled events for this campaign.
-			wp_clear_scheduled_hook( 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_clear_scheduled_hook( 'autoaib_create_single_post', [ $campaign_id ] );
 
 			// Check if campaign post is published (active).
 			$campaign_post = get_post( $campaign_id );
@@ -2192,13 +2187,13 @@ class Ajax {
 			}
 
 			// Check if campaign is already completed.
-			$campaign_completed = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
+			$campaign_completed = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'campaignCompleted' );
 			if ( $campaign_completed ) {
 				return;
 			}
 
 			// Check if campaign is paused.
-			$is_paused = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
+			$is_paused = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_meta( $campaign_id, 'isPaused' );
 			if ( $is_paused ) {
 				return;
 			}
@@ -2235,7 +2230,7 @@ class Ajax {
 			// Schedule the first post at the user-defined start date/time using single event.
 			// The cron handler will self-schedule subsequent posts after each execution.
 			// This matches the pause/resume pattern where we schedule one event at a time.
-			wp_schedule_single_event( $start_timestamp, 'wpaib_create_single_post', [ $campaign_id ] );
+			wp_schedule_single_event( $start_timestamp, 'autoaib_create_single_post', [ $campaign_id ] );
 		} catch ( \Exception $e ) {
 			return;
 		}
@@ -2247,7 +2242,7 @@ class Ajax {
 	 * @param int    $interval Interval number.
 	 * @param string $unit     Time unit (day, week, month, year).
 	 * @return int Interval in seconds.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function calculate_interval_seconds( $interval, $unit ): int {
 		// Production mode: Normal intervals.
@@ -2261,7 +2256,7 @@ class Ajax {
 		$seconds = $interval * ( $multipliers[ $unit ] ?? DAY_IN_SECONDS );
 
 		// Allow testing plugins to modify intervals.
-		return apply_filters( 'wpaib_campaign_interval_seconds', $seconds, $interval, $unit );
+		return apply_filters( 'autoaib_campaign_interval_seconds', $seconds, $interval, $unit );
 	}
 
 	/**
@@ -2270,7 +2265,7 @@ class Ajax {
 	 * @param int    $interval Interval number.
 	 * @param string $unit     Time unit.
 	 * @return string Schedule name.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_wp_cron_schedule( $interval, $unit ): string {
 		// Use built-in schedules when possible.
@@ -2282,23 +2277,23 @@ class Ajax {
 		}
 
 		// Create custom schedule name.
-		$schedule_name = "wpaib_{$interval}_{$unit}";
+		$schedule_name = "autoaib_{$interval}_{$unit}";
 
 		// Register custom schedule dynamically using a globally registered filter.
 		// We store the schedule info in an option so the filter can pick it up.
-		$custom_schedules = get_option( 'wpaib_custom_cron_schedules', [] );
+		$custom_schedules = get_option( 'autoaib_custom_cron_schedules', [] );
 		if ( ! isset( $custom_schedules[ $schedule_name ] ) ) {
 			$custom_schedules[ $schedule_name ] = [
 				'interval' => $this->calculate_interval_seconds( $interval, $unit ),
 				'display'  => sprintf(
 					/* translators: 1: Interval number, 2: Time unit, 3: s (if interval is greater than 1). */
-					__( 'Every %1$d %2$s%3$s', 'wp-ai-blogger' ),
+					__( 'Every %1$d %2$s%3$s', 'auto-ai-blogger' ),
 					$interval,
 					$unit,
 					$interval > 1 ? 's' : ''
 				),
 			];
-			update_option( 'wpaib_custom_cron_schedules', $custom_schedules );
+			update_option( 'autoaib_custom_cron_schedules', $custom_schedules );
 		}
 
 		return $schedule_name;
@@ -2309,13 +2304,13 @@ class Ajax {
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 * @return array<mixed> Campaign creation logs.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function get_campaign_creation_logs( $campaign_id ): array {
 		$logs = [];
 
 		// Get real success logs using the helper function.
-		$success_logs = wpaib_get_campaign_success_logs( $campaign_id, 20 );
+		$success_logs = autoaib_get_campaign_success_logs( $campaign_id, 20 );
 
 		foreach ( $success_logs as $index => $log ) {
 			// Use stored timestamp data directly (no backward compatibility needed).
@@ -2326,7 +2321,7 @@ class Ajax {
 			// Calculate time ago.
 			$time_ago = '';
 			if ( $unix_timestamp ) {
-				$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'wp-ai-blogger' ); // phpcs:ignore.
+				$time_ago = human_time_diff( $unix_timestamp, current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'auto-ai-blogger' ); // phpcs:ignore.
 			}
 
 			$logs[] = [
@@ -2336,29 +2331,29 @@ class Ajax {
 				'time_ago'       => $time_ago,
 				'unix_timestamp' => $unix_timestamp,
 				'status'         => 'success',
-				'title'          => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Created', 'wp-ai-blogger' ), $log['post_number'] ?? $index + 1 ),
-				'message'        => $log['message'] ?? sprintf( /* translators: %s is the success message. */ __( 'Post was created successfully and published.', 'wp-ai-blogger' ) ),
+				'title'          => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Created', 'auto-ai-blogger' ), $log['post_number'] ?? $index + 1 ),
+				'message'        => $log['message'] ?? sprintf( /* translators: %s is the success message. */ __( 'Post was created successfully and published.', 'auto-ai-blogger' ) ),
 				'post_id'        => $log['post_id'] ?? null,
-				'post_title'     => $log['post_title'] ?? sprintf( /* translators: %1$s: Post number, %2$s: Default post title. */ __( 'Generated Blog Post #%d', 'wp-ai-blogger' ), $log['post_number'] ?? $index + 1 ),
+				'post_title'     => $log['post_title'] ?? sprintf( /* translators: %1$s: Post number, %2$s: Default post title. */ __( 'Generated Blog Post #%d', 'auto-ai-blogger' ), $log['post_number'] ?? $index + 1 ),
 				'steps'          => [
 					[
 						'status'      => 'success',
-						'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+						'description' => __( 'Campaign validation passed', 'auto-ai-blogger' ),
 						'duration'    => wp_rand( 50, 150 ),
 					],
 					[
 						'status'      => 'success',
-						'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+						'description' => __( 'API request initiated', 'auto-ai-blogger' ),
 						'duration'    => wp_rand( 200, 500 ),
 					],
 					[
 						'status'      => 'success',
-						'description' => __( 'Content generated successfully', 'wp-ai-blogger' ),
+						'description' => __( 'Content generated successfully', 'auto-ai-blogger' ),
 						'duration'    => wp_rand( 1000, 3000 ),
 					],
 					[
 						'status'      => 'success',
-						'description' => __( 'Post created and published', 'wp-ai-blogger' ),
+						'description' => __( 'Post created and published', 'auto-ai-blogger' ),
 						'duration'    => wp_rand( 100, 300 ),
 					],
 				],
@@ -2366,7 +2361,7 @@ class Ajax {
 		}
 
 		// Get real error logs using our new function.
-		$error_logs = wpaib_get_campaign_error_logs( $campaign_id, 50 );
+		$error_logs = autoaib_get_campaign_error_logs( $campaign_id, 50 );
 
 		// Merge success and error logs.
 		$logs = array_merge( $logs, $error_logs );
@@ -2389,10 +2384,10 @@ class Ajax {
 	 *
 	 * @param int $campaign_id Campaign ID.
 	 * @return array<mixed> Sample campaign logs.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	private function generate_sample_campaign_logs( $campaign_id ): array {
-		$campaign_data   = \WPAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );
+		$campaign_data   = \WPSolvex\AutoAIBlogger\Inc\Utils\Metadata::get_campaign_data( $campaign_id, true );
 		$posts_created   = intval( $campaign_data['postsCreated'] ?? 0 );
 		$posts_failed    = intval( $campaign_data['postsFailed'] ?? 0 );
 		$posts_scheduled = intval( $campaign_data['postsScheduled'] ?? 0 );
@@ -2407,22 +2402,22 @@ class Ajax {
 			$steps     = [
 				[
 					'status'      => 'success',
-					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+					'description' => __( 'Campaign validation passed', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 50, 150 ),
 				],
 				[
 					'status'      => 'success',
-					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+					'description' => __( 'API request initiated', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 200, 500 ),
 				],
 				[
 					'status'      => 'success',
-					'description' => __( 'Content generated successfully', 'wp-ai-blogger' ),
+					'description' => __( 'Content generated successfully', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 1000, 3000 ),
 				],
 				[
 					'status'      => 'success',
-					'description' => __( 'Post created and published', 'wp-ai-blogger' ),
+					'description' => __( 'Post created and published', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 100, 300 ),
 				],
 			];
@@ -2431,10 +2426,10 @@ class Ajax {
 				'id'         => $log_counter,
 				'timestamp'  => gmdate( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_created - $i ) * 600 ),
 				'status'     => 'success',
-				'title'      => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Created', 'wp-ai-blogger' ), $i ),
-				'message'    => sprintf( /* translators: %d is the post number. */ __( 'Post #%d was created successfully and published.', 'wp-ai-blogger' ), $i ),
+				'title'      => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Created', 'auto-ai-blogger' ), $i ),
+				'message'    => sprintf( /* translators: %d is the post number. */ __( 'Post #%d was created successfully and published.', 'auto-ai-blogger' ), $i ),
 				'post_id'    => 1000 + $i,
-				'post_title' => sprintf( /* translators: %d is the post number. */ __( 'Generated Blog Post #%d', 'wp-ai-blogger' ), $i ),
+				'post_title' => sprintf( /* translators: %d is the post number. */ __( 'Generated Blog Post #%d', 'auto-ai-blogger' ), $i ),
 				'steps'      => $steps,
 			];
 			$log_counter++;
@@ -2442,11 +2437,11 @@ class Ajax {
 
 		// Generate logs for failed posts.
 		$error_reasons = [
-			__( 'API quota exceeded. Please check your subscription limits.', 'wp-ai-blogger' ),
-			__( 'Network timeout occurred during content generation.', 'wp-ai-blogger' ),
-			__( 'Invalid keywords provided. Content generation failed.', 'wp-ai-blogger' ),
-			__( 'Database connection error while saving post.', 'wp-ai-blogger' ),
-			__( 'Content filtering blocked the generated text.', 'wp-ai-blogger' ),
+			__( 'API quota exceeded. Please check your subscription limits.', 'auto-ai-blogger' ),
+			__( 'Network timeout occurred during content generation.', 'auto-ai-blogger' ),
+			__( 'Invalid keywords provided. Content generation failed.', 'auto-ai-blogger' ),
+			__( 'Database connection error while saving post.', 'auto-ai-blogger' ),
+			__( 'Content filtering blocked the generated text.', 'auto-ai-blogger' ),
 		];
 
 		for ( $i = 1; $i <= $posts_failed; $i++ ) {
@@ -2456,22 +2451,22 @@ class Ajax {
 			$failed_steps = [
 				[
 					'status'      => 'success',
-					'description' => __( 'Campaign validation passed', 'wp-ai-blogger' ),
+					'description' => __( 'Campaign validation passed', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 50, 150 ),
 				],
 				[
 					'status'      => 'success',
-					'description' => __( 'API request initiated', 'wp-ai-blogger' ),
+					'description' => __( 'API request initiated', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 200, 500 ),
 				],
 				[
 					'status'      => 'error',
-					'description' => __( 'Content generation failed', 'wp-ai-blogger' ),
+					'description' => __( 'Content generation failed', 'auto-ai-blogger' ),
 					'duration'    => wp_rand( 100, 300 ),
 				],
 				[
 					'status'      => 'error',
-					'description' => __( 'Post creation aborted', 'wp-ai-blogger' ),
+					'description' => __( 'Post creation aborted', 'auto-ai-blogger' ),
 					'duration'    => 0,
 				],
 			];
@@ -2480,8 +2475,8 @@ class Ajax {
 				'id'            => $log_counter,
 				'timestamp'     => gmdate( 'Y-m-d H:i:s', strtotime( $timestamp ) - ( $posts_failed - $i ) * 400 ),
 				'status'        => 'error',
-				'title'         => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Creation - Failed', 'wp-ai-blogger' ), $posts_created + $i ),
-				'message'       => sprintf( /* translators: %d is the post number. */ __( 'Post #%d creation failed due to an error.', 'wp-ai-blogger' ), $posts_created + $i ),
+				'title'         => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Creation - Failed', 'auto-ai-blogger' ), $posts_created + $i ),
+				'message'       => sprintf( /* translators: %d is the post number. */ __( 'Post #%d creation failed due to an error.', 'auto-ai-blogger' ), $posts_created + $i ),
 				'error_details' => $error_reason,
 				'steps'         => $failed_steps,
 			];
@@ -2494,12 +2489,12 @@ class Ajax {
 				'id'        => $posts_created + 1,
 				'timestamp' => current_time( 'mysql' ),
 				'status'    => 'pending',
-				'title'     => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Creation - Scheduled', 'wp-ai-blogger' ), $posts_created + 1 ),
-				'message'   => sprintf( /* translators: %d is the post number. */ __( 'Post #%d is scheduled to be created in the next cron run.', 'wp-ai-blogger' ), $posts_created + 1 ),
+				'title'     => sprintf( /* translators: %d is the post number. */ __( 'Post #%d Creation - Scheduled', 'auto-ai-blogger' ), $posts_created + 1 ),
+				'message'   => sprintf( /* translators: %d is the post number. */ __( 'Post #%d is scheduled to be created in the next cron run.', 'auto-ai-blogger' ), $posts_created + 1 ),
 				'steps'     => [
 					[
 						'status'      => 'processing',
-						'description' => __( 'Waiting for scheduled time...', 'wp-ai-blogger' ),
+						'description' => __( 'Waiting for scheduled time...', 'auto-ai-blogger' ),
 					],
 				],
 			];
@@ -2516,10 +2511,10 @@ class Ajax {
 			// Determine completion status and message.
 			if ( $posts_failed > 0 ) {
 				$completion_status  = $success_rate >= 80 ? 'warning' : 'error';
-				$completion_title   = sprintf( /* translators: %d is the success rate. */ __( 'Campaign Completed - %d%% Successful', 'wp-ai-blogger' ), $success_rate );
+				$completion_title   = sprintf( /* translators: %d is the success rate. */ __( 'Campaign Completed - %d%% Successful', 'auto-ai-blogger' ), $success_rate );
 				$completion_message = sprintf(
 					/* translators: %1$d is the number of successful posts, %2$d is the number of attempts, %3$d is the number of failed posts, %4$d is the target number of posts. */
-					__( 'Campaign completed with %1$d successful posts out of %2$d attempts (%3$d failed). Target of %4$d posts reached.', 'wp-ai-blogger' ),
+					__( 'Campaign completed with %1$d successful posts out of %2$d attempts (%3$d failed). Target of %4$d posts reached.', 'auto-ai-blogger' ),
 					$posts_created,
 					$total_attempted,
 					$posts_failed,
@@ -2527,8 +2522,8 @@ class Ajax {
 				);
 			} else {
 				$completion_status  = 'success';
-				$completion_title   = __( 'Campaign Completed Successfully', 'wp-ai-blogger' );
-				$completion_message = sprintf( /* translators: %d is the number of successful posts. */ __( 'Campaign successfully completed with all %d posts created without any failures.', 'wp-ai-blogger' ), $posts_created );
+				$completion_title   = __( 'Campaign Completed Successfully', 'auto-ai-blogger' );
+				$completion_message = sprintf( /* translators: %d is the number of successful posts. */ __( 'Campaign successfully completed with all %d posts created without any failures.', 'auto-ai-blogger' ), $posts_created );
 			}
 
 			$sample_logs[] = [
@@ -2540,19 +2535,19 @@ class Ajax {
 				'steps'     => [
 					[
 						'status'      => $posts_created > 0 ? 'success' : 'warning',
-						'description' => sprintf( /* translators: %d is the number of successful posts. */ __( '%d posts created successfully', 'wp-ai-blogger' ), $posts_created ),
+						'description' => sprintf( /* translators: %d is the number of successful posts. */ __( '%d posts created successfully', 'auto-ai-blogger' ), $posts_created ),
 					],
 					[
 						'status'      => $posts_failed > 0 ? 'error' : 'success',
-						'description' => sprintf( /* translators: %d is the number of failed posts. */ __( '%d posts failed', 'wp-ai-blogger' ), $posts_failed ),
+						'description' => sprintf( /* translators: %d is the number of failed posts. */ __( '%d posts failed', 'auto-ai-blogger' ), $posts_failed ),
 					],
 					[
 						'status'      => 'success',
-						'description' => __( 'Campaign marked as completed', 'wp-ai-blogger' ),
+						'description' => __( 'Campaign marked as completed', 'auto-ai-blogger' ),
 					],
 					[
 						'status'      => 'success',
-						'description' => __( 'Scheduled events cleared', 'wp-ai-blogger' ),
+						'description' => __( 'Scheduled events cleared', 'auto-ai-blogger' ),
 					],
 				],
 			];
@@ -2564,9 +2559,9 @@ class Ajax {
 				'id'            => 1,
 				'timestamp'     => current_time( 'mysql' ),
 				'status'        => 'error',
-				'title'         => __( 'Campaign Inactive', 'wp-ai-blogger' ),
-				'message'       => __( 'Campaign is currently inactive. Activate the campaign to start creating posts.', 'wp-ai-blogger' ),
-				'error_details' => __( 'Campaign status is set to draft. Change status to published to enable post creation.', 'wp-ai-blogger' ),
+				'title'         => __( 'Campaign Inactive', 'auto-ai-blogger' ),
+				'message'       => __( 'Campaign is currently inactive. Activate the campaign to start creating posts.', 'auto-ai-blogger' ),
+				'error_details' => __( 'Campaign status is set to draft. Change status to published to enable post creation.', 'auto-ai-blogger' ),
 			];
 		}
 

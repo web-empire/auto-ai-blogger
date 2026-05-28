@@ -2,11 +2,11 @@
 /**
  * Trait.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
-namespace WPAIBlogger\Inc\Traits;
+namespace WPSolvex\AutoAIBlogger\Inc\Traits;
 
 /**
  * Trait Get_Instance.

@@ -2,13 +2,13 @@
 /**
  * Frontend.
  *
- * @package wp-ai-blogger
- * @since x.x.x
+ * @package auto-ai-blogger
+ * @since 0.0.2
  */
 
-namespace WPAIBlogger\Core;
+namespace WPSolvex\AutoAIBlogger\Core;
 
-use WPAIBlogger\Inc\Traits\Get_Instance;
+use WPSolvex\AutoAIBlogger\Inc\Traits\Get_Instance;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -23,7 +23,7 @@ class Frontend {
 	/**
 	 * Constructor
 	 *
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function __construct() {
 		// Hook into the_content to track views when posts are displayed.
@@ -34,13 +34,13 @@ class Frontend {
 	 * Track post views.
 	 *
 	 * @return void
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function track_post_views(): void {
 		if ( is_singular() ) {
 			global $post;
 			if ( $post ) {
-				wpaib_track_post_view( $post->ID );
+				autoaib_track_post_view( $post->ID );
 			}
 		}
 	}

@@ -35,6 +35,8 @@ module.exports = function (grunt) {
 					'!config/**',
 					'!tests/**',
 					'!bin/**',
+					'!claude/**',
+					'!claudeignore/**',
 					'!artifact/**',
 					'!assets/css/unminified/**',
 					'!assets/js/unminified/**',
@@ -47,27 +49,28 @@ module.exports = function (grunt) {
 					'!postcss.config.js',
 					'!.DS_Store',
 					'!phpinsights.php',
-					'!src/**',
+					// '!src/**',
 					'!copilot_readme/**',
+					'!debug_tokens.js'
 				],
-				dest: 'wp-ai-blogger/',
+				dest: 'auto-ai-blogger/',
 			},
 		},
 		compress: {
 			main: {
 				options: {
-					archive: 'wp-ai-blogger-<%= pkg.version %>.zip',
+					archive: 'auto-ai-blogger-<%= pkg.version %>.zip',
 					mode: 'zip',
 				},
 				files: [
 					{
-						src: ['./wp-ai-blogger/**'],
+						src: ['./auto-ai-blogger/**'],
 					},
 				],
 			},
 		},
 		clean: {
-			main: ['wp-ai-blogger'],
+			main: ['auto-ai-blogger'],
 			zip: ['*.zip'],
 			concat: ['assets/js/unminified/main.js', 'assets/css/unminified/main.css'],
 		},
@@ -81,7 +84,7 @@ module.exports = function (grunt) {
 		},
 		replace: {
 			plugin_main: {
-				src: ['wp-ai-blogger.php'],
+				src: ['auto-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{
@@ -101,12 +104,12 @@ module.exports = function (grunt) {
 				]
 			},
 			plugin_const: {
-				src: ['wp-ai-blogger.php'],
+				src: ['auto-ai-blogger.php'],
 				overwrite: true,
 				replacements: [
 					{
-						from: /WP_AI_BLOGGER_VERSION', '.*?'/g,
-						to: 'WP_AI_BLOGGER_VERSION\', \'<%= pkg.version %>\''
+						from: /AUTOAIB_VERSION', '.*?'/g,
+						to: 'AUTOAIB_VERSION\', \'<%= pkg.version %>\''
 					}
 				]
 			},

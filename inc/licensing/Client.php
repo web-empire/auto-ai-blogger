@@ -2,6 +2,10 @@
 
 namespace SureCart\Licensing;
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * SureCart Client
  *
@@ -144,7 +148,7 @@ class Client {
 	/**
 	 * Initialize plugin/theme updater
 	 *
-	 * @return SureCart\Updater
+	 * @return SureCart\Updater|null
 	 */
 	public function updater() {
 		if ( ! class_exists( __NAMESPACE__ . '\Updater' ) ) {
@@ -213,11 +217,11 @@ class Client {
 	public function endpoint() {
 		// allow a constant to be set.
 		if ( defined( 'SURECART_LICENSING_ENDPOINT' ) ) {
-			return trailingslashit( SURECART_LICENSING_ENDPOINT );
+			return trailingslashit( constant( 'SURECART_LICENSING_ENDPOINT' ) );
 		}
 
 		// filterable endpoint.
-		return trailingslashit( apply_filters( 'surecart_licensing_endpoint', 'https://api.surecart.com' ) );
+		return trailingslashit( apply_filters( 'autoaib_licensing_endpoint', 'https://api.surecart.com' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -278,8 +282,9 @@ class Client {
 	 * @return bool
 	 */
 	public function is_local_server() {
-		$is_local = in_array( $_SERVER['REMOTE_ADDR'], [ '127.0.0.1', '::1' ], true );
-		return apply_filters( 'surecart_licensing_is_local', $is_local );
+		$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$is_local    = in_array( $remote_addr, [ '127.0.0.1', '::1' ], true );
+		return apply_filters( 'autoaib_licensing_is_local', $is_local ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -298,48 +303,25 @@ class Client {
 	 */
 	protected function set_basename_and_slug(): void {
 		// it's a plugin.
-		if ( strpos( $this->file, WP_CONTENT_DIR . '/themes/' ) === false ) {
-			$this->basename = plugin_basename( $this->file );
+		$this->basename = AUTOAIB_BASE_PATH;
 
-			[ $this->slug ] = explode( '/', $this->basename );
+		[ $this->slug ] = explode( '/', $this->basename );
 
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-			$plugin_data = get_plugin_data( $this->file );
+		$plugin_data = get_plugin_data( $this->file );
 
-			if ( empty( $plugin_data['Version'] ) ) {
-				add_action(
-					'admin_notices',
-					function(): void {
-						printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your plugin.</p></div>' );
-					}
-				);
-			}
-
-			$this->project_version = $plugin_data['Version'];
-			$this->type            = 'plugin';
-
-			// it's a theme.
-		} else {
-			$this->basename = str_replace( WP_CONTENT_DIR . '/themes/', '', $this->file );
-
-			[ $this->slug ] = explode( '/', $this->basename );
-
-			$theme = wp_get_theme( $this->slug );
-
-			$this->project_version = $theme->version;
-
-			if ( empty( $theme->version ) ) {
-				add_action(
-					'admin_notices',
-					function(): void {
-						printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your theme.</p></div>' );
-					}
-				);
-			}
-
-			$this->type = 'theme';
+		if ( empty( $plugin_data['Version'] ) ) {
+			add_action(
+				'admin_notices',
+				function(): void {
+					printf( '<div class="notice notice-error"><p>' . esc_html( $this->name ) . ' Licensing Configuration Error: The <code>__FILE__</code> must point to the main file of your plugin.</p></div>' );
+				}
+			);
 		}
+
+		$this->project_version = $plugin_data['Version'];
+		$this->type            = 'plugin';
 
 		$this->textdomain = $this->slug;
 	}

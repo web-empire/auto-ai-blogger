@@ -2,23 +2,23 @@
 /**
  * Loader.
  *
- * @package wp-ai-blogger
+ * @package auto-ai-blogger
  * @since 1.0.0
  */
 
-namespace WPAIBlogger;
+namespace WPSolvex\AutoAIBlogger;
 
-use WPAIBlogger\Admin\Ajax;
-use WPAIBlogger\Admin\API;
-use WPAIBlogger\Admin\Filters;
-use WPAIBlogger\Admin\Licensing;
-use WPAIBlogger\Admin\Menu;
-use WPAIBlogger\Core\CPT;
-use WPAIBlogger\Core\Editor;
-use WPAIBlogger\Core\Frontend;
-use WPAIBlogger\Core\Maintenance;
-use WPAIBlogger\Inc\Cron_Handler;
-use WPAIBlogger\Inc\Notifications\Notification_Helper;
+use WPSolvex\AutoAIBlogger\Admin\Ajax;
+use WPSolvex\AutoAIBlogger\Admin\API;
+use WPSolvex\AutoAIBlogger\Admin\Filters;
+use WPSolvex\AutoAIBlogger\Admin\Licensing;
+use WPSolvex\AutoAIBlogger\Admin\Menu;
+use WPSolvex\AutoAIBlogger\Core\CPT;
+use WPSolvex\AutoAIBlogger\Core\Editor;
+use WPSolvex\AutoAIBlogger\Core\Frontend;
+use WPSolvex\AutoAIBlogger\Core\Maintenance;
+use WPSolvex\AutoAIBlogger\Inc\Cron_Handler;
+use WPSolvex\AutoAIBlogger\Inc\Notifications\Notification_Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -48,17 +48,17 @@ class Loader {
 		spl_autoload_register( [ $this, 'autoload' ] );
 
 		// Activation hook.
-		register_activation_hook( WP_AI_BLOGGER_FILE, [ $this, 'activation_actions' ] );
+		register_activation_hook( AUTOAIB_FILE, [ $this, 'activation_actions' ] );
 
 		// Deactivation hook.
-		register_deactivation_hook( WP_AI_BLOGGER_FILE, [ $this, 'deactivation_actions' ] );
+		register_deactivation_hook( AUTOAIB_FILE, [ $this, 'deactivation_actions' ] );
 
 		add_action( 'plugins_loaded', [ $this, 'setup' ], 1 );
 
 		// Remove this after the translation error is fixed.
 		add_filter( 'doing_it_wrong_trigger_error', [ $this, 'suppress_translation_error' ], 10, 4 );
 
-		add_filter( 'plugin_action_links_' . WP_AI_BLOGGER_BASE_PATH, [ $this, 'plugin_action_links' ] );
+		add_filter( 'plugin_action_links_' . AUTOAIB_BASE_PATH, [ $this, 'plugin_action_links' ] );
 	}
 
 	/**
@@ -91,9 +91,9 @@ class Loader {
 		add_filter( 'cron_schedules', [ $this, 'register_custom_cron_schedules' ] );
 
 		/* Enforce free user limits for max content words if Pro is not available */
-		if ( ! defined( 'WP_AI_BLOGGER_PRO_VERSION' ) ) {
-			add_filter( 'wpaib_max_content_words', [ $this, 'enforce_free_max_words_limit' ], 10, 2 );
-			add_filter( 'wpaib_campaign_image_count', [ $this, 'enforce_free_image_limit' ], 10, 2 );
+		if ( ! defined( 'AUTOAIB_PRO_VERSION' ) ) {
+			add_filter( 'autoaib_max_content_words', [ $this, 'enforce_free_max_words_limit' ], 10, 2 );
+			add_filter( 'autoaib_campaign_image_count', [ $this, 'enforce_free_image_limit' ], 10, 2 );
 		}
 
 		if ( is_admin() ) {
@@ -121,9 +121,9 @@ class Loader {
 	 * @return void
 	 */
 	public function define_store_constants(): void {
-		define( 'WP_AI_BLOGGER_PRODUCT_ID', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_ID' ) ? WP_AI_BLOGGER_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
-		define( 'WP_AI_BLOGGER_PRODUCT_NAME', defined( 'WP_AI_BLOGGER_PRO_PRODUCT_NAME' ) ? WP_AI_BLOGGER_PRO_PRODUCT_NAME : 'WP AI Blogger' );
-		define( 'WP_AI_BLOGGER_PRODUCT_FILE', defined( 'WP_AI_BLOGGER_PRO_FILE' ) ? WP_AI_BLOGGER_PRO_FILE : WP_AI_BLOGGER_FILE );
+		define( 'AUTOAIB_PRODUCT_ID', defined( 'AUTOAIB_PRO_PRODUCT_ID' ) ? AUTOAIB_PRO_PRODUCT_ID : '2effb53f-1066-40d3-9667-ef9f09f91db1' );
+		define( 'AUTOAIB_PRODUCT_NAME', defined( 'AUTOAIB_PRO_PRODUCT_NAME' ) ? AUTOAIB_PRO_PRODUCT_NAME : 'Solvex AI Blogger' );
+		define( 'AUTOAIB_PRODUCT_FILE', defined( 'AUTOAIB_PRO_FILE' ) ? AUTOAIB_PRO_FILE : AUTOAIB_FILE );
 	}
 
 	/**
@@ -137,7 +137,7 @@ class Loader {
 	 * @return bool
 	 */
 	public function suppress_translation_error( $status, $function_name, $message, $version ) {
-		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'wp-ai-blogger' ) !== false ) {
+		if ( $function_name === '_load_textdomain_just_in_time' && strpos( $message, 'auto-ai-blogger' ) !== false ) {
 			return false;
 		}
 		return $status;
@@ -151,7 +151,7 @@ class Loader {
 	 * @since 1.0.0
 	 */
 	public function register_custom_cron_schedules( $schedules ) {
-		$custom_schedules = get_option( 'wpaib_custom_cron_schedules', [] );
+		$custom_schedules = get_option( 'autoaib_custom_cron_schedules', [] );
 
 		if ( ! empty( $custom_schedules ) && is_array( $custom_schedules ) ) {
 			foreach ( $custom_schedules as $name => $schedule ) {
@@ -184,22 +184,24 @@ class Loader {
 	 * @return void
 	 */
 	public function autoload( $class ): void {
-		if ( strpos( $class, __NAMESPACE__ ) !== 0 ) {
+		$namespace = __NAMESPACE__;
+		$namespace_prefix = $namespace . '\\';
+		if ( stripos( $class, $namespace_prefix ) !== 0 ) {
 			return;
 		}
 
-		$class_to_load = $class;
+		$class_to_load = substr( $class, strlen( $namespace_prefix ) );
 
 		$filename = preg_replace(
-			[ '/^' . __NAMESPACE__ . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
-			[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
+			[ '/([a-z])([A-Z])/', '/_/' ],
+			[ '$1-$2', '-' ],
 			$class_to_load
 		);
 
 		if ( is_string( $filename ) ) {
-			$filename = strtolower( $filename );
+			$filename = strtolower( str_replace( '\\', DIRECTORY_SEPARATOR, $filename ) );
 
-			$file = WP_AI_BLOGGER_DIR . $filename . '.php';
+			$file = AUTOAIB_DIR . $filename . '.php';
 
 			// if the file readable, include it.
 			if ( is_readable( $file ) ) {
@@ -233,7 +235,7 @@ class Loader {
 	 * @param int $max_words   The maximum words from campaign settings.
 	 * @param int $campaign_id The campaign ID.
 	 * @return int The enforced maximum words value.
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function enforce_free_max_words_limit( $max_words, $campaign_id ): int {
 		// Free users are limited to 1000 words max.
@@ -258,7 +260,7 @@ class Loader {
 	 * @param int $image_count The number of images from campaign settings.
 	 * @param int $campaign_id The campaign ID.
 	 * @return int The enforced image count (always 1 for free users).
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function enforce_free_image_limit( $image_count, $campaign_id ): int {
 		// Free users are limited to 1 image per post.
@@ -270,12 +272,12 @@ class Loader {
 	 *
 	 * @param  array $links links.
 	 * @return array
-	 * @since x.x.x
+	 * @since 0.0.2
 	 */
 	public function plugin_action_links( $links ) {
 		return array_merge(
 			[
-				'<a href="' . esc_url( admin_url( 'edit.php?page=wp-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'wp-ai-blogger' ) . '</a>',
+				'<a href="' . esc_url( admin_url( 'edit.php?page=auto-ai-blogger' ) ) . '">' . __( 'Automate Blogging', 'auto-ai-blogger' ) . '</a>',
 			],
 			$links
 		);
